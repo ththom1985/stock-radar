@@ -154,6 +154,10 @@ def card_html(r, idx=None, proj_key="projection_long"):
                  f'KGV {pe if pe else "–"} · ROE {roe if roe is not None else "–"}%')
     news_lbl = {"positiv": "🟢 News +", "negativ": "🔴 News −",
                 "neutral": "⚪ News ="}.get(r.get("news_sentiment"))
+    if news_lbl and r.get("news_mode") == "KI":
+        news_lbl += " 🤖"
+    llm_reason = r.get("news_llm_reason") or ""
+    llm_div = f'<div class="meta">🤖 {_esc(llm_reason)}</div>' if llm_reason else ""
     earn = r.get("next_earnings")
     ed = r.get("earnings_in_days")
     earn_txt = ""
@@ -178,6 +182,7 @@ def card_html(r, idx=None, proj_key="projection_long"):
         f'{sig_line}'
         f'<div class="bars">{bars}</div>'
         f'<div class="summary">{_esc(r.get("plain_summary",""))}</div>'
+        f'{llm_div}'
         f'{_proj_html(r.get(proj_key))}'
         f'<div class="chips">{chips}</div>'
         f'{news_div}'

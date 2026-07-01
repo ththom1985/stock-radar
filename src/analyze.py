@@ -1,6 +1,7 @@
 """Main pipeline: load universe -> fetch prices -> technical indicators ->
 fundamentals -> scoring -> write data/output/latest.json (+ history snapshot).
 
+
 Ranking layers:
   - daytrade_score   : short-term technical (momentum/breakout/volume)
   - longterm_score   : long-term technical (trend + healthy entry)
@@ -8,6 +9,7 @@ Ranking layers:
   - investment_score : blend of long-term technical + fundamental
 """
 import json
+import os
 from datetime import datetime, timezone
 
 from .config import OUTPUT, HISTORY, TOP_N
@@ -19,6 +21,7 @@ from .fundamentals import fetch_fundamentals
 from .fundamental_score import (
     score_value, score_quality, score_growth, combine_fundamental, magic_formula_ranks,
 )
+from .llm_news import enhance as llm_enhance_news, llm_available
 from .aschenbrenner import load_aschenbrenner, stance_for
 from .rating import radar_elo, radar_score, stars, plain_summary, suggest_actions
 from .projection import project
@@ -122,6 +125,18 @@ def run(with_news=True, with_fundamentals=True):
             r["earnings_in_days"] = days_until(nd)
         print("Lade Markt-News …")
         market = fetch_market_news()
+
+        # --- KI-Upgrade: Top-N von Claude bewerten lassen (nur wenn API-Key gesetzt) ---
+        if llm_available():
+            top_n = int(os.environ.get("STOCK_RADAR_LLM_TOPN", "60"))
+            subset = sorted(rows, key=lambda r: r.get("investment_score") or 0,
+                            reverse=True)[:top_n]
+            print(f"KI-News (Claude) für Top {len(subset)} Titel …")
+            enh = llm_enhance_news(subset, news_by)
+            for r in rows:
+                if r["symbol"] in enh:
+                    r.update(enh[r["symbol"]])
+            print(f"  KI-News: {len(enh)} Titel bewertet.")
 
     # --- Aschenbrenner stance + human-facing rating layer ---
     asch_data = load_aschenbrenner()

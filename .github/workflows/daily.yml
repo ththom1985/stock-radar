@@ -26,6 +26,8 @@ jobs:
       - run: pip install -r requirements-ci.txt
 
       - name: Analyse ausführen
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: python -m src.analyze
 
       - name: Ergebnis committen
