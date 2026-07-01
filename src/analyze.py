@@ -19,6 +19,8 @@ from .fundamentals import fetch_fundamentals
 from .fundamental_score import (
     score_value, score_quality, score_growth, combine_fundamental, magic_formula_ranks,
 )
+from .aschenbrenner import load_aschenbrenner, stance_for
+from .rating import radar_elo, plain_summary, suggest_actions
 from .news import fetch_news_for
 
 
@@ -100,6 +102,17 @@ def run(with_news=True, with_fundamentals=True):
             r["fundamental_score"] = None
             r["investment_score"] = r["longterm_score"]
 
+    # --- Aschenbrenner stance + human-facing rating layer ---
+    asch_data = load_aschenbrenner()
+    for r in rows:
+        r["aschenbrenner"] = stance_for(r["symbol"], asch_data)
+        elo, rating_label, color = radar_elo(r)
+        r["radar_elo"] = elo
+        r["radar_rating"] = rating_label
+        r["radar_color"] = color
+        r["plain_summary"] = plain_summary(r)
+        r["actions"] = suggest_actions(r)
+
     top_daytrade = sorted(rows, key=lambda r: r["daytrade_score"], reverse=True)[:TOP_N]
     top_longterm = sorted(rows, key=lambda r: r["investment_score"], reverse=True)[:TOP_N]
     top_fundamental = sorted(
@@ -107,18 +120,29 @@ def run(with_news=True, with_fundamentals=True):
         key=lambda r: r["fundamental_score"], reverse=True,
     )[:TOP_N]
 
+    aschenbrenner_holdings = sorted(
+        [r for r in rows if r.get("aschenbrenner")],
+        key=lambda r: r["aschenbrenner"].get("weight_pct") or 0, reverse=True,
+    )
+
     if with_news:
         print("Lade News für die Top-Picks …")
-        for r in {id(x): x for x in top_daytrade + top_longterm + top_fundamental}.values():
+        picks = top_daytrade + top_longterm + top_fundamental + aschenbrenner_holdings
+        for r in {id(x): x for x in picks}.values():
             r["news"] = fetch_news_for(r["symbol"], limit=3)
 
     result = {
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "universe_size": len(symbols),
         "analyzed": len(rows),
+        "aschenbrenner_meta": {
+            "quarter": asch_data.get("report_quarter"),
+            "filed": asch_data.get("filed"),
+        },
         "top_daytrade": top_daytrade,
         "top_longterm": top_longterm,
         "top_fundamental": top_fundamental,
+        "aschenbrenner_holdings": aschenbrenner_holdings,
         "all": rows,
     }
 
