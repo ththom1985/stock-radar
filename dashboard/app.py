@@ -84,6 +84,7 @@ with st.expander("ℹ️ Legende – was bedeuten die Zahlen?"):
 - **Handlungs-Chips** – konkrete Ideen. 🟢 Grün = Chance · 🔴 Rot = Vorsicht · ⚪ Grau = neutral.
 - **📅 Projektion** – erwartete Kurs-Spanne aus der tatsächlichen Schwankungsbreite
   (**≈ 2 von 3 Fällen**), plus Richtungs-Tendenz & Konfidenz aus den Signalen.
+  Zeiträume: **Daytrading 1 Tag / 1 Woche**, **Langzeit 1 / 3 / 12 / 24 Monate**.
   ⚠️ **Statistische Schätzung, keine Kursprognose oder Garantie.**
 """)
 
@@ -120,7 +121,7 @@ def _proj_html(proj):
     return f'<div class="proj">{rows}</div>'
 
 
-def card_html(r, idx=None):
+def card_html(r, idx=None, proj_key="projection_long"):
     color = r.get("radar_color", "#6b7280")
     asch = r.get("aschenbrenner")
     asch_cls = " asch" if asch else ""
@@ -155,23 +156,24 @@ def card_html(r, idx=None):
         f'<div class="meta">{meta_line}</div>'
         f'<div class="bars">{bars}</div>'
         f'<div class="summary">{_esc(r.get("plain_summary",""))}</div>'
-        f'{_proj_html(r.get("projection"))}'
+        f'{_proj_html(r.get(proj_key))}'
         f'<div class="chips">{chips}</div>'
         f'{news_div}'
         f'</div>'
     )
 
 
-def grid(picks, numbered=True):
-    cards = "".join(card_html(r, i if numbered else None) for i, r in enumerate(picks, 1))
+def grid(picks, numbered=True, proj_key="projection_long"):
+    cards = "".join(card_html(r, i if numbered else None, proj_key) for i, r in enumerate(picks, 1))
     st.markdown(f'<div class="radar-grid">{cards}</div>', unsafe_allow_html=True)
 
 
 tabs = st.tabs(["🚀 Daytrading", "🏦 Langzeit", "📊 Fundamental", "🧠 Aschenbrenner", "🔎 Alle"])
 
 with tabs[0]:
-    st.caption("Kurzfristige Momentum-, Breakout- und Volumen-Setups (Long **und** Short).")
-    grid(data["top_daytrade"])
+    st.caption("Kurzfristige Momentum-, Breakout- und Volumen-Setups (Long **und** Short). "
+               "Projektion auf **1 Tag & 1 Woche**.")
+    grid(data["top_daytrade"], proj_key="projection_short")
 
 with tabs[1]:
     st.caption("Gesamt-Rating: langfristiger Trend (Technik) **+** Bewertung & Qualität (Fundamental).")

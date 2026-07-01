@@ -117,7 +117,8 @@ def run(with_news=True, with_fundamentals=True):
         r["stars"] = stars(r["radar_score"])
         r["plain_summary"] = plain_summary(r)
         r["actions"] = suggest_actions(r)
-        r["projection"] = project(r)
+        r["projection_short"] = project(r, "short")
+        r["projection_long"] = project(r, "long")
 
     top_daytrade = sorted(rows, key=lambda r: r["daytrade_score"], reverse=True)[:TOP_N]
     top_longterm = sorted(rows, key=lambda r: r["investment_score"], reverse=True)[:TOP_N]
