@@ -20,7 +20,8 @@ from .fundamental_score import (
     score_value, score_quality, score_growth, combine_fundamental, magic_formula_ranks,
 )
 from .aschenbrenner import load_aschenbrenner, stance_for
-from .rating import radar_elo, plain_summary, suggest_actions
+from .rating import radar_elo, radar_score, stars, plain_summary, suggest_actions
+from .projection import project
 from .news import fetch_news_for
 
 
@@ -68,6 +69,8 @@ def run(with_news=True, with_fundamentals=True):
             "rsi": _num(f.get("rsi")),
             "rvol": _num(f.get("rvol")),
             "atr_pct": _num(f.get("atr_pct")),
+            "vol_daily": _num(f.get("vol_daily")),
+            "vol_daily_pct": _pct(f.get("vol_daily")),
             "pct_from_high52": _num(f.get("pct_from_high52")),
             "daytrade_score": dscore,
             "daytrade_direction": ddir,
@@ -110,8 +113,11 @@ def run(with_news=True, with_fundamentals=True):
         r["radar_elo"] = elo
         r["radar_rating"] = rating_label
         r["radar_color"] = color
+        r["radar_score"] = radar_score(elo)
+        r["stars"] = stars(r["radar_score"])
         r["plain_summary"] = plain_summary(r)
         r["actions"] = suggest_actions(r)
+        r["projection"] = project(r)
 
     top_daytrade = sorted(rows, key=lambda r: r["daytrade_score"], reverse=True)[:TOP_N]
     top_longterm = sorted(rows, key=lambda r: r["investment_score"], reverse=True)[:TOP_N]

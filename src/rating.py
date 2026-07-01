@@ -50,6 +50,16 @@ def radar_elo(row):
     return elo, "Meiden", "#dc2626"
 
 
+def radar_score(elo):
+    """Simple, intuitive 0-100 score derived from the ELO (ELO 1000→0, 2000→100)."""
+    return max(0, min(100, int(round((elo - 1000) / 10))))
+
+
+def stars(score_0_100):
+    """0-5 star rating from the 0-100 score."""
+    return int(round(score_0_100 / 20))
+
+
 def plain_summary(row):
     """2-4 short sentences in plain German that a non-expert understands."""
     parts = []

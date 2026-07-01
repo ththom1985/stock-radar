@@ -104,4 +104,8 @@ def compute_features(df):
     f["ret_20d"] = (f["price"] / _f(close.iloc[-21]) - 1) * 100 if len(close) > 21 else np.nan
     f["ret_60d"] = (f["price"] / _f(close.iloc[-61]) - 1) * 100 if len(close) > 61 else np.nan
 
+    # Historical daily volatility (stdev of log returns, ~60d) for range projection
+    log_ret = np.log(close / close.shift(1)).dropna()
+    f["vol_daily"] = _f(log_ret.iloc[-60:].std()) if len(log_ret) >= 20 else np.nan
+
     return f
