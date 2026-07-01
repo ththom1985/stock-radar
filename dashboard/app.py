@@ -23,29 +23,47 @@ c1.metric("Stand (UTC)", data["generated_at"].replace("T", " "))
 c2.metric("Universum", data["universe_size"])
 c3.metric("Analysiert", data["analyzed"])
 
-st.caption("⚠️ Research-Werkzeug, keine Anlageberatung. Signale sind rein technisch berechnet.")
+st.caption("⚠️ Research-Werkzeug, keine Anlageberatung. Signale sind technisch & fundamental berechnet.")
 
-tab1, tab2, tab3 = st.tabs(["🚀 Daytrading Top 10", "🏦 Langzeit Top 10", "🔎 Alle Werte"])
-
-_DIR_COLOR = {"LONG": "🟢 LONG", "SHORT": "🔴 SHORT", "NEUTRAL": "⚪ NEUTRAL"}
+_DIR = {"LONG": "🟢 LONG", "SHORT": "🔴 SHORT", "NEUTRAL": "⚪ NEUTRAL"}
 
 
-def render_cards(picks, score_key, reasons_key, dir_key=None):
+def _sub_scores(r):
+    """Small colored bars for Value/Quality/Growth if present."""
+    cols = st.columns(4)
+    for col, key, label in [
+        (cols[0], "value_score", "Value"),
+        (cols[1], "quality_score", "Quality"),
+        (cols[2], "growth_score", "Growth"),
+        (cols[3], "magic_score", "Magic"),
+    ]:
+        v = r.get(key)
+        col.metric(label, f"{v:.0f}" if isinstance(v, (int, float)) else "–")
+
+
+def render_cards(picks, score_key, score_label, reason_keys, dir_key=None, show_fund=False):
     for i, r in enumerate(picks, 1):
         with st.container(border=True):
             head = st.columns([4, 1, 1, 1, 1])
-            title = f"#{i}  **{r['symbol']}** · {r['name'] or '—'}"
+            title = f"#{i}  **{r['symbol']}** · {r.get('name') or '—'}"
             if dir_key:
-                title += f"  {_DIR_COLOR.get(r[dir_key], r[dir_key])}"
+                title += f"  {_DIR.get(r[dir_key], r[dir_key])}"
             head[0].markdown(f"### {title}")
-            head[1].metric("Score", r[score_key])
-            head[2].metric("Kurs", r["price"])
-            head[3].metric("Tag %", r.get("daily_return_pct"))
-            head[4].metric("RSI", r.get("rsi"))
+            head[1].metric(score_label, r.get(score_key))
+            head[2].metric("Kurs", r.get("price"))
+            head[3].metric("KGV", r.get("pe") if r.get("pe") else "–")
+            head[4].metric("ROE %", r.get("roe_pct") if r.get("roe_pct") is not None else "–")
 
-            st.markdown("**Warum diese Chance:**")
-            for reason in r[reasons_key]:
-                st.markdown(f"- {reason}")
+            if show_fund:
+                _sub_scores(r)
+
+            reasons = []
+            for k in reason_keys:
+                reasons += r.get(k) or []
+            if reasons:
+                st.markdown("**Warum:**")
+                for reason in reasons:
+                    st.markdown(f"- {reason}")
 
             news = r.get("news") or []
             if news:
@@ -55,22 +73,34 @@ def render_cards(picks, score_key, reasons_key, dir_key=None):
                         st.markdown(f"- [{n['title']}]({n['link']}){pub}")
 
 
+tab1, tab2, tab3, tab4 = st.tabs([
+    "🚀 Daytrading Top 10", "🏦 Langzeit Top 10", "📊 Fundamental Top 10", "🔎 Alle Werte",
+])
+
 with tab1:
     st.caption("Kurzfristige Momentum-, Breakout- und Volumen-Setups (Long **und** Short).")
-    render_cards(data["top_daytrade"], "daytrade_score", "daytrade_reasons", "daytrade_direction")
+    render_cards(data["top_daytrade"], "daytrade_score", "Score",
+                 ["daytrade_reasons"], dir_key="daytrade_direction")
 
 with tab2:
-    st.caption("Intakte Aufwärtstrends mit gesundem Rücksetzer – gute Einstiegspunkte.")
-    render_cards(data["top_longterm"], "longterm_score", "longterm_reasons")
+    st.caption("Kombi-Score: langfristiger Trend (Technik) **+** Bewertung/Qualität (Fundamental).")
+    render_cards(data["top_longterm"], "investment_score", "Invest",
+                 ["longterm_reasons", "fundamental_reasons"], show_fund=True)
 
 with tab3:
+    st.caption("Reine Fundamentalbewertung: Value (KGV/KBV/EV-EBITDA), Quality (ROE/Margen/Schulden), "
+               "Growth, plus Greenblatt „Magic Formula\".")
+    render_cards(data.get("top_fundamental", []), "fundamental_score", "Fund",
+                 ["fundamental_reasons"], show_fund=True)
+
+with tab4:
     df = pd.DataFrame([
         {k: v for k, v in r.items()
-         if k not in ("daytrade_reasons", "longterm_reasons", "news")}
+         if k not in ("daytrade_reasons", "longterm_reasons", "fundamental_reasons", "news")}
         for r in data["all"]
     ])
     if not df.empty:
         st.dataframe(
-            df.sort_values("daytrade_score", ascending=False),
+            df.sort_values("investment_score", ascending=False),
             use_container_width=True, hide_index=True,
         )

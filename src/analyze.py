@@ -1,5 +1,12 @@
-"""Main pipeline: load universe -> fetch prices -> compute indicators ->
-score -> write data/output/latest.json (+ dated history snapshot)."""
+"""Main pipeline: load universe -> fetch prices -> technical indicators ->
+fundamentals -> scoring -> write data/output/latest.json (+ history snapshot).
+
+Ranking layers:
+  - daytrade_score   : short-term technical (momentum/breakout/volume)
+  - longterm_score   : long-term technical (trend + healthy entry)
+  - fundamental_score: Value/Quality/Growth from company financials
+  - investment_score : blend of long-term technical + fundamental
+"""
 import json
 from datetime import datetime, timezone
 
@@ -8,6 +15,10 @@ from .universe import load_universe
 from .fetch import fetch_prices
 from .indicators import compute_features
 from .score import score_daytrade, score_longterm
+from .fundamentals import fetch_fundamentals
+from .fundamental_score import (
+    score_value, score_quality, score_growth, combine_fundamental, magic_formula_ranks,
+)
 from .news import fetch_news_for
 
 
@@ -20,7 +31,18 @@ def _num(x):
     return x
 
 
-def run(with_news=True):
+def _pct(x):
+    return round(x * 100, 1) if isinstance(x, (int, float)) and x == x else None
+
+
+def _invest_score(longterm, fundamental):
+    """Blend long-term technical with fundamental (50/50 when both present)."""
+    if fundamental is None:
+        return longterm
+    return round(0.5 * longterm + 0.5 * fundamental, 1)
+
+
+def run(with_news=True, with_fundamentals=True):
     universe = load_universe()
     symbols = [u["symbol"] for u in universe]
     name_map = {u["symbol"]: u["name"] for u in universe}
@@ -52,12 +74,42 @@ def run(with_news=True):
             "longterm_reasons": lreasons,
         })
 
+    # --- Fundamental layer ---
+    if with_fundamentals:
+        fund = fetch_fundamentals([r["symbol"] for r in rows])
+        magic = magic_formula_ranks(fund)
+        for r in rows:
+            f = fund.get(r["symbol"], {})
+            vscore, vreasons = score_value(f)
+            qscore, qreasons = score_quality(f)
+            gscore, greasons = score_growth(f)
+            fscore = combine_fundamental(vscore, qscore, gscore)
+            r["sector"] = f.get("sector")
+            r["pe"] = _num(f.get("pe"))
+            r["roe_pct"] = _pct(f.get("roe"))
+            r["revenue_growth_pct"] = _pct(f.get("revenue_growth"))
+            r["value_score"] = vscore
+            r["quality_score"] = qscore
+            r["growth_score"] = gscore
+            r["magic_score"] = magic.get(r["symbol"])
+            r["fundamental_score"] = fscore
+            r["fundamental_reasons"] = (qreasons + vreasons + greasons)[:5]
+            r["investment_score"] = _invest_score(r["longterm_score"], fscore)
+    else:
+        for r in rows:
+            r["fundamental_score"] = None
+            r["investment_score"] = r["longterm_score"]
+
     top_daytrade = sorted(rows, key=lambda r: r["daytrade_score"], reverse=True)[:TOP_N]
-    top_longterm = sorted(rows, key=lambda r: r["longterm_score"], reverse=True)[:TOP_N]
+    top_longterm = sorted(rows, key=lambda r: r["investment_score"], reverse=True)[:TOP_N]
+    top_fundamental = sorted(
+        [r for r in rows if r.get("fundamental_score") is not None],
+        key=lambda r: r["fundamental_score"], reverse=True,
+    )[:TOP_N]
 
     if with_news:
         print("Lade News für die Top-Picks …")
-        for r in {id(x): x for x in top_daytrade + top_longterm}.values():
+        for r in {id(x): x for x in top_daytrade + top_longterm + top_fundamental}.values():
             r["news"] = fetch_news_for(r["symbol"], limit=3)
 
     result = {
@@ -66,6 +118,7 @@ def run(with_news=True):
         "analyzed": len(rows),
         "top_daytrade": top_daytrade,
         "top_longterm": top_longterm,
+        "top_fundamental": top_fundamental,
         "all": rows,
     }
 
@@ -79,10 +132,15 @@ def run(with_news=True):
 
     print("\n=== TOP DAYTRADE ===")
     for i, r in enumerate(top_daytrade, 1):
-        print(f"{i:>2}. {r['symbol']:<6} Score {r['daytrade_score']:>5} [{r['daytrade_direction']}]  {r['name']}")
-    print("\n=== TOP LANGZEIT ===")
+        print(f"{i:>2}. {r['symbol']:<8} Score {r['daytrade_score']:>5} [{r['daytrade_direction']}]  {r['name']}")
+    print("\n=== TOP LANGZEIT (Technik + Fundamental) ===")
     for i, r in enumerate(top_longterm, 1):
-        print(f"{i:>2}. {r['symbol']:<6} Score {r['longterm_score']:>5}  {r['name']}")
+        fs = r.get("fundamental_score")
+        fs = f"F{fs:>5}" if fs is not None else "F   - "
+        print(f"{i:>2}. {r['symbol']:<8} Invest {r['investment_score']:>5}  ({fs})  {r['name']}")
+    print("\n=== TOP FUNDAMENTAL (Value/Quality/Growth) ===")
+    for i, r in enumerate(top_fundamental, 1):
+        print(f"{i:>2}. {r['symbol']:<8} Score {r['fundamental_score']:>5}  {r['name']}")
     print(f"\nGespeichert: {OUTPUT / 'latest.json'}")
     return result
 
