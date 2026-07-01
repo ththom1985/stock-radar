@@ -168,7 +168,8 @@ def grid(picks, numbered=True, proj_key="projection_long"):
     st.markdown(f'<div class="radar-grid">{cards}</div>', unsafe_allow_html=True)
 
 
-tabs = st.tabs(["🚀 Daytrading", "🏦 Langzeit", "📊 Fundamental", "🧠 Aschenbrenner", "🔎 Alle"])
+tabs = st.tabs(["🚀 Daytrading", "🏦 Langzeit", "📊 Fundamental", "🧠 Aschenbrenner",
+                "💼 Paper-Depot", "🔎 Alle"])
 
 with tabs[0]:
     st.caption("Kurzfristige Momentum-, Breakout- und Volumen-Setups (Long **und** Short). "
@@ -201,6 +202,60 @@ with tabs[3]:
         grid(mixed, numbered=False)
 
 with tabs[4]:
+    PORT = ROOT / "data" / "portfolio.json"
+    if not PORT.exists():
+        st.info("Noch kein Paper-Depot vorhanden – wird beim nächsten Analyse-Lauf erstellt.")
+    else:
+        pf = json.loads(PORT.read_text(encoding="utf-8"))
+        pos = pf.get("positions", {})
+        invested = sum(p.get("value_eur", 0) for p in pos.values())
+        equity = pf.get("cash", 0) + invested
+        ret = (equity / pf.get("start_capital", 10000) - 1) * 100
+        st.caption(f"🤖 Vollautomatischer Selbst-Check: startet mit "
+                   f"{pf.get('start_capital', 10000):,.0f} € virtuell, kauft täglich die Top-Tipps "
+                   f"(Top {10}, gleichgewichtet), verkauft bei Stop −15 %, Ziel +30 %, Rating-Verfall "
+                   f"oder Rauswurf aus den Top-Tipps. Wechselkurse ausgeklammert. Seit {pf.get('created')}.")
+
+        m = st.columns(5)
+        m[0].metric("Kontostand", f"{equity:,.0f} €", f"{ret:+.1f} %")
+        m[1].metric("Realisiert G/V", f"{pf.get('realized_pnl', 0):,.0f} €")
+        m[2].metric("Investiert", f"{invested:,.0f} €")
+        m[3].metric("Cash", f"{pf.get('cash', 0):,.0f} €")
+        m[4].metric("Positionen", len(pos))
+
+        curve = pf.get("equity_curve", [])
+        if len(curve) >= 2:
+            cdf = pd.DataFrame(curve).set_index("date")[["equity"]]
+            st.line_chart(cdf, height=220)
+        elif curve:
+            st.caption("📈 Kurve baut sich ab dem 2. Handelstag auf.")
+
+        st.markdown("**Aktuelle Positionen**")
+        if pos:
+            hold = pd.DataFrame([{
+                "Symbol": s, "Name": p.get("name"), "seit": p.get("entry_date"),
+                "Kaufkurs": p.get("entry_price"), "akt. Kurs": p.get("last_price"),
+                "Rendite %": p.get("pnl_pct"), "Einsatz €": p.get("stake_eur"),
+                "Wert €": p.get("value_eur"), "G/V €": p.get("pnl_eur"),
+            } for s, p in pos.items()])
+            st.dataframe(hold.sort_values("G/V €", ascending=False),
+                         use_container_width=True, hide_index=True)
+        else:
+            st.caption("Aktuell keine offenen Positionen.")
+
+        st.markdown("**Handels-Protokoll** (neueste zuerst)")
+        log = pf.get("trade_log", [])
+        if log:
+            ldf = pd.DataFrame(list(reversed(log)))[
+                ["date", "action", "symbol", "name", "price", "stake_eur",
+                 "value_eur", "pnl_eur", "pnl_pct", "reason"]]
+            ldf.columns = ["Datum", "Aktion", "Symbol", "Name", "Kurs", "Einsatz €",
+                           "Wert €", "G/V €", "G/V %", "Grund"]
+            st.dataframe(ldf.head(40), use_container_width=True, hide_index=True)
+        else:
+            st.caption("Noch keine Trades.")
+
+with tabs[5]:
     cols = ["symbol", "name", "sector", "radar_score", "radar_rating", "radar_elo", "price",
             "investment_score", "fundamental_score", "daytrade_score", "daytrade_direction",
             "value_score", "quality_score", "growth_score", "pe", "roe_pct"]

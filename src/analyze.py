@@ -22,6 +22,7 @@ from .fundamental_score import (
 from .aschenbrenner import load_aschenbrenner, stance_for
 from .rating import radar_elo, radar_score, stars, plain_summary, suggest_actions
 from .projection import project
+from .paper_trader import update_portfolio
 from .news import fetch_news_for
 
 
@@ -132,6 +133,9 @@ def run(with_news=True, with_fundamentals=True):
         key=lambda r: r["aschenbrenner"].get("weight_pct") or 0, reverse=True,
     )
 
+    # --- Virtual paper-trading self-check (persists in data/portfolio.json) ---
+    paper = update_portfolio(rows)
+
     if with_news:
         print("Lade News für die Top-Picks …")
         picks = top_daytrade + top_longterm + top_fundamental + aschenbrenner_holdings
@@ -150,6 +154,7 @@ def run(with_news=True, with_fundamentals=True):
         "top_longterm": top_longterm,
         "top_fundamental": top_fundamental,
         "aschenbrenner_holdings": aschenbrenner_holdings,
+        "paper": paper,
         "all": rows,
     }
 
@@ -172,6 +177,10 @@ def run(with_news=True, with_fundamentals=True):
     print("\n=== TOP FUNDAMENTAL (Value/Quality/Growth) ===")
     for i, r in enumerate(top_fundamental, 1):
         print(f"{i:>2}. {r['symbol']:<8} Score {r['fundamental_score']:>5}  {r['name']}")
+    print(f"\n=== PAPER-DEPOT ===")
+    print(f"Kontostand {paper['equity']:.2f} € ({paper['total_return_pct']:+.2f}%) · "
+          f"Cash {paper['cash']:.2f} € · Positionen {paper['n_positions']} · "
+          f"Trades gesamt {paper['n_trades']}")
     print(f"\nGespeichert: {OUTPUT / 'latest.json'}")
     return result
 
