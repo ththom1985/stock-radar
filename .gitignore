@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+*.pyc
+.streamlit/secrets.toml
+# Keep latest.json (committed by the workflow), ignore heavy per-run snapshots locally:
+data/output/history/*.json
+data/prices/
