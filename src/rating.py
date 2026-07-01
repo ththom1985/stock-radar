@@ -35,6 +35,10 @@ def radar_elo(row):
         elif asch["stance"] == "SHORT_BET":
             elo -= 70
 
+    ns = row.get("news_score")
+    if _has(ns) and (row.get("news_n") or 0) >= 2:
+        elo += max(-55, min(55, (ns - 50) * 1.4))
+
     elo = int(round(max(700, min(2200, elo)) / 5) * 5)
 
     for thr, label, color in [
@@ -116,6 +120,19 @@ def plain_summary(row):
     elif ddir == "SHORT" and dt >= 45:
         parts.append("Kurzfristig haben die Verkäufer die Oberhand.")
 
+    # News sentiment
+    ns = row.get("news_sentiment")
+    if ns == "positiv":
+        parts.append("Die aktuellen Schlagzeilen sind überwiegend positiv.")
+    elif ns == "negativ":
+        parts.append("Achtung: die aktuellen Schlagzeilen sind überwiegend negativ.")
+
+    # Earnings
+    ed = row.get("earnings_in_days")
+    if _has(ed) and 0 <= ed <= 10:
+        when = "heute" if ed == 0 else f"in {ed} Tagen"
+        parts.append(f"📅 Zahlen {when} ({row.get('next_earnings')}) – bis dahin oft erhöhte Schwankung.")
+
     # Aschenbrenner
     asch = row.get("aschenbrenner")
     if asch:
@@ -157,6 +174,15 @@ def suggest_actions(row):
         out.append({"text": "Abwarten – teuer & überkauft", "tone": "neg"})
     if _has(rsi) and rsi <= 28:
         out.append({"text": "Spekulativer Rebound möglich", "tone": "neutral"})
+    ns = row.get("news_score")
+    nn = row.get("news_n") or 0
+    if _has(ns) and nn >= 2 and ns <= 38:
+        out.append({"text": "Negative News – abwarten", "tone": "neg"})
+    elif _has(ns) and nn >= 2 and ns >= 62:
+        out.append({"text": "Positive News – Rückenwind", "tone": "pos"})
+    ed = row.get("earnings_in_days")
+    if _has(ed) and 0 <= ed <= 7:
+        out.append({"text": f"Zahlen in {ed} T. – Vorsicht", "tone": "neutral"})
     if asch and asch["stance"] == "LONG":
         out.append({"text": "Aschenbrenner-Konviktion (long)", "tone": "pos"})
 

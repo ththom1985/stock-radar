@@ -82,11 +82,22 @@ with st.expander("ℹ️ Legende – was bedeuten die Zahlen?"):
 - **🟣 Aschenbrenner-Badge** – Position im Fonds *Situational Awareness LP*. **LONG** = er setzt auf
   steigende Kurse · **Short-Wette** = Put-Option (gegen die Aktie) · **gemischt** = Absicherung.
 - **Handlungs-Chips** – konkrete Ideen. 🟢 Grün = Chance · 🔴 Rot = Vorsicht · ⚪ Grau = neutral.
+- **🟢/🔴 News (n)** – Stimmung der aktuellen Schlagzeilen (n = Anzahl), fließt in den Score ein.
+  **📅 Zahlen** – nächster Termin der Geschäftszahlen; „in X T." = Tage bis dahin (davor oft mehr Schwankung).
 - **📅 Projektion** – erwartete Kurs-Spanne aus der tatsächlichen Schwankungsbreite
   (**≈ 2 von 3 Fällen**), plus Richtungs-Tendenz & Konfidenz aus den Signalen.
   Zeiträume: **Daytrading 1 Tag / 1 Woche**, **Langzeit 1 / 3 / 12 / 24 Monate**.
   ⚠️ **Statistische Schätzung, keine Kursprognose oder Garantie.**
 """)
+
+mn = data.get("market_news", {})
+if mn.get("headlines"):
+    _mlabel = {"positiv": "🟢 positiv", "negativ": "🔴 negativ", "neutral": "⚪ neutral"}.get(
+        mn.get("market_label"), "–")
+    with st.expander(f"📰 Markt- & Wirtschafts-News — Gesamtstimmung: {_mlabel}"):
+        for h in mn["headlines"]:
+            src = f" · _{h.get('source')}_" if h.get("source") else ""
+            st.markdown(f"- [{h.get('title')}]({h.get('link')}){src}")
 
 st.caption("⚠️ Research-Werkzeug, keine Anlageberatung.")
 
@@ -141,6 +152,16 @@ def card_html(r, idx=None, proj_key="projection_long"):
     roe = r.get("roe_pct")
     meta_line = (f'{_esc(r.get("sector") or "")} · Kurs {r.get("price")} · '
                  f'KGV {pe if pe else "–"} · ROE {roe if roe is not None else "–"}%')
+    news_lbl = {"positiv": "🟢 News +", "negativ": "🔴 News −",
+                "neutral": "⚪ News ="}.get(r.get("news_sentiment"))
+    earn = r.get("next_earnings")
+    ed = r.get("earnings_in_days")
+    earn_txt = ""
+    if earn:
+        earn_txt = f'📅 Zahlen {_esc(earn)}' + (f' (in {ed} T.)' if isinstance(ed, int) and ed >= 0 else "")
+    sig_bits = [b for b in [(f'{news_lbl} ({r.get("news_n")})' if news_lbl and r.get("news_n") else None),
+                            earn_txt] if b]
+    sig_line = f'<div class="meta">{" · ".join(sig_bits)}</div>' if sig_bits else ""
     rank = f"#{idx} " if idx else ""
     return (
         f'<div class="card{asch_cls}" style="border-left-color:{color}">'
@@ -154,6 +175,7 @@ def card_html(r, idx=None, proj_key="projection_long"):
         f'<div class="rt" style="color:{color}">{_esc(r.get("radar_rating"))}</div></div>'
         f'{asch_badge}</div>'
         f'<div class="meta">{meta_line}</div>'
+        f'{sig_line}'
         f'<div class="bars">{bars}</div>'
         f'<div class="summary">{_esc(r.get("plain_summary",""))}</div>'
         f'{_proj_html(r.get(proj_key))}'

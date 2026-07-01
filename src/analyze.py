@@ -23,7 +23,8 @@ from .aschenbrenner import load_aschenbrenner, stance_for
 from .rating import radar_elo, radar_score, stars, plain_summary, suggest_actions
 from .projection import project
 from .paper_trader import update_portfolio
-from .news import fetch_news_for
+from .news_engine import fetch_all_ticker_news, news_signal, fetch_market_news
+from .earnings import fetch_earnings, days_until
 
 
 def _num(x):
@@ -106,6 +107,22 @@ def run(with_news=True, with_fundamentals=True):
             r["fundamental_score"] = None
             r["investment_score"] = r["longterm_score"]
 
+    # --- News layer (per-ticker sentiment) + earnings dates ---
+    market = {"market_sentiment": None, "market_label": None, "headlines": []}
+    if with_news:
+        syms = [r["symbol"] for r in rows]
+        print(f"Lade News für {len(syms)} Titel …")
+        news_by = fetch_all_ticker_news(syms)
+        earn = fetch_earnings(syms)
+        for r in rows:
+            sig = news_signal(news_by.get(r["symbol"], []))
+            r.update(sig)
+            nd = earn.get(r["symbol"], {}).get("next_earnings")
+            r["next_earnings"] = nd
+            r["earnings_in_days"] = days_until(nd)
+        print("Lade Markt-News …")
+        market = fetch_market_news()
+
     # --- Aschenbrenner stance + human-facing rating layer ---
     asch_data = load_aschenbrenner()
     for r in rows:
@@ -136,16 +153,11 @@ def run(with_news=True, with_fundamentals=True):
     # --- Virtual paper-trading self-check (persists in data/portfolio.json) ---
     paper = update_portfolio(rows)
 
-    if with_news:
-        print("Lade News für die Top-Picks …")
-        picks = top_daytrade + top_longterm + top_fundamental + aschenbrenner_holdings
-        for r in {id(x): x for x in picks}.values():
-            r["news"] = fetch_news_for(r["symbol"], limit=3)
-
     result = {
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "universe_size": len(symbols),
         "analyzed": len(rows),
+        "market_news": market,
         "aschenbrenner_meta": {
             "quarter": asch_data.get("report_quarter"),
             "filed": asch_data.get("filed"),
