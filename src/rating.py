@@ -122,6 +122,55 @@ def potential_score(row):
     return round(sum(v * w for v, w in parts) / sum(w for _, w in parts))
 
 
+def _band(x, bands):
+    for thr, sc in bands:
+        if x <= thr:
+            return sc
+    return bands[-1][1]
+
+
+def entry_score(row):
+    """0-100: how good the CURRENT price is as an entry point right now.
+    High = healthy pullback / near a low / cheap / room to analyst target,
+    in an intact trend. Low = overbought / at the highs / chasing hype."""
+    parts = []
+    rsi = row.get("rsi")
+    if _has(rsi):  # timing: pullback good, overbought bad
+        parts.append((_band(rsi, [(30, 75), (45, 92), (55, 74), (65, 55), (72, 34), (200, 15)]), 0.30))
+    pfh = row.get("pct_from_high52")
+    if _has(pfh):  # distance below 52w-high: discount = closer to a low
+        parts.append((_band(pfh, [(-45, 45), (-25, 72), (-10, 88), (-3, 55), (200, 32)]), 0.25))
+    vs = row.get("value_score")
+    if _has(vs):
+        parts.append((vs, 0.20))
+    au, an = row.get("analyst_upside_pct"), row.get("analyst_n") or 0
+    if _has(au) and an >= 3:  # room to analyst target
+        parts.append((_band(au, [(0, 25), (10, 50), (25, 72), (45, 90), (1e9, 100)]), 0.15))
+    lt = row.get("longterm_score")
+    if _has(lt):  # trend support: a dip in an uptrend is buyable
+        parts.append((lt, 0.10))
+    if not parts:
+        return None
+    score = sum(v * w for v, w in parts) / sum(w for _, w in parts)
+    if row.get("hype_surging") and _has(rsi) and rsi > 68:
+        score -= 12  # buying into froth is a poor entry
+    return int(round(max(0, min(100, score))))
+
+
+def entry_label(score):
+    if score is None:
+        return "–", "calm"
+    if score >= 70:
+        return "sehr gut", "up"
+    if score >= 55:
+        return "gut", "up"
+    if score >= 45:
+        return "okay", "soon"
+    if score >= 32:
+        return "eher abwarten", "soon"
+    return "schlecht (teuer/heiß)", "down"
+
+
 def conviction(row):
     """0-100: how SURE the call is = agreement across signals (either direction).
     High when trend, fundamentals, analysts, news and momentum point the same way."""

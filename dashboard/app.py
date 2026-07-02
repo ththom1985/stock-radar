@@ -72,6 +72,11 @@ CSS = """
 .dir-up{background:#dcfce7;color:#15803d;}
 .dir-down{background:#fee2e2;color:#b91c1c;}
 .dir-side{background:#f1f5f9;color:#475569;}
+.entry{padding:3px 10px;border-radius:11px;font-size:11.5px;font-weight:800;}
+.entry-up{background:#dcfce7;color:#15803d;}
+.entry-soon{background:#fef9c3;color:#854d0e;}
+.entry-down{background:#fee2e2;color:#b91c1c;}
+.entry-calm{background:#f1f5f9;color:#475569;}
 </style>
 """
 st.markdown(CSS, unsafe_allow_html=True)
@@ -102,6 +107,9 @@ with st.expander("ℹ️ Legende – was bedeuten die Zahlen?"):
   **Quality** (Ertragskraft/Bilanz) · **Growth** (Wachstum) – je 0–100.
 - **🟣 Aschenbrenner-Badge** – Position im Fonds *Situational Awareness LP*. **LONG** = er setzt auf
   steigende Kurse · **Short-Wette** = Put-Option (gegen die Aktie) · **gemischt** = Absicherung.
+- **🎬 Einstieg jetzt (0–100)** – wie gut der **aktuelle Kurs** zum Einsteigen ist: **hoch** = gesunder
+  Rücksetzer / günstig bewertet / nahe am Tief in intaktem Trend; **niedrig** = heißgelaufen/überkauft/
+  an den Höchstständen (schlechter Einstieg). Grün = gut, Gelb = okay, Rot = eher teuer.
 - **🎯 Konfidenz · 🚀 Potenzial · ⏱️ Dringlichkeit** (oben auf jeder Karte): wie **sicher** das Signal
   ist (Übereinstimmung aller Faktoren), wie viel **Kurspotenzial** drin ist (Analysten-Ziel bzw. 12-Monats-
   Prognose), und wie **schnell** zu handeln ist (Sofort heute / Diese Woche / In Ruhe langfristig).
@@ -150,6 +158,21 @@ def _qplabel(v):
     if not isinstance(v, (int, float)):
         return "–"
     return "hoch" if v >= 67 else "mittel" if v >= 45 else "niedrig"
+
+
+def _entry(es):
+    """(label, css) for the entry-timing traffic light."""
+    if not isinstance(es, (int, float)):
+        return "–", "calm"
+    if es >= 70:
+        return "sehr gut", "up"
+    if es >= 55:
+        return "gut", "up"
+    if es >= 45:
+        return "okay", "soon"
+    if es >= 32:
+        return "abwarten", "soon"
+    return "teuer/heiß", "down"
 
 
 def _proj_html(proj, context="invest"):
@@ -234,7 +257,12 @@ def card_html(r, idx=None, context="invest"):
         pot_stat = (f'<span class="stat">⚡ Tagesschwankung <b>±{atr:.0f}%</b></span>'
                     if isinstance(atr, (int, float)) else "")
     ut = r.get("urgency_tone") or "calm"
+    es = r.get("entry_score")
+    elab, ecls = _entry(es)
+    entry_pill = (f'<span class="entry entry-{ecls}">🎬 Einstieg jetzt: {elab} '
+                  f'({es if es is not None else "–"}/100)</span>')
     stat_row = (f'<div class="stats"><span class="dir dir-{dcls}">{dlabel}</span>'
+                f'{entry_pill}'
                 f'<span class="stat">🎯 Sicherheit <b>{conv if conv is not None else "–"}%</b></span>'
                 f'{pot_stat}'
                 f'<span class="urg urg-{ut}">{_esc(r.get("urgency") or "")}</span></div>')
@@ -425,7 +453,7 @@ with tabs[6]:
 
 with tabs[7]:
     cols = ["symbol", "name", "sector", "industry", "radar_score", "radar_rating",
-            "conviction", "upside_pct", "urgency", "quality", "potential",
+            "entry_score", "conviction", "upside_pct", "urgency", "quality", "potential",
             "analyst_rating", "analyst_upside_pct", "price", "investment_score",
             "fundamental_score", "daytrade_score", "daytrade_direction", "pe", "roe_pct"]
     df = pd.DataFrame([{k: r.get(k) for k in cols} for r in data["all"]])
