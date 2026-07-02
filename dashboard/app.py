@@ -96,6 +96,7 @@ CSS = """
 .card .plan-foot .gp{background:#16a34a;color:#fff;font-weight:800;padding:3px 10px;border-radius:999px;font-size:13px;}
 .card .plan-foot .rk{color:#b91c1c;font-weight:700;font-size:12px;}
 .card .plan-foot .crv{color:#334155;font-weight:700;font-size:12px;background:#e2e8f0;padding:2px 9px;border-radius:999px;}
+.card .expert-badge{display:inline-block;background:#fef3c7;color:#92400e;border:1px solid #fcd34d;font-weight:700;font-size:11px;padding:2px 8px;border-radius:999px;margin:2px 0 0 4px;}
 </style>
 """
 st.markdown(CSS, unsafe_allow_html=True)
@@ -138,6 +139,10 @@ with st.expander("ℹ️ Legende – was bedeuten die Zahlen?"):
   Zeit bis zum Ziel). Unten: **💰 Gewinnpotenzial in +%** (eine klare positive Zahl, kein ±), **Risiko** und
   **Chance-Risiko-Verhältnis** (z.B. 3,6:1 = 3,6-mal mehr Chance als Risiko; ab ~2:1 attraktiv). Grün =
   kaufbar · Gelb = gestaffelt/abwarten · Rot = meiden.
+- **⭐ Experten-Badge** – dieser Titel wurde zuletzt von echten Experten/Medien empfohlen (Maydorn/
+  Der Aktionär, Handelsblatt, DZ Bank, LYNX, echtgeld.tv, „Alles auf Aktien", Aktienwelt360, Abilitato).
+  Eigener Tab **⭐ Experten** listet alle – nach Radar-Score gereiht, filterbar nach Quelle. Keine
+  Kaufempfehlung: das Radar bewertet jeden Titel unabhängig.
 - **🏷️ Sektor-Badge & Branche** – Wirtschaftssektor und feinere Branche der Aktie.
 - **🎯 Analysten** – Konsens-Empfehlung + Ø-Kursziel in % zum aktuellen Kurs (n = Anzahl Analysten).
 - **Handlungs-Chips** – konkrete Ideen. 🟢 Grün = Chance · 🔴 Rot = Vorsicht · ⚪ Grau = neutral.
@@ -384,6 +389,8 @@ def card_html(r, idx=None, context="invest"):
     sector = r.get("sector") or ""
     industry = r.get("industry") or ""
     sector_badge = f'<span class="sector-badge">🏷️ {_esc(sector)}</span>' if sector else ""
+    esrc = r.get("expert_sources") or []
+    expert_badge = (f'<span class="expert-badge">⭐ {_esc(" · ".join(esrc))}</span>' if esrc else "")
     meta_line = ((f'{_esc(industry)} · ' if industry else "")
                  + f'Kurs {r.get("price")} · KGV {pe if pe else "–"} · '
                  f'ROE {roe if roe is not None else "–"}%')
@@ -456,7 +463,7 @@ def card_html(r, idx=None, context="invest"):
         f'</div>'
         f'<div class="name"><div class="tk">{_esc(r["symbol"])} · {_esc(r.get("name") or "")}</div>'
         f'<div class="rt" style="color:{color}">{_esc(r.get("radar_rating"))}</div></div>'
-        f'{sector_badge}{asch_badge}</div>'
+        f'{sector_badge}{expert_badge}{asch_badge}</div>'
         f'{stat_row}'
         f'{_plan_html(r, context)}'
         f'<div class="meta">{meta_line}</div>'
@@ -496,7 +503,7 @@ def grid_split(picks):
 
 
 tabs = st.tabs(["🎯 Heute", "🚀 Daytrading", "🏦 Langzeit", "📊 Fundamental", "🧠 Aschenbrenner",
-                "🔥 Social", "💼 Paper-Depot", "🔎 Alle"])
+                "🔥 Social", "💼 Paper-Depot", "🔎 Alle", "⭐ Experten"])
 
 with tabs[0]:
     st.caption("**Deine Top-Chancen heute**, nach Rang. Jede Karte zeigt oben: **Richtung** "
@@ -608,7 +615,9 @@ with tabs[7]:
             "entry_score", "conviction", "upside_pct", "urgency", "quality", "potential",
             "analyst_rating", "analyst_upside_pct", "price", "investment_score",
             "fundamental_score", "daytrade_score", "daytrade_direction", "pe", "roe_pct"]
-    df = pd.DataFrame([{k: r.get(k) for k in cols} for r in data["all"]])
+    df = pd.DataFrame([{**{k: r.get(k) for k in cols},
+                        "experten": " · ".join(r.get("expert_sources") or [])}
+                       for r in data["all"]])
     q = st.text_input("Filter (Symbol/Name/Sektor)", "")
     if q:
         m = df.apply(lambda row: q.lower() in " ".join(str(v).lower() for v in row.values), axis=1)
@@ -616,3 +625,20 @@ with tabs[7]:
     if not df.empty:
         st.dataframe(df.sort_values("radar_score", ascending=False),
                      width="stretch", hide_index=True)
+
+with tabs[8]:
+    st.caption("⭐ **Aktien, die echte Experten & Medien zuletzt empfohlen haben** — recherchiert aus "
+               "öffentlich zugänglichen Quellen (Maydorn / Der Aktionär, Handelsblatt, DZ Bank, LYNX, "
+               "echtgeld.tv, „Alles auf Aktien\", Aktienwelt360, Abilitato). Jede Karte trägt ihr "
+               "⭐-Herkunfts-Badge. **Wichtig:** Das ist KEINE Kaufempfehlung — das Radar bewertet jeden "
+               "Titel unabhängig; die Reihung folgt dem eigenen Score (#1 = bester Radar-Score).")
+    picks = [r for r in data["all"] if r.get("expert_sources")]
+    all_sources = sorted({s for r in picks for s in (r.get("expert_sources") or [])})
+    c1, c2 = st.columns([2, 3])
+    sel = c1.selectbox("Quelle filtern", ["Alle Quellen"] + all_sources)
+    if sel != "Alle Quellen":
+        picks = [r for r in picks if sel in (r.get("expert_sources") or [])]
+    picks = sorted(picks, key=lambda r: r.get("radar_score") or 0, reverse=True)
+    c2.markdown(f"<div style='padding-top:26px;color:#64748b'>{len(picks)} Titel · "
+                f"{len(all_sources)} Quellen</div>", unsafe_allow_html=True)
+    grid(picks, numbered=True, context="invest")

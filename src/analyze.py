@@ -12,7 +12,7 @@ import json
 import os
 from datetime import datetime, timezone
 
-from .config import OUTPUT, HISTORY, TOP_N, INVEST_W_TECH, INVEST_W_FUND
+from .config import OUTPUT, HISTORY, TOP_N, INVEST_W_TECH, INVEST_W_FUND, DATA
 from .universe import load_universe
 from .fetch import fetch_prices
 from .indicators import compute_features
@@ -34,6 +34,17 @@ from .expert_signals import (minervini, weinstein_stage,
 from .paper_trader import update_portfolio
 from .news_engine import fetch_all_ticker_news, news_signal, fetch_market_news
 from .earnings import fetch_earnings, days_until
+
+
+def _load_expert_sources():
+    """symbol -> list of expert/media sources that recommended it (badge)."""
+    p = DATA / "expert_sources.json"
+    if p.exists():
+        try:
+            return json.loads(p.read_text(encoding="utf-8"))
+        except Exception:  # noqa: BLE001
+            return {}
+    return {}
 
 
 def _num(x):
@@ -217,7 +228,9 @@ def run(with_news=True, with_fundamentals=True):
 
     # --- Aschenbrenner stance + human-facing rating layer ---
     asch_data = load_aschenbrenner()
+    expert_src = _load_expert_sources()
     for r in rows:
+        r["expert_sources"] = expert_src.get(r["symbol"])
         r["aschenbrenner"] = stance_for(r["symbol"], asch_data)
         elo, rating_label, color = radar_elo(r)
         r["radar_elo"] = elo
