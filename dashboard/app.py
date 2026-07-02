@@ -163,8 +163,14 @@ def card_html(r, idx=None, proj_key="projection_long"):
     earn_txt = ""
     if earn:
         earn_txt = f'📅 Zahlen {_esc(earn)}' + (f' (in {ed} T.)' if isinstance(ed, int) and ed >= 0 else "")
+    hype_txt = ""
+    if r.get("hype_rank"):
+        fire = "🔥 " if r.get("hype_surging") else ""
+        chg = r.get("hype_change_pct")
+        hype_txt = (f'{fire}Reddit #{r.get("hype_rank")}'
+                    + (f' ({chg:+.0f}%)' if isinstance(chg, (int, float)) else ""))
     sig_bits = [b for b in [(f'{news_lbl} ({r.get("news_n")})' if news_lbl and r.get("news_n") else None),
-                            earn_txt] if b]
+                            hype_txt, earn_txt] if b]
     sig_line = f'<div class="meta">{" · ".join(sig_bits)}</div>' if sig_bits else ""
     rank = f"#{idx} " if idx else ""
     return (
@@ -196,7 +202,7 @@ def grid(picks, numbered=True, proj_key="projection_long"):
 
 
 tabs = st.tabs(["🚀 Daytrading", "🏦 Langzeit", "📊 Fundamental", "🧠 Aschenbrenner",
-                "💼 Paper-Depot", "🔎 Alle"])
+                "🔥 Social", "💼 Paper-Depot", "🔎 Alle"])
 
 with tabs[0]:
     st.caption("Kurzfristige Momentum-, Breakout- und Volumen-Setups (Long **und** Short). "
@@ -229,6 +235,16 @@ with tabs[3]:
         grid(mixed, numbered=False)
 
 with tabs[4]:
+    st.caption("🔥 Retail-Aufmerksamkeit auf Reddit (r/wallstreetbets & Co, via ApeWisdom) – "
+               "frühe Momentum-/Meme-Bewegungen. 🔥 = Erwähnungen/Rang stark gestiegen. "
+               "Vorsicht: Hype ≠ Qualität.")
+    hype = data.get("top_hype", [])
+    if hype:
+        grid(hype)
+    else:
+        st.info("Aktuell keine deiner Titel in den Reddit-Trends (ApeWisdom ist US-Reddit-fokussiert).")
+
+with tabs[5]:
     PORT = ROOT / "data" / "portfolio.json"
     if not PORT.exists():
         st.info("Noch kein Paper-Depot vorhanden – wird beim nächsten Analyse-Lauf erstellt.")
@@ -282,7 +298,7 @@ with tabs[4]:
         else:
             st.caption("Noch keine Trades.")
 
-with tabs[5]:
+with tabs[6]:
     cols = ["symbol", "name", "sector", "radar_score", "radar_rating", "radar_elo", "price",
             "investment_score", "fundamental_score", "daytrade_score", "daytrade_direction",
             "value_score", "quality_score", "growth_score", "pe", "roe_pct"]

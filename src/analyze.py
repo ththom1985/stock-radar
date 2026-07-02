@@ -12,7 +12,7 @@ import json
 import os
 from datetime import datetime, timezone
 
-from .config import OUTPUT, HISTORY, TOP_N
+from .config import OUTPUT, HISTORY, TOP_N, INVEST_W_TECH, INVEST_W_FUND
 from .universe import load_universe
 from .fetch import fetch_prices
 from .indicators import compute_features
@@ -25,6 +25,7 @@ from .llm_news import enhance as llm_enhance_news, llm_available
 from .aschenbrenner import load_aschenbrenner, stance_for
 from .rating import radar_elo, radar_score, stars, plain_summary, suggest_actions
 from .projection import project
+from .social import fetch_social, social_signal
 from .paper_trader import update_portfolio
 from .news_engine import fetch_all_ticker_news, news_signal, fetch_market_news
 from .earnings import fetch_earnings, days_until
@@ -44,10 +45,10 @@ def _pct(x):
 
 
 def _invest_score(longterm, fundamental):
-    """Blend long-term technical with fundamental (50/50 when both present)."""
+    """Blend long-term technical with fundamental using configurable weights."""
     if fundamental is None:
         return longterm
-    return round(0.5 * longterm + 0.5 * fundamental, 1)
+    return round(INVEST_W_TECH * longterm + INVEST_W_FUND * fundamental, 1)
 
 
 def run(with_news=True, with_fundamentals=True):
@@ -138,6 +139,17 @@ def run(with_news=True, with_fundamentals=True):
                     r.update(enh[r["symbol"]])
             print(f"  KI-News: {len(enh)} Titel bewertet.")
 
+    # --- Social / Reddit hype layer (ApeWisdom, free) ---
+    print("Lade Reddit-/Social-Hype …")
+    social = fetch_social()
+    n_hype = 0
+    for r in rows:
+        sig = social_signal(r["symbol"], social)
+        if sig:
+            r.update(sig)
+            n_hype += 1
+    print(f"  Social: {n_hype} Titel mit Reddit-Erwähnungen.")
+
     # --- Aschenbrenner stance + human-facing rating layer ---
     asch_data = load_aschenbrenner()
     for r in rows:
@@ -165,6 +177,11 @@ def run(with_news=True, with_fundamentals=True):
         key=lambda r: r["aschenbrenner"].get("weight_pct") or 0, reverse=True,
     )
 
+    top_hype = sorted(
+        [r for r in rows if r.get("hype_rank")],
+        key=lambda r: r.get("hype_score") or 0, reverse=True,
+    )[:TOP_N]
+
     # --- Virtual paper-trading self-check (persists in data/portfolio.json) ---
     paper = update_portfolio(rows)
 
@@ -181,6 +198,7 @@ def run(with_news=True, with_fundamentals=True):
         "top_longterm": top_longterm,
         "top_fundamental": top_fundamental,
         "aschenbrenner_holdings": aschenbrenner_holdings,
+        "top_hype": top_hype,
         "paper": paper,
         "all": rows,
     }

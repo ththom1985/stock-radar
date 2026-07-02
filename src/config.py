@@ -36,6 +36,11 @@ FETCH_PAUSE = 1.0       # seconds between batches (be gentle to Yahoo)
 # --- Output ---
 TOP_N = 10
 
+# --- Feintuning: Gewichte für den Investment-Score (Langzeit) ---
+# Anteil Technik (Trend) vs. Fundamental. Müssen zusammen 1.0 ergeben.
+INVEST_W_TECH = 0.5
+INVEST_W_FUND = 0.5
+
 # --- Indicator windows ---
 RSI_PERIOD = 14
 ATR_PERIOD = 14

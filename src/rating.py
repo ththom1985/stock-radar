@@ -39,6 +39,9 @@ def radar_elo(row):
     if _has(ns) and (row.get("news_n") or 0) >= 2:
         elo += max(-55, min(55, (ns - 50) * 1.4))
 
+    if row.get("hype_surging") and _has(row.get("hype_score")):
+        elo += min(40, row["hype_score"] * 0.4)  # retail momentum (short-term)
+
     elo = int(round(max(700, min(2200, elo)) / 5) * 5)
 
     for thr, label, color in [
@@ -127,6 +130,14 @@ def plain_summary(row):
     elif ns == "negativ":
         parts.append("Achtung: die aktuellen Schlagzeilen sind überwiegend negativ.")
 
+    # Social / retail hype
+    if row.get("hype_surging"):
+        rank = row.get("hype_rank")
+        chg = row.get("hype_change_pct")
+        extra = f", Erwähnungen {chg:+.0f}%" if _has(chg) else ""
+        parts.append(f"Auf Reddit stark diskutiert (Rang {rank}{extra}) – hohe "
+                     f"Retail-Aufmerksamkeit, aber auch Hype-Risiko.")
+
     # Earnings
     ed = row.get("earnings_in_days")
     if _has(ed) and 0 <= ed <= 10:
@@ -183,6 +194,8 @@ def suggest_actions(row):
     ed = row.get("earnings_in_days")
     if _has(ed) and 0 <= ed <= 7:
         out.append({"text": f"Zahlen in {ed} T. – Vorsicht", "tone": "neutral"})
+    if row.get("hype_surging"):
+        out.append({"text": f"🔥 Reddit-Hype (Rang {row.get('hype_rank')})", "tone": "neutral"})
     if asch and asch["stance"] == "LONG":
         out.append({"text": "Aschenbrenner-Konviktion (long)", "tone": "pos"})
 
