@@ -25,7 +25,7 @@ from .llm_news import enhance as llm_enhance_news, llm_available
 from .aschenbrenner import load_aschenbrenner, stance_for
 from .rating import (radar_elo, radar_score, stars, plain_summary, suggest_actions,
                      quality_score as calc_quality, potential_score as calc_potential,
-                     conviction, urgency, upside_pct, entry_score, trade_plan)
+                     conviction, urgency, upside_pct, entry_score, trade_plan, risk_warnings)
 from .projection import project
 from .social import fetch_social, social_signal
 from .deep_fundamentals import fetch_deep
@@ -138,6 +138,8 @@ def run(with_news=True, with_fundamentals=True):
                 if isinstance(tgt, (int, float)) and tgt > 0 and r.get("price") else None
             )
             r["pe"] = _num(f.get("pe"))
+            r["forward_pe"] = _num(f.get("forward_pe"))
+            r["earnings_growth"] = _num(f.get("earnings_growth"))
             r["roe_pct"] = _pct(f.get("roe"))
             r["revenue_growth_pct"] = _pct(f.get("revenue_growth"))
             r["value_score"] = vscore
@@ -251,6 +253,7 @@ def run(with_news=True, with_fundamentals=True):
         r["entry_score"] = entry_score(r)
         r["trade_plan_long"] = trade_plan(r, "invest")
         r["trade_plan_short"] = trade_plan(r, "trade")
+        r["risk_warnings"] = risk_warnings(r)
 
     top_daytrade = sorted(rows, key=lambda r: r["daytrade_score"], reverse=True)[:TOP_N]
     top_longterm = sorted(rows, key=lambda r: r["investment_score"], reverse=True)[:TOP_N]

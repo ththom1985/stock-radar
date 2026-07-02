@@ -98,6 +98,7 @@ CSS = """
 .card .plan-foot .crv{color:#334155;font-weight:700;font-size:12px;background:#e2e8f0;padding:2px 9px;border-radius:999px;}
 .card .expert-badge{display:inline-block;background:#fef3c7;color:#92400e;border:1px solid #fcd34d;font-weight:700;font-size:11px;padding:2px 8px;border-radius:999px;margin:2px 0 0 4px;}
 .card .vol-badge{display:inline-block;background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;font-weight:700;font-size:11px;padding:2px 8px;border-radius:999px;margin:2px 0 0 4px;}
+.card .riskbar{margin:8px 0 0;padding:7px 11px;border-radius:8px;background:#fef2f2;border:1px solid #fca5a5;border-left:4px solid #dc2626;color:#b91c1c;font-weight:700;font-size:12px;line-height:1.5;}
 </style>
 """
 st.markdown(CSS, unsafe_allow_html=True)
@@ -134,6 +135,11 @@ with st.expander("ℹ️ Legende – was bedeuten die Zahlen?"):
 - **🎯 Sicherheit · 💰 Gewinnpotenzial · ⏱️ Dringlichkeit** (oben auf jeder Karte): wie **sicher** das Signal
   ist (Übereinstimmung aller Faktoren), das **Gewinnpotenzial in +%** aus dem Handlungsplan, und wie
   **schnell** zu handeln ist (Sofort heute / Diese Woche / In Ruhe langfristig).
+- **⚠️ Rote Warn-Leiste** (über dem Handlungsplan) – macht Risiken sichtbar, die ein hoher Score sonst
+  verdeckt: **„Spitzenzyklus möglich"** (zyklische Branche wie Chips/Rohstoffe/Auto mit explodierten
+  Gewinnen → niedriges KGV kann trügen, Gewinne evtl. nicht dauerhaft) und **„Langfristig positiv, aber
+  kurzfristig fallend"** (das Timing ist schlecht – du kaufst in fallende Kurse). Dazu das rote Badge
+  **⚠️ Sehr schwankungsstark** bei hoher Tagesschwankung/Beta.
 - **📋 Handlungsplan** (farbiger Kasten) – die **konkrete Empfehlung mit echten Kursen**: **🎬 Einstieg**
   (von–bis, gute Kaufzone aus Unterstützungen + ATR) · **🎯 Ausstieg/Ziel** (von–bis, nächste Widerstände
   bzw. Analysten-Ziel) · **🛑 Stop-Loss** (Absicherung, 1×ATR unter der Zone) · **⏳ Haltedauer** (geschätzte
@@ -297,6 +303,14 @@ def _pro_details(r):
         f'{minervini}'
         '</details>'
     )
+
+
+def _risk_bar(r):
+    """Loud red warnings that a high score can hide (cyclical peak, bad timing)."""
+    rw = r.get("risk_warnings") or []
+    if not rw:
+        return ""
+    return f'<div class="riskbar">{"<br>".join(_esc(w) for w in rw)}</div>'
 
 
 def _plan_html(r, context="invest"):
@@ -472,6 +486,7 @@ def card_html(r, idx=None, context="invest"):
         f'<div class="rt" style="color:{color}">{_esc(r.get("radar_rating"))}</div></div>'
         f'{sector_badge}{expert_badge}{vol_badge}{asch_badge}</div>'
         f'{stat_row}'
+        f'{_risk_bar(r)}'
         f'{_plan_html(r, context)}'
         f'<div class="meta">{meta_line}</div>'
         f'{sig_line}'

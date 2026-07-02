@@ -202,6 +202,41 @@ def entry_label(score):
     return "schlecht (teuer/heiß)", "down"
 
 
+_CYCLICAL_KEYS = ("semiconductor", "memory", "material", "metal", "mining", "steel",
+                  "copper", "aluminum", "gold", "silver", "chemical", "energy",
+                  "oil", "gas", "auto", "automobile", "airline", "shipping",
+                  "homebuild", "construction", "paper", "packaging")
+
+
+def risk_warnings(row):
+    """Loud red-flag warnings that a high headline score can hide.
+
+    1) Cyclical peak / value trap: a boom-bust industry (chips, metals, energy,
+       autos …) with exploded earnings — the low P/E can be deceptive because
+       peak earnings are not durable.
+    2) Timing conflict: long-term bullish but the short-term trend points DOWN
+       (you would be buying into falling momentum).
+    Returns a list of short German strings.
+    """
+    out = []
+    txt = f"{row.get('sector') or ''} {row.get('industry') or ''}".lower()
+    if any(k in txt for k in _CYCLICAL_KEYS):
+        eg = row.get("earnings_growth")
+        gs = row.get("growth_score")
+        fpe, tpe = row.get("forward_pe"), row.get("pe")
+        peak = ((isinstance(eg, (int, float)) and eg >= 0.4)
+                or (isinstance(gs, (int, float)) and gs >= 85)
+                or (isinstance(fpe, (int, float)) and isinstance(tpe, (int, float))
+                    and 0 < fpe < tpe * 0.6))
+        if peak:
+            out.append("⚠️ Spitzenzyklus möglich – Gewinne evtl. nicht dauerhaft")
+    inv, lt = row.get("investment_score"), row.get("longterm_score")
+    bull = (isinstance(inv, (int, float)) and inv >= 58) or (isinstance(lt, (int, float)) and lt >= 62)
+    if bull and row.get("daytrade_direction") == "SHORT":
+        out.append("⚠️ Langfristig positiv, aber kurzfristig fallend – Timing schlecht")
+    return out
+
+
 def conviction(row):
     """0-100: how SURE the call is = agreement across signals (either direction).
     High when trend, fundamentals, analysts, news and momentum point the same way."""
