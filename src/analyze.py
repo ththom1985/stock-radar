@@ -37,9 +37,9 @@ from .news_engine import fetch_all_ticker_news, news_signal, fetch_market_news
 from .earnings import fetch_earnings, days_until
 
 
-def _load_expert_sources():
-    """symbol -> list of expert/media sources that recommended it (badge)."""
-    p = DATA / "expert_sources.json"
+def _load_json_map(filename):
+    """Load a {symbol: [...]} JSON map from data/, empty dict on any failure."""
+    p = DATA / filename
     if p.exists():
         try:
             return json.loads(p.read_text(encoding="utf-8"))
@@ -48,10 +48,15 @@ def _load_expert_sources():
     return {}
 
 
+def _load_expert_sources():
+    """symbol -> list of expert/media sources that recommended it (badge)."""
+    return _load_json_map("expert_sources.json")
+
+
 def _num(x):
-    """Round floats for JSON, turn NaN into None."""
+    """Round floats for JSON, turn NaN/Inf into None."""
     if isinstance(x, float):
-        if x != x:  # NaN
+        if x != x or x in (float("inf"), float("-inf")):  # NaN or Inf
             return None
         return round(x, 4)
     return x
@@ -66,7 +71,7 @@ def _clean(v):
     if isinstance(v, bool):
         return v
     if isinstance(v, float):
-        return None if v != v else round(v, 4)
+        return None if (v != v or v in (float("inf"), float("-inf"))) else round(v, 4)
     if isinstance(v, (int, str)):
         return v
     return None
@@ -232,8 +237,10 @@ def run(with_news=True, with_fundamentals=True):
     # --- Aschenbrenner stance + human-facing rating layer ---
     asch_data = load_aschenbrenner()
     expert_src = _load_expert_sources()
+    theme_map = _load_json_map("themes.json")
     for r in rows:
         r["expert_sources"] = expert_src.get(r["symbol"])
+        r["themes"] = theme_map.get(r["symbol"])
         r["aschenbrenner"] = stance_for(r["symbol"], asch_data)
         elo, rating_label, color = radar_elo(r)
         r["radar_elo"] = elo

@@ -97,6 +97,7 @@ CSS = """
 .card .plan-foot .rk{color:#b91c1c;font-weight:700;font-size:12px;}
 .card .plan-foot .crv{color:#334155;font-weight:700;font-size:12px;background:#e2e8f0;padding:2px 9px;border-radius:999px;}
 .card .expert-badge{display:inline-block;background:#fef3c7;color:#92400e;border:1px solid #fcd34d;font-weight:700;font-size:11px;padding:2px 8px;border-radius:999px;margin:2px 0 0 4px;}
+.card .theme-badge{display:inline-block;background:#eef2ff;color:#4338ca;border:1px solid #c7d2fe;font-weight:700;font-size:11px;padding:2px 8px;border-radius:999px;margin:2px 0 0 4px;}
 .card .vol-badge{display:inline-block;background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;font-weight:700;font-size:11px;padding:2px 8px;border-radius:999px;margin:2px 0 0 4px;}
 .card .riskbar{margin:8px 0 0;padding:7px 11px;border-radius:8px;background:#fef2f2;border:1px solid #fca5a5;border-left:4px solid #dc2626;color:#b91c1c;font-weight:700;font-size:12px;line-height:1.5;}
 .card .entry-why{margin:6px 0 0;font-size:12px;font-weight:600;padding:4px 9px;border-radius:7px;}
@@ -170,6 +171,10 @@ with st.expander("ℹ️ Legende – was bedeuten die Zahlen?"):
   Zeit bis zum Ziel). Unten: **💰 Gewinnpotenzial in +%** (eine klare positive Zahl, kein ±), **Risiko** und
   **Chance-Risiko-Verhältnis** (z.B. 3,6:1 = 3,6-mal mehr Chance als Risiko; ab ~2:1 attraktiv). Grün =
   kaufbar · Gelb = gestaffelt/abwarten · Rot = meiden.
+- **🧭 Themen-Badge** – Zukunfts-Thema des Titels (Quantum, Space, Kernenergie, Energie, Data Center, KI,
+  Robotik, seltene Erden/Rohstoffe, Biotech, Emerging Markets u.a.). Eigener Tab **🧭 Themen** zum Stöbern
+  nach Thema (nach Radar-Score gereiht). Universum auf **~1000 Titel** erweitert – bewusst auch spekulative
+  Perlen; die ⚠️-Warnungen und das 📉-Abwärtsrisiko je Karte helfen bei der Einordnung.
 - **⭐ Experten-Badge** – dieser Titel wurde zuletzt von echten Experten/Medien empfohlen (Maydorn/
   Der Aktionär, Handelsblatt, DZ Bank, LYNX, echtgeld.tv, „Alles auf Aktien", Aktienwelt360, Abilitato).
   Eigener Tab **⭐ Experten** listet alle – nach Radar-Score gereiht, filterbar nach Quelle. Keine
@@ -459,6 +464,8 @@ def card_html(r, idx=None, context="invest"):
     sector_badge = f'<span class="sector-badge">🏷️ {_esc(sector)}</span>' if sector else ""
     esrc = r.get("expert_sources") or []
     expert_badge = (f'<span class="expert-badge">⭐ {_esc(" · ".join(esrc))}</span>' if esrc else "")
+    thl = r.get("themes") or []
+    theme_badge = (f'<span class="theme-badge">🧭 {_esc(" · ".join(thl[:3]))}</span>' if thl else "")
     atrp, beta = r.get("atr_pct"), r.get("beta")
     _volatile = (isinstance(atrp, (int, float)) and atrp >= 5) or (isinstance(beta, (int, float)) and beta >= 1.8)
     vol_badge = ""
@@ -545,7 +552,7 @@ def card_html(r, idx=None, context="invest"):
         f'<div class="name"><div class="tk">{_esc(r["symbol"])} · {_esc(r.get("name") or "")}</div>'
         f'{price_line}'
         f'<div class="rt" style="color:{color}">{_esc(r.get("radar_rating"))}</div></div>'
-        f'{sector_badge}{expert_badge}{vol_badge}{asch_badge}</div>'
+        f'{sector_badge}{expert_badge}{theme_badge}{vol_badge}{asch_badge}</div>'
         f'{stat_row}'
         f'{_entry_why(r)}'
         f'{_downside_html(r)}'
@@ -588,7 +595,7 @@ def grid_split(picks):
 
 
 tabs = st.tabs(["🎯 Heute", "🚀 Daytrading", "🏦 Langzeit", "📊 Fundamental", "🧠 Aschenbrenner",
-                "🔥 Social", "💼 Paper-Depot", "🔎 Alle", "⭐ Experten"])
+                "🔥 Social", "💼 Paper-Depot", "🔎 Alle", "⭐ Experten", "🧭 Themen"])
 
 with tabs[0]:
     st.caption("**Deine Top-Chancen heute**, nach Rang. Jede Karte zeigt oben: **Richtung** "
@@ -701,8 +708,15 @@ with tabs[7]:
             "analyst_rating", "analyst_upside_pct", "price", "investment_score",
             "fundamental_score", "daytrade_score", "daytrade_direction", "pe", "roe_pct"]
     df = pd.DataFrame([{**{k: r.get(k) for k in cols},
-                        "experten": " · ".join(r.get("expert_sources") or [])}
+                        "experten": " · ".join(r.get("expert_sources") or []),
+                        "themen": " · ".join(r.get("themes") or [])}
                        for r in data["all"]])
+    # Guard: coerce numeric columns and drop Inf/NaN-as-string so Arrow can render
+    for c in ["radar_score", "entry_score", "conviction", "upside_pct", "quality", "potential",
+              "analyst_upside_pct", "price", "investment_score", "fundamental_score",
+              "daytrade_score", "pe", "roe_pct"]:
+        if c in df.columns:
+            df[c] = pd.to_numeric(df[c], errors="coerce").replace([float("inf"), float("-inf")], None)
     q = st.text_input("Filter (Symbol/Name/Sektor)", "")
     if q:
         m = df.apply(lambda row: q.lower() in " ".join(str(v).lower() for v in row.values), axis=1)
@@ -727,3 +741,25 @@ with tabs[8]:
     c2.markdown(f"<div style='padding-top:26px;color:#64748b'>{len(picks)} Titel · "
                 f"{len(all_sources)} Quellen</div>", unsafe_allow_html=True)
     grid(picks, numbered=True, context="invest")
+
+with tabs[9]:
+    st.caption("🧭 **Zukunfts-Themen** – dein erweitertes Universum nach Trend sortiert: Quantum, Space/"
+               "Satelliten, Kernenergie & moderne Energie, Data Center, KI, Robotik, seltene Erden, Biotech, "
+               "Emerging Markets u.a. Wähle ein Thema; die Titel sind nach deinem Radar-Score gereiht "
+               "(#1 = bester Score). Bewusst auch spekulative Perlen mit Extrempotenzial dabei – lies die "
+               "⚠️-Warnungen und das Abwärtsrisiko je Karte.")
+    themed = [r for r in data["all"] if r.get("themes")]
+    all_themes = sorted({t for r in themed for t in (r.get("themes") or [])})
+    counts = {t: sum(1 for r in themed if t in (r.get("themes") or [])) for t in all_themes}
+    c1, c2 = st.columns([2, 3])
+    sel = c1.selectbox("Thema wählen", [f"{t} ({counts[t]})" for t in all_themes],
+                       index=max(0, all_themes.index("KI")) if "KI" in all_themes else 0)
+    sel_theme = sel.rsplit(" (", 1)[0]
+    picks = sorted([r for r in themed if sel_theme in (r.get("themes") or [])],
+                   key=lambda r: r.get("radar_score") or 0, reverse=True)
+    c2.markdown(f"<div style='padding-top:26px;color:#64748b'>{len(picks)} Titel im Thema "
+                f"<b>{_esc(sel_theme)}</b> · {len(all_themes)} Themen · {len(themed)} Titel gesamt "
+                f"getaggt</div>", unsafe_allow_html=True)
+    grid(picks[:60], numbered=True, context="invest")
+    if len(picks) > 60:
+        st.caption(f"… und {len(picks) - 60} weitere in „{sel_theme}\" (Top 60 gezeigt).")
