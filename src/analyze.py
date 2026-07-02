@@ -25,7 +25,7 @@ from .llm_news import enhance as llm_enhance_news, llm_available
 from .aschenbrenner import load_aschenbrenner, stance_for
 from .rating import (radar_elo, radar_score, stars, plain_summary, suggest_actions,
                      quality_score as calc_quality, potential_score as calc_potential,
-                     conviction, urgency, upside_pct, entry_score)
+                     conviction, urgency, upside_pct, entry_score, trade_plan)
 from .projection import project
 from .social import fetch_social, social_signal
 from .deep_fundamentals import fetch_deep
@@ -236,6 +236,8 @@ def run(with_news=True, with_fundamentals=True):
         r["urgency"], r["urgency_tone"] = u_label, u_tone
         r["upside_pct"] = upside_pct(r)
         r["entry_score"] = entry_score(r)
+        r["trade_plan_long"] = trade_plan(r, "invest")
+        r["trade_plan_short"] = trade_plan(r, "trade")
 
     top_daytrade = sorted(rows, key=lambda r: r["daytrade_score"], reverse=True)[:TOP_N]
     top_longterm = sorted(rows, key=lambda r: r["investment_score"], reverse=True)[:TOP_N]

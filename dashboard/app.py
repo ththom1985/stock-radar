@@ -85,6 +85,17 @@ CSS = """
 .card .pro-grp .h{font-weight:700;color:#0f172a;margin-bottom:2px;}
 .card .pro-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px 18px;color:#475569;}
 .card .pro-grid b{color:#111827;}
+.card .plan{margin:9px 0;padding:9px 11px;border-radius:9px;background:#f8fafc;border:1px solid #e2e8f0;}
+.card .plan-pos{background:#f0fdf4;border-color:#bbf7d0;}
+.card .plan-neg{background:#fef2f2;border-color:#fecaca;}
+.card .plan-neutral{background:#fffbeb;border-color:#fde68a;}
+.card .plan-act{font-weight:800;font-size:13.5px;color:#0f172a;margin-bottom:7px;}
+.card .plan-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px 14px;font-size:12px;color:#64748b;}
+.card .plan-grid .pv{display:block;font-size:14px;font-weight:800;color:#0f172a;margin-top:1px;}
+.card .plan-foot{display:flex;flex-wrap:wrap;gap:7px 10px;margin-top:9px;align-items:center;}
+.card .plan-foot .gp{background:#16a34a;color:#fff;font-weight:800;padding:3px 10px;border-radius:999px;font-size:13px;}
+.card .plan-foot .rk{color:#b91c1c;font-weight:700;font-size:12px;}
+.card .plan-foot .crv{color:#334155;font-weight:700;font-size:12px;background:#e2e8f0;padding:2px 9px;border-radius:999px;}
 </style>
 """
 st.markdown(CSS, unsafe_allow_html=True)
@@ -118,9 +129,15 @@ with st.expander("ℹ️ Legende – was bedeuten die Zahlen?"):
 - **🎬 Einstieg jetzt (0–100)** – wie gut der **aktuelle Kurs** zum Einsteigen ist: **hoch** = gesunder
   Rücksetzer / günstig bewertet / nahe am Tief in intaktem Trend; **niedrig** = heißgelaufen/überkauft/
   an den Höchstständen (schlechter Einstieg). Grün = gut, Gelb = okay, Rot = eher teuer.
-- **🎯 Konfidenz · 🚀 Potenzial · ⏱️ Dringlichkeit** (oben auf jeder Karte): wie **sicher** das Signal
-  ist (Übereinstimmung aller Faktoren), wie viel **Kurspotenzial** drin ist (Analysten-Ziel bzw. 12-Monats-
-  Prognose), und wie **schnell** zu handeln ist (Sofort heute / Diese Woche / In Ruhe langfristig).
+- **🎯 Sicherheit · 💰 Gewinnpotenzial · ⏱️ Dringlichkeit** (oben auf jeder Karte): wie **sicher** das Signal
+  ist (Übereinstimmung aller Faktoren), das **Gewinnpotenzial in +%** aus dem Handlungsplan, und wie
+  **schnell** zu handeln ist (Sofort heute / Diese Woche / In Ruhe langfristig).
+- **📋 Handlungsplan** (farbiger Kasten) – die **konkrete Empfehlung mit echten Kursen**: **🎬 Einstieg**
+  (von–bis, gute Kaufzone aus Unterstützungen + ATR) · **🎯 Ausstieg/Ziel** (von–bis, nächste Widerstände
+  bzw. Analysten-Ziel) · **🛑 Stop-Loss** (Absicherung, 1×ATR unter der Zone) · **⏳ Haltedauer** (geschätzte
+  Zeit bis zum Ziel). Unten: **💰 Gewinnpotenzial in +%** (eine klare positive Zahl, kein ±), **Risiko** und
+  **Chance-Risiko-Verhältnis** (z.B. 3,6:1 = 3,6-mal mehr Chance als Risiko; ab ~2:1 attraktiv). Grün =
+  kaufbar · Gelb = gestaffelt/abwarten · Rot = meiden.
 - **🏷️ Sektor-Badge & Branche** – Wirtschaftssektor und feinere Branche der Aktie.
 - **🎯 Analysten** – Konsens-Empfehlung + Ø-Kursziel in % zum aktuellen Kurs (n = Anzahl Analysten).
 - **Handlungs-Chips** – konkrete Ideen. 🟢 Grün = Chance · 🔴 Rot = Vorsicht · ⚪ Grau = neutral.
@@ -276,6 +293,38 @@ def _pro_details(r):
     )
 
 
+def _plan_html(r, context="invest"):
+    """Prominent, number-based action plan: entry / target / stop / hold +
+    a single positive profit potential (no ± ranges)."""
+    tp = r.get("trade_plan_short") if context == "trade" else r.get("trade_plan_long")
+    if not tp:
+        return ""
+    pot, risk, rrr = tp.get("potential_pct"), tp.get("risk_pct"), tp.get("rrr")
+    is_short = tp.get("side") == "short"
+    buy_lbl = "Verkaufen (Short)" if is_short else "Einstieg – kaufen"
+    sell_lbl = "Eindecken (Ziel)" if is_short else "Ausstieg – Ziel-Zone"
+    pot_txt = f'+{pot:.0f}%' if isinstance(pot, (int, float)) else '–'
+    risk_txt = f'−{risk:.0f}%' if isinstance(risk, (int, float)) else '–'
+    rrr_txt = (f'{rrr:.1f}:1'.replace('.', ',')) if isinstance(rrr, (int, float)) else '–'
+    tone = tp.get("action_tone", "neutral")
+    return (
+        f'<div class="plan plan-{tone}">'
+        f'<div class="plan-act">{_esc(tp.get("action",""))}</div>'
+        f'<div class="plan-grid">'
+        f'<div>🎬 {buy_lbl}<span class="pv">{tp.get("entry_low")} – {tp.get("entry_high")}</span></div>'
+        f'<div>🎯 {sell_lbl}<span class="pv">{tp.get("target_low")} – {tp.get("target_high")}</span></div>'
+        f'<div>🛑 Stop-Loss<span class="pv">{tp.get("stop")}</span></div>'
+        f'<div>⏳ Haltedauer<span class="pv">{_esc(tp.get("hold",""))}</span></div>'
+        f'</div>'
+        f'<div class="plan-foot">'
+        f'<span class="gp">💰 Gewinnpotenzial {pot_txt}</span>'
+        f'<span class="rk">Risiko {risk_txt}</span>'
+        f'<span class="crv">Chance-Risiko {rrr_txt}</span>'
+        f'</div>'
+        f'</div>'
+    )
+
+
 def _proj_html(proj, context="invest"):
     """Clear, direction-first projection. No confusing symmetric ranges."""
     if not proj:
@@ -288,11 +337,8 @@ def _proj_html(proj, context="invest"):
         return ('<div class="proj">📈 <b>Kursprognose</b> (Ø-Erwartung, keine Garantie): '
                 + " · ".join(parts)
                 + ' <span style="color:#94a3b8">– je weiter weg, desto unsicherer</span></div>')
-    # trade: only the short-term swing magnitude (no false precision)
-    wk = next((p for p in proj if "Woche" in p["label"]), proj[-1])
-    swing = abs(wk["high_pct"] - wk["center_pct"])
-    return (f'<div class="proj">⚡ Kurzfrist-Bewegungsspielraum (1 Woche): '
-            f'typisch <b>±{swing:.0f}%</b></div>')
+    # trade: the concrete plan box already carries entry/target/stop — no ± here
+    return ""
 
 
 def _direction(r, context):
@@ -350,13 +396,15 @@ def card_html(r, idx=None, context="invest"):
     dlabel, dcls = _direction(r, context)
     conv = r.get("conviction")
     if context == "invest":
-        up = r.get("upside_pct")
-        pot_stat = (f'<span class="stat">🚀 Kursziel <b>{up:+.0f}%</b></span>'
-                    if isinstance(up, (int, float)) else "")
+        tp = r.get("trade_plan_long") or {}
+        gp = tp.get("potential_pct")
+        pot_stat = (f'<span class="stat">💰 Gewinnpotenzial <b>+{gp:.0f}%</b></span>'
+                    if isinstance(gp, (int, float)) else "")
     else:
-        atr = r.get("atr_pct")
-        pot_stat = (f'<span class="stat">⚡ Tagesschwankung <b>±{atr:.0f}%</b></span>'
-                    if isinstance(atr, (int, float)) else "")
+        tp = r.get("trade_plan_short") or {}
+        gp = tp.get("potential_pct")
+        pot_stat = (f'<span class="stat">💰 Gewinnpotenzial <b>+{gp:.0f}%</b></span>'
+                    if isinstance(gp, (int, float)) else "")
     ut = r.get("urgency_tone") or "calm"
     es = r.get("entry_score")
     elab, ecls = _entry(es)
@@ -410,6 +458,7 @@ def card_html(r, idx=None, context="invest"):
         f'<div class="rt" style="color:{color}">{_esc(r.get("radar_rating"))}</div></div>'
         f'{sector_badge}{asch_badge}</div>'
         f'{stat_row}'
+        f'{_plan_html(r, context)}'
         f'<div class="meta">{meta_line}</div>'
         f'{sig_line}'
         f'<div class="bars">{bars}</div>'

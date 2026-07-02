@@ -240,6 +240,129 @@ def upside_pct(row):
     return None
 
 
+def _pos(x):
+    return isinstance(x, (int, float)) and x > 0
+
+
+def _eta_label(days, context):
+    """Friendly holding-period range from an estimated number of trading days."""
+    if not isinstance(days, (int, float)) or days <= 0:
+        return "wenige Tage" if context == "trade" else "einige Monate"
+    for thr, lab in [(3, "1–3 Handelstage"), (10, "1–2 Wochen"), (25, "2–5 Wochen"),
+                     (65, "1–3 Monate"), (130, "3–6 Monate"), (260, "6–12 Monate")]:
+        if days <= thr:
+            return lab
+    return "12–24 Monate"
+
+
+def trade_plan(row, context="invest"):
+    """Concrete, number-based action plan for one stock.
+
+    Uses real price structure (support/resistance from SMAs, pivots, breakout
+    and 52-week levels + analyst target) and ATR for the money-management stop.
+    Returns entry zone, target zone, stop, a SINGLE positive profit potential
+    (%), the risk (%), the reward:risk ratio and an estimated holding period —
+    plus a plain action recommendation. Returns None if price data is missing.
+    """
+    P = row.get("price")
+    if not _pos(P):
+        return None
+    a = row.get("atr")
+    if not _pos(a):
+        ap = row.get("atr_pct")
+        a = (ap / 100 * P) if _pos(ap) else 0.02 * P
+    a = max(a, 0.005 * P)  # floor so the zones never collapse to a point
+
+    side = "short" if (context == "trade" and row.get("daytrade_direction") == "SHORT") else "long"
+    alt = row.get("altman_z")
+    avoid = side == "long" and (
+        row.get("weinstein_stage") == 4
+        or (isinstance(alt, (int, float)) and alt < 1.81)
+        or row.get("radar_rating") == "Meiden"
+        or (row.get("longterm_score") or 50) < 30
+    )
+
+    supports = [row.get(k) for k in ("sma20", "sma50", "sma150", "sma200",
+                                     "pivot", "pivot_s1", "low20", "ema21", "low52")]
+    resist = [row.get(k) for k in ("sma20", "sma50", "sma150", "sma200",
+                                   "pivot_r1", "high20", "high52", "ema9")]
+    tgt = row.get("target_price")
+
+    def below(cands):
+        return sorted([c for c in cands if isinstance(c, (int, float)) and 0 < c < P], reverse=True)
+
+    def above(cands):
+        return sorted([c for c in cands if isinstance(c, (int, float)) and c > P])
+
+    if side == "long":
+        near_sup = next((s for s in below(supports) if s >= P - 2.2 * a), None)
+        entry_low = min(near_sup if near_sup else P - a, P - 0.3 * a)
+        entry_high = P + 0.2 * a
+        res_above = above(resist)
+        t1 = next((r for r in res_above if r >= P + 2 * a), None) or (P + 3 * a)
+        hi = [t1 + 2 * a, P + 6 * a]
+        if _pos(tgt) and tgt > P:
+            hi.append(tgt)
+        farther = next((r for r in res_above if r > t1 + 0.5 * a), None)
+        if farther:
+            hi.append(farther)
+        target_low, target_high = t1, max(hi)
+        stop = entry_low - 1.0 * a
+        entry_mid, target_mid = (entry_low + entry_high) / 2, (target_low + target_high) / 2
+        potential = (target_mid / entry_mid - 1) * 100
+        risk = (entry_mid - stop) / entry_mid * 100
+    else:  # short
+        near_res = next((r for r in above(resist) if r <= P + 2.2 * a), None)
+        entry_high = max(near_res if near_res else P + a, P + 0.3 * a)
+        entry_low = P - 0.2 * a
+        t1 = next((s for s in below(supports) if s <= P - 2 * a), None) or (P - 3 * a)
+        lo = [t1 - 2 * a, P - 6 * a]
+        farther = next((s for s in below(supports) if s < t1 - 0.5 * a), None)
+        if farther:
+            lo.append(farther)
+        target_high, target_low = t1, min([x for x in lo if x > 0] or [P * 0.5])
+        stop = entry_high + 1.0 * a
+        entry_mid, target_mid = (entry_low + entry_high) / 2, (target_low + target_high) / 2
+        potential = (1 - target_mid / entry_mid) * 100
+        risk = (stop - entry_mid) / entry_mid * 100
+
+    potential = max(potential, 0.0)
+    rrr = round(potential / risk, 1) if risk and risk > 0 else None
+    days = abs(target_mid - entry_mid) / (0.35 * a) if a else None
+    hold = _eta_label(days, context)
+
+    es = row.get("entry_score")
+    if avoid:
+        action, tone = "🚫 Meiden – aktuell kein sauberes Kaufsetup", "neg"
+    elif side == "short":
+        action, tone = "📉 Nur für Profis: Wette auf fallende Kurse (Short)", "neg"
+    elif isinstance(es, (int, float)) and es >= 55:
+        action, tone = "✅ Jetzt in der Einstiegszone kaufen", "pos"
+    elif isinstance(es, (int, float)) and es >= 42:
+        action, tone = "🟡 Gestaffelt kaufen (Teilpositionen)", "neutral"
+    else:
+        action, tone = "⏳ Auf Rücksetzer in die Zone warten", "neutral"
+
+    def r2(x):
+        return round(x, 2)
+
+    return {
+        "side": side,
+        "avoid": bool(avoid),
+        "entry_low": r2(min(entry_low, entry_high)),
+        "entry_high": r2(max(entry_low, entry_high)),
+        "target_low": r2(min(target_low, target_high)),
+        "target_high": r2(max(target_low, target_high)),
+        "stop": r2(stop),
+        "potential_pct": round(potential, 1),
+        "risk_pct": round(risk, 1),
+        "rrr": rrr,
+        "hold": hold,
+        "action": action,
+        "action_tone": tone,
+    }
+
+
 def plain_summary(row):
     """2-4 short sentences in plain German that a non-expert understands."""
     parts = []
