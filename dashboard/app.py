@@ -77,6 +77,14 @@ CSS = """
 .entry-soon{background:#fef9c3;color:#854d0e;}
 .entry-down{background:#fee2e2;color:#b91c1c;}
 .entry-calm{background:#f1f5f9;color:#475569;}
+.card .expert-line{font-size:12px;margin:4px 0 2px;color:#334155;}
+.card .expert-line b{color:#0f172a;}
+.card details{margin-top:8px;font-size:12px;}
+.card details summary{cursor:pointer;color:#2563eb;font-weight:700;padding:2px 0;}
+.card .pro-grp{margin:7px 0;}
+.card .pro-grp .h{font-weight:700;color:#0f172a;margin-bottom:2px;}
+.card .pro-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px 18px;color:#475569;}
+.card .pro-grid b{color:#111827;}
 </style>
 """
 st.markdown(CSS, unsafe_allow_html=True)
@@ -173,6 +181,99 @@ def _entry(es):
     if es >= 32:
         return "abwarten", "soon"
     return "teuer/heiß", "down"
+
+
+def _fmt(x, dec=0, suf=""):
+    if isinstance(x, bool):
+        return "ja" if x else "nein"
+    if isinstance(x, (int, float)):
+        return f"{x:.{dec}f}{suf}"
+    return _esc(x) if x else "–"
+
+
+def _altman_zone(z):
+    if not isinstance(z, (int, float)):
+        return ""
+    return " (sicher)" if z > 2.99 else " (Graubereich)" if z >= 1.81 else " (kritisch!)"
+
+
+def _expert_line(r):
+    bits = []
+    met = len(r.get("minervini_met") or [])
+    tot = met + len(r.get("minervini_failed") or [])
+    if tot:
+        bits.append(f'Minervini <b>{met}/{tot}</b>')
+    wl = r.get("weinstein_label")
+    if wl:
+        bits.append(f'<b>{_esc(wl.split("–")[0].strip())}</b>')
+    if isinstance(r.get("piotroski"), (int, float)):
+        bits.append(f'Piotroski <b>{r["piotroski"]}/9</b>')
+    if isinstance(r.get("altman_z"), (int, float)):
+        bits.append(f'Altman-Z <b>{r["altman_z"]}</b>{_altman_zone(r["altman_z"])}')
+    return f'<div class="expert-line">📐 {" · ".join(bits)}</div>' if bits else ""
+
+
+def _pro_details(r):
+    def row(label, val):
+        return f'<div>{label}: <b>{val}</b></div>'
+
+    trend = "".join([
+        row("ADX (Trendstärke)", _fmt(r.get("adx"), 0)),
+        row("+DI / −DI", f'{_fmt(r.get("plus_di"),0)} / {_fmt(r.get("minus_di"),0)}'),
+        row("EMA9 &gt; EMA21", _fmt(r.get("ema9_above_21"))),
+        row("Ichimoku", _fmt(r.get("ichimoku"))),
+        row("Supertrend", "aufwärts" if r.get("supertrend_up") else "abwärts" if r.get("supertrend_up") is not None else "–"),
+        row("Parabolic SAR", "long" if r.get("psar_bull") else "short" if r.get("psar_bull") is not None else "–"),
+        row("Trend-Score", _fmt(r.get("tech_trend"), 0, "/100")),
+    ])
+    mom = "".join([
+        row("RSI (14)", _fmt(r.get("rsi"), 0)),
+        row("Stochastik %K/%D", f'{_fmt(r.get("stoch_k"),0)} / {_fmt(r.get("stoch_d"),0)}'),
+        row("Williams %R", _fmt(r.get("williams_r"), 0)),
+        row("CCI (20)", _fmt(r.get("cci"), 0)),
+        row("ROC (10)", _fmt(r.get("roc10"), 1, "%")),
+        row("Aroon ↑/↓", f'{_fmt(r.get("aroon_up"),0)} / {_fmt(r.get("aroon_down"),0)}'),
+        row("Momentum-Score", _fmt(r.get("tech_momentum"), 0, "/100")),
+    ])
+    vol = "".join([
+        row("OBV", "steigend" if r.get("obv_rising") else "fallend" if r.get("obv_rising") is not None else "–"),
+        row("MFI (14)", _fmt(r.get("mfi"), 0)),
+        row("Chaikin Money Flow", _fmt(r.get("cmf"), 2)),
+        row("Rel. Volumen", _fmt(r.get("rvol"), 1, "×")),
+        row("Volumen-Score", _fmt(r.get("tech_volume"), 0, "/100")),
+    ])
+    risk = "".join([
+        row("ATR (Tagesspanne)", _fmt(r.get("atr_pct"), 1, "%")),
+        row("Volatilität p.a.", _fmt(r.get("vol_annual_pct"), 0, "%")),
+        row("Max. Drawdown 1J", _fmt(r.get("max_drawdown_pct"), 0, "%")),
+        row("Beta", _fmt(r.get("beta"), 2)),
+        row("Position 52W-Range", _fmt(r.get("range_pos_pct"), 0, "%")),
+        row("Nächstes Fib-Level", _fmt(r.get("fib_nearest"))),
+        row("Pivot / R1 / S1", f'{_fmt(r.get("pivot"),2)} / {_fmt(r.get("pivot_r1"),2)} / {_fmt(r.get("pivot_s1"),2)}'),
+    ])
+    fund = "".join([
+        row("Piotroski F-Score", _fmt(r.get("piotroski"), 0, "/9")),
+        row("Altman Z-Score", _fmt(r.get("altman_z"), 2) + _altman_zone(r.get("altman_z"))),
+        row("Graham-Number", _fmt(r.get("graham_number"), 2)),
+        row("Graham-Sicherheitsmarge", _fmt(r.get("graham_margin_pct"), 0, "%")),
+        row("FCF-Rendite", _fmt(r.get("fcf_yield_pct"), 1, "%")),
+        row("Rule of 40", _fmt(r.get("rule40"), 0)),
+        row("Magic-Formula-Rang", _fmt(r.get("magic_score"), 0, "/100")),
+    ])
+    mv_met = r.get("minervini_met") or []
+    minervini = (f'<div class="pro-grp"><div class="h">Minervini-Trendtemplate (erfüllt)</div>'
+                 f'<div>{" · ".join(_esc(m) for m in mv_met) or "–"}</div></div>') if mv_met else ""
+
+    return (
+        '<details><summary>🔬 Profi-Analyse (alle Indikatoren)</summary>'
+        f'<div class="pro-grp"><div class="h">📈 Trend</div><div class="pro-grid">{trend}</div></div>'
+        f'<div class="pro-grp"><div class="h">⚡ Momentum</div><div class="pro-grid">{mom}</div></div>'
+        f'<div class="pro-grp"><div class="h">📊 Volumen</div><div class="pro-grid">{vol}</div></div>'
+        f'<div class="pro-grp"><div class="h">🎢 Volatilität &amp; Marken</div><div class="pro-grid">{risk}</div></div>'
+        f'<div class="pro-grp"><div class="h">🏛️ Fundamental (Profi)</div><div class="pro-grid">{fund}</div></div>'
+        f'{minervini}'
+        '</details>'
+    )
 
 
 def _proj_html(proj, context="invest"):
@@ -313,11 +414,13 @@ def card_html(r, idx=None, context="invest"):
         f'{sig_line}'
         f'<div class="bars">{bars}</div>'
         f'{qp_line}'
+        f'{_expert_line(r)}'
         f'<div class="summary">{_esc(r.get("plain_summary",""))}</div>'
         f'{llm_div}'
         f'{_proj_html(r.get(proj_key), context)}'
         f'<div class="chips">{chips}</div>'
         f'{news_div}'
+        f'{_pro_details(r)}'
         f'</div>'
     )
 

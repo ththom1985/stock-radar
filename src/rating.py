@@ -51,6 +51,25 @@ def radar_elo(row):
         if _has(am):
             elo += max(-40, min(40, (3 - am) * 20))     # consensus: 1(strong buy)→+40, 5→-40
 
+    # Expert frameworks
+    mv = row.get("minervini_score")
+    if _has(mv):
+        elo += (mv - 50) * 0.4                          # ±20 trend-template alignment
+    pio = row.get("piotroski")
+    if _has(pio):
+        elo += (pio - 4.5) * 7                          # Piotroski 9→+31, 0→-31
+    alt = row.get("altman_z")
+    if _has(alt):
+        if alt < 1.81:
+            elo -= 45                                   # bankruptcy distress zone
+        elif alt > 2.99:
+            elo += 12
+    stg = row.get("weinstein_stage")
+    if stg == 4:
+        elo -= 30
+    elif stg == 2:
+        elo += 15
+
     elo = int(round(max(700, min(2200, elo)) / 5) * 5)
 
     for thr, label, color in [
@@ -94,6 +113,9 @@ def quality_score(row):
     am, an = row.get("analyst_mean"), row.get("analyst_n") or 0
     if _has(am) and an >= 3:
         parts.append((max(0, min(100, (5 - am) / 4 * 100)), 0.2))
+    pio = row.get("piotroski")
+    if _has(pio):
+        parts.append((pio / 9 * 100, 0.2))          # Piotroski fundamental strength
     if not parts:
         return None
     return round(sum(v * w for v, w in parts) / sum(w for _, w in parts))
@@ -275,6 +297,24 @@ def plain_summary(row):
         arrow = f"+{au:.0f}%" if au >= 0 else f"{au:.0f}%"
         parts.append(f"{an} Analysten: Konsens „{rating_de}\", Ø-Kursziel {arrow} zum aktuellen Kurs.")
 
+    # Expert frameworks
+    if _has(row.get("minervini_score")) and row["minervini_score"] >= 80:
+        parts.append("Erfüllt Minervinis Trend-Template (bestätigter Aufwärtstrend).")
+    stg = row.get("weinstein_stage")
+    if stg == 4:
+        parts.append("Weinstein-Phase 4 (Abwärtstrend) – für Käufe meiden.")
+    elif stg == 2 and not (_has(row.get("minervini_score")) and row["minervini_score"] >= 80):
+        parts.append("Weinstein-Phase 2 (Aufwärtstrend).")
+    pio = row.get("piotroski")
+    if _has(pio):
+        if pio >= 8:
+            parts.append(f"Bilanz sehr solide (Piotroski {pio}/9).")
+        elif pio <= 2:
+            parts.append(f"Bilanz schwach (Piotroski {pio}/9).")
+    alt = row.get("altman_z")
+    if _has(alt) and alt < 1.81:
+        parts.append(f"⚠️ Erhöhtes Pleiterisiko (Altman-Z {alt}).")
+
     # Short term
     dt = row.get("daytrade_score") or 0
     ddir = row.get("daytrade_direction")
@@ -356,6 +396,14 @@ def suggest_actions(row):
         out.append({"text": f"Zahlen in {ed} T. – Vorsicht", "tone": "neutral"})
     if row.get("hype_surging"):
         out.append({"text": f"🔥 Reddit-Hype (Rang {row.get('hype_rank')})", "tone": "neutral"})
+    if _has(row.get("minervini_score")) and row["minervini_score"] >= 80:
+        out.append({"text": "Minervini Stage-2 ✓", "tone": "pos"})
+    alt = row.get("altman_z")
+    if _has(alt) and alt < 1.81:
+        out.append({"text": "⚠️ Pleiterisiko (Altman)", "tone": "neg"})
+    pio = row.get("piotroski")
+    if _has(pio) and pio >= 8:
+        out.append({"text": f"Bilanz stark (Piotroski {pio}/9)", "tone": "pos"})
     au, an = row.get("analyst_upside_pct"), row.get("analyst_n") or 0
     if _has(au) and an >= 5 and au >= 20:
         out.append({"text": f"Analysten-Kursziel +{au:.0f}%", "tone": "pos"})

@@ -108,4 +108,20 @@ def compute_features(df):
     log_ret = np.log(close / close.shift(1)).dropna()
     f["vol_daily"] = _f(log_ret.iloc[-60:].std()) if len(log_ret) >= 20 else np.nan
 
+    # SMA150 + slopes (for Minervini trend template & Weinstein stage analysis)
+    sma150 = close.rolling(150).mean()
+    sma200_series = close.rolling(200).mean()
+    f["sma150"] = _f(sma150.iloc[-1]) if len(close) >= 150 else np.nan
+    f["sma150_1m_ago"] = _f(sma150.iloc[-22]) if len(close) >= 172 else np.nan
+    f["sma200_1m_ago"] = _f(sma200_series.iloc[-22]) if len(close) >= 222 else np.nan
+    f["low52"] = f.get("low52")
+    f["pct_above_low52"] = (f["price"] / f["low52"] - 1) * 100 if f.get("low52") else np.nan
+
+    # Merge advanced literature indicators (ADX, Stochastic, MFI, Ichimoku, …)
+    try:
+        from .tech_advanced import advanced_indicators
+        f.update(advanced_indicators(df))
+    except Exception:  # noqa: BLE001
+        pass
+
     return f

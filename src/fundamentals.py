@@ -45,6 +45,11 @@ _FIELDS = {
     "recommendationKey": "rec_key",
     "numberOfAnalystOpinions": "analyst_n",
     "targetMeanPrice": "target_price",
+    # For Graham number / FCF yield / Rule of 40 / risk
+    "trailingEps": "eps",
+    "bookValue": "bvps",
+    "beta": "beta",
+    "totalRevenue": "revenue",
 }
 
 

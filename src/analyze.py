@@ -28,6 +28,9 @@ from .rating import (radar_elo, radar_score, stars, plain_summary, suggest_actio
                      conviction, urgency, upside_pct, entry_score)
 from .projection import project
 from .social import fetch_social, social_signal
+from .deep_fundamentals import fetch_deep
+from .expert_signals import (minervini, weinstein_stage,
+                             tech_trend_score, tech_momentum_score, tech_volume_score)
 from .paper_trader import update_portfolio
 from .news_engine import fetch_all_ticker_news, news_signal, fetch_market_news
 from .earnings import fetch_earnings, days_until
@@ -44,6 +47,17 @@ def _num(x):
 
 def _pct(x):
     return round(x * 100, 1) if isinstance(x, (int, float)) and x == x else None
+
+
+def _clean(v):
+    """Make a feature value JSON-safe."""
+    if isinstance(v, bool):
+        return v
+    if isinstance(v, float):
+        return None if v != v else round(v, 4)
+    if isinstance(v, (int, str)):
+        return v
+    return None
 
 
 def _invest_score(longterm, fundamental):
@@ -69,7 +83,8 @@ def run(with_news=True, with_fundamentals=True):
             continue
         dscore, ddir, dreasons = score_daytrade(f)
         lscore, lreasons = score_longterm(f)
-        rows.append({
+        row = {k: _clean(v) for k, v in f.items()}  # keep all indicators for the pro view
+        row.update({
             "symbol": sym,
             "name": name_map.get(sym, ""),
             "price": _num(f["price"]),
@@ -86,6 +101,8 @@ def run(with_news=True, with_fundamentals=True):
             "longterm_score": lscore,
             "longterm_reasons": lreasons,
         })
+        row["ret_60d"] = _num(f.get("ret_60d"))
+        rows.append(row)
 
     # --- Fundamental layer ---
     if with_fundamentals:
@@ -119,6 +136,18 @@ def run(with_news=True, with_fundamentals=True):
             r["fundamental_score"] = fscore
             r["fundamental_reasons"] = (qreasons + vreasons + greasons)[:5]
             r["investment_score"] = _invest_score(r["longterm_score"], fscore)
+            # --- literature value metrics (from .info) ---
+            r["beta"] = _num(f.get("beta"))
+            eps, bvps, price = f.get("eps"), f.get("bvps"), r.get("price")
+            if isinstance(eps, (int, float)) and isinstance(bvps, (int, float)) and eps > 0 and bvps > 0:
+                graham = (22.5 * eps * bvps) ** 0.5
+                r["graham_number"] = round(graham, 2)
+                r["graham_margin_pct"] = round((graham / price - 1) * 100, 1) if price else None
+            fcf, mcap, rev = f.get("free_cashflow"), f.get("market_cap"), f.get("revenue")
+            if isinstance(fcf, (int, float)) and isinstance(mcap, (int, float)) and mcap:
+                r["fcf_yield_pct"] = round(fcf / mcap * 100, 1)
+            if isinstance(f.get("revenue_growth"), (int, float)) and isinstance(fcf, (int, float)) and rev:
+                r["rule40"] = round(f["revenue_growth"] * 100 + fcf / rev * 100)
     else:
         for r in rows:
             r["fundamental_score"] = None
@@ -162,6 +191,29 @@ def run(with_news=True, with_fundamentals=True):
             r.update(sig)
             n_hype += 1
     print(f"  Social: {n_hype} Titel mit Reddit-Erwähnungen.")
+
+    # --- Relative strength, deep fundamentals & expert frameworks ---
+    ranked = sorted([r for r in rows if isinstance(r.get("ret_60d"), (int, float))],
+                    key=lambda r: r["ret_60d"])
+    nrs = len(ranked)
+    for i, r in enumerate(ranked):
+        r["rs_rating"] = round((i + 1) / nrs * 100) if nrs else None
+    if with_fundamentals:
+        mcaps = {r["symbol"]: (fund.get(r["symbol"], {}) or {}).get("market_cap") for r in rows}
+        deep = fetch_deep([r["symbol"] for r in rows], mcaps)
+        for r in rows:
+            d = deep.get(r["symbol"], {})
+            r["piotroski"] = d.get("piotroski")
+            r["altman_z"] = d.get("altman_z")
+    print("Berechne Experten-Signale (Minervini, Weinstein, Trend/Momentum/Volumen) …")
+    for r in rows:
+        mv, met, failed = minervini(r, r.get("rs_rating"))
+        r["minervini_score"], r["minervini_met"], r["minervini_failed"] = mv, met, failed
+        stg, lbl = weinstein_stage(r)
+        r["weinstein_stage"], r["weinstein_label"] = stg, lbl
+        r["tech_trend"] = tech_trend_score(r)
+        r["tech_momentum"] = tech_momentum_score(r)
+        r["tech_volume"] = tech_volume_score(r)
 
     # --- Aschenbrenner stance + human-facing rating layer ---
     asch_data = load_aschenbrenner()
