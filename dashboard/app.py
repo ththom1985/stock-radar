@@ -65,7 +65,13 @@ CSS = """
 .urg-urgent{background:#fee2e2;color:#991b1b;}
 .urg-soon{background:#ffedd5;color:#9a3412;}
 .urg-calm{background:#dcfce7;color:#166534;}
-.day-h{font-size:19px;font-weight:800;margin:14px 0 2px;}
+.day-h{font-size:19px;font-weight:800;margin:16px 0 4px;}
+.rankbadge{font-size:24px;font-weight:900;min-width:46px;height:46px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;color:#fff;flex:0 0 auto;}
+.dir{font-size:15px;font-weight:800;padding:4px 12px;border-radius:12px;white-space:nowrap;}
+.dir-up{background:#dcfce7;color:#15803d;}
+.dir-down{background:#fee2e2;color:#b91c1c;}
+.dir-side{background:#f1f5f9;color:#475569;}
 </style>
 """
 st.markdown(CSS, unsafe_allow_html=True)
@@ -146,21 +152,49 @@ def _qplabel(v):
     return "hoch" if v >= 67 else "mittel" if v >= 45 else "niedrig"
 
 
-def _proj_html(proj):
+def _proj_html(proj, context="invest"):
+    """Clear, direction-first projection. No confusing symmetric ranges."""
     if not proj:
         return ""
-    rows = ""
-    for p in proj:
-        arr = _ARROW.get(p["direction"], "")
-        c = p.get("center_pct", 0)
-        rows += (f'<div class="row">📅 <b>{_esc(p["label"])}</b>: {arr} Ø <b>{c:+.0f}%</b> '
-                 f'(~{p.get("expected_price")}) · Spanne {p["low_pct"]:+.0f}%…{p["high_pct"]:+.0f}% '
-                 f'· Konfidenz {_esc(p["confidence_label"])} {p["confidence_pct"]}%</div>')
-    return f'<div class="proj">{rows}</div>'
+    if context == "invest":
+        parts = []
+        for p in proj:
+            lbl = p["label"].replace(" Monate", "M").replace(" Monat", "M")
+            parts.append(f'{lbl} <b>{p["center_pct"]:+.0f}%</b>')
+        return ('<div class="proj">📈 <b>Kursprognose</b> (Ø-Erwartung, keine Garantie): '
+                + " · ".join(parts)
+                + ' <span style="color:#94a3b8">– je weiter weg, desto unsicherer</span></div>')
+    # trade: only the short-term swing magnitude (no false precision)
+    wk = next((p for p in proj if "Woche" in p["label"]), proj[-1])
+    swing = abs(wk["high_pct"] - wk["center_pct"])
+    return (f'<div class="proj">⚡ Kurzfrist-Bewegungsspielraum (1 Woche): '
+            f'typisch <b>±{swing:.0f}%</b></div>')
 
 
-def card_html(r, idx=None, proj_key="projection_long"):
+def _direction(r, context):
+    """Return (label, css_class) for the up/down verdict."""
+    if context == "trade":
+        dd = r.get("daytrade_direction")
+        if dd == "LONG":
+            return "📈 STEIGEND", "up"
+        if dd == "SHORT":
+            return "📉 FALLEND", "down"
+        return "➡️ SEITWÄRTS", "side"
+    centre = None
+    for p in (r.get("projection_long") or []):
+        if str(p.get("label", "")).startswith("12"):
+            centre = p.get("center_pct")
+    base = centre if isinstance(centre, (int, float)) else ((r.get("investment_score") or 50) - 50)
+    if base >= 3:
+        return "📈 STEIGEND", "up"
+    if base <= -3:
+        return "📉 FALLEND", "down"
+    return "➡️ SEITWÄRTS", "side"
+
+
+def card_html(r, idx=None, context="invest"):
     color = r.get("radar_color", "#6b7280")
+    proj_key = "projection_short" if context == "trade" else "projection_long"
     asch = r.get("aschenbrenner")
     asch_cls = " asch" if asch else ""
     asch_badge = (f'<span class="asch-badge">{_esc(asch["label"])} · {asch.get("weight_pct")}%</span>'
@@ -187,21 +221,24 @@ def card_html(r, idx=None, proj_key="projection_long"):
     qp_line = (f'<div class="qp">🏅 Qualität: <b>{_qplabel(q)}</b> '
                f'({q if q is not None else "–"}/100) · 🚀 Potenzial: <b>{_qplabel(pot)}</b> '
                f'({pot if pot is not None else "–"}/100)</div>')
-    au, an = r.get("analyst_upside_pct"), r.get("analyst_n")
-    ana_txt = ""
-    if isinstance(au, (int, float)) and an:
-        rk = {"strong_buy": "Kauf++", "buy": "Kauf", "hold": "Halten",
-              "underperform": "Reduzieren", "sell": "Verkauf"}.get(
-                  r.get("analyst_rating"), r.get("analyst_rating") or "")
-        ana_txt = f'🎯 {_esc(rk)} {au:+.0f}% (n={an})'
+
+    # --- direction + headline stats ---
+    dlabel, dcls = _direction(r, context)
     conv = r.get("conviction")
-    up = r.get("upside_pct")
-    up_txt = f'{up:+.0f}%' if isinstance(up, (int, float)) else "–"
+    if context == "invest":
+        up = r.get("upside_pct")
+        pot_stat = (f'<span class="stat">🚀 Kursziel <b>{up:+.0f}%</b></span>'
+                    if isinstance(up, (int, float)) else "")
+    else:
+        atr = r.get("atr_pct")
+        pot_stat = (f'<span class="stat">⚡ Tagesschwankung <b>±{atr:.0f}%</b></span>'
+                    if isinstance(atr, (int, float)) else "")
     ut = r.get("urgency_tone") or "calm"
-    stat_row = (f'<div class="stats">'
-                f'<span class="stat">🎯 Konfidenz <b>{conv if conv is not None else "–"}%</b></span>'
-                f'<span class="stat">🚀 Potenzial <b>{up_txt}</b></span>'
+    stat_row = (f'<div class="stats"><span class="dir dir-{dcls}">{dlabel}</span>'
+                f'<span class="stat">🎯 Sicherheit <b>{conv if conv is not None else "–"}%</b></span>'
+                f'{pot_stat}'
                 f'<span class="urg urg-{ut}">{_esc(r.get("urgency") or "")}</span></div>')
+
     news_lbl = {"positiv": "🟢 News +", "negativ": "🔴 News −",
                 "neutral": "⚪ News ="}.get(r.get("news_sentiment"))
     if news_lbl and r.get("news_mode") == "KI":
@@ -219,19 +256,28 @@ def card_html(r, idx=None, proj_key="projection_long"):
         chg = r.get("hype_change_pct")
         hype_txt = (f'{fire}Reddit #{r.get("hype_rank")}'
                     + (f' ({chg:+.0f}%)' if isinstance(chg, (int, float)) else ""))
+    ana_txt = ""
+    au, an = r.get("analyst_upside_pct"), r.get("analyst_n")
+    if context == "invest" and isinstance(au, (int, float)) and an:
+        rk = {"strong_buy": "Kauf++", "buy": "Kauf", "hold": "Halten",
+              "underperform": "Reduzieren", "sell": "Verkauf"}.get(
+                  r.get("analyst_rating"), r.get("analyst_rating") or "")
+        ana_txt = f'🎯 Analysten {_esc(rk)} {au:+.0f}% (n={an})'
     sig_bits = [b for b in [(f'{news_lbl} ({r.get("news_n")})' if news_lbl and r.get("news_n") else None),
                             ana_txt, hype_txt, earn_txt] if b]
     sig_line = f'<div class="meta">{" · ".join(sig_bits)}</div>' if sig_bits else ""
-    rank = f"#{idx} " if idx else ""
+
+    rank_badge = (f'<div class="rankbadge" style="background:{color}">{idx}</div>' if idx else "")
     return (
         f'<div class="card{asch_cls}" style="border-left-color:{color}">'
         f'<div class="hd">'
+        f'{rank_badge}'
         f'<div class="score">'
         f'<div class="num" style="color:{color}">{r.get("radar_score")}<small>/100</small></div>'
         f'<div class="stars" style="color:#f59e0b">{_stars(r.get("stars"))}</div>'
         f'<div class="elo">ELO {r.get("radar_elo")}</div>'
         f'</div>'
-        f'<div class="name"><div class="tk">{rank}{_esc(r["symbol"])} · {_esc(r.get("name") or "")}</div>'
+        f'<div class="name"><div class="tk">{_esc(r["symbol"])} · {_esc(r.get("name") or "")}</div>'
         f'<div class="rt" style="color:{color}">{_esc(r.get("radar_rating"))}</div></div>'
         f'{sector_badge}{asch_badge}</div>'
         f'{stat_row}'
@@ -241,62 +287,51 @@ def card_html(r, idx=None, proj_key="projection_long"):
         f'{qp_line}'
         f'<div class="summary">{_esc(r.get("plain_summary",""))}</div>'
         f'{llm_div}'
-        f'{_proj_html(r.get(proj_key))}'
+        f'{_proj_html(r.get(proj_key), context)}'
         f'<div class="chips">{chips}</div>'
         f'{news_div}'
         f'</div>'
     )
 
 
-def grid(picks, numbered=True, proj_key="projection_long"):
-    cards = "".join(card_html(r, i if numbered else None, proj_key) for i, r in enumerate(picks, 1))
+def grid(picks, numbered=True, context="invest"):
+    cards = "".join(card_html(r, i if numbered else None, context) for i, r in enumerate(picks, 1))
     st.markdown(f'<div class="radar-grid">{cards}</div>', unsafe_allow_html=True)
 
 
-_TIER_ORDER = ["Top-Chance", "Stark", "Solide", "Neutral", "Schwach", "Meiden"]
-_TIER_DESC = {
-    "Top-Chance": "höchste Qualität & Potenzial", "Stark": "starke Kandidaten",
-    "Solide": "solide Basis", "Neutral": "durchschnittlich",
-    "Schwach": "wenig überzeugend", "Meiden": "eher meiden",
-}
-
-
-def grid_tiered(picks, proj_key="projection_long"):
-    """Render picks grouped under quality/potential tier headers (hierarchical)."""
-    groups = {}
-    for r in picks:
-        groups.setdefault(r.get("radar_rating", "Neutral"), []).append(r)
-    shown = False
-    for tier in _TIER_ORDER:
-        g = groups.get(tier)
-        if not g:
-            continue
-        shown = True
-        st.markdown(f'<div class="tier-h">{tier} '
-                    f'<span class="tier-sub">— {_TIER_DESC.get(tier, "")} · {len(g)}</span></div>',
-                    unsafe_allow_html=True)
-        grid(g, numbered=False, proj_key=proj_key)
-    if not shown:
-        grid(picks)
+def grid_split(picks):
+    """Trading view split into Long (rising) and Short (falling), each ranked."""
+    longs = [r for r in picks if r.get("daytrade_direction") == "LONG"]
+    shorts = [r for r in picks if r.get("daytrade_direction") == "SHORT"]
+    if longs:
+        st.markdown('<div class="day-h" style="color:#15803d">📈 Steigen erwartet – Long/Kaufen '
+                    f'({len(longs)})</div>', unsafe_allow_html=True)
+        grid(longs, numbered=True, context="trade")
+    if shorts:
+        st.markdown('<div class="day-h" style="color:#b91c1c">📉 Fallen erwartet – Short/Verkaufen '
+                    f'({len(shorts)})</div>', unsafe_allow_html=True)
+        grid(shorts, numbered=True, context="trade")
+    if not longs and not shorts:
+        grid(picks, numbered=True, context="trade")
 
 
 tabs = st.tabs(["🎯 Heute", "🚀 Daytrading", "🏦 Langzeit", "📊 Fundamental", "🧠 Aschenbrenner",
                 "🔥 Social", "💼 Paper-Depot", "🔎 Alle"])
 
 with tabs[0]:
-    st.caption("**Deine Top-Chancen heute** – nach Rang. Pro Aktie: 🎯 **Konfidenz** (wie sicher), "
-               "🚀 **Potenzial** (erwarteter Gewinn), ⏱️ **Dringlichkeit** (wie schnell handeln).")
-    st.markdown('<div class="day-h">🚀 Zum Handeln – kurzfristig (Rang nach Chance)</div>',
+    st.caption("**Deine Top-Chancen heute**, nach Rang. Jede Karte zeigt oben: **Richtung** "
+               "(📈 steigend / 📉 fallend), 🎯 **Sicherheit** (wie überzeugt), 🚀 **Potenzial/Ziel** und "
+               "⏱️ **Dringlichkeit**. Die große Zahl links ist der Rang.")
+    st.markdown('<div class="day-h">🚀 Zum Handeln – kurzfristig</div>', unsafe_allow_html=True)
+    grid_split(data["top_daytrade"])
+    st.markdown('<div class="day-h">🏦 Fürs Depot – langfristig (Rang 1 = beste Chance)</div>',
                 unsafe_allow_html=True)
-    grid(data["top_daytrade"], numbered=True, proj_key="projection_short")
-    st.markdown('<div class="day-h">🏦 Fürs Depot – langfristig (Rang nach Qualität × Potenzial)</div>',
-                unsafe_allow_html=True)
-    grid(data["top_longterm"], numbered=True)
+    grid(data["top_longterm"], numbered=True, context="invest")
 
 with tabs[1]:
-    st.caption("Kurzfristige Momentum-, Breakout- und Volumen-Setups (Long **und** Short), "
-               "**Rang 1 = beste Chance**. Projektion auf 1 Tag & 1 Woche.")
-    grid(data["top_daytrade"], numbered=True, proj_key="projection_short")
+    st.caption("Kurzfristige Setups, getrennt in **Long (steigend)** und **Short (fallend)**, je nach "
+               "Chance gereiht. Große Zahl = Rang.")
+    grid_split(data["top_daytrade"])
 
 with tabs[2]:
     st.caption("Langzeit-Rangliste (**#1 = beste Chance**): Technik + Fundamental + Analysten + News. "
