@@ -99,6 +99,10 @@ CSS = """
 .card .expert-badge{display:inline-block;background:#fef3c7;color:#92400e;border:1px solid #fcd34d;font-weight:700;font-size:11px;padding:2px 8px;border-radius:999px;margin:2px 0 0 4px;}
 .card .vol-badge{display:inline-block;background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;font-weight:700;font-size:11px;padding:2px 8px;border-radius:999px;margin:2px 0 0 4px;}
 .card .riskbar{margin:8px 0 0;padding:7px 11px;border-radius:8px;background:#fef2f2;border:1px solid #fca5a5;border-left:4px solid #dc2626;color:#b91c1c;font-weight:700;font-size:12px;line-height:1.5;}
+.card .entry-why{margin:6px 0 0;font-size:12px;font-weight:600;padding:4px 9px;border-radius:7px;}
+.card .entry-why-up{background:#f0fdf4;color:#15803d;}
+.card .entry-why-soon{background:#fffbeb;color:#a16207;}
+.card .entry-why-down{background:#fef2f2;color:#b91c1c;}
 </style>
 """
 st.markdown(CSS, unsafe_allow_html=True)
@@ -129,9 +133,13 @@ with st.expander("ℹ️ Legende – was bedeuten die Zahlen?"):
   **Quality** (Ertragskraft/Bilanz) · **Growth** (Wachstum) – je 0–100.
 - **🟣 Aschenbrenner-Badge** – Position im Fonds *Situational Awareness LP*. **LONG** = er setzt auf
   steigende Kurse · **Short-Wette** = Put-Option (gegen die Aktie) · **gemischt** = Absicherung.
-- **🎬 Einstieg jetzt (0–100)** – wie gut der **aktuelle Kurs** zum Einsteigen ist: **hoch** = gesunder
-  Rücksetzer / günstig bewertet / nahe am Tief in intaktem Trend; **niedrig** = heißgelaufen/überkauft/
-  an den Höchstständen (schlechter Einstieg). Grün = gut, Gelb = okay, Rot = eher teuer.
+- **🎬 Einstieg jetzt (0–100) + „Timing"-Zeile** – wie gut der **aktuelle Moment** zum Kaufen ist, nach
+  Profi-Logik: **Trend-Regime zuerst** (Dips kauft man nur im Aufwärtstrend – im Abwärtstrend ist jeder
+  Rücksetzer Fallende-Messer-Risiko und wird stark abgewertet), **kontrollierter Rücksetzer** an einen
+  steigenden Durchschnitt (nicht überdehnt/nachlaufend), **Momentum-Bestätigung** (dreht MACD/Stochastik
+  wieder hoch, Kurs über EMA9?) und **Malus, wenn kurzfristig noch fallend**. Die **grün/gelb/rote
+  Timing-Zeile** sagt in Klartext, *warum* – z.B. „gesunder Rücksetzer, Momentum dreht" vs. „noch fallend –
+  auf Stabilisierung warten".
 - **🎯 Sicherheit · 💰 Gewinnpotenzial · ⏱️ Dringlichkeit** (oben auf jeder Karte): wie **sicher** das Signal
   ist (Übereinstimmung aller Faktoren), das **Gewinnpotenzial in +%** aus dem Handlungsplan, und wie
   **schnell** zu handeln ist (Sofort heute / Diese Woche / In Ruhe langfristig).
@@ -303,6 +311,17 @@ def _pro_details(r):
         f'{minervini}'
         '</details>'
     )
+
+
+def _entry_why(r):
+    """Plain-language timing verdict shown right under the header stats."""
+    why = r.get("entry_reason")
+    if not why:
+        return ""
+    es = r.get("entry_score")
+    tone = "up" if isinstance(es, (int, float)) and es >= 55 else \
+           "down" if isinstance(es, (int, float)) and es < 38 else "soon"
+    return f'<div class="entry-why entry-why-{tone}">🎬 Timing: {_esc(why)}</div>'
 
 
 def _risk_bar(r):
@@ -486,6 +505,7 @@ def card_html(r, idx=None, context="invest"):
         f'<div class="rt" style="color:{color}">{_esc(r.get("radar_rating"))}</div></div>'
         f'{sector_badge}{expert_badge}{vol_badge}{asch_badge}</div>'
         f'{stat_row}'
+        f'{_entry_why(r)}'
         f'{_risk_bar(r)}'
         f'{_plan_html(r, context)}'
         f'<div class="meta">{meta_line}</div>'

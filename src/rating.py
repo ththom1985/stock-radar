@@ -151,34 +151,64 @@ def _band(x, bands):
     return bands[-1][1]
 
 
-def entry_score(row):
-    """0-100: how good the CURRENT price is as an entry point right now.
-    High = healthy pullback / near a low / cheap / room to analyst target,
-    in an intact trend. Low = overbought / at the highs / chasing hype."""
-    parts = []
-    rsi = row.get("rsi")
-    if _has(rsi):  # timing: pullback good, overbought bad
-        parts.append((_band(rsi, [(30, 75), (45, 92), (55, 74), (65, 55), (72, 34), (200, 15)]), 0.30))
-    pfh = row.get("pct_from_high52")
-    if _has(pfh):  # distance below 52w-high: discount = closer to a low
-        parts.append((_band(pfh, [(-45, 45), (-25, 72), (-10, 88), (-3, 55), (200, 32)]), 0.25))
-    vs = row.get("value_score")
-    if _has(vs):
-        parts.append((vs, 0.20))
-    au, an = row.get("analyst_upside_pct"), row.get("analyst_n") or 0
-    if _has(au) and an >= 3:  # room to analyst target
-        parts.append((_band(au, [(0, 25), (10, 50), (25, 72), (45, 90), (1e9, 100)]), 0.15))
+def _macd_turning_up(row):
+    h, hp = row.get("macd_hist"), row.get("macd_hist_prev")
+    return _has(h) and _has(hp) and h > hp
+
+
+def _extension_pct(row):
+    """% the price sits above its rising short MA (pullback depth). None if n/a."""
+    price = row.get("price")
+    ref = row.get("sma20") if _has(row.get("sma20")) else row.get("sma50")
+    if _has(price) and _has(ref) and ref > 0:
+        return (price / ref - 1) * 100
+    return None
+
+
+def _regime(row):
+    """'up' / 'down' / 'neutral' trend regime for entry timing."""
+    stage = row.get("weinstein_stage")
     lt = row.get("longterm_score")
-    if _has(lt):  # trend support: a dip in an uptrend is buyable
-        parts.append((lt, 0.10))
-    if not parts:
-        return None
-    score = sum(v * w for v, w in parts) / sum(w for _, w in parts)
-    if row.get("hype_surging") and _has(rsi) and rsi > 68:
-        score -= 12  # buying into froth is a poor entry
-    # Volatility dampening: a "good entry level" on a very swingy stock is far
-    # less precise — a normal single day can move several %. Wild names must not
-    # read as an unqualified "sehr gut".
+    price, s150, s150p = row.get("price"), row.get("sma150"), row.get("sma150_1m_ago")
+    up = (stage == 2) or (_has(lt) and lt >= 62) or (
+        _has(price) and _has(s150) and _has(s150p) and price > s150 and s150 > s150p)
+    down = (stage == 4) or (_has(lt) and lt <= 30) or (
+        _has(price) and _has(s150) and _has(s150p) and price < s150 and s150 < s150p)
+    if down and not up:
+        return "down"
+    if up and not down:
+        return "up"
+    return "neutral"
+
+
+def _momentum_turn_score(row):
+    """0-100: is short-term momentum stabilising / turning UP (good for a buy)
+    or still falling (a knife you should not catch)?"""
+    s = 50
+    h, hp = row.get("macd_hist"), row.get("macd_hist_prev")
+    if _has(h) and _has(hp):
+        s += 18 if h > hp else -18          # histogram rising = momentum improving
+        if h > 0:
+            s += 6
+    dd = row.get("daytrade_direction")
+    if dd == "LONG":
+        s += 16
+    elif dd == "SHORT":
+        s -= 16
+    price, ema9 = row.get("price"), row.get("ema9")
+    if _has(price) and _has(ema9):
+        s += 8 if price > ema9 else -8      # reclaimed the fast EMA
+    k, dsig = row.get("stoch_k"), row.get("stoch_d")
+    if _has(k) and _has(dsig):
+        if k > dsig and k < 45:
+            s += 10                          # bullish stochastic cross from low
+        elif k < dsig and k > 70:
+            s -= 8
+    return max(0, min(100, s))
+
+
+def _entry_vol_adjust(score, row):
+    """Dampen the entry score for very swingy names (imprecise timing)."""
     atrp = row.get("atr_pct")
     if _has(atrp) and atrp > 4:
         score -= min(22, (atrp - 4) * 2.5)
@@ -186,6 +216,86 @@ def entry_score(row):
     if _has(beta) and beta > 1.6:
         score -= min(10, (beta - 1.6) * 8)
     return int(round(max(0, min(100, score))))
+
+
+def entry_score(row):
+    """0-100: how good NOW is as a BUY entry — regime-aware.
+
+    Philosophy from the literature: only buy dips in an uptrend; wait for
+    momentum to turn back up (don't catch a falling knife); don't chase moves
+    extended far above the average; reward a controlled pullback near rising
+    support. In a downtrend there is essentially no good long entry.
+    """
+    if not _has(row.get("price")):
+        return None
+    rsi = row.get("rsi")
+    regime = _regime(row)
+
+    # Confirmed downtrend → dips are falling-knife risk, cap low.
+    if regime == "down":
+        base = 20
+        if _has(rsi) and rsi < 30 and _macd_turning_up(row):
+            base = 34  # only a speculative oversold bounce
+        return _entry_vol_adjust(base, row)
+
+    parts = []
+    # 1) Pullback depth: best when near/just above a rising MA, poor when extended
+    ext = _extension_pct(row)
+    if ext is not None:
+        parts.append((_band(ext, [(-6, 55), (0, 88), (4, 92), (9, 74),
+                                   (16, 52), (30, 32), (1e9, 18)]), 0.28))
+    # 2) RSI timing: healthy reset best; overbought = chasing; very deep = risky
+    if _has(rsi):
+        parts.append((_band(rsi, [(30, 55), (40, 82), (52, 90), (60, 70),
+                                  (68, 48), (75, 28), (200, 15)]), 0.24))
+    # 3) Momentum confirmation — has the dip stopped falling / turned up?
+    parts.append((_momentum_turn_score(row), 0.28))
+    # 4) Trend support (a dip in a strong uptrend is buyable)
+    lt = row.get("longterm_score")
+    if _has(lt):
+        parts.append((lt, 0.12))
+    # 5) Cheap helps for the longer hold
+    vs = row.get("value_score")
+    if _has(vs):
+        parts.append((vs, 0.08))
+
+    if not parts:
+        return None
+    score = sum(v * w for v, w in parts) / sum(w for _, w in parts)
+    if row.get("daytrade_direction") == "SHORT":
+        score -= 18                          # still in a short-term downtrend
+    if regime == "neutral":
+        score -= 6                           # no clear trend to lean on
+    if row.get("hype_surging") and _has(rsi) and rsi > 68:
+        score -= 12
+    return _entry_vol_adjust(score, row)
+
+
+def entry_reason(row):
+    """Plain-German one-liner explaining WHY the timing is good/bad right now."""
+    if not _has(row.get("price")):
+        return ""
+    rsi = row.get("rsi")
+    dd = row.get("daytrade_direction")
+    ext = _extension_pct(row)
+    turning = _macd_turning_up(row) or dd == "LONG"
+    if _regime(row) == "down":
+        if _has(rsi) and rsi < 30 and turning:
+            return "Abwärtstrend, aber stark überverkauft und dreht – nur spekulativer Rebound"
+        return "Abwärtstrend – Rücksetzer sind Fallende-Messer-Risiko, besser meiden"
+    if _has(rsi) and rsi >= 72:
+        return "heißgelaufen (überkauft) – besser einen Rücksetzer abwarten"
+    if ext is not None and ext > 15:
+        return "weit über dem Durchschnitt (gestreckt) – nicht hinterherlaufen"
+    if dd == "SHORT":
+        return "kurzfristig noch fallend – auf Stabilisierung/Dreh nach oben warten"
+    if ext is not None and -4 <= ext <= 8 and turning:
+        return "gesunder Rücksetzer im Aufwärtstrend, Momentum dreht – günstiges Fenster"
+    if _has(rsi) and rsi < 35 and turning:
+        return "stark abverkauft und dreht nach oben – spekulativer Rebound"
+    if turning:
+        return "Momentum dreht nach oben – Einstieg wird interessanter"
+    return "kein klares Einstiegssignal – abwarten oder nur klein antesten"
 
 
 def entry_label(score):
