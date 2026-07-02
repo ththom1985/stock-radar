@@ -1,6 +1,5 @@
-yfinance>=0.2.40
-pandas>=2.0
-numpy>=1.24
-feedparser>=6.0
-anthropic>=0.40
+# Abhängigkeiten für das DASHBOARD (Streamlit Cloud + lokale Anzeige).
+# Bewusst schlank – das Dashboard liest nur data/output/latest.json & portfolio.json.
+# Die Analyse-Pipeline (GitHub Actions) nutzt die volle Liste in requirements-ci.txt.
 streamlit>=1.30
+pandas>=2.0
