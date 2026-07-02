@@ -218,6 +218,56 @@ def _entry_vol_adjust(score, row):
     return int(round(max(0, min(100, score))))
 
 
+def _supports_below(row):
+    """Distinct real support levels below the current price, nearest first."""
+    P = row.get("price")
+    if not _has(P):
+        return []
+    cands = [row.get(k) for k in ("sma20", "sma50", "sma150", "sma200",
+                                  "pivot", "pivot_s1", "low20", "low52", "ema21")]
+    below = sorted({round(c, 2) for c in cands
+                    if isinstance(c, (int, float)) and 0 < c < P}, reverse=True)
+    merged = []
+    for c in below:
+        if not merged or abs(merged[-1] / c - 1) > 0.015:  # drop near-duplicate levels
+            merged.append(c)
+    return merged
+
+
+def downside_analysis(row):
+    """How far could it fall before real support — is a bottom near or is there
+    air below? Answers 'wird sie noch weiter fallen?' with price structure, not
+    a guess. Returns support levels, downside %, a risk level and a verdict."""
+    P = row.get("price")
+    if not _has(P):
+        return None
+    sup = _supports_below(row)
+    atrp = row.get("atr_pct") or 3
+    s1 = sup[0] if sup else None
+    s2 = sup[1] if len(sup) > 1 else None
+    room1 = (P / s1 - 1) * 100 if s1 else None
+    turning = _macd_turning_up(row) and row.get("daytrade_direction") != "SHORT"
+    near = room1 is not None and room1 <= 1.5 * atrp
+    regime = _regime(row)
+
+    if regime == "down" and not turning:
+        risk, verdict = "hoch", "Abwärtstrend intakt – ein weiterer Rückgang ist wahrscheinlicher als ein Boden."
+    elif near and turning and regime != "down":
+        risk, verdict = "gering", "nahe einer starken Unterstützung und Momentum dreht – ein Boden ist wahrscheinlicher."
+    elif near:
+        risk, verdict = "mittel", "dicht an einer Unterstützung – dort erst Stabilisierung abwarten."
+    elif room1 is not None and room1 > 3 * atrp:
+        risk = "hoch" if not turning else "mittel"
+        verdict = "viel Luft nach unten bis zur nächsten Unterstützung – erhöhtes Rückschlagrisiko."
+    else:
+        risk, verdict = "mittel", "moderater Puffer bis zur nächsten Unterstützung."
+    return {
+        "support1": s1, "support1_pct": round(-room1, 1) if room1 is not None else None,
+        "support2": s2, "support2_pct": round(-(P / s2 - 1) * 100, 1) if s2 else None,
+        "risk": risk, "verdict": verdict,
+    }
+
+
 def entry_score(row):
     """0-100: how good NOW is as a BUY entry — regime-aware.
 
@@ -268,6 +318,16 @@ def entry_score(row):
         score -= 6                           # no clear trend to lean on
     if row.get("hype_surging") and _has(rsi) and rsi > 68:
         score -= 12
+    # Downside room: sitting on support (limited fall) is a better entry than
+    # hanging in the air far above the next floor (room to keep falling).
+    sup = _supports_below(row)
+    atrp = row.get("atr_pct")
+    if sup and _has(atrp) and atrp > 0:
+        room = (row["price"] / sup[0] - 1) * 100
+        if room <= 1.2 * atrp:
+            score += 8                       # cushioned by nearby support
+        elif room >= 4 * atrp:
+            score -= 8                       # air below → can fall further
     return _entry_vol_adjust(score, row)
 
 

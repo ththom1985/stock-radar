@@ -103,6 +103,15 @@ CSS = """
 .card .entry-why-up{background:#f0fdf4;color:#15803d;}
 .card .entry-why-soon{background:#fffbeb;color:#a16207;}
 .card .entry-why-down{background:#fef2f2;color:#b91c1c;}
+.card .px{font-size:13px;color:#0f172a;margin-top:3px;}
+.card .px b{font-size:16px;font-weight:800;}
+.card .px .px-up{font-weight:800;color:#16a34a;}
+.card .px .px-down{font-weight:800;color:#dc2626;}
+.card .downside{margin:6px 0 0;font-size:12px;font-weight:600;padding:5px 9px;border-radius:7px;line-height:1.5;}
+.card .downside b{font-weight:800;}
+.card .downside-up{background:#f0fdf4;color:#15803d;}
+.card .downside-soon{background:#fffbeb;color:#a16207;}
+.card .downside-down{background:#fef2f2;color:#b91c1c;}
 </style>
 """
 st.markdown(CSS, unsafe_allow_html=True)
@@ -143,6 +152,13 @@ with st.expander("ℹ️ Legende – was bedeuten die Zahlen?"):
 - **🎯 Sicherheit · 💰 Gewinnpotenzial · ⏱️ Dringlichkeit** (oben auf jeder Karte): wie **sicher** das Signal
   ist (Übereinstimmung aller Faktoren), das **Gewinnpotenzial in +%** aus dem Handlungsplan, und wie
   **schnell** zu handeln ist (Sofort heute / Diese Woche / In Ruhe langfristig).
+- **💶 Kurs** (im Karten-Kopf) – der aktuelle Kurs (Tagesschluss, ~15 Min verzögert) mit Tagesveränderung
+  (grün/rot). Währung je nach Börse (US = $, .DE = €, …), ohne Symbol dargestellt.
+- **📉 Abwärtsrisiko** (grün/gelb/rote Zeile) – **wie weit könnte die Aktie noch fallen?** Zeigt die
+  **nächste(n) Unterstützung(en)** unter dem Kurs (Kurslevel + % Abstand) und ein Urteil: *„Boden
+  wahrscheinlicher"* (nahe Unterstützung + Momentum dreht) vs. *„viel Luft nach unten – Rückschlagrisiko"*
+  vs. *„Abwärtstrend intakt – weiterer Rückgang wahrscheinlich"*. Genau die Frage „ist der Boden nah oder
+  fällt sie noch weiter?".
 - **⚠️ Rote Warn-Leiste** (über dem Handlungsplan) – macht Risiken sichtbar, die ein hoher Score sonst
   verdeckt: **„Spitzenzyklus möglich"** (zyklische Branche wie Chips/Rohstoffe/Auto mit explodierten
   Gewinnen → niedriges KGV kann trügen, Gewinne evtl. nicht dauerhaft) und **„Langfristig positiv, aber
@@ -324,6 +340,24 @@ def _entry_why(r):
     return f'<div class="entry-why entry-why-{tone}">🎬 Timing: {_esc(why)}</div>'
 
 
+def _downside_html(r):
+    """How far it could fall to real support — answers 'fällt sie noch weiter?'"""
+    dn = r.get("downside")
+    if not dn:
+        return ""
+    risk = dn.get("risk")
+    tone = {"hoch": "down", "mittel": "soon", "gering": "up"}.get(risk, "soon")
+    s1, s1p = dn.get("support1"), dn.get("support1_pct")
+    s2, s2p = dn.get("support2"), dn.get("support2_pct")
+    sup = ""
+    if s1 is not None:
+        sup = f' Nächste Unterstützung <b>{s1}</b> ({s1p:+.0f} %)'
+        if s2 is not None:
+            sup += f', dann <b>{s2}</b> ({s2p:+.0f} %)'
+    return (f'<div class="downside downside-{tone}">📉 Abwärtsrisiko <b>{_esc(risk)}</b> – '
+            f'{_esc(dn.get("verdict",""))}{sup}</div>')
+
+
 def _risk_bar(r):
     """Loud red warnings that a high score can hide (cyclical peak, bad timing)."""
     rw = r.get("risk_warnings") or []
@@ -432,8 +466,15 @@ def card_html(r, idx=None, context="invest"):
         swing = f' · ±{atrp:.0f}%/Tag' if isinstance(atrp, (int, float)) else ""
         vol_badge = f'<span class="vol-badge">⚠️ Sehr schwankungsstark{swing}</span>'
     meta_line = ((f'{_esc(industry)} · ' if industry else "")
-                 + f'Kurs {r.get("price")} · KGV {pe if pe else "–"} · '
+                 + f'KGV {pe if pe else "–"} · '
                  f'ROE {roe if roe is not None else "–"}%')
+    px = r.get("price")
+    dchg = r.get("daily_return_pct")
+    chg_txt = ""
+    if isinstance(dchg, (int, float)):
+        pcls = "up" if dchg >= 0 else "down"
+        chg_txt = f' <span class="px-{pcls}">{dchg:+.1f}%</span>'
+    price_line = f'<div class="px">💶 Kurs <b>{px}</b>{chg_txt}</div>' if px is not None else ""
     q, pot = r.get("quality"), r.get("potential")
     qp_line = (f'<div class="qp">🏅 Qualität: <b>{_qplabel(q)}</b> '
                f'({q if q is not None else "–"}/100) · 🚀 Potenzial: <b>{_qplabel(pot)}</b> '
@@ -502,10 +543,12 @@ def card_html(r, idx=None, context="invest"):
         f'<div class="elo">ELO {r.get("radar_elo")}</div>'
         f'</div>'
         f'<div class="name"><div class="tk">{_esc(r["symbol"])} · {_esc(r.get("name") or "")}</div>'
+        f'{price_line}'
         f'<div class="rt" style="color:{color}">{_esc(r.get("radar_rating"))}</div></div>'
         f'{sector_badge}{expert_badge}{vol_badge}{asch_badge}</div>'
         f'{stat_row}'
         f'{_entry_why(r)}'
+        f'{_downside_html(r)}'
         f'{_risk_bar(r)}'
         f'{_plan_html(r, context)}'
         f'<div class="meta">{meta_line}</div>'

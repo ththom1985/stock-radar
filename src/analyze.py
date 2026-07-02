@@ -26,7 +26,7 @@ from .aschenbrenner import load_aschenbrenner, stance_for
 from .rating import (radar_elo, radar_score, stars, plain_summary, suggest_actions,
                      quality_score as calc_quality, potential_score as calc_potential,
                      conviction, urgency, upside_pct, entry_score, entry_reason,
-                     trade_plan, risk_warnings)
+                     downside_analysis, trade_plan, risk_warnings)
 from .projection import project
 from .social import fetch_social, social_signal
 from .deep_fundamentals import fetch_deep
@@ -253,6 +253,7 @@ def run(with_news=True, with_fundamentals=True):
         r["upside_pct"] = upside_pct(r)
         r["entry_score"] = entry_score(r)
         r["entry_reason"] = entry_reason(r)
+        r["downside"] = downside_analysis(r)
         r["trade_plan_long"] = trade_plan(r, "invest")
         r["trade_plan_short"] = trade_plan(r, "trade")
         r["risk_warnings"] = risk_warnings(r)
