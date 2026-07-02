@@ -176,6 +176,15 @@ def entry_score(row):
     score = sum(v * w for v, w in parts) / sum(w for _, w in parts)
     if row.get("hype_surging") and _has(rsi) and rsi > 68:
         score -= 12  # buying into froth is a poor entry
+    # Volatility dampening: a "good entry level" on a very swingy stock is far
+    # less precise — a normal single day can move several %. Wild names must not
+    # read as an unqualified "sehr gut".
+    atrp = row.get("atr_pct")
+    if _has(atrp) and atrp > 4:
+        score -= min(22, (atrp - 4) * 2.5)
+    beta = row.get("beta")
+    if _has(beta) and beta > 1.6:
+        score -= min(10, (beta - 1.6) * 8)
     return int(round(max(0, min(100, score))))
 
 

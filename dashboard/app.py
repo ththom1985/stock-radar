@@ -97,6 +97,7 @@ CSS = """
 .card .plan-foot .rk{color:#b91c1c;font-weight:700;font-size:12px;}
 .card .plan-foot .crv{color:#334155;font-weight:700;font-size:12px;background:#e2e8f0;padding:2px 9px;border-radius:999px;}
 .card .expert-badge{display:inline-block;background:#fef3c7;color:#92400e;border:1px solid #fcd34d;font-weight:700;font-size:11px;padding:2px 8px;border-radius:999px;margin:2px 0 0 4px;}
+.card .vol-badge{display:inline-block;background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;font-weight:700;font-size:11px;padding:2px 8px;border-radius:999px;margin:2px 0 0 4px;}
 </style>
 """
 st.markdown(CSS, unsafe_allow_html=True)
@@ -391,6 +392,12 @@ def card_html(r, idx=None, context="invest"):
     sector_badge = f'<span class="sector-badge">🏷️ {_esc(sector)}</span>' if sector else ""
     esrc = r.get("expert_sources") or []
     expert_badge = (f'<span class="expert-badge">⭐ {_esc(" · ".join(esrc))}</span>' if esrc else "")
+    atrp, beta = r.get("atr_pct"), r.get("beta")
+    _volatile = (isinstance(atrp, (int, float)) and atrp >= 5) or (isinstance(beta, (int, float)) and beta >= 1.8)
+    vol_badge = ""
+    if _volatile:
+        swing = f' · ±{atrp:.0f}%/Tag' if isinstance(atrp, (int, float)) else ""
+        vol_badge = f'<span class="vol-badge">⚠️ Sehr schwankungsstark{swing}</span>'
     meta_line = ((f'{_esc(industry)} · ' if industry else "")
                  + f'Kurs {r.get("price")} · KGV {pe if pe else "–"} · '
                  f'ROE {roe if roe is not None else "–"}%')
@@ -463,7 +470,7 @@ def card_html(r, idx=None, context="invest"):
         f'</div>'
         f'<div class="name"><div class="tk">{_esc(r["symbol"])} · {_esc(r.get("name") or "")}</div>'
         f'<div class="rt" style="color:{color}">{_esc(r.get("radar_rating"))}</div></div>'
-        f'{sector_badge}{expert_badge}{asch_badge}</div>'
+        f'{sector_badge}{expert_badge}{vol_badge}{asch_badge}</div>'
         f'{stat_row}'
         f'{_plan_html(r, context)}'
         f'<div class="meta">{meta_line}</div>'
