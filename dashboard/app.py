@@ -58,6 +58,14 @@ CSS = """
 .tier-h{font-size:18px;font-weight:800;margin:20px 0 2px;padding-bottom:3px;
   border-bottom:2px solid #e5e7eb;}
 .tier-sub{font-size:12px;color:#6b7280;margin-bottom:4px;}
+.card .stats{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:7px 0 3px;font-size:12.5px;}
+.card .stat{background:#f1f5f9;border-radius:9px;padding:3px 9px;color:#334155;}
+.card .stat b{color:#0f172a;}
+.urg{padding:3px 10px;border-radius:11px;font-size:11.5px;font-weight:800;}
+.urg-urgent{background:#fee2e2;color:#991b1b;}
+.urg-soon{background:#ffedd5;color:#9a3412;}
+.urg-calm{background:#dcfce7;color:#166534;}
+.day-h{font-size:19px;font-weight:800;margin:14px 0 2px;}
 </style>
 """
 st.markdown(CSS, unsafe_allow_html=True)
@@ -88,6 +96,11 @@ with st.expander("ℹ️ Legende – was bedeuten die Zahlen?"):
   **Quality** (Ertragskraft/Bilanz) · **Growth** (Wachstum) – je 0–100.
 - **🟣 Aschenbrenner-Badge** – Position im Fonds *Situational Awareness LP*. **LONG** = er setzt auf
   steigende Kurse · **Short-Wette** = Put-Option (gegen die Aktie) · **gemischt** = Absicherung.
+- **🎯 Konfidenz · 🚀 Potenzial · ⏱️ Dringlichkeit** (oben auf jeder Karte): wie **sicher** das Signal
+  ist (Übereinstimmung aller Faktoren), wie viel **Kurspotenzial** drin ist (Analysten-Ziel bzw. 12-Monats-
+  Prognose), und wie **schnell** zu handeln ist (Sofort heute / Diese Woche / In Ruhe langfristig).
+- **🏷️ Sektor-Badge & Branche** – Wirtschaftssektor und feinere Branche der Aktie.
+- **🎯 Analysten** – Konsens-Empfehlung + Ø-Kursziel in % zum aktuellen Kurs (n = Anzahl Analysten).
 - **Handlungs-Chips** – konkrete Ideen. 🟢 Grün = Chance · 🔴 Rot = Vorsicht · ⚪ Grau = neutral.
 - **🟢/🔴 News (n)** – Stimmung der aktuellen Schlagzeilen (n = Anzahl), fließt in den Score ein.
   **📅 Zahlen** – nächster Termin der Geschäftszahlen; „in X T." = Tage bis dahin (davor oft mehr Schwankung).
@@ -181,6 +194,14 @@ def card_html(r, idx=None, proj_key="projection_long"):
               "underperform": "Reduzieren", "sell": "Verkauf"}.get(
                   r.get("analyst_rating"), r.get("analyst_rating") or "")
         ana_txt = f'🎯 {_esc(rk)} {au:+.0f}% (n={an})'
+    conv = r.get("conviction")
+    up = r.get("upside_pct")
+    up_txt = f'{up:+.0f}%' if isinstance(up, (int, float)) else "–"
+    ut = r.get("urgency_tone") or "calm"
+    stat_row = (f'<div class="stats">'
+                f'<span class="stat">🎯 Konfidenz <b>{conv if conv is not None else "–"}%</b></span>'
+                f'<span class="stat">🚀 Potenzial <b>{up_txt}</b></span>'
+                f'<span class="urg urg-{ut}">{_esc(r.get("urgency") or "")}</span></div>')
     news_lbl = {"positiv": "🟢 News +", "negativ": "🔴 News −",
                 "neutral": "⚪ News ="}.get(r.get("news_sentiment"))
     if news_lbl and r.get("news_mode") == "KI":
@@ -213,6 +234,7 @@ def card_html(r, idx=None, proj_key="projection_long"):
         f'<div class="name"><div class="tk">{rank}{_esc(r["symbol"])} · {_esc(r.get("name") or "")}</div>'
         f'<div class="rt" style="color:{color}">{_esc(r.get("radar_rating"))}</div></div>'
         f'{sector_badge}{asch_badge}</div>'
+        f'{stat_row}'
         f'<div class="meta">{meta_line}</div>'
         f'{sig_line}'
         f'<div class="bars">{bars}</div>'
@@ -258,25 +280,34 @@ def grid_tiered(picks, proj_key="projection_long"):
         grid(picks)
 
 
-tabs = st.tabs(["🚀 Daytrading", "🏦 Langzeit", "📊 Fundamental", "🧠 Aschenbrenner",
+tabs = st.tabs(["🎯 Heute", "🚀 Daytrading", "🏦 Langzeit", "📊 Fundamental", "🧠 Aschenbrenner",
                 "🔥 Social", "💼 Paper-Depot", "🔎 Alle"])
 
 with tabs[0]:
-    st.caption("Kurzfristige Momentum-, Breakout- und Volumen-Setups (Long **und** Short). "
-               "Projektion auf **1 Tag & 1 Woche**.")
-    grid(data["top_daytrade"], proj_key="projection_short")
+    st.caption("**Deine Top-Chancen heute** – nach Rang. Pro Aktie: 🎯 **Konfidenz** (wie sicher), "
+               "🚀 **Potenzial** (erwarteter Gewinn), ⏱️ **Dringlichkeit** (wie schnell handeln).")
+    st.markdown('<div class="day-h">🚀 Zum Handeln – kurzfristig (Rang nach Chance)</div>',
+                unsafe_allow_html=True)
+    grid(data["top_daytrade"], numbered=True, proj_key="projection_short")
+    st.markdown('<div class="day-h">🏦 Fürs Depot – langfristig (Rang nach Qualität × Potenzial)</div>',
+                unsafe_allow_html=True)
+    grid(data["top_longterm"], numbered=True)
 
 with tabs[1]:
-    st.caption("Hierarchisch nach **Qualität × Potenzial** (Technik + Fundamental + Analysten + News). "
-               "Gruppiert in Chancen-Stufen.")
-    grid_tiered(data["top_longterm"])
+    st.caption("Kurzfristige Momentum-, Breakout- und Volumen-Setups (Long **und** Short), "
+               "**Rang 1 = beste Chance**. Projektion auf 1 Tag & 1 Woche.")
+    grid(data["top_daytrade"], numbered=True, proj_key="projection_short")
 
 with tabs[2]:
-    st.caption("Reine Fundamentalbewertung: Value, Quality, Growth + Greenblatt „Magic Formula\", "
-               "gruppiert in Chancen-Stufen.")
-    grid_tiered(data.get("top_fundamental", []))
+    st.caption("Langzeit-Rangliste (**#1 = beste Chance**): Technik + Fundamental + Analysten + News. "
+               "Rating-Stufe steht je Karte (Top-Chance/Stark/…).")
+    grid(data["top_longterm"], numbered=True)
 
 with tabs[3]:
+    st.caption("Reine Fundamentalbewertung (**#1 = beste**): Value, Quality, Growth + Greenblatt „Magic Formula\".")
+    grid(data.get("top_fundamental", []), numbered=True)
+
+with tabs[4]:
     holds = data.get("aschenbrenner_holdings", [])
     st.caption(f"🧠 Leopold Aschenbrenners Fonds *Situational Awareness LP* — aus dem SEC-13F "
                f"({meta.get('quarter') or '?'}, eingereicht {meta.get('filed') or '?'}).")
@@ -293,7 +324,7 @@ with tabs[3]:
         st.markdown('<div class="grp-h">🟡 Gemischt (Put + Call / Absicherung)</div>', unsafe_allow_html=True)
         grid(mixed, numbered=False)
 
-with tabs[4]:
+with tabs[5]:
     st.caption("🔥 Retail-Aufmerksamkeit auf Reddit (r/wallstreetbets & Co, via ApeWisdom) – "
                "frühe Momentum-/Meme-Bewegungen. 🔥 = Erwähnungen/Rang stark gestiegen. "
                "Vorsicht: Hype ≠ Qualität.")
@@ -303,7 +334,7 @@ with tabs[4]:
     else:
         st.info("Aktuell keine deiner Titel in den Reddit-Trends (ApeWisdom ist US-Reddit-fokussiert).")
 
-with tabs[5]:
+with tabs[6]:
     PORT = ROOT / "data" / "portfolio.json"
     if not PORT.exists():
         st.info("Noch kein Paper-Depot vorhanden – wird beim nächsten Analyse-Lauf erstellt.")
@@ -341,7 +372,7 @@ with tabs[5]:
                 "Wert €": p.get("value_eur"), "G/V €": p.get("pnl_eur"),
             } for s, p in pos.items()])
             st.dataframe(hold.sort_values("G/V €", ascending=False),
-                         use_container_width=True, hide_index=True)
+                         width="stretch", hide_index=True)
         else:
             st.caption("Aktuell keine offenen Positionen.")
 
@@ -353,14 +384,15 @@ with tabs[5]:
                  "value_eur", "pnl_eur", "pnl_pct", "reason"]]
             ldf.columns = ["Datum", "Aktion", "Symbol", "Name", "Kurs", "Einsatz €",
                            "Wert €", "G/V €", "G/V %", "Grund"]
-            st.dataframe(ldf.head(40), use_container_width=True, hide_index=True)
+            st.dataframe(ldf.head(40), width="stretch", hide_index=True)
         else:
             st.caption("Noch keine Trades.")
 
-with tabs[6]:
-    cols = ["symbol", "name", "sector", "radar_score", "radar_rating", "radar_elo", "price",
-            "investment_score", "fundamental_score", "daytrade_score", "daytrade_direction",
-            "value_score", "quality_score", "growth_score", "pe", "roe_pct"]
+with tabs[7]:
+    cols = ["symbol", "name", "sector", "industry", "radar_score", "radar_rating",
+            "conviction", "upside_pct", "urgency", "quality", "potential",
+            "analyst_rating", "analyst_upside_pct", "price", "investment_score",
+            "fundamental_score", "daytrade_score", "daytrade_direction", "pe", "roe_pct"]
     df = pd.DataFrame([{k: r.get(k) for k in cols} for r in data["all"]])
     q = st.text_input("Filter (Symbol/Name/Sektor)", "")
     if q:
@@ -368,4 +400,4 @@ with tabs[6]:
         df = df[m]
     if not df.empty:
         st.dataframe(df.sort_values("radar_score", ascending=False),
-                     use_container_width=True, hide_index=True)
+                     width="stretch", hide_index=True)

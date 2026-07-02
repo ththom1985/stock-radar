@@ -122,6 +122,53 @@ def potential_score(row):
     return round(sum(v * w for v, w in parts) / sum(w for _, w in parts))
 
 
+def conviction(row):
+    """0-100: how SURE the call is = agreement across signals (either direction).
+    High when trend, fundamentals, analysts, news and momentum point the same way."""
+    sig = []
+    lt = row.get("longterm_score")
+    if _has(lt):
+        sig.append(1 if lt >= 55 else -1 if lt <= 45 else 0)
+    fs = row.get("fundamental_score")
+    if _has(fs):
+        sig.append(1 if fs >= 60 else -1 if fs <= 40 else 0)
+    au, an = row.get("analyst_upside_pct"), row.get("analyst_n") or 0
+    if _has(au) and an >= 3:
+        sig.append(1 if au >= 10 else -1 if au <= -5 else 0)
+    ns = row.get("news_score")
+    if _has(ns) and (row.get("news_n") or 0) >= 2:
+        sig.append(1 if ns >= 60 else -1 if ns <= 40 else 0)
+    dt, dd = row.get("daytrade_score") or 0, row.get("daytrade_direction")
+    if dt >= 45:
+        sig.append(1 if dd == "LONG" else -1 if dd == "SHORT" else 0)
+    if not sig:
+        return 50
+    net = abs(sum(sig)) / len(sig)  # 0 (conflict) … 1 (full agreement)
+    return int(round(50 + net * 45))
+
+
+def urgency(row):
+    """How fast to act. Returns (label, tone: urgent/soon/calm)."""
+    dt, dd = row.get("daytrade_score") or 0, row.get("daytrade_direction")
+    ed = row.get("earnings_in_days")
+    if (dd in ("LONG", "SHORT") and dt >= 55) or row.get("hype_surging") or (_has(ed) and 0 <= ed <= 2):
+        return "⏱️ Sofort (heute)", "urgent"
+    if dt >= 45 or (_has(ed) and 0 <= ed <= 7):
+        return "📅 Diese Woche", "soon"
+    return "🧘 In Ruhe (Langzeit)", "calm"
+
+
+def upside_pct(row):
+    """Headline upside potential: analyst target if available, else 12M projection."""
+    au, an = row.get("analyst_upside_pct"), row.get("analyst_n") or 0
+    if _has(au) and an >= 3:
+        return au
+    for p in (row.get("projection_long") or []):
+        if str(p.get("label", "")).startswith("12"):
+            return p.get("center_pct")
+    return None
+
+
 def plain_summary(row):
     """2-4 short sentences in plain German that a non-expert understands."""
     parts = []
