@@ -42,6 +42,15 @@ def radar_elo(row):
     if row.get("hype_surging") and _has(row.get("hype_score")):
         elo += min(40, row["hype_score"] * 0.4)  # retail momentum (short-term)
 
+    an = row.get("analyst_n") or 0
+    if an >= 3:
+        au = row.get("analyst_upside_pct")
+        if _has(au):
+            elo += max(-45, min(55, au * 1.1))          # analyst target upside = potential
+        am = row.get("analyst_mean")
+        if _has(am):
+            elo += max(-40, min(40, (3 - am) * 20))     # consensus: 1(strong buy)→+40, 5→-40
+
     elo = int(round(max(700, min(2200, elo)) / 5) * 5)
 
     for thr, label, color in [
@@ -65,6 +74,52 @@ def radar_score(elo):
 def stars(score_0_100):
     """0-5 star rating from the 0-100 score."""
     return int(round(score_0_100 / 20))
+
+
+def _label3(v):
+    if v is None:
+        return None
+    return "hoch" if v >= 67 else "mittel" if v >= 45 else "niedrig"
+
+
+def quality_score(row):
+    """0-100: how solid/safe the company is (fundamentals, trend, analyst consensus)."""
+    parts = []
+    fs = row.get("fundamental_score")
+    if _has(fs):
+        parts.append((fs, 0.5))
+    lt = row.get("longterm_score")
+    if _has(lt):
+        parts.append((lt, 0.3))
+    am, an = row.get("analyst_mean"), row.get("analyst_n") or 0
+    if _has(am) and an >= 3:
+        parts.append((max(0, min(100, (5 - am) / 4 * 100)), 0.2))
+    if not parts:
+        return None
+    return round(sum(v * w for v, w in parts) / sum(w for _, w in parts))
+
+
+def potential_score(row):
+    """0-100: upside potential (analyst target, momentum, room to run, growth, hype)."""
+    parts = []
+    au, an = row.get("analyst_upside_pct"), row.get("analyst_n") or 0
+    if _has(au) and an >= 3:
+        parts.append((max(0, min(100, 50 + au * 1.25)), 0.4))
+    dt, ddir = row.get("daytrade_score"), row.get("daytrade_direction")
+    if _has(dt):
+        mom = 50 + (dt - 50) * (1 if ddir == "LONG" else -1 if ddir == "SHORT" else 0)
+        parts.append((max(0, min(100, mom)), 0.2))
+    pfh = row.get("pct_from_high52")
+    if _has(pfh):
+        parts.append((max(0, min(100, 50 - pfh)), 0.15))  # further below 52w-high = more room
+    gs = row.get("growth_score")
+    if _has(gs):
+        parts.append((gs, 0.15))
+    if row.get("hype_surging"):
+        parts.append((80, 0.1))
+    if not parts:
+        return None
+    return round(sum(v * w for v, w in parts) / sum(w for _, w in parts))
 
 
 def plain_summary(row):
@@ -114,6 +169,15 @@ def plain_summary(row):
         else:
             f += "."
         parts.append(f)
+
+    # Analyst consensus
+    au, an = row.get("analyst_upside_pct"), row.get("analyst_n") or 0
+    if _has(au) and an >= 3:
+        rating_de = {"strong_buy": "starker Kauf", "buy": "Kauf", "hold": "Halten",
+                     "underperform": "Untergewichten", "sell": "Verkauf"}.get(
+                         row.get("analyst_rating"), row.get("analyst_rating") or "—")
+        arrow = f"+{au:.0f}%" if au >= 0 else f"{au:.0f}%"
+        parts.append(f"{an} Analysten: Konsens „{rating_de}\", Ø-Kursziel {arrow} zum aktuellen Kurs.")
 
     # Short term
     dt = row.get("daytrade_score") or 0
@@ -196,6 +260,11 @@ def suggest_actions(row):
         out.append({"text": f"Zahlen in {ed} T. – Vorsicht", "tone": "neutral"})
     if row.get("hype_surging"):
         out.append({"text": f"🔥 Reddit-Hype (Rang {row.get('hype_rank')})", "tone": "neutral"})
+    au, an = row.get("analyst_upside_pct"), row.get("analyst_n") or 0
+    if _has(au) and an >= 5 and au >= 20:
+        out.append({"text": f"Analysten-Kursziel +{au:.0f}%", "tone": "pos"})
+    elif _has(au) and an >= 5 and au <= -5:
+        out.append({"text": "Kurs über Analysten-Ziel", "tone": "neg"})
     if asch and asch["stance"] == "LONG":
         out.append({"text": "Aschenbrenner-Konviktion (long)", "tone": "pos"})
 

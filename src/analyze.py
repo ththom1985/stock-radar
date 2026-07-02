@@ -23,7 +23,8 @@ from .fundamental_score import (
 )
 from .llm_news import enhance as llm_enhance_news, llm_available
 from .aschenbrenner import load_aschenbrenner, stance_for
-from .rating import radar_elo, radar_score, stars, plain_summary, suggest_actions
+from .rating import (radar_elo, radar_score, stars, plain_summary, suggest_actions,
+                     quality_score as calc_quality, potential_score as calc_potential)
 from .projection import project
 from .social import fetch_social, social_signal
 from .paper_trader import update_portfolio
@@ -96,6 +97,17 @@ def run(with_news=True, with_fundamentals=True):
             gscore, greasons = score_growth(f)
             fscore = combine_fundamental(vscore, qscore, gscore)
             r["sector"] = f.get("sector")
+            r["industry"] = f.get("industry")
+            # Analyst consensus
+            r["analyst_rating"] = f.get("rec_key")
+            r["analyst_mean"] = _num(f.get("rec_mean"))
+            r["analyst_n"] = f.get("analyst_n")
+            tgt = f.get("target_price")
+            r["target_price"] = _num(tgt)
+            r["analyst_upside_pct"] = (
+                round((tgt / r["price"] - 1) * 100, 1)
+                if isinstance(tgt, (int, float)) and tgt > 0 and r.get("price") else None
+            )
             r["pe"] = _num(f.get("pe"))
             r["roe_pct"] = _pct(f.get("roe"))
             r["revenue_growth_pct"] = _pct(f.get("revenue_growth"))
@@ -160,6 +172,8 @@ def run(with_news=True, with_fundamentals=True):
         r["radar_color"] = color
         r["radar_score"] = radar_score(elo)
         r["stars"] = stars(r["radar_score"])
+        r["quality"] = calc_quality(r)
+        r["potential"] = calc_potential(r)
         r["plain_summary"] = plain_summary(r)
         r["actions"] = suggest_actions(r)
         r["projection_short"] = project(r, "short")

@@ -40,6 +40,11 @@ _FIELDS = {
     "freeCashflow": "free_cashflow",
     "sector": "sector",
     "industry": "industry",
+    # Analyst consensus
+    "recommendationMean": "rec_mean",     # 1=Strong Buy … 5=Sell
+    "recommendationKey": "rec_key",
+    "numberOfAnalystOpinions": "analyst_n",
+    "targetMeanPrice": "target_price",
 }
 
 

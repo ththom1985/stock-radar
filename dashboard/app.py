@@ -51,6 +51,13 @@ CSS = """
 .card .news{font-size:12px;margin-top:8px;color:#6b7280;}
 .card .news a{color:#2563eb;text-decoration:none;}
 .grp-h{font-size:16px;font-weight:800;margin:16px 0 2px;}
+.sector-badge{background:#e0f2fe;color:#075985;border:1px solid #bae6fd;padding:2px 9px;
+  border-radius:11px;font-size:11px;font-weight:600;}
+.card .qp{font-size:12px;color:#475569;margin:5px 0 2px;}
+.card .qp b{color:#111827;}
+.tier-h{font-size:18px;font-weight:800;margin:20px 0 2px;padding-bottom:3px;
+  border-bottom:2px solid #e5e7eb;}
+.tier-sub{font-size:12px;color:#6b7280;margin-bottom:4px;}
 </style>
 """
 st.markdown(CSS, unsafe_allow_html=True)
@@ -120,15 +127,22 @@ def _stars(n):
     return "★" * n + "☆" * (5 - n)
 
 
+def _qplabel(v):
+    if not isinstance(v, (int, float)):
+        return "–"
+    return "hoch" if v >= 67 else "mittel" if v >= 45 else "niedrig"
+
+
 def _proj_html(proj):
     if not proj:
         return ""
     rows = ""
     for p in proj:
         arr = _ARROW.get(p["direction"], "")
-        rows += (f'<div class="row">📅 <b>{_esc(p["label"])}</b>: {arr} {_esc(p["direction"])} · '
-                 f'Spanne {p["low_price"]}–{p["high_price"]} (±{p["high_pct"]}%, ≈2 von 3) · '
-                 f'Konfidenz {_esc(p["confidence_label"])} ({p["confidence_pct"]}%)</div>')
+        c = p.get("center_pct", 0)
+        rows += (f'<div class="row">📅 <b>{_esc(p["label"])}</b>: {arr} Ø <b>{c:+.0f}%</b> '
+                 f'(~{p.get("expected_price")}) · Spanne {p["low_pct"]:+.0f}%…{p["high_pct"]:+.0f}% '
+                 f'· Konfidenz {_esc(p["confidence_label"])} {p["confidence_pct"]}%</div>')
     return f'<div class="proj">{rows}</div>'
 
 
@@ -150,8 +164,23 @@ def card_html(r, idx=None, proj_key="projection_long"):
     news_div = f'<div class="news">📰 {news_html}</div>' if news_html else ""
     pe = r.get("pe")
     roe = r.get("roe_pct")
-    meta_line = (f'{_esc(r.get("sector") or "")} · Kurs {r.get("price")} · '
-                 f'KGV {pe if pe else "–"} · ROE {roe if roe is not None else "–"}%')
+    sector = r.get("sector") or ""
+    industry = r.get("industry") or ""
+    sector_badge = f'<span class="sector-badge">🏷️ {_esc(sector)}</span>' if sector else ""
+    meta_line = ((f'{_esc(industry)} · ' if industry else "")
+                 + f'Kurs {r.get("price")} · KGV {pe if pe else "–"} · '
+                 f'ROE {roe if roe is not None else "–"}%')
+    q, pot = r.get("quality"), r.get("potential")
+    qp_line = (f'<div class="qp">🏅 Qualität: <b>{_qplabel(q)}</b> '
+               f'({q if q is not None else "–"}/100) · 🚀 Potenzial: <b>{_qplabel(pot)}</b> '
+               f'({pot if pot is not None else "–"}/100)</div>')
+    au, an = r.get("analyst_upside_pct"), r.get("analyst_n")
+    ana_txt = ""
+    if isinstance(au, (int, float)) and an:
+        rk = {"strong_buy": "Kauf++", "buy": "Kauf", "hold": "Halten",
+              "underperform": "Reduzieren", "sell": "Verkauf"}.get(
+                  r.get("analyst_rating"), r.get("analyst_rating") or "")
+        ana_txt = f'🎯 {_esc(rk)} {au:+.0f}% (n={an})'
     news_lbl = {"positiv": "🟢 News +", "negativ": "🔴 News −",
                 "neutral": "⚪ News ="}.get(r.get("news_sentiment"))
     if news_lbl and r.get("news_mode") == "KI":
@@ -170,7 +199,7 @@ def card_html(r, idx=None, proj_key="projection_long"):
         hype_txt = (f'{fire}Reddit #{r.get("hype_rank")}'
                     + (f' ({chg:+.0f}%)' if isinstance(chg, (int, float)) else ""))
     sig_bits = [b for b in [(f'{news_lbl} ({r.get("news_n")})' if news_lbl and r.get("news_n") else None),
-                            hype_txt, earn_txt] if b]
+                            ana_txt, hype_txt, earn_txt] if b]
     sig_line = f'<div class="meta">{" · ".join(sig_bits)}</div>' if sig_bits else ""
     rank = f"#{idx} " if idx else ""
     return (
@@ -183,10 +212,11 @@ def card_html(r, idx=None, proj_key="projection_long"):
         f'</div>'
         f'<div class="name"><div class="tk">{rank}{_esc(r["symbol"])} · {_esc(r.get("name") or "")}</div>'
         f'<div class="rt" style="color:{color}">{_esc(r.get("radar_rating"))}</div></div>'
-        f'{asch_badge}</div>'
+        f'{sector_badge}{asch_badge}</div>'
         f'<div class="meta">{meta_line}</div>'
         f'{sig_line}'
         f'<div class="bars">{bars}</div>'
+        f'{qp_line}'
         f'<div class="summary">{_esc(r.get("plain_summary",""))}</div>'
         f'{llm_div}'
         f'{_proj_html(r.get(proj_key))}'
@@ -201,6 +231,33 @@ def grid(picks, numbered=True, proj_key="projection_long"):
     st.markdown(f'<div class="radar-grid">{cards}</div>', unsafe_allow_html=True)
 
 
+_TIER_ORDER = ["Top-Chance", "Stark", "Solide", "Neutral", "Schwach", "Meiden"]
+_TIER_DESC = {
+    "Top-Chance": "höchste Qualität & Potenzial", "Stark": "starke Kandidaten",
+    "Solide": "solide Basis", "Neutral": "durchschnittlich",
+    "Schwach": "wenig überzeugend", "Meiden": "eher meiden",
+}
+
+
+def grid_tiered(picks, proj_key="projection_long"):
+    """Render picks grouped under quality/potential tier headers (hierarchical)."""
+    groups = {}
+    for r in picks:
+        groups.setdefault(r.get("radar_rating", "Neutral"), []).append(r)
+    shown = False
+    for tier in _TIER_ORDER:
+        g = groups.get(tier)
+        if not g:
+            continue
+        shown = True
+        st.markdown(f'<div class="tier-h">{tier} '
+                    f'<span class="tier-sub">— {_TIER_DESC.get(tier, "")} · {len(g)}</span></div>',
+                    unsafe_allow_html=True)
+        grid(g, numbered=False, proj_key=proj_key)
+    if not shown:
+        grid(picks)
+
+
 tabs = st.tabs(["🚀 Daytrading", "🏦 Langzeit", "📊 Fundamental", "🧠 Aschenbrenner",
                 "🔥 Social", "💼 Paper-Depot", "🔎 Alle"])
 
@@ -210,12 +267,14 @@ with tabs[0]:
     grid(data["top_daytrade"], proj_key="projection_short")
 
 with tabs[1]:
-    st.caption("Gesamt-Rating: langfristiger Trend (Technik) **+** Bewertung & Qualität (Fundamental).")
-    grid(data["top_longterm"])
+    st.caption("Hierarchisch nach **Qualität × Potenzial** (Technik + Fundamental + Analysten + News). "
+               "Gruppiert in Chancen-Stufen.")
+    grid_tiered(data["top_longterm"])
 
 with tabs[2]:
-    st.caption("Reine Fundamentalbewertung: Value, Quality, Growth + Greenblatt „Magic Formula\".")
-    grid(data.get("top_fundamental", []))
+    st.caption("Reine Fundamentalbewertung: Value, Quality, Growth + Greenblatt „Magic Formula\", "
+               "gruppiert in Chancen-Stufen.")
+    grid_tiered(data.get("top_fundamental", []))
 
 with tabs[3]:
     holds = data.get("aschenbrenner_holdings", [])
