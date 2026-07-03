@@ -107,7 +107,8 @@ CSS = """
 .card .thesis{margin:6px 0 0;font-size:12.5px;color:#166534;background:#f0fdf4;border:1px solid #bbf7d0;padding:5px 9px;border-radius:7px;}
 .card .thesis b{color:#14532d;}
 .card .pricedin{margin:4px 0 0;font-size:11.5px;color:#a16207;background:#fffbeb;border:1px solid #fde68a;padding:4px 9px;border-radius:7px;font-weight:600;}
-.card .flag{width:26px;height:18px;border-radius:0;border:1px solid #cbd5e1;vertical-align:-3px;margin-right:6px;object-fit:fill;}
+.card .flag{display:inline-block;width:26px;height:18px;margin-right:6px;vertical-align:-3px;border:1px solid #cbd5e1;border-radius:2px;overflow:hidden;line-height:0;}
+.card .flag svg{width:26px;height:18px;display:block;}
 .card .submkt{color:#b45309;font-weight:700;font-size:11px;background:#fffbeb;border:1px solid #fde68a;padding:1px 6px;border-radius:6px;margin-left:5px;}
 .card .scen{margin:6px 0 0;display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;}
 .card .scen-lbl{color:#64748b;font-weight:700;}
@@ -129,11 +130,62 @@ CSS = """
 .card .downside-up{background:#f0fdf4;color:#15803d;}
 .card .downside-soon{background:#fffbeb;color:#a16207;}
 .card .downside-down{background:#fef2f2;color:#b91c1c;}
+/* --- Logo, Kopf, Tabs, Mobile --- */
+.app-logo{display:flex;align-items:center;gap:12px;margin:0 0 2px;}
+.app-logo .mark{width:48px;height:48px;flex:none;}
+.app-logo .txt{line-height:1.06;}
+.app-logo .txt .nm{font-size:27px;font-weight:900;letter-spacing:.3px;color:#0f172a;}
+.app-logo .txt .nm b{color:#16a34a;font-weight:900;}
+.app-logo .txt .th{color:#2563eb;}
+.app-logo .txt .sub{font-size:11.5px;color:#64748b;font-weight:600;margin-top:1px;}
+.statusline{font-size:12px;color:#64748b;margin:3px 0 8px;}
+.statusline b{color:#334155;font-weight:700;}
+.stTabs [data-baseweb="tab-list"]{gap:2px;flex-wrap:wrap;}
+.stTabs [data-baseweb="tab"]{padding:8px 12px;}
+.stTabs [data-baseweb="tab"] [data-testid="stMarkdownContainer"] p{font-size:1.18rem;font-weight:700;}
+@media (max-width:640px){
+  .card{flex:1 1 100%;padding:11px 12px;font-size:13.5px;}
+  .card .plan-grid,.card .pro-grid{grid-template-columns:1fr;}
+  .card .score .num{font-size:26px;}
+  .app-logo .txt .nm{font-size:21px;}
+  .app-logo .mark{width:40px;height:40px;}
+  .app-logo .txt .sub{font-size:10.5px;}
+  .stTabs [data-baseweb="tab"]{padding:7px 9px;}
+  .stTabs [data-baseweb="tab"] [data-testid="stMarkdownContainer"] p{font-size:1.02rem;}
+  .day-h{font-size:17px;}
+}
 </style>
 """
 st.markdown(CSS, unsafe_allow_html=True)
 
-st.title("📈 Stock Radar")
+LOGO = """
+<div class="app-logo">
+  <svg class="mark" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="sw" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#22c55e" stop-opacity="0.95"/>
+        <stop offset="100%" stop-color="#22c55e" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <circle cx="32" cy="32" r="30" fill="#0b1f3a" stroke="#1e3a5f" stroke-width="2"/>
+    <circle cx="32" cy="32" r="21" fill="none" stroke="#1f6f43" stroke-width="1"/>
+    <circle cx="32" cy="32" r="12" fill="none" stroke="#1f6f43" stroke-width="1"/>
+    <line x1="32" y1="4" x2="32" y2="60" stroke="#173a5a" stroke-width="1"/>
+    <line x1="4" y1="32" x2="60" y2="32" stroke="#173a5a" stroke-width="1"/>
+    <path d="M32 32 L32 3 A29 29 0 0 1 57 18 Z" fill="url(#sw)"/>
+    <rect x="21" y="35" width="4" height="10" rx="1.2" fill="#ef4444"/>
+    <rect x="29" y="27" width="4" height="15" rx="1.2" fill="#22c55e"/>
+    <rect x="37" y="21" width="4" height="13" rx="1.2" fill="#22c55e"/>
+    <circle cx="45" cy="19" r="2.1" fill="#4ade80"/>
+    <circle cx="24" cy="23" r="1.5" fill="#86efac"/>
+  </svg>
+  <div class="txt">
+    <div class="nm"><span class="th">TH</span> Stock<b>Radar</b></div>
+    <div class="sub">📡 Tornado-Scan über 1000+ Aktien – Chancen, Timing &amp; Risiken</div>
+  </div>
+</div>
+"""
+st.markdown(LOGO, unsafe_allow_html=True)
 
 if not LATEST.exists():
     st.warning("Noch keine Analyse vorhanden. Bitte zuerst laufen lassen: `python -m src.analyze`")
@@ -142,14 +194,19 @@ if not LATEST.exists():
 data = json.loads(LATEST.read_text(encoding="utf-8"))
 meta = data.get("aschenbrenner_meta", {})
 
-_FLAGS_FILE = ROOT / "data" / "flags_b64.json"
-FLAGS = json.loads(_FLAGS_FILE.read_text(encoding="utf-8")) if _FLAGS_FILE.exists() else {}
+_FLAGS_DIR = ROOT / "data" / "flags"
+FLAGS = ({f.stem: f.read_text(encoding="utf-8") for f in _FLAGS_DIR.glob("*.svg")}
+         if _FLAGS_DIR.exists() else {})
 
-h1, h2, h3, h4 = st.columns(4)
-h1.metric("Stand (UTC)", data["generated_at"].replace("T", " "))
-h2.metric("Universum", data["universe_size"])
-h3.metric("Analysiert", data["analyzed"])
-h4.metric("Aschenbrenner-13F", meta.get("quarter") or "–")
+mn = data.get("market_news", {})
+_mlabel = {"positiv": "🟢 positiv", "negativ": "🔴 negativ", "neutral": "⚪ neutral"}.get(
+    mn.get("market_label"), "–")
+st.markdown(
+    f'<div class="statusline">Stand <b>{data["generated_at"].replace("T", " ")}</b> · '
+    f'Universum <b>{data["universe_size"]}</b> · analysiert <b>{data["analyzed"]}</b> · '
+    f'Aschenbrenner 13F <b>{meta.get("quarter") or "–"}</b> · Markt <b>{_mlabel}</b> · '
+    f'<i>Research-Werkzeug, keine Anlageberatung</i></div>',
+    unsafe_allow_html=True)
 
 with st.expander("ℹ️ Legende – was bedeuten die Zahlen?"):
     st.markdown("""
@@ -233,8 +290,6 @@ if mn.get("headlines"):
         for h in mn["headlines"]:
             src = f" · _{h.get('source')}_" if h.get("source") else ""
             st.markdown(f"- [{h.get('title')}]({h.get('link')}){src}")
-
-st.caption("⚠️ Research-Werkzeug, keine Anlageberatung.")
 
 _ARROW = {"eher aufwärts": "↗", "eher abwärts": "↘", "eher seitwärts": "→"}
 
@@ -569,8 +624,8 @@ def card_html(r, idx=None, context="invest"):
     price_line = f'<div class="px">💶 Kurs <b>{px}</b>{chg_txt}</div>' if px is not None else ""
     cc = r.get("cc")
     _cty = _esc(r.get("country") or "")
-    _src = FLAGS.get(cc)
-    flag_img = f'<img class="flag" src="{_src}" alt="" title="{_cty}">' if _src else ""
+    _svg = FLAGS.get(cc)
+    flag_img = f'<span class="flag" title="{_cty}">{_svg}</span>' if _svg else ""
     q, pot = r.get("quality"), r.get("potential")
     qp_line = (f'<div class="qp">🏅 Qualität: <b>{_qplabel(q)}</b> '
                f'({q if q is not None else "–"}/100) · 🚀 Potenzial: <b>{_qplabel(pot)}</b> '
