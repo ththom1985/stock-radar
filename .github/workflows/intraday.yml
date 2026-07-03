@@ -1,0 +1,44 @@
+name: Stock Radar Intraday (Kurse)
+
+# Häufiger, leichter Lauf: nur Kurse/Scores/Makro frisch, News vom letzten
+# Volllauf übernommen. Alle 15 Min während der US-Handelszeit (Mo-Fr, UTC).
+# Um 7 Min versetzt, damit es nicht mit dem Volllauf (daily.yml) kollidiert.
+on:
+  schedule:
+    - cron: "7,22,37,52 13-21 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: stock-radar-data
+  cancel-in-progress: false
+
+jobs:
+  intraday:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements-ci.txt
+
+      - name: Intraday-Kurse ausführen
+        env:
+          STOCK_RADAR_INTRADAY: "1"
+          STOCK_RADAR_DEEP_MAX: "0"
+        run: python -m src.analyze
+
+      - name: Ergebnis committen
+        run: |
+          git config user.name "stock-radar-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add data/output/latest.json data/portfolio.json data/macro.json data/fx_usd.json
+          git commit -m "Intraday $(date -u +%Y-%m-%dT%H:%MZ)" || echo "keine Änderungen"
+          git pull --rebase --autostash origin main || true
+          git push || echo "push übersprungen"

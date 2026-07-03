@@ -57,6 +57,14 @@ def _load_expert_sources():
     return _load_json_map("expert_sources.json")
 
 
+def _load_prev_output():
+    """Last written latest.json (to carry news forward on light intraday runs)."""
+    try:
+        return json.loads((OUTPUT / "latest.json").read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        return {}
+
+
 def _num(x):
     """Round floats for JSON, turn NaN/Inf into None."""
     if isinstance(x, float):
@@ -89,10 +97,15 @@ def _invest_score(longterm, fundamental):
 
 
 def run(with_news=True, with_fundamentals=True):
+    # Light intraday mode (frequent price refresh): skip the slow RSS/LLM news
+    # fetch and carry the last full run's news forward instead.
+    intraday = os.environ.get("STOCK_RADAR_INTRADAY") == "1"
+    if intraday:
+        with_news = False
     universe = load_universe()
     symbols = [u["symbol"] for u in universe]
     name_map = {u["symbol"]: u["name"] for u in universe}
-    print(f"Universum: {len(symbols)} Ticker. Lade Kurse …")
+    print(f"Universum: {len(symbols)} Ticker{' · INTRADAY (Kurse frisch, News weitergetragen)' if intraday else ''}. Lade Kurse …")
 
     prices = fetch_prices(symbols)
     print(f"Kursdaten erhalten für {len(prices)}/{len(symbols)} Ticker.")
@@ -222,6 +235,20 @@ def run(with_news=True, with_fundamentals=True):
                 if r["symbol"] in enh:
                     r.update(enh[r["symbol"]])
             print(f"  KI-News: {len(enh)} Titel bewertet.")
+    else:
+        # Intraday: carry news/earnings forward from the last full run (no re-fetch)
+        prev = _load_prev_output()
+        prev_by = {r.get("symbol"): r for r in prev.get("all", [])}
+        _carry = ("news_score", "news_sentiment", "news_n", "news", "news_mode",
+                  "news_llm_reason", "next_earnings", "earnings_in_days")
+        for r in rows:
+            pr = prev_by.get(r["symbol"])
+            if pr:
+                for k in _carry:
+                    if k in pr:
+                        r[k] = pr[k]
+        market = prev.get("market_news") or market
+        print(f"  News aus letztem Volllauf übernommen ({len(prev_by)} Titel).")
 
     # --- Social / Reddit hype layer (ApeWisdom, free) ---
     print("Lade Reddit-/Social-Hype …")

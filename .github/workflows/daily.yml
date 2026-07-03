@@ -1,7 +1,8 @@
-name: Stock Radar Analyse
+name: Stock Radar Volllauf (News + Fundamental)
 
-# Läuft mehrmals an Handelstagen (Mo-Fr). Zeiten in UTC.
-# US-Handelszeiten (Sommer): 13:30-20:00 UTC. Läufe: kurz nach Open, Mittag, nahe Close.
+# VOLLLAUF 3x/Handelstag: inkl. News-RSS, KI-News, Bilanz-Kennzahlen. Die Kurse
+# werden zusätzlich alle 15 Min vom leichten Intraday-Workflow (intraday.yml)
+# aktualisiert. Zeiten in UTC.
 on:
   schedule:
     - cron: "0 14 * * 1-5"    # ~kurz nach US-Open
@@ -11,6 +12,10 @@ on:
 
 permissions:
   contents: write               # damit der Bot latest.json committen darf
+
+concurrency:
+  group: stock-radar-data
+  cancel-in-progress: false
 
 jobs:
   analyze:
@@ -36,4 +41,5 @@ jobs:
           git config user.email "bot@users.noreply.github.com"
           git add data/output/latest.json data/fundamentals.json data/portfolio.json data/earnings.json data/fx_usd.json data/macro.json
           git commit -m "Analyse $(date -u +%Y-%m-%dT%H:%MZ)" || echo "keine Änderungen"
+          git pull --rebase --autostash origin main || true
           git push || echo "push übersprungen"
