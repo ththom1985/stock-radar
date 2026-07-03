@@ -5,7 +5,23 @@ name: Stock Radar Intraday (Kurse)
 # Um 7 Min versetzt, damit es nicht mit dem Volllauf (daily.yml) kollidiert.
 on:
   schedule:
-    - cron: "7,22,37,52 13-21 * * 1-5"
+    # Zeiten in UTC (Sommer/DST). Dicht rund um Open/Close, locker mittags,
+    # nachts/geschlossen aus. US ist am wichtigsten (~80% des Universums).
+    # --- US-Open 13:30 UTC (15:30 dt.): sehr dicht, ~alle 10 Min ---
+    - cron: "22,32,42,52 13 * * 1-5"
+    - cron: "2,12,22,32,42,52 14 * * 1-5"
+    # --- US-Mittag: locker, alle 30 Min ---
+    - cron: "2,32 15-18 * * 1-5"
+    # --- US-Close 20:00 UTC (22:00 dt.): dicht ---
+    - cron: "2,12,22,32,42,52 19 * * 1-5"
+    - cron: "2,12 20 * * 1-5"
+    # --- Europa-Open ~07:00 UTC (09:00 dt.): alle 20 Min ---
+    - cron: "2,22,42 7 * * 1-5"
+    # --- Europa-Vormittag: stündlich (leicht) ---
+    - cron: "2 8-12 * * 1-5"
+    # --- Asien Open/Close: nur je 1 Touch ---
+    - cron: "2 1 * * 1-5"
+    - cron: "2 6 * * 1-5"
   workflow_dispatch:
 
 permissions:

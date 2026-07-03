@@ -31,6 +31,7 @@ from .rating import (radar_elo, radar_score, stars, plain_summary, suggest_actio
 from .geo import country_flag
 from .fx import currency_for, get_fx_rates
 from .macro import fetch_macro, macro_adjust
+from .intraday import fetch_intraday_patterns, pattern_note
 from .projection import project
 from .social import fetch_social, social_signal
 from .deep_fundamentals import fetch_deep
@@ -240,7 +241,7 @@ def run(with_news=True, with_fundamentals=True):
         prev = _load_prev_output()
         prev_by = {r.get("symbol"): r for r in prev.get("all", [])}
         _carry = ("news_score", "news_sentiment", "news_n", "news", "news_mode",
-                  "news_llm_reason", "next_earnings", "earnings_in_days")
+                  "news_llm_reason", "next_earnings", "earnings_in_days", "intraday_note")
         for r in rows:
             pr = prev_by.get(r["symbol"])
             if pr:
@@ -283,6 +284,12 @@ def run(with_news=True, with_fundamentals=True):
         r["tech_trend"] = tech_trend_score(r)
         r["tech_momentum"] = tech_momentum_score(r)
         r["tech_volume"] = tech_volume_score(r)
+
+    # --- Intraday time-of-day patterns (full run only; bounded + cached) ---
+    if not intraday:
+        pats = fetch_intraday_patterns([r["symbol"] for r in rows])
+        for r in rows:
+            r["intraday_note"] = pattern_note(pats.get(r["symbol"]))
 
     # --- Macro context (VIX / rates / Fed) ---
     macro = fetch_macro()
