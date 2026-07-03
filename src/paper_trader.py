@@ -39,6 +39,13 @@ def _today():
     return datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
 
+def _days_between(a, b):
+    try:
+        return (datetime.strptime(b, "%Y-%m-%d") - datetime.strptime(a, "%Y-%m-%d")).days
+    except Exception:  # noqa: BLE001
+        return None
+
+
 def _init(today):
     return {
         "start_capital": START_CAPITAL, "created": today, "cash": START_CAPITAL,
@@ -126,13 +133,24 @@ def update_portfolio(rows, today=None):
                 value = pos["stake_eur"] * cur / pos["entry_price"]
                 pnl = value - pos["stake_eur"]
                 ret = (cur / pos["entry_price"] - 1) * 100
+                se, sx = pos.get("score_at_entry"), score_by.get(sym)
+                held = _days_between(pos.get("entry_date"), today)
+                extra = []
+                if se is not None and sx is not None and se != sx:
+                    extra.append(f"Rating {se}→{sx}")
+                if held is not None:
+                    extra.append(f"{held} T gehalten")
+                gv = "Gewinn" if pnl >= 0 else "Verlust"
+                full_reason = f"{reason} · {gv} ${pnl:+,.0f}" + (" · " + " · ".join(extra) if extra else "")
                 p["cash"] += value
                 p["realized_pnl"] += pnl
                 p["trade_log"].append({
                     "date": today, "action": "SELL", "symbol": sym,
                     "name": pos.get("name"), "price": round(cur, 4),
                     "stake_eur": round(pos["stake_eur"], 2), "value_eur": round(value, 2),
-                    "pnl_eur": round(pnl, 2), "pnl_pct": round(ret, 2), "reason": reason,
+                    "pnl_eur": round(pnl, 2), "pnl_pct": round(ret, 2),
+                    "score_entry": se, "score_exit": sx, "held_days": held,
+                    "reason": full_reason,
                 })
                 del p["positions"][sym]
 
@@ -161,7 +179,8 @@ def update_portfolio(rows, today=None):
             p["trade_log"].append({
                 "date": today, "action": "BUY", "symbol": sym, "name": name_by.get(sym),
                 "price": round(cur, 4), "stake_eur": round(stake, 2), "value_eur": round(stake, 2),
-                "pnl_eur": 0.0, "pnl_pct": 0.0, "reason": "Top-Tipp",
+                "pnl_eur": 0.0, "pnl_pct": 0.0,
+                "reason": f"Top-Tipp gekauft (Score {score_by.get(sym)})",
             })
 
         p["last_trade_date"] = today

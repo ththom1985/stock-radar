@@ -868,15 +868,26 @@ with tabs[6]:
         else:
             st.caption("Aktuell keine offenen Positionen.")
 
-        st.markdown("**Handels-Protokoll** (neueste zuerst)")
+        st.markdown("**📜 Chronik – jede Entscheidung dokumentiert** (neueste zuerst)")
         log = pf.get("trade_log", [])
         if log:
-            ldf = pd.DataFrame(list(reversed(log)))[
-                ["date", "action", "symbol", "name", "price", "stake_eur",
-                 "value_eur", "pnl_eur", "pnl_pct", "reason"]]
-            ldf.columns = ["Datum", "Aktion", "Symbol", "Name", "Kurs $", "Einsatz $",
-                           "Wert $", "G/V $", "G/V %", "Grund"]
-            st.dataframe(ldf.head(40), width="stretch", hide_index=True)
+            lines = []
+            for e in reversed(log[-30:]):
+                icon = "🟢 **Kauf**" if e.get("action") == "BUY" else "🔴 **Verkauf**"
+                pnl = e.get("pnl_eur")
+                pnl_txt = (f" · {'Gewinn' if pnl >= 0 else 'Verlust'} **${pnl:+,.0f}** "
+                           f"({e.get('pnl_pct'):+.1f} %)") if e.get("action") == "SELL" and pnl is not None else ""
+                lines.append(f"- **{e.get('date')}** · {icon} **{e.get('symbol')}** "
+                             f"({_esc(e.get('name') or '')}) @ ${e.get('price')}{pnl_txt} — "
+                             f"{_esc(e.get('reason') or '')}")
+            st.markdown("\n".join(lines))
+            with st.expander("📋 Vollständiges Handels-Protokoll als Tabelle"):
+                ldf = pd.DataFrame(list(reversed(log)))[
+                    ["date", "action", "symbol", "name", "price", "stake_eur",
+                     "value_eur", "pnl_eur", "pnl_pct", "reason"]]
+                ldf.columns = ["Datum", "Aktion", "Symbol", "Name", "Kurs $", "Einsatz $",
+                               "Wert $", "G/V $", "G/V %", "Grund"]
+                st.dataframe(ldf, width="stretch", hide_index=True)
         else:
             st.caption("Noch keine Trades.")
 

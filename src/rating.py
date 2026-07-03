@@ -44,12 +44,13 @@ def radar_elo(row):
 
     an = row.get("analyst_n") or 0
     if an >= 3:
+        # Analyst input deliberately down-weighted (targets are laggy & get revised).
         au = row.get("analyst_upside_pct")
         if _has(au):
-            elo += max(-45, min(55, au * 1.1))          # analyst target upside = potential
+            elo += max(-22, min(28, au * 0.55))         # halved vs. before
         am = row.get("analyst_mean")
         if _has(am):
-            elo += max(-40, min(40, (3 - am) * 20))     # consensus: 1(strong buy)→+40, 5→-40
+            elo += max(-18, min(18, (3 - am) * 9))      # consensus, down-weighted
 
     # Expert frameworks
     mv = row.get("minervini_score")
@@ -112,10 +113,10 @@ def quality_score(row):
         parts.append((lt, 0.3))
     am, an = row.get("analyst_mean"), row.get("analyst_n") or 0
     if _has(am) and an >= 3:
-        parts.append((max(0, min(100, (5 - am) / 4 * 100)), 0.2))
+        parts.append((max(0, min(100, (5 - am) / 4 * 100)), 0.1))   # analysts down-weighted
     pio = row.get("piotroski")
     if _has(pio):
-        parts.append((pio / 9 * 100, 0.2))          # Piotroski fundamental strength
+        parts.append((pio / 9 * 100, 0.25))         # Piotroski fundamental strength (up)
     if not parts:
         return None
     return round(sum(v * w for v, w in parts) / sum(w for _, w in parts))
@@ -126,17 +127,17 @@ def potential_score(row):
     parts = []
     au, an = row.get("analyst_upside_pct"), row.get("analyst_n") or 0
     if _has(au) and an >= 3:
-        parts.append((max(0, min(100, 50 + au * 1.25)), 0.4))
+        parts.append((max(0, min(100, 50 + au * 1.25)), 0.22))   # analysts down-weighted
     dt, ddir = row.get("daytrade_score"), row.get("daytrade_direction")
     if _has(dt):
         mom = 50 + (dt - 50) * (1 if ddir == "LONG" else -1 if ddir == "SHORT" else 0)
         parts.append((max(0, min(100, mom)), 0.2))
     pfh = row.get("pct_from_high52")
     if _has(pfh):
-        parts.append((max(0, min(100, 50 - pfh)), 0.15))  # further below 52w-high = more room
+        parts.append((max(0, min(100, 50 - pfh)), 0.18))  # further below 52w-high = more room
     gs = row.get("growth_score")
     if _has(gs):
-        parts.append((gs, 0.15))
+        parts.append((gs, 0.28))                          # fundamental growth (up)
     if row.get("hype_surging"):
         parts.append((80, 0.1))
     if not parts:
@@ -620,23 +621,23 @@ def trend_phase(row):
 def bull_thesis(row):
     """One-line 'why could this rise?' — the strongest bullish drivers, ranked."""
     cl = []
-    au, an = row.get("analyst_upside_pct"), row.get("analyst_n") or 0
-    if _has(au) and an >= 3 and au >= 12:
-        cl.append((f"Analysten sehen +{au:.0f}% Kursziel", 6))
     gs = row.get("growth_score")
     if _has(gs) and gs >= 75:
-        cl.append(("Umsatz/Gewinn wachsen kräftig", 5))
+        cl.append(("Umsatz/Gewinn wachsen kräftig", 6))
+    vs = row.get("value_score")
+    if _has(vs) and vs >= 65:
+        cl.append(("günstig bewertet", 5))
+    pio = row.get("piotroski")
+    if _has(pio) and pio >= 7:
+        cl.append(("sehr solide Bilanz", 5))
     mv = row.get("minervini_score")
     if _has(mv) and mv >= 80:
         cl.append(("bestätigter Aufwärtstrend", 4))
     elif row.get("weinstein_stage") == 2 and (row.get("longterm_score") or 0) >= 58:
         cl.append(("intakter Aufwärtstrend", 3))
-    vs = row.get("value_score")
-    if _has(vs) and vs >= 65:
-        cl.append(("günstig bewertet", 4))
-    pio = row.get("piotroski")
-    if _has(pio) and pio >= 7:
-        cl.append(("sehr solide Bilanz", 3))
+    au, an = row.get("analyst_upside_pct"), row.get("analyst_n") or 0
+    if _has(au) and an >= 3 and au >= 12:
+        cl.append((f"Analysten sehen +{au:.0f}% Kursziel", 3))   # nett, aber nachrangig
     if row.get("daytrade_direction") == "LONG":
         cl.append(("kurzfristig kaufen die Anleger zu", 2))
     if row.get("news_sentiment") == "positiv":

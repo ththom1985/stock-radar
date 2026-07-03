@@ -48,7 +48,7 @@ def _annual_drift(row, bias, mode):
     upside = row.get("analyst_upside_pct")
     if mode == "long" and _has(upside):
         analyst_annual = _clamp(upside, -35, 50)           # analyst target ≈ 12M view
-        return _clamp(0.6 * analyst_annual + 0.4 * signal_annual, -35, 55)
+        return _clamp(0.4 * analyst_annual + 0.6 * signal_annual, -35, 55)   # analysts down-weighted
     return signal_annual
 
 

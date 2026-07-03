@@ -38,8 +38,8 @@ TOP_N = 10
 
 # --- Feintuning: Gewichte für den Investment-Score (Langzeit) ---
 # Anteil Technik (Trend) vs. Fundamental. Müssen zusammen 1.0 ergeben.
-INVEST_W_TECH = 0.5
-INVEST_W_FUND = 0.5
+INVEST_W_TECH = 0.45
+INVEST_W_FUND = 0.55   # bewusst mehr auf Fundamentaldaten als auf Technik
 
 # --- Indicator windows ---
 RSI_PERIOD = 14
