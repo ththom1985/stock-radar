@@ -13,7 +13,7 @@ import yfinance as yf
 from .config import DATA
 
 FX_CACHE = DATA / "fx_usd.json"
-MAX_AGE_HOURS = 20
+MAX_AGE_HOURS = 2   # refresh on every pipeline run (~3x/trading day)
 
 # Yahoo suffix -> trading currency
 _SUFFIX_CCY = {

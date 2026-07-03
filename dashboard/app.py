@@ -198,6 +198,10 @@ _FLAGS_DIR = ROOT / "data" / "flags"
 FLAGS = ({f.stem: f.read_text(encoding="utf-8") for f in _FLAGS_DIR.glob("*.svg")}
          if _FLAGS_DIR.exists() else {})
 
+_FX_FILE = ROOT / "data" / "fx_usd.json"
+FX_RATES = json.loads(_FX_FILE.read_text(encoding="utf-8")) if _FX_FILE.exists() else {}
+_fx_time = (FX_RATES.get("_fetched_at", "") or "").replace("T", " ")[:16]
+
 mn = data.get("market_news", {})
 _mlabel = {"positiv": "🟢 positiv", "negativ": "🔴 negativ", "neutral": "⚪ neutral"}.get(
     mn.get("market_label"), "–")
@@ -205,8 +209,21 @@ st.markdown(
     f'<div class="statusline">Stand <b>{data["generated_at"].replace("T", " ")}</b> · '
     f'Universum <b>{data["universe_size"]}</b> · analysiert <b>{data["analyzed"]}</b> · '
     f'Aschenbrenner 13F <b>{meta.get("quarter") or "–"}</b> · Markt <b>{_mlabel}</b> · '
-    f'alle Kurse in <b>USD</b> · <i>Research-Werkzeug, keine Anlageberatung</i></div>',
+    f'alle Kurse in <b>USD</b>'
+    + (f' (1 € = <b>${FX_RATES["EUR"]:.3f}</b>, Stand {_fx_time})' if FX_RATES.get("EUR") else "")
+    + ' · <i>Research-Werkzeug, keine Anlageberatung</i></div>',
     unsafe_allow_html=True)
+
+if FX_RATES:
+    _cur_names = {"EUR": "Euro", "GBp": "Brit. Pence", "CHF": "Franken", "JPY": "Yen",
+                  "CAD": "Kanada-$", "AUD": "Austral-$", "CNY": "Yuan", "HKD": "HK-$",
+                  "KRW": "Won", "TWD": "Taiwan-$", "INR": "Rupie", "BRL": "Real",
+                  "MXN": "Peso", "SEK": "Krone (SE)", "NOK": "Krone (NO)", "DKK": "Krone (DK)",
+                  "PLN": "Zloty", "SAR": "Riyal", "IDR": "Rupiah", "ZAc": "Rand-Cent", "SGD": "S-$"}
+    with st.expander(f"💱 Wechselkurse nach USD (Stand {_fx_time}, aktualisiert ~3×/Handelstag)"):
+        _rows = [{"Währung": f"{_cur_names.get(k, k)} ({k})", "1 Einheit = USD": f"${v:.4f}"}
+                 for k, v in sorted(FX_RATES.items()) if not k.startswith("_") and k != "USD"]
+        st.dataframe(pd.DataFrame(_rows), width="stretch", hide_index=True)
 
 with st.expander("ℹ️ Legende – was bedeuten die Zahlen?"):
     st.markdown("""
@@ -815,16 +832,17 @@ with tabs[6]:
         invested = sum(p.get("value_eur", 0) for p in pos.values())
         equity = pf.get("cash", 0) + invested
         ret = (equity / pf.get("start_capital", 10000) - 1) * 100
-        st.caption(f"🤖 Vollautomatischer Selbst-Check: startet mit "
-                   f"{pf.get('start_capital', 10000):,.0f} € virtuell, kauft täglich die Top-Tipps "
-                   f"(Top {10}, gleichgewichtet), verkauft bei Stop −15 %, Ziel +30 %, Rating-Verfall "
-                   f"oder Rauswurf aus den Top-Tipps. Wechselkurse ausgeklammert. Seit {pf.get('created')}.")
+        st.caption(f"🤖 **Fortlaufendes** automatisches Selbst-Check-Depot (läuft über Monate weiter, "
+                   f"kein Reset): startet mit ${pf.get('start_capital', 10000):,.0f} virtuell, kauft die "
+                   f"Top-Tipps (Top {10}, gleichgewichtet), **verkauft automatisch** bei Ziel +30 %, "
+                   f"Stop −15 %, Rating-Verfall oder Rauswurf aus den Top-Tipps – und kauft mit dem Erlös "
+                   f"den nächsten besten Pick. Alle Werte in USD. Seit {pf.get('created')}.")
 
         m = st.columns(5)
-        m[0].metric("Kontostand", f"{equity:,.0f} €", f"{ret:+.1f} %")
-        m[1].metric("Realisiert G/V", f"{pf.get('realized_pnl', 0):,.0f} €")
-        m[2].metric("Investiert", f"{invested:,.0f} €")
-        m[3].metric("Cash", f"{pf.get('cash', 0):,.0f} €")
+        m[0].metric("Kontostand", f"${equity:,.0f}", f"{ret:+.1f} %")
+        m[1].metric("Realisiert G/V", f"${pf.get('realized_pnl', 0):,.0f}")
+        m[2].metric("Investiert", f"${invested:,.0f}")
+        m[3].metric("Cash", f"${pf.get('cash', 0):,.0f}")
         m[4].metric("Positionen", len(pos))
 
         curve = pf.get("equity_curve", [])
@@ -838,11 +856,11 @@ with tabs[6]:
         if pos:
             hold = pd.DataFrame([{
                 "Symbol": s, "Name": p.get("name"), "seit": p.get("entry_date"),
-                "Kaufkurs": p.get("entry_price"), "akt. Kurs": p.get("last_price"),
-                "Rendite %": p.get("pnl_pct"), "Einsatz €": p.get("stake_eur"),
-                "Wert €": p.get("value_eur"), "G/V €": p.get("pnl_eur"),
+                "Kaufkurs $": p.get("entry_price"), "akt. Kurs $": p.get("last_price"),
+                "Rendite %": p.get("pnl_pct"), "Einsatz $": p.get("stake_eur"),
+                "Wert $": p.get("value_eur"), "G/V $": p.get("pnl_eur"),
             } for s, p in pos.items()])
-            st.dataframe(hold.sort_values("G/V €", ascending=False),
+            st.dataframe(hold.sort_values("G/V $", ascending=False),
                          width="stretch", hide_index=True)
         else:
             st.caption("Aktuell keine offenen Positionen.")
@@ -853,8 +871,8 @@ with tabs[6]:
             ldf = pd.DataFrame(list(reversed(log)))[
                 ["date", "action", "symbol", "name", "price", "stake_eur",
                  "value_eur", "pnl_eur", "pnl_pct", "reason"]]
-            ldf.columns = ["Datum", "Aktion", "Symbol", "Name", "Kurs", "Einsatz €",
-                           "Wert €", "G/V €", "G/V %", "Grund"]
+            ldf.columns = ["Datum", "Aktion", "Symbol", "Name", "Kurs $", "Einsatz $",
+                           "Wert $", "G/V $", "G/V %", "Grund"]
             st.dataframe(ldf.head(40), width="stretch", hide_index=True)
         else:
             st.caption("Noch keine Trades.")
