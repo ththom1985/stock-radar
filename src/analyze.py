@@ -26,7 +26,8 @@ from .aschenbrenner import load_aschenbrenner, stance_for
 from .rating import (radar_elo, radar_score, stars, plain_summary, suggest_actions,
                      quality_score as calc_quality, potential_score as calc_potential,
                      conviction, urgency, upside_pct, entry_score, entry_reason,
-                     downside_analysis, trade_plan, risk_warnings)
+                     downside_analysis, trade_plan, risk_warnings, bull_thesis, priced_in_note)
+from .geo import country_flag
 from .projection import project
 from .social import fetch_social, social_signal
 from .deep_fundamentals import fetch_deep
@@ -241,6 +242,7 @@ def run(with_news=True, with_fundamentals=True):
     for r in rows:
         r["expert_sources"] = expert_src.get(r["symbol"])
         r["themes"] = theme_map.get(r["symbol"])
+        r["country"], r["flag"] = country_flag(r["symbol"])
         r["aschenbrenner"] = stance_for(r["symbol"], asch_data)
         elo, rating_label, color = radar_elo(r)
         r["radar_elo"] = elo
@@ -260,10 +262,12 @@ def run(with_news=True, with_fundamentals=True):
         r["upside_pct"] = upside_pct(r)
         r["entry_score"] = entry_score(r)
         r["entry_reason"] = entry_reason(r)
+        r["risk_warnings"] = risk_warnings(r)
+        r["bull_thesis"] = bull_thesis(r)
+        r["priced_in"] = priced_in_note(r)
         r["downside"] = downside_analysis(r)
         r["trade_plan_long"] = trade_plan(r, "invest")
         r["trade_plan_short"] = trade_plan(r, "trade")
-        r["risk_warnings"] = risk_warnings(r)
 
     top_daytrade = sorted(rows, key=lambda r: r["daytrade_score"], reverse=True)[:TOP_N]
     top_longterm = sorted(rows, key=lambda r: r["investment_score"], reverse=True)[:TOP_N]

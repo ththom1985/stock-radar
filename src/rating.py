@@ -577,6 +577,67 @@ def trade_plan(row, context="invest"):
     }
 
 
+def bull_thesis(row):
+    """One-line 'why could this rise?' — the strongest bullish drivers, ranked."""
+    cl = []
+    au, an = row.get("analyst_upside_pct"), row.get("analyst_n") or 0
+    if _has(au) and an >= 3 and au >= 12:
+        cl.append((f"Analysten sehen +{au:.0f}% Kursziel", 6))
+    gs = row.get("growth_score")
+    if _has(gs) and gs >= 75:
+        cl.append(("Umsatz/Gewinn wachsen kräftig", 5))
+    mv = row.get("minervini_score")
+    if _has(mv) and mv >= 80:
+        cl.append(("bestätigter Aufwärtstrend", 4))
+    elif row.get("weinstein_stage") == 2 and (row.get("longterm_score") or 0) >= 58:
+        cl.append(("intakter Aufwärtstrend", 3))
+    vs = row.get("value_score")
+    if _has(vs) and vs >= 65:
+        cl.append(("günstig bewertet", 4))
+    pio = row.get("piotroski")
+    if _has(pio) and pio >= 7:
+        cl.append(("sehr solide Bilanz", 3))
+    if row.get("daytrade_direction") == "LONG":
+        cl.append(("kurzfristig kaufen die Anleger zu", 2))
+    if row.get("news_sentiment") == "positiv":
+        cl.append(("positive Nachrichtenlage", 2))
+    th = row.get("themes") or []
+    strong = [t for t in th if t in ("KI", "Kernenergie", "Quantum", "Space", "Robotik",
+                                     "Data Center", "Ukraine-Wiederaufbau", "Rüstung")]
+    if strong:
+        cl.append((f"Rückenwind aus Megatrend {strong[0]}", 2))
+    esrc = row.get("expert_sources")
+    if esrc:
+        cl.append((f"von {esrc[0]} empfohlen", 1))
+    asch = row.get("aschenbrenner")
+    if asch and asch.get("stance") == "LONG":
+        cl.append(("Smart Money (Aschenbrenner) ist long", 3))
+    if not cl:
+        return "Keine starken Aufwärtstreiber erkennbar – eher neutral bis abwartend."
+    cl.sort(key=lambda x: -x[1])
+    return " · ".join(c for c, _ in cl[:3])
+
+
+def priced_in_note(row):
+    """How much optimism is already in the price? Returns a caution string or None."""
+    flags = []
+    rsi = row.get("rsi")
+    if _has(rsi) and rsi >= 72:
+        flags.append("technisch heißgelaufen")
+    au, an = row.get("analyst_upside_pct"), row.get("analyst_n") or 0
+    if _has(au) and an >= 3 and au < 3:
+        flags.append("kaum Luft zum Kursziel")
+    if any("Spitzenzyklus" in w for w in (row.get("risk_warnings") or [])):
+        flags.append("Spitzenzyklus")
+    if "Rüstung" in (row.get("themes") or []):
+        flags.append("Rüstung trägt Kriegsprämie (Friedensrisiko)")
+    if row.get("hype_surging"):
+        flags.append("Retail-Hype")
+    if not flags:
+        return None
+    return "Viel Optimismus schon eingepreist: " + ", ".join(flags)
+
+
 def plain_summary(row):
     """2-4 short sentences in plain German that a non-expert understands."""
     parts = []

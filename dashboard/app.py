@@ -104,6 +104,9 @@ CSS = """
 .card .entry-why-up{background:#f0fdf4;color:#15803d;}
 .card .entry-why-soon{background:#fffbeb;color:#a16207;}
 .card .entry-why-down{background:#fef2f2;color:#b91c1c;}
+.card .thesis{margin:6px 0 0;font-size:12.5px;color:#166534;background:#f0fdf4;border:1px solid #bbf7d0;padding:5px 9px;border-radius:7px;}
+.card .thesis b{color:#14532d;}
+.card .pricedin{margin:4px 0 0;font-size:11.5px;color:#a16207;background:#fffbeb;border:1px solid #fde68a;padding:4px 9px;border-radius:7px;font-weight:600;}
 .card .px{font-size:13px;color:#0f172a;margin-top:3px;}
 .card .px b{font-size:16px;font-weight:800;}
 .card .px .px-up{font-weight:800;color:#16a34a;}
@@ -153,8 +156,16 @@ with st.expander("ℹ️ Legende – was bedeuten die Zahlen?"):
 - **🎯 Sicherheit · 💰 Gewinnpotenzial · ⏱️ Dringlichkeit** (oben auf jeder Karte): wie **sicher** das Signal
   ist (Übereinstimmung aller Faktoren), das **Gewinnpotenzial in +%** aus dem Handlungsplan, und wie
   **schnell** zu handeln ist (Sofort heute / Diese Woche / In Ruhe langfristig).
+- **🏳️ Landesflagge** (vor dem Kürzel) – Herkunftsland des Unternehmens (auch bei US-notierten ADRs korrekt,
+  z.B. 🇮🇳 ICICI, 🇧🇷 Nubank, 🇹🇼 TSMC).
 - **💶 Kurs** (im Karten-Kopf) – der aktuelle Kurs (Tagesschluss, ~15 Min verzögert) mit Tagesveränderung
   (grün/rot). Währung je nach Börse (US = $, .DE = €, …), ohne Symbol dargestellt.
+- **🔼 Warum steigt es?** (grüne Zeile) – die konsolidierte Ober-Begründung: die **stärksten Aufwärtstreiber**
+  in einem Satz (Analystenziel, Wachstum, Trend, Bewertung, Bilanz, Megatrend, Smart Money). Darunter der
+  **⚖️ Eingepreist-Check**: wie viel Optimismus schon im Kurs steckt (überkauft, kaum Luft zum Ziel,
+  Spitzenzyklus, Rüstungs-Kriegsprämie, Retail-Hype).
+- **🎯 Einstieg-heute-Tab** – ein eigener Algorithmus rankt **tagesaktuell** nur die besten Einstiege:
+  gutes Timing + geringes Abwärtsrisiko + solider Score, minus rote Warnungen. Deine Kaufkandidaten-Kurzliste.
 - **📉 Abwärtsrisiko** (grün/gelb/rote Zeile) – **wie weit könnte die Aktie noch fallen?** Zeigt die
   **nächste(n) Unterstützung(en)** unter dem Kurs (Kurslevel + % Abstand) und ein Urteil: *„Boden
   wahrscheinlicher"* (nahe Unterstützung + Momentum dreht) vs. *„viel Luft nach unten – Rückschlagrisiko"*
@@ -332,6 +343,16 @@ def _pro_details(r):
         f'{minervini}'
         '</details>'
     )
+
+
+def _thesis_html(r):
+    """Consolidated 'why could it rise?' + how much is already priced in."""
+    th = r.get("bull_thesis")
+    if not th:
+        return ""
+    pi = r.get("priced_in")
+    pi_html = f'<div class="pricedin">⚖️ {_esc(pi)}</div>' if pi else ""
+    return f'<div class="thesis">🔼 <b>Warum steigt es?</b> {_esc(th)}</div>{pi_html}'
 
 
 def _entry_why(r):
@@ -549,11 +570,12 @@ def card_html(r, idx=None, context="invest"):
         f'<div class="stars" style="color:#f59e0b">{_stars(r.get("stars"))}</div>'
         f'<div class="elo">ELO {r.get("radar_elo")}</div>'
         f'</div>'
-        f'<div class="name"><div class="tk">{_esc(r["symbol"])} · {_esc(r.get("name") or "")}</div>'
+        f'<div class="name"><div class="tk">{r.get("flag","")} {_esc(r["symbol"])} · {_esc(r.get("name") or "")}</div>'
         f'{price_line}'
         f'<div class="rt" style="color:{color}">{_esc(r.get("radar_rating"))}</div></div>'
         f'{sector_badge}{expert_badge}{theme_badge}{vol_badge}{asch_badge}</div>'
         f'{stat_row}'
+        f'{_thesis_html(r)}'
         f'{_entry_why(r)}'
         f'{_downside_html(r)}'
         f'{_risk_bar(r)}'
@@ -594,8 +616,20 @@ def grid_split(picks):
         grid(picks, numbered=True, context="trade")
 
 
+def entry_opportunity(r):
+    """Own daily algorithm for 'best entry right now': mostly timing (entry_score),
+    plus overall quality, a bonus when the downside to support is small and a
+    penalty for each red warning. 0-ish..100+."""
+    es = r.get("entry_score") or 0
+    rs = r.get("radar_score") or 0
+    dn = (r.get("downside") or {}).get("risk")
+    dbonus = {"gering": 12, "mittel": 0, "hoch": -18}.get(dn, 0)
+    warn = -14 * len(r.get("risk_warnings") or [])
+    return round(es * 0.60 + rs * 0.30 + dbonus + warn, 1)
+
+
 tabs = st.tabs(["🎯 Heute", "🚀 Daytrading", "🏦 Langzeit", "📊 Fundamental", "🧠 Aschenbrenner",
-                "🔥 Social", "💼 Paper-Depot", "🔎 Alle", "⭐ Experten", "🧭 Themen"])
+                "🔥 Social", "💼 Paper-Depot", "🔎 Alle", "⭐ Experten", "🧭 Themen", "🎯 Einstieg heute"])
 
 with tabs[0]:
     st.caption("**Deine Top-Chancen heute**, nach Rang. Jede Karte zeigt oben: **Richtung** "
@@ -763,3 +797,25 @@ with tabs[9]:
     grid(picks[:60], numbered=True, context="invest")
     if len(picks) > 60:
         st.caption(f"… und {len(picks) - 60} weitere in „{sel_theme}\" (Top 60 gezeigt).")
+
+with tabs[10]:
+    st.caption("🎯 **Tagesaktuell die besten Einstiege** – ein eigener Algorithmus rankt nur Aktien, bei "
+               "denen **jetzt** das Timing stimmt: guter Einstieg-Score (gesunder Rücksetzer im Aufwärts"
+               "trend, Momentum dreht), geringes Abwärtsrisiko (nahe Unterstützung), solider Radar-Score – "
+               "**abzüglich** roter Warnungen (Spitzenzyklus / kurzfristig fallend). Aktualisiert sich mit "
+               "jedem Lauf (3×/Handelstag). Kein Kaufbefehl – prüfe Karte, Boden und Handlungsplan.")
+    cand = [r for r in data["all"]
+            if (r.get("entry_score") or 0) >= 58
+            and (r.get("radar_score") or 0) >= 45
+            and (r.get("downside") or {}).get("risk") != "hoch"
+            and not (r.get("risk_warnings") or [])]
+    cand = sorted(cand, key=entry_opportunity, reverse=True)
+    st.markdown(f'<div class="day-h">🎯 Beste Einstiegschancen heute ({len(cand)})</div>',
+                unsafe_allow_html=True)
+    if cand:
+        grid(cand[:40], numbered=True, context="invest")
+        if len(cand) > 40:
+            st.caption(f"… und {len(cand) - 40} weitere, die die Kriterien erfüllen (Top 40 gezeigt).")
+    else:
+        st.info("Aktuell erfüllt kein Titel alle Kriterien gleichzeitig – das ist eher ein Zeichen für "
+                "einen schwierigen Markt. Lieber abwarten.")
