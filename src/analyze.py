@@ -26,7 +26,8 @@ from .aschenbrenner import load_aschenbrenner, stance_for
 from .rating import (radar_elo, radar_score, stars, plain_summary, suggest_actions,
                      quality_score as calc_quality, potential_score as calc_potential,
                      conviction, urgency, upside_pct, entry_score, entry_reason,
-                     downside_analysis, trade_plan, risk_warnings, bull_thesis, priced_in_note)
+                     downside_analysis, trade_plan, risk_warnings, bull_thesis, priced_in_note,
+                     trend_phase)
 from .geo import country_flag
 from .projection import project
 from .social import fetch_social, social_signal
@@ -242,7 +243,7 @@ def run(with_news=True, with_fundamentals=True):
     for r in rows:
         r["expert_sources"] = expert_src.get(r["symbol"])
         r["themes"] = theme_map.get(r["symbol"])
-        r["country"], r["flag"] = country_flag(r["symbol"])
+        r["country"], r["cc"] = country_flag(r["symbol"])
         r["aschenbrenner"] = stance_for(r["symbol"], asch_data)
         elo, rating_label, color = radar_elo(r)
         r["radar_elo"] = elo
@@ -256,6 +257,9 @@ def run(with_news=True, with_fundamentals=True):
         r["actions"] = suggest_actions(r)
         r["projection_short"] = project(r, "short")
         r["projection_long"] = project(r, "long")
+        r["trend_phase"] = trend_phase(r)
+        r["exp_return_12m"] = next((p.get("center_pct") for p in (r["projection_long"] or [])
+                                    if str(p.get("label", "")).startswith("12")), None)
         r["conviction"] = conviction(r)
         u_label, u_tone = urgency(r)
         r["urgency"], r["urgency_tone"] = u_label, u_tone
@@ -270,7 +274,15 @@ def run(with_news=True, with_fundamentals=True):
         r["trade_plan_short"] = trade_plan(r, "trade")
 
     top_daytrade = sorted(rows, key=lambda r: r["daytrade_score"], reverse=True)[:TOP_N]
-    top_longterm = sorted(rows, key=lambda r: r["investment_score"], reverse=True)[:TOP_N]
+
+    def _long_opportunity(r):
+        # Quality (investment_score) AND expected 12M return, so a high-quality
+        # but low-upside stock cannot outrank a strong-upside one.
+        base = r.get("investment_score") or 0
+        er = r.get("exp_return_12m")
+        return base + (max(-30, min(50, er)) * 0.6 if isinstance(er, (int, float)) else 0)
+
+    top_longterm = sorted(rows, key=_long_opportunity, reverse=True)[:TOP_N]
     top_fundamental = sorted(
         [r for r in rows if r.get("fundamental_score") is not None],
         key=lambda r: r["fundamental_score"], reverse=True,

@@ -107,6 +107,11 @@ CSS = """
 .card .thesis{margin:6px 0 0;font-size:12.5px;color:#166534;background:#f0fdf4;border:1px solid #bbf7d0;padding:5px 9px;border-radius:7px;}
 .card .thesis b{color:#14532d;}
 .card .pricedin{margin:4px 0 0;font-size:11.5px;color:#a16207;background:#fffbeb;border:1px solid #fde68a;padding:4px 9px;border-radius:7px;font-weight:600;}
+.card .flag{width:24px;height:18px;border-radius:2px;vertical-align:-3px;margin-right:6px;box-shadow:0 0 0 1px rgba(0,0,0,.15);}
+.card .trend{margin:6px 0 0;font-size:12px;padding:5px 9px;border-radius:7px;line-height:1.5;}
+.card .trend-up{background:#f0fdf4;color:#166534;}
+.card .trend-soon{background:#fffbeb;color:#a16207;}
+.card .trend-down{background:#fef2f2;color:#b91c1c;}
 .card .px{font-size:13px;color:#0f172a;margin-top:3px;}
 .card .px b{font-size:16px;font-weight:800;}
 .card .px .px-up{font-weight:800;color:#16a34a;}
@@ -153,9 +158,16 @@ with st.expander("ℹ️ Legende – was bedeuten die Zahlen?"):
   wieder hoch, Kurs über EMA9?) und **Malus, wenn kurzfristig noch fallend**. Die **grün/gelb/rote
   Timing-Zeile** sagt in Klartext, *warum* – z.B. „gesunder Rücksetzer, Momentum dreht" vs. „noch fallend –
   auf Stabilisierung warten".
-- **🎯 Sicherheit · 💰 Gewinnpotenzial · ⏱️ Dringlichkeit** (oben auf jeder Karte): wie **sicher** das Signal
-  ist (Übereinstimmung aller Faktoren), das **Gewinnpotenzial in +%** aus dem Handlungsplan, und wie
-  **schnell** zu handeln ist (Sofort heute / Diese Woche / In Ruhe langfristig).
+- **🎯 Sicherheit · 📊 Erwartung 12M · ⏱️ Dringlichkeit** (oben auf jeder Karte): wie **sicher** das Signal
+  ist, die **wahrscheinliche** 12-Monats-Rendite (Ø-Erwartung; „unter Marktschnitt" = weniger als ~7 %/Jahr
+  wie ein Index), und wie **schnell** zu handeln ist. **Wichtig:** Das ist die *wahrscheinliche* Rendite –
+  nicht zu verwechseln mit dem **🎯 Ziel-Potenzial (optimistisch)** im Handlungsplan, das nur zeigt, wie viel
+  drin wäre, *wenn* die Aktie die optimistische Ziel-Zone erreicht. Beide Zahlen sind bewusst getrennt.
+- **📈 Trendphase & 🔔 Verkauf** (grün/gelb/rote Zeile) – wo die Aktie im Trendzyklus steht (früher/mittlerer
+  Aufwärtstrend, Spätphase mit Top-Gefahr, Abwärtstrend, Bodenbildung) und **ab wann der Verkauf kritisch
+  wird** (z.B. „unter die 50-Tage-Linie fällt" = Trendbruch, oder überkauft = Teilverkauf/Trailing-Stop).
+  Enthält auch „buy the rumor, sell the news"-Warnung vor nahen Zahlen.
+- **🔍 Suche-Tab** – jede Aktie deines ~1000er-Universums per Kürzel/Name/Land/Thema aufrufen (volle Karte).
 - **🏳️ Landesflagge** (vor dem Kürzel) – Herkunftsland des Unternehmens (auch bei US-notierten ADRs korrekt,
   z.B. 🇮🇳 ICICI, 🇧🇷 Nubank, 🇹🇼 TSMC).
 - **💶 Kurs** (im Karten-Kopf) – der aktuelle Kurs (Tagesschluss, ~15 Min verzögert) mit Tagesveränderung
@@ -345,6 +357,16 @@ def _pro_details(r):
     )
 
 
+def _trend_html(r):
+    """Where in the trend cycle + when selling gets critical."""
+    tp = r.get("trend_phase")
+    if not tp:
+        return ""
+    tone = tp.get("tone", "soon")
+    return (f'<div class="trend trend-{tone}">📈 <b>Trendphase:</b> {_esc(tp.get("phase",""))} '
+            f'· 🔔 <b>Verkauf:</b> {_esc(tp.get("sell",""))}</div>')
+
+
 def _thesis_html(r):
     """Consolidated 'why could it rise?' + how much is already priced in."""
     th = r.get("bull_thesis")
@@ -416,7 +438,7 @@ def _plan_html(r, context="invest"):
         f'<div>⏳ Haltedauer<span class="pv">{_esc(tp.get("hold",""))}</span></div>'
         f'</div>'
         f'<div class="plan-foot">'
-        f'<span class="gp">💰 Gewinnpotenzial {pot_txt}</span>'
+        f'<span class="gp">🎯 Ziel-Potenzial (optimistisch) {pot_txt}</span>'
         f'<span class="rk">Risiko {risk_txt}</span>'
         f'<span class="crv">Chance-Risiko {rrr_txt}</span>'
         f'</div>'
@@ -503,6 +525,10 @@ def card_html(r, idx=None, context="invest"):
         pcls = "up" if dchg >= 0 else "down"
         chg_txt = f' <span class="px-{pcls}">{dchg:+.1f}%</span>'
     price_line = f'<div class="px">💶 Kurs <b>{px}</b>{chg_txt}</div>' if px is not None else ""
+    cc = r.get("cc")
+    _cty = _esc(r.get("country") or "")
+    flag_img = (f'<img class="flag" src="https://flagcdn.com/32x24/{cc}.png" alt="{_cty}" title="{_cty}">'
+                if cc else "")
     q, pot = r.get("quality"), r.get("potential")
     qp_line = (f'<div class="qp">🏅 Qualität: <b>{_qplabel(q)}</b> '
                f'({q if q is not None else "–"}/100) · 🚀 Potenzial: <b>{_qplabel(pot)}</b> '
@@ -512,10 +538,12 @@ def card_html(r, idx=None, context="invest"):
     dlabel, dcls = _direction(r, context)
     conv = r.get("conviction")
     if context == "invest":
-        tp = r.get("trade_plan_long") or {}
-        gp = tp.get("potential_pct")
-        pot_stat = (f'<span class="stat">💰 Gewinnpotenzial <b>+{gp:.0f}%</b></span>'
-                    if isinstance(gp, (int, float)) else "")
+        er = r.get("exp_return_12m")
+        if isinstance(er, (int, float)):
+            idx = "" if er >= 7 else " <span style='color:#b45309'>(unter Marktschnitt)</span>"
+            pot_stat = f'<span class="stat">📊 Erwartung 12M <b>{er:+.0f}%</b>{idx}</span>'
+        else:
+            pot_stat = ""
     else:
         tp = r.get("trade_plan_short") or {}
         gp = tp.get("potential_pct")
@@ -570,12 +598,13 @@ def card_html(r, idx=None, context="invest"):
         f'<div class="stars" style="color:#f59e0b">{_stars(r.get("stars"))}</div>'
         f'<div class="elo">ELO {r.get("radar_elo")}</div>'
         f'</div>'
-        f'<div class="name"><div class="tk">{r.get("flag","")} {_esc(r["symbol"])} · {_esc(r.get("name") or "")}</div>'
+        f'<div class="name"><div class="tk">{flag_img}{_esc(r["symbol"])} · {_esc(r.get("name") or "")}</div>'
         f'{price_line}'
         f'<div class="rt" style="color:{color}">{_esc(r.get("radar_rating"))}</div></div>'
         f'{sector_badge}{expert_badge}{theme_badge}{vol_badge}{asch_badge}</div>'
         f'{stat_row}'
         f'{_thesis_html(r)}'
+        f'{_trend_html(r)}'
         f'{_entry_why(r)}'
         f'{_downside_html(r)}'
         f'{_risk_bar(r)}'
@@ -629,7 +658,8 @@ def entry_opportunity(r):
 
 
 tabs = st.tabs(["🎯 Heute", "🚀 Daytrading", "🏦 Langzeit", "📊 Fundamental", "🧠 Aschenbrenner",
-                "🔥 Social", "💼 Paper-Depot", "🔎 Alle", "⭐ Experten", "🧭 Themen", "🎯 Einstieg heute"])
+                "🔥 Social", "💼 Paper-Depot", "🔎 Alle", "⭐ Experten", "🧭 Themen", "🎯 Einstieg heute",
+                "🔍 Suche"])
 
 with tabs[0]:
     st.caption("**Deine Top-Chancen heute**, nach Rang. Jede Karte zeigt oben: **Richtung** "
@@ -819,3 +849,29 @@ with tabs[10]:
     else:
         st.info("Aktuell erfüllt kein Titel alle Kriterien gleichzeitig – das ist eher ein Zeichen für "
                 "einen schwierigen Markt. Lieber abwarten.")
+
+with tabs[11]:
+    st.caption("🔍 **Jede Aktie deines Universums nachschlagen** – tippe Kürzel, Name, Sektor, Land oder "
+               "Thema. Zeigt die volle Analyse-Karte (nicht nur Empfehlungen).")
+    q = st.text_input("Suche (z.B. „Rheinmetall\", „NVDA\", „Indien\", „Quantum\", „Solar\")", "",
+                      key="universe_search")
+    if q.strip():
+        ql = q.strip().lower()
+
+        def _match(r):
+            hay = " ".join(str(x).lower() for x in [
+                r.get("symbol"), r.get("name"), r.get("sector"), r.get("industry"),
+                r.get("country"), " ".join(r.get("themes") or []),
+                " ".join(r.get("expert_sources") or [])])
+            return ql in hay
+        hits = sorted([r for r in data["all"] if _match(r)],
+                      key=lambda r: r.get("radar_score") or 0, reverse=True)
+        st.markdown(f'<div class="day-h">Treffer: {len(hits)}</div>', unsafe_allow_html=True)
+        if hits:
+            grid(hits[:40], numbered=False, context="invest")
+            if len(hits) > 40:
+                st.caption(f"… und {len(hits) - 40} weitere Treffer (Top 40 nach Score gezeigt).")
+        else:
+            st.info("Kein Titel gefunden. Tipp: kürzeres Stichwort oder Kürzel probieren.")
+    else:
+        st.info("Gib oben einen Suchbegriff ein, um jede Aktie aus deinen ~1000 aufzurufen.")

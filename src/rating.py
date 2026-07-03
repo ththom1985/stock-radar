@@ -577,6 +577,46 @@ def trade_plan(row, context="invest"):
     }
 
 
+def trend_phase(row):
+    """Where is the stock in its trend cycle, and when does selling get critical?
+    Uses Weinstein stage + how stretched/overbought it is + earnings timing
+    ('buy the rumor, sell the news'). Returns {phase, sell, tone}."""
+    stage = row.get("weinstein_stage")
+    rsi = row.get("rsi")
+    price, sma50 = row.get("price"), row.get("sma50")
+    ext50 = (price / sma50 - 1) * 100 if _has(price) and _has(sma50) and sma50 > 0 else None
+    macd_h = row.get("macd_hist")
+    late = ((_has(rsi) and rsi >= 75)
+            or (ext50 is not None and ext50 >= 22)
+            or (_has(macd_h) and macd_h < 0 and stage == 2 and _has(rsi) and rsi > 60))
+
+    if stage == 4:
+        phase, tone = "Abwärtstrend", "down"
+        sell = "bereits im Abwärtstrend – für Käufe meiden, kein Halten"
+    elif stage == 3 or (stage == 2 and late):
+        phase, tone = "Spätphase (Top-Gefahr)", "soon"
+        rl = f"RSI {rsi:.0f}" if _has(rsi) else "überdehnt"
+        sell = f"überkauft/überdehnt ({rl}) – Teilverkauf oder engen Trailing-Stop erwägen"
+    elif stage == 2:
+        if ext50 is not None and ext50 < 6 and _has(rsi) and rsi < 62:
+            phase, tone = "früher Aufwärtstrend", "up"
+        else:
+            phase, tone = "Aufwärtstrend (mittendrin)", "up"
+        sl = f" ({sma50:.2f})" if _has(sma50) else ""
+        sell = f"kritisch, sobald der Kurs unter die 50-Tage-Linie{sl} fällt (Trendbruch)"
+    elif stage == 1:
+        phase, tone = "Bodenbildung (früh)", "soon"
+        sell = "noch kein Trend – erst den Ausbruch abwarten"
+    else:
+        phase, tone = "Seitwärts / unklar", "soon"
+        sell = "kein klarer Trend – nur mit engem Stop"
+
+    ed = row.get("earnings_in_days")
+    if _has(ed) and 0 <= ed <= 5 and stage in (2, 3):
+        sell += f" · Zahlen in {ed} T.: „buy the rumor, sell the news\"-Risiko"
+    return {"phase": phase, "sell": sell, "tone": tone}
+
+
 def bull_thesis(row):
     """One-line 'why could this rise?' — the strongest bullish drivers, ranked."""
     cl = []
