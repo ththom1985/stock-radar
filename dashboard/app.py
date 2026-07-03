@@ -135,6 +135,9 @@ if not LATEST.exists():
 data = json.loads(LATEST.read_text(encoding="utf-8"))
 meta = data.get("aschenbrenner_meta", {})
 
+_FLAGS_FILE = ROOT / "data" / "flags_b64.json"
+FLAGS = json.loads(_FLAGS_FILE.read_text(encoding="utf-8")) if _FLAGS_FILE.exists() else {}
+
 h1, h2, h3, h4 = st.columns(4)
 h1.metric("Stand (UTC)", data["generated_at"].replace("T", " "))
 h2.metric("Universum", data["universe_size"])
@@ -452,13 +455,20 @@ def _proj_html(proj, context="invest"):
     if not proj:
         return ""
     if context == "invest":
+        want = ("1 Monat", "6 Monate", "12 Monate")
         parts = []
+        er12 = None
         for p in proj:
+            if p.get("label") not in want:
+                continue
             lbl = p["label"].replace(" Monate", "M").replace(" Monat", "M")
             parts.append(f'{lbl} <b>{p["center_pct"]:+.0f}%</b>')
-        return ('<div class="proj">📈 <b>Kursprognose</b> (Ø-Erwartung, keine Garantie): '
-                + " · ".join(parts)
-                + ' <span style="color:#94a3b8">– je weiter weg, desto unsicherer</span></div>')
+            if p["label"] == "12 Monate":
+                er12 = p.get("center_pct")
+        sub = (' <span class="submkt">12M unter Marktschnitt</span>'
+               if isinstance(er12, (int, float)) and er12 < 7 else "")
+        return ('<div class="proj">📊 <b>Erwartete Ø-Rendite</b> (keine Garantie): '
+                + " · ".join(parts) + sub + '</div>')
     # trade: the concrete plan box already carries entry/target/stop — no ± here
     return ""
 
@@ -528,8 +538,8 @@ def card_html(r, idx=None, context="invest"):
     price_line = f'<div class="px">💶 Kurs <b>{px}</b>{chg_txt}</div>' if px is not None else ""
     cc = r.get("cc")
     _cty = _esc(r.get("country") or "")
-    flag_img = (f'<img class="flag" src="https://flagcdn.com/40x30/{cc}.png" alt="" title="{_cty}" loading="lazy">'
-                if cc else "")
+    _src = FLAGS.get(cc)
+    flag_img = f'<img class="flag" src="{_src}" alt="" title="{_cty}">' if _src else ""
     q, pot = r.get("quality"), r.get("potential")
     qp_line = (f'<div class="qp">🏅 Qualität: <b>{_qplabel(q)}</b> '
                f'({q if q is not None else "–"}/100) · 🚀 Potenzial: <b>{_qplabel(pot)}</b> '
@@ -539,12 +549,7 @@ def card_html(r, idx=None, context="invest"):
     dlabel, dcls = _direction(r, context)
     conv = r.get("conviction")
     if context == "invest":
-        er = r.get("exp_return_12m")
-        if isinstance(er, (int, float)):
-            sub = '<span class="submkt">unter Marktschnitt</span>' if er < 7 else ""
-            pot_stat = f'<span class="stat">Erwartung 12M <b>{er:+.0f}%</b>{sub}</span>'
-        else:
-            pot_stat = ""
+        pot_stat = ""  # expected returns now shown as their own multi-horizon line
     else:
         tp = r.get("trade_plan_short") or {}
         gp = tp.get("potential_pct")
@@ -605,6 +610,7 @@ def card_html(r, idx=None, context="invest"):
         f'{sector_badge}{expert_badge}{theme_badge}{vol_badge}{asch_badge}</div>'
         f'{stat_row}'
         f'{_thesis_html(r)}'
+        f'{_proj_html(r.get(proj_key), context)}'
         f'{_trend_html(r)}'
         f'{_entry_why(r)}'
         f'{_downside_html(r)}'
@@ -617,7 +623,6 @@ def card_html(r, idx=None, context="invest"):
         f'{_expert_line(r)}'
         f'<div class="summary">{_esc(r.get("plain_summary",""))}</div>'
         f'{llm_div}'
-        f'{_proj_html(r.get(proj_key), context)}'
         f'<div class="chips">{chips}</div>'
         f'{news_div}'
         f'{_pro_details(r)}'
