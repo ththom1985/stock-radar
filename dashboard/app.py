@@ -205,7 +205,7 @@ st.markdown(
     f'<div class="statusline">Stand <b>{data["generated_at"].replace("T", " ")}</b> · '
     f'Universum <b>{data["universe_size"]}</b> · analysiert <b>{data["analyzed"]}</b> · '
     f'Aschenbrenner 13F <b>{meta.get("quarter") or "–"}</b> · Markt <b>{_mlabel}</b> · '
-    f'<i>Research-Werkzeug, keine Anlageberatung</i></div>',
+    f'alle Kurse in <b>USD</b> · <i>Research-Werkzeug, keine Anlageberatung</i></div>',
     unsafe_allow_html=True)
 
 with st.expander("ℹ️ Legende – was bedeuten die Zahlen?"):
@@ -466,9 +466,9 @@ def _downside_html(r):
     s2, s2p = dn.get("support2"), dn.get("support2_pct")
     sup = ""
     if s1 is not None:
-        sup = f' Nächste Unterstützung <b>{s1}</b> ({s1p:+.0f} %)'
+        sup = f' Nächste Unterstützung <b>${s1}</b> ({s1p:+.0f} %)'
         if s2 is not None:
-            sup += f', dann <b>{s2}</b> ({s2p:+.0f} %)'
+            sup += f', dann <b>${s2}</b> ({s2p:+.0f} %)'
     return (f'<div class="downside downside-{tone}">📉 Abwärtsrisiko <b>{_esc(risk)}</b> – '
             f'{_esc(dn.get("verdict",""))}{sup}</div>')
 
@@ -499,9 +499,9 @@ def _plan_html(r, context="invest"):
         f'<div class="plan plan-{tone}">'
         f'<div class="plan-act">{_esc(tp.get("action",""))}</div>'
         f'<div class="plan-grid">'
-        f'<div>🎬 {buy_lbl}<span class="pv">{tp.get("entry_low")} – {tp.get("entry_high")}</span></div>'
-        f'<div>🎯 {sell_lbl}<span class="pv">{tp.get("target_low")} – {tp.get("target_high")}</span></div>'
-        f'<div>🛑 Stop-Loss<span class="pv">{tp.get("stop")}</span></div>'
+        f'<div>🎬 {buy_lbl}<span class="pv">${tp.get("entry_low")} – ${tp.get("entry_high")}</span></div>'
+        f'<div>🎯 {sell_lbl}<span class="pv">${tp.get("target_low")} – ${tp.get("target_high")}</span></div>'
+        f'<div>🛑 Stop-Loss<span class="pv">${tp.get("stop")}</span></div>'
         f'<div>⏳ Haltedauer<span class="pv">{_esc(tp.get("hold",""))}</span></div>'
         f'</div>'
         f'<div class="plan-foot">'
@@ -621,7 +621,7 @@ def card_html(r, idx=None, context="invest"):
     if isinstance(dchg, (int, float)):
         pcls = "up" if dchg >= 0 else "down"
         chg_txt = f' <span class="px-{pcls}">{dchg:+.1f}%</span>'
-    price_line = f'<div class="px">💶 Kurs <b>{px}</b>{chg_txt}</div>' if px is not None else ""
+    price_line = f'<div class="px">💵 Kurs <b>${px}</b>{chg_txt}</div>' if px is not None else ""
     cc = r.get("cc")
     _cty = _esc(r.get("country") or "")
     _svg = FLAGS.get(cc)

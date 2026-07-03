@@ -34,6 +34,6 @@ jobs:
         run: |
           git config user.name "stock-radar-bot"
           git config user.email "bot@users.noreply.github.com"
-          git add data/output/latest.json data/fundamentals.json data/portfolio.json data/earnings.json
+          git add data/output/latest.json data/fundamentals.json data/portfolio.json data/earnings.json data/fx_usd.json
           git commit -m "Analyse $(date -u +%Y-%m-%dT%H:%MZ)" || echo "keine Änderungen"
           git push || echo "push übersprungen"

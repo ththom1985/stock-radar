@@ -602,7 +602,7 @@ def trend_phase(row):
             phase, tone = "früher Aufwärtstrend", "up"
         else:
             phase, tone = "Aufwärtstrend (mittendrin)", "up"
-        sl = f" ({sma50:.2f})" if _has(sma50) else ""
+        sl = f" (${sma50:.2f})" if _has(sma50) else ""
         sell = f"kritisch, sobald der Kurs unter die 50-Tage-Linie{sl} fällt (Trendbruch)"
     elif stage == 1:
         phase, tone = "Bodenbildung (früh)", "soon"

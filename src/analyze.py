@@ -29,6 +29,7 @@ from .rating import (radar_elo, radar_score, stars, plain_summary, suggest_actio
                      downside_analysis, trade_plan, risk_warnings, bull_thesis, priced_in_note,
                      trend_phase)
 from .geo import country_flag
+from .fx import currency_for, get_fx_rates
 from .projection import project
 from .social import fetch_social, social_signal
 from .deep_fundamentals import fetch_deep
@@ -173,6 +174,25 @@ def run(with_news=True, with_fundamentals=True):
         for r in rows:
             r["fundamental_score"] = None
             r["investment_score"] = r["longterm_score"]
+
+    # --- Convert every price level to USD (display consistency) ---
+    # Ratios (%, upside, margins, atr_pct) were computed from local values and
+    # stay correct; only absolute price fields are scaled.
+    _PRICE_KEYS = ("price", "prev_close", "sma20", "sma50", "sma150", "sma200",
+                   "sma150_1m_ago", "sma200_1m_ago", "ema9", "ema21", "high52", "low52",
+                   "high20", "low20", "atr", "pivot", "pivot_r1", "pivot_s1",
+                   "target_price", "graham_number")
+    fx = get_fx_rates({currency_for(r["symbol"]) for r in rows})
+    for r in rows:
+        cur = currency_for(r["symbol"])
+        rate = fx.get(cur) or 1.0
+        r["currency"] = cur
+        r["fx_usd"] = rate
+        if rate != 1.0:
+            for k in _PRICE_KEYS:
+                v = r.get(k)
+                if isinstance(v, (int, float)):
+                    r[k] = round(v * rate, 2)
 
     # --- News layer (per-ticker sentiment) + earnings dates ---
     market = {"market_sentiment": None, "market_label": None, "headlines": []}
