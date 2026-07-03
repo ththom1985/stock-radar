@@ -130,6 +130,9 @@ CSS = """
 .card .downside-up{background:#f0fdf4;color:#15803d;}
 .card .downside-soon{background:#fffbeb;color:#a16207;}
 .card .downside-down{background:#fef2f2;color:#b91c1c;}
+.card .macro{margin:6px 0 0;font-size:12px;color:#475569;background:#f1f5f9;border:1px solid #e2e8f0;padding:4px 9px;border-radius:7px;}
+.macrobar{margin:2px 0 8px;padding:7px 12px;border:1px solid #e2e8f0;border-radius:9px;font-size:13px;color:#334155;}
+.macrobar b{color:#0f172a;}
 /* --- Logo, Kopf, Tabs, Mobile --- */
 .app-logo{display:flex;align-items:center;gap:12px;margin:0 0 2px;}
 .app-logo .mark{width:48px;height:48px;flex:none;}
@@ -214,6 +217,26 @@ st.markdown(
     + ' · <i>Research-Werkzeug, keine Anlageberatung</i></div>',
     unsafe_allow_html=True)
 
+_mc = data.get("macro") or {}
+if _mc.get("regime"):
+    _bg = {"risk_off": "#fef2f2", "risk_on": "#f0fdf4", "neutral": "#f8fafc"}.get(_mc["regime"], "#f8fafc")
+    _bd = {"risk_off": "#fca5a5", "risk_on": "#86efac", "neutral": "#e2e8f0"}.get(_mc["regime"], "#e2e8f0")
+    _ic = {"risk_off": "🌪️", "risk_on": "🟢", "neutral": "⚪"}.get(_mc["regime"], "⚪")
+    _rd = {"rising": "steigend ↗", "falling": "fallend ↘", "flat": "seitwärts →"}.get(_mc.get("rate_dir"), "")
+    _tone = {"hawkish": "restriktiv (hawkish)", "dovish": "locker (dovish)",
+             "neutral": "neutral"}.get((_mc.get("fomc_tone") or {}).get("tone"))
+    _p = [f'{_ic} <b>Marktumfeld: {_mc.get("regime_label") or ""}</b>']
+    if _mc.get("vix") is not None:
+        _p.append(f'VIX <b>{_mc["vix"]}</b>')
+    if _mc.get("tnx_pct") is not None:
+        _p.append(f'10J-Zins <b>{_mc["tnx_pct"]}%</b> {_rd}')
+    if _mc.get("fomc_in_days") is not None:
+        _p.append(f'Fed-Sitzung in <b>{_mc["fomc_in_days"]} T</b> ({_mc.get("fomc_next")})')
+    if _tone:
+        _p.append(f'letzte Fed-Aussage: {_tone}')
+    st.markdown(f'<div class="macrobar" style="background:{_bg};border-color:{_bd}">'
+                + ' · '.join(_p) + '</div>', unsafe_allow_html=True)
+
 if FX_RATES:
     _cur_names = {"EUR": "Euro", "GBp": "Brit. Pence", "CHF": "Franken", "JPY": "Yen",
                   "CAD": "Kanada-$", "AUD": "Austral-$", "CNY": "Yuan", "HKD": "HK-$",
@@ -254,6 +277,11 @@ with st.expander("ℹ️ Legende – was bedeuten die Zahlen?"):
   wird** (z.B. „unter die 50-Tage-Linie fällt" = Trendbruch, oder überkauft = Teilverkauf/Trailing-Stop).
   Enthält auch „buy the rumor, sell the news"-Warnung vor nahen Zahlen.
 - **🔍 Suche-Tab** – jede Aktie deines ~1000er-Universums per Kürzel/Name/Land/Thema aufrufen (volle Karte).
+- **🌍 Marktumfeld-Banner (oben) & Makro-Zeile je Karte** – berücksichtigt das **Gesamtumfeld**: **VIX**
+  (Angst-Index: hoch = Risk-Off), **10-Jahres-Zins** + Richtung (steigende Zinsen drücken teure Growth-Aktien,
+  helfen Banken; fallende helfen REITs/Versorger/Wachstum), und die **Fed-Sitzung** (Datum + heuristische
+  Einschätzung hawkish/dovish). Wo relevant, kippt das den Score leicht (z.B. Risk-Off dämpft hoch-volatile
+  Spekulanten) und erscheint als 🌍-Zeile auf der Karte. Wird ~3×/Handelstag automatisch aktualisiert.
 - **🏳️ Landesflagge** (vor dem Kürzel) – Herkunftsland des Unternehmens (auch bei US-notierten ADRs korrekt,
   z.B. Indien bei ICICI, Brasilien bei Nubank, Taiwan bei TSMC).
 - **💶 Kurs** (im Karten-Kopf) – der aktuelle Kurs (Tagesschluss, ~15 Min verzögert) mit Tagesveränderung
@@ -490,6 +518,14 @@ def _downside_html(r):
             f'{_esc(dn.get("verdict",""))}{sup}</div>')
 
 
+def _macro_html(r):
+    """Per-stock macro context (only shown when the environment is relevant)."""
+    notes = r.get("macro_notes") or []
+    if not notes:
+        return ""
+    return f'<div class="macro">🌍 {" · ".join(_esc(n) for n in notes)}</div>'
+
+
 def _risk_bar(r):
     """Loud red warnings that a high score can hide (cyclical peak, bad timing)."""
     rw = r.get("risk_warnings") or []
@@ -718,6 +754,7 @@ def card_html(r, idx=None, context="invest"):
         f'{_trend_html(r)}'
         f'{_entry_why(r)}'
         f'{_downside_html(r)}'
+        f'{_macro_html(r)}'
         f'{_risk_bar(r)}'
         f'{_plan_html(r, context)}'
         f'<div class="meta">{meta_line}</div>'

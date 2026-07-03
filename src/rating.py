@@ -71,6 +71,11 @@ def radar_elo(row):
     elif stg == 2:
         elo += 15
 
+    # Macro context (VIX regime, rates, Fed) — small nudge, computed upstream
+    mp = row.get("macro_pts")
+    if _has(mp):
+        elo += mp
+
     elo = int(round(max(700, min(2200, elo)) / 5) * 5)
 
     for thr, label, color in [

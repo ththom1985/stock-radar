@@ -30,6 +30,7 @@ from .rating import (radar_elo, radar_score, stars, plain_summary, suggest_actio
                      trend_phase)
 from .geo import country_flag
 from .fx import currency_for, get_fx_rates
+from .macro import fetch_macro, macro_adjust
 from .projection import project
 from .social import fetch_social, social_signal
 from .deep_fundamentals import fetch_deep
@@ -256,6 +257,12 @@ def run(with_news=True, with_fundamentals=True):
         r["tech_momentum"] = tech_momentum_score(r)
         r["tech_volume"] = tech_volume_score(r)
 
+    # --- Macro context (VIX / rates / Fed) ---
+    macro = fetch_macro()
+    print(f"Marktumfeld: {macro.get('regime_label')} · VIX {macro.get('vix')} · "
+          f"10J-Zins {macro.get('tnx_pct')}% ({macro.get('rate_dir')}) · "
+          f"Fed in {macro.get('fomc_in_days')} T")
+
     # --- Aschenbrenner stance + human-facing rating layer ---
     asch_data = load_aschenbrenner()
     expert_src = _load_expert_sources()
@@ -265,6 +272,7 @@ def run(with_news=True, with_fundamentals=True):
         r["themes"] = theme_map.get(r["symbol"])
         r["country"], r["cc"] = country_flag(r["symbol"])
         r["aschenbrenner"] = stance_for(r["symbol"], asch_data)
+        r["macro_pts"], r["macro_notes"] = macro_adjust(r, macro)
         elo, rating_label, color = radar_elo(r)
         r["radar_elo"] = elo
         r["radar_rating"] = rating_label
@@ -326,6 +334,7 @@ def run(with_news=True, with_fundamentals=True):
         "universe_size": len(symbols),
         "analyzed": len(rows),
         "market_news": market,
+        "macro": macro,
         "aschenbrenner_meta": {
             "quarter": asch_data.get("report_quarter"),
             "filed": asch_data.get("filed"),
