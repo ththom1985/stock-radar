@@ -832,11 +832,14 @@ with tabs[6]:
         invested = sum(p.get("value_eur", 0) for p in pos.values())
         equity = pf.get("cash", 0) + invested
         ret = (equity / pf.get("start_capital", 10000) - 1) * 100
-        st.caption(f"🤖 **Fortlaufendes** automatisches Selbst-Check-Depot (läuft über Monate weiter, "
-                   f"kein Reset): startet mit ${pf.get('start_capital', 10000):,.0f} virtuell, kauft die "
-                   f"Top-Tipps (Top {10}, gleichgewichtet), **verkauft automatisch** bei Ziel +30 %, "
-                   f"Stop −15 %, Rating-Verfall oder Rauswurf aus den Top-Tipps – und kauft mit dem Erlös "
-                   f"den nächsten besten Pick. Alle Werte in USD. Seit {pf.get('created')}.")
+        st.caption(f"🤖 **Fortlaufendes, intelligentes** Selbst-Check-Depot (läuft über Monate, kein Reset): "
+                   f"startet mit ${pf.get('start_capital', 10000):,.0f} virtuell und **prüft bei jedem Lauf "
+                   f"jede Position neu (Revision)**. Es verkauft **signalbasiert, nicht nach starrer Regel** – "
+                   f"Gewinner werden laufen gelassen und nur mit **Trailing-Stop** (sichert Gewinn ab Hoch) "
+                   f"geschützt, Verlierer fliegen **früh** raus, sobald die These bricht (Trend dreht abwärts, "
+                   f"Rating fällt, Rauswurf aus den Top-Tipps) – bei jedem beliebigen %. Not-Stop −22 % als "
+                   f"Netz. Erlös → nächster bester Pick (keine Abwärtstrends). Alle Werte in USD. Seit "
+                   f"{pf.get('created')}.")
 
         m = st.columns(5)
         m[0].metric("Kontostand", f"${equity:,.0f}", f"{ret:+.1f} %")
