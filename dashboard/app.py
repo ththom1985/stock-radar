@@ -107,7 +107,8 @@ CSS = """
 .card .thesis{margin:6px 0 0;font-size:12.5px;color:#166534;background:#f0fdf4;border:1px solid #bbf7d0;padding:5px 9px;border-radius:7px;}
 .card .thesis b{color:#14532d;}
 .card .pricedin{margin:4px 0 0;font-size:11.5px;color:#a16207;background:#fffbeb;border:1px solid #fde68a;padding:4px 9px;border-radius:7px;font-weight:600;}
-.card .flag{width:24px;height:18px;border-radius:2px;vertical-align:-3px;margin-right:6px;box-shadow:0 0 0 1px rgba(0,0,0,.15);}
+.card .flag{width:26px;height:18px;border-radius:0;border:1px solid #cbd5e1;vertical-align:-3px;margin-right:6px;object-fit:fill;}
+.card .submkt{color:#b45309;font-weight:700;font-size:11px;background:#fffbeb;border:1px solid #fde68a;padding:1px 6px;border-radius:6px;margin-left:5px;}
 .card .trend{margin:6px 0 0;font-size:12px;padding:5px 9px;border-radius:7px;line-height:1.5;}
 .card .trend-up{background:#f0fdf4;color:#166534;}
 .card .trend-soon{background:#fffbeb;color:#a16207;}
@@ -169,7 +170,7 @@ with st.expander("ℹ️ Legende – was bedeuten die Zahlen?"):
   Enthält auch „buy the rumor, sell the news"-Warnung vor nahen Zahlen.
 - **🔍 Suche-Tab** – jede Aktie deines ~1000er-Universums per Kürzel/Name/Land/Thema aufrufen (volle Karte).
 - **🏳️ Landesflagge** (vor dem Kürzel) – Herkunftsland des Unternehmens (auch bei US-notierten ADRs korrekt,
-  z.B. 🇮🇳 ICICI, 🇧🇷 Nubank, 🇹🇼 TSMC).
+  z.B. Indien bei ICICI, Brasilien bei Nubank, Taiwan bei TSMC).
 - **💶 Kurs** (im Karten-Kopf) – der aktuelle Kurs (Tagesschluss, ~15 Min verzögert) mit Tagesveränderung
   (grün/rot). Währung je nach Börse (US = $, .DE = €, …), ohne Symbol dargestellt.
 - **🔼 Warum steigt es?** (grüne Zeile) – die konsolidierte Ober-Begründung: die **stärksten Aufwärtstreiber**
@@ -527,7 +528,7 @@ def card_html(r, idx=None, context="invest"):
     price_line = f'<div class="px">💶 Kurs <b>{px}</b>{chg_txt}</div>' if px is not None else ""
     cc = r.get("cc")
     _cty = _esc(r.get("country") or "")
-    flag_img = (f'<img class="flag" src="https://flagcdn.com/32x24/{cc}.png" alt="{_cty}" title="{_cty}">'
+    flag_img = (f'<img class="flag" src="https://flagcdn.com/40x30/{cc}.png" alt="" title="{_cty}" loading="lazy">'
                 if cc else "")
     q, pot = r.get("quality"), r.get("potential")
     qp_line = (f'<div class="qp">🏅 Qualität: <b>{_qplabel(q)}</b> '
@@ -540,8 +541,8 @@ def card_html(r, idx=None, context="invest"):
     if context == "invest":
         er = r.get("exp_return_12m")
         if isinstance(er, (int, float)):
-            idx = "" if er >= 7 else " <span style='color:#b45309'>(unter Marktschnitt)</span>"
-            pot_stat = f'<span class="stat">📊 Erwartung 12M <b>{er:+.0f}%</b>{idx}</span>'
+            sub = '<span class="submkt">unter Marktschnitt</span>' if er < 7 else ""
+            pot_stat = f'<span class="stat">Erwartung 12M <b>{er:+.0f}%</b>{sub}</span>'
         else:
             pot_stat = ""
     else:
