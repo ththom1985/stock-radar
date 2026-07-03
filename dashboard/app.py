@@ -109,6 +109,13 @@ CSS = """
 .card .pricedin{margin:4px 0 0;font-size:11.5px;color:#a16207;background:#fffbeb;border:1px solid #fde68a;padding:4px 9px;border-radius:7px;font-weight:600;}
 .card .flag{width:26px;height:18px;border-radius:0;border:1px solid #cbd5e1;vertical-align:-3px;margin-right:6px;object-fit:fill;}
 .card .submkt{color:#b45309;font-weight:700;font-size:11px;background:#fffbeb;border:1px solid #fde68a;padding:1px 6px;border-radius:6px;margin-left:5px;}
+.card .scen{margin:6px 0 0;display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;}
+.card .scen-lbl{color:#64748b;font-weight:700;}
+.card .sc{padding:3px 9px;border-radius:999px;font-weight:600;}
+.card .sc b{font-weight:800;}
+.card .sc-mid{background:#eef2ff;color:#3730a3;border:1px solid #c7d2fe;}
+.card .sc-bull{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;}
+.card .sc-bear{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;}
 .card .trend{margin:6px 0 0;font-size:12px;padding:5px 9px;border-radius:7px;line-height:1.5;}
 .card .trend-up{background:#f0fdf4;color:#166534;}
 .card .trend-soon{background:#fffbeb;color:#a16207;}
@@ -162,11 +169,12 @@ with st.expander("ℹ️ Legende – was bedeuten die Zahlen?"):
   wieder hoch, Kurs über EMA9?) und **Malus, wenn kurzfristig noch fallend**. Die **grün/gelb/rote
   Timing-Zeile** sagt in Klartext, *warum* – z.B. „gesunder Rücksetzer, Momentum dreht" vs. „noch fallend –
   auf Stabilisierung warten".
-- **🎯 Sicherheit · 📊 Erwartung 12M · ⏱️ Dringlichkeit** (oben auf jeder Karte): wie **sicher** das Signal
-  ist, die **wahrscheinliche** 12-Monats-Rendite (Ø-Erwartung; „unter Marktschnitt" = weniger als ~7 %/Jahr
-  wie ein Index), und wie **schnell** zu handeln ist. **Wichtig:** Das ist die *wahrscheinliche* Rendite –
-  nicht zu verwechseln mit dem **🎯 Ziel-Potenzial (optimistisch)** im Handlungsplan, das nur zeigt, wie viel
-  drin wäre, *wenn* die Aktie die optimistische Ziel-Zone erreicht. Beide Zahlen sind bewusst getrennt.
+- **📊 Erwartete Ø-Rendite (Median)** – die **wahrscheinlichste** Entwicklung über **1M · 6M · 12M** (Ø aus
+  dem Prognosemodell, keine Garantie; „unter Marktschnitt" = 12M weniger als ~7 %/Jahr wie ein Index).
+- **Szenarien (klar gegenübergestellt)** – direkt daneben drei Fälle: **📊 Median** (wahrscheinlich) ·
+  **🎯 Chance-Szenario** (optimistisch: Kurs erreicht die Ziel-Zone) · **🛑 Risiko-Szenario** (Stop-Loss wird
+  ausgelöst). So siehst du auf einen Blick, was *wahrscheinlich*, was *im besten* und was *im schlechtesten*
+  Fall passiert – bewusst **kein** einzelnes „Gewinnpotenzial" mehr, sondern sauber klassifiziert.
 - **📈 Trendphase & 🔔 Verkauf** (grün/gelb/rote Zeile) – wo die Aktie im Trendzyklus steht (früher/mittlerer
   Aufwärtstrend, Spätphase mit Top-Gefahr, Abwärtstrend, Bodenbildung) und **ab wann der Verkauf kritisch
   wird** (z.B. „unter die 50-Tage-Linie fällt" = Trendbruch, oder überkauft = Teilverkauf/Trailing-Stop).
@@ -450,6 +458,29 @@ def _plan_html(r, context="invest"):
     )
 
 
+def _scenario_html(r, context="invest"):
+    """Classified, side-by-side outlook: probable Median vs. optimistic Chance
+    (target reached) vs. Risiko (stop hit). NOT called 'Gewinnpotenzial'."""
+    if context != "invest":
+        return ""
+    tp = r.get("trade_plan_long") or {}
+    er = r.get("exp_return_12m")
+    bull, bear = tp.get("potential_pct"), tp.get("risk_pct")
+    items = []
+    if isinstance(er, (int, float)):
+        items.append(f'<span class="sc sc-mid" title="Wahrscheinlichste Entwicklung (Median, 12 Monate)">'
+                     f'📊 Median (12M) <b>{er:+.0f}%</b></span>')
+    if isinstance(bull, (int, float)):
+        items.append(f'<span class="sc sc-bull" title="Optimistisches Szenario: Kurs erreicht die Ziel-Zone">'
+                     f'🎯 Chance-Szenario <b>+{bull:.0f}%</b></span>')
+    if isinstance(bear, (int, float)):
+        items.append(f'<span class="sc sc-bear" title="Risiko-Szenario: Stop-Loss wird ausgelöst">'
+                     f'🛑 Risiko-Szenario <b>−{bear:.0f}%</b></span>')
+    if not items:
+        return ""
+    return ('<div class="scen"><span class="scen-lbl">Szenarien:</span>' + "".join(items) + '</div>')
+
+
 def _proj_html(proj, context="invest"):
     """Clear, direction-first projection. No confusing symmetric ranges."""
     if not proj:
@@ -611,6 +642,7 @@ def card_html(r, idx=None, context="invest"):
         f'{stat_row}'
         f'{_thesis_html(r)}'
         f'{_proj_html(r.get(proj_key), context)}'
+        f'{_scenario_html(r, context)}'
         f'{_trend_html(r)}'
         f'{_entry_why(r)}'
         f'{_downside_html(r)}'
