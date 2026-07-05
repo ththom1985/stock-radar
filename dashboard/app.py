@@ -98,6 +98,7 @@ CSS = """
 .card .plan-foot .crv{color:#334155;font-weight:700;font-size:12px;background:#e2e8f0;padding:2px 9px;border-radius:999px;}
 .card .expert-badge{display:inline-block;background:#fef3c7;color:#92400e;border:1px solid #fcd34d;font-weight:700;font-size:11px;padding:2px 8px;border-radius:999px;margin:2px 0 0 4px;}
 .card .theme-badge{display:inline-block;background:#eef2ff;color:#4338ca;border:1px solid #c7d2fe;font-weight:700;font-size:11px;padding:2px 8px;border-radius:999px;margin:2px 0 0 4px;}
+.card .etf-badge{display:inline-block;background:#0f172a;color:#fff;font-weight:800;font-size:11px;padding:2px 8px;border-radius:999px;margin:2px 0 0 4px;}
 .card .vol-badge{display:inline-block;background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;font-weight:700;font-size:11px;padding:2px 8px;border-radius:999px;margin:2px 0 0 4px;}
 .card .riskbar{margin:8px 0 0;padding:7px 11px;border-radius:8px;background:#fef2f2;border:1px solid #fca5a5;border-left:4px solid #dc2626;color:#b91c1c;font-weight:700;font-size:12px;line-height:1.5;}
 .card .entry-why{margin:6px 0 0;font-size:12px;font-weight:600;padding:4px 9px;border-radius:7px;}
@@ -239,6 +240,11 @@ if _mc.get("regime"):
         _p.append(f'Fed-Sitzung in <b>{_mc["fomc_in_days"]} T</b> ({_mc.get("fomc_next")})')
     if _tone:
         _p.append(f'letzte Fed-Aussage: {_tone}')
+    _cd = {"rising": "↗", "falling": "↘", "flat": "→"}
+    for _lbl, _k, _dk in [("Öl", "oil", "oil_dir"), ("Gold", "gold", "gold_dir"),
+                          ("Kupfer", "copper", "copper_dir"), ("$-Index", "dxy", "dxy_dir")]:
+        if _mc.get(_k) is not None:
+            _p.append(f'{_lbl} <b>{_mc[_k]}</b> {_cd.get(_mc.get(_dk), "")}')
     st.markdown(f'<div class="macrobar" style="background:{_bg};border-color:{_bd}">'
                 + ' · '.join(_p) + '</div>', unsafe_allow_html=True)
 
@@ -290,6 +296,11 @@ with st.expander("ℹ️ Legende – was bedeuten die Zahlen?"):
   wird** (z.B. „unter die 50-Tage-Linie fällt" = Trendbruch, oder überkauft = Teilverkauf/Trailing-Stop).
   Enthält auch „buy the rumor, sell the news"-Warnung vor nahen Zahlen.
 - **🔍 Suche-Tab** – jede Aktie deines ~1000er-Universums per Kürzel/Name/Land/Thema aufrufen (volle Karte).
+- **📊 ETF-Badge & 🛢️ Rohstoff-Rückenwind** – **ETFs** (Index/Sektor/Themen/Rohstoff/Anleihen/International/
+  Krypto) sind mit schwarzem **📊 ETF**-Badge markiert und werden **rein technisch** bewertet (Trend/Momentum/
+  Volumen – keine Bilanz). **Rohstoffe/Devisen** (Öl/Gold/Kupfer/Silber/Dollar, oben im Banner mit Pfeil)
+  wirken als **Rückenwind/Gegenwind** auf passende Aktien: Öl↑→Energiewerte+, Gold↑→Goldminen+, starker
+  Dollar→Emerging Markets−. Erscheint in der 🌍-Makro-Zeile der Karte.
 - **🌍 Marktumfeld-Banner (oben) & Makro-Zeile je Karte** – berücksichtigt das **Gesamtumfeld**: **VIX**
   (Angst-Index: hoch = Risk-Off), **10-Jahres-Zins** + Richtung (steigende Zinsen drücken teure Growth-Aktien,
   helfen Banken; fallende helfen REITs/Versorger/Wachstum), und die **Fed-Sitzung** (Datum + heuristische
@@ -688,7 +699,10 @@ def card_html(r, idx=None, context="invest"):
     esrc = r.get("expert_sources") or []
     expert_badge = (f'<span class="expert-badge">⭐ {_esc(" · ".join(esrc))}</span>' if esrc else "")
     thl = r.get("themes") or []
-    theme_badge = (f'<span class="theme-badge">🧭 {_esc(" · ".join(thl[:3]))}</span>' if thl else "")
+    _is_etf = "ETF" in thl
+    etf_badge = '<span class="etf-badge">📊 ETF</span>' if _is_etf else ""
+    _thshow = [t for t in thl if t != "ETF"][:3]
+    theme_badge = (f'<span class="theme-badge">🧭 {_esc(" · ".join(_thshow))}</span>' if _thshow else "")
     atrp, beta = r.get("atr_pct"), r.get("beta")
     _volatile = (isinstance(atrp, (int, float)) and atrp >= 5) or (isinstance(beta, (int, float)) and beta >= 1.8)
     vol_badge = ""
@@ -776,7 +790,7 @@ def card_html(r, idx=None, context="invest"):
         f'<div class="name"><div class="tk">{flag_img}{_esc(r["symbol"])} · {_esc(r.get("name") or "")}</div>'
         f'{price_line}'
         f'<div class="rt" style="color:{color}">{_esc(r.get("radar_rating"))}</div></div>'
-        f'{sector_badge}{expert_badge}{theme_badge}{vol_badge}{asch_badge}</div>'
+        f'{sector_badge}{etf_badge}{expert_badge}{theme_badge}{vol_badge}{asch_badge}</div>'
         f'{stat_row}'
         f'{_thesis_html(r)}'
         f'{_proj_html(r.get(proj_key), context)}'

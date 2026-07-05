@@ -101,13 +101,22 @@ def fetch_macro(today=None, verbose=True):
     vix, vix_prev = _last_and_prev("^VIX")
     tnx, tnx_prev = _last_and_prev("^TNX")          # 10Y yield (sometimes ×10, sometimes direct)
     spx, spx_prev = _last_and_prev("^GSPC")
+    dxy, dxy_p = _last_and_prev("DX-Y.NYB")
+    oil, oil_p = _last_and_prev("CL=F")
+    gold, gold_p = _last_and_prev("GC=F")
+    copper, copper_p = _last_and_prev("HG=F")
+    silver, silver_p = _last_and_prev("SI=F")
+    btc, btc_p = _last_and_prev("BTC-USD")
 
     def _yld(x):  # normalise to percent whether Yahoo returns 4.4 or 44.0
         return None if x is None else round(x / 10, 2) if x > 20 else round(x, 2)
     tnx_pct, tnx_prev_pct = _yld(tnx), _yld(tnx_prev)
-    dxy, _ = _last_and_prev("DX-Y.NYB")
-    oil, _ = _last_and_prev("CL=F")
-    gold, _ = _last_and_prev("GC=F")
+
+    def _dir(last, prev, thr=3.0):  # rising/falling/flat over ~20 trading days
+        if last is None or not prev:
+            return "flat"
+        chg = (last / prev - 1) * 100
+        return "rising" if chg >= thr else "falling" if chg <= -thr else "flat"
 
     # VIX regime
     if vix is None:
@@ -136,7 +145,10 @@ def fetch_macro(today=None, verbose=True):
         "tnx_pct": tnx_pct, "tnx_prev_pct": tnx_prev_pct,
         "rate_dir": rate_dir,
         "spx": spx, "spx_up": (spx is not None and spx_prev is not None and spx > spx_prev),
-        "dxy": dxy, "oil": oil, "gold": gold,
+        "dxy": dxy, "oil": oil, "gold": gold, "copper": copper, "silver": silver, "btc": btc,
+        "dxy_dir": _dir(dxy, dxy_p, 1.5), "oil_dir": _dir(oil, oil_p),
+        "gold_dir": _dir(gold, gold_p), "copper_dir": _dir(copper, copper_p),
+        "silver_dir": _dir(silver, silver_p), "btc_dir": _dir(btc, btc_p, 6.0),
         "regime": regime, "regime_label": regime_label,
         "fomc_next": fomc_date, "fomc_in_days": fomc_days,
         "fomc_tone": tone,
@@ -185,8 +197,53 @@ def macro_adjust(row, macro):
             pts += 3
             notes.append("Fallende Zinsen: Rückenwind für Wachstum")
 
+    # --- Commodity / FX tailwinds ---
+    industry = (row.get("industry") or "").lower()
+    sec = sector.lower()
+    od = macro.get("oil_dir")
+    if sec == "energy" or "oil" in industry or "gas" in industry:
+        if od == "rising":
+            pts += 5
+            notes.append("Ölpreis steigt: Rückenwind für Energiewerte")
+        elif od == "falling":
+            pts -= 4
+            notes.append("Ölpreis fällt: Gegenwind für Energiewerte")
+    if "airline" in industry and od == "rising":
+        pts -= 4
+        notes.append("Ölpreis steigt: höhere Spritkosten (Airlines)")
+    if "gold" in industry:
+        gd = macro.get("gold_dir")
+        if gd == "rising":
+            pts += 5
+            notes.append("Goldpreis steigt: Rückenwind für Goldminen")
+        elif gd == "falling":
+            pts -= 4
+            notes.append("Goldpreis fällt: Gegenwind für Goldminen")
+    if "silver" in industry and macro.get("silver_dir") == "rising":
+        pts += 5
+        notes.append("Silberpreis steigt: Rückenwind für Silberminen")
+    if ("copper" in industry or "industrial metals" in industry):
+        cd = macro.get("copper_dir")
+        if cd == "rising":
+            pts += 4
+            notes.append("Kupferpreis steigt: Rückenwind")
+        elif cd == "falling":
+            pts -= 3
+            notes.append("Kupferpreis fällt: Gegenwind")
+    _DEV = {"us", "de", "fr", "gb", "ch", "jp", "ca", "nl", "it", "es", "se", "au",
+            "nz", "dk", "no", "fi", "at", "ie", "be", "pt"}
+    is_em = "Emerging Markets" in themes or (row.get("cc") and row.get("cc") not in _DEV)
+    dd = macro.get("dxy_dir")
+    if is_em:
+        if dd == "rising":
+            pts -= 5
+            notes.append("Starker Dollar: Gegenwind für Emerging Markets")
+        elif dd == "falling":
+            pts += 4
+            notes.append("Schwacher Dollar: Rückenwind für Emerging Markets")
+
     fd = macro.get("fomc_in_days")
     if isinstance(fd, int) and 0 <= fd <= 3:
         notes.append(f"📅 Fed-Entscheidung in {fd} T – bis dahin oft erhöhte Schwankung")
 
-    return max(-12, min(12, pts)), notes
+    return max(-16, min(16, pts)), notes
