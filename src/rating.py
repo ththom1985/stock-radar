@@ -75,6 +75,10 @@ def radar_elo(row):
     mp = row.get("macro_pts")
     if _has(mp):
         elo += mp
+    # Sudden unusual volume (accumulation / distribution)
+    vp = row.get("volume_pts")
+    if _has(vp):
+        elo += vp
 
     elo = int(round(max(700, min(2200, elo)) / 5) * 5)
 
@@ -581,6 +585,24 @@ def trade_plan(row, context="invest"):
         "action": action,
         "action_tone": tone,
     }
+
+
+def volume_signal(row):
+    """Sudden unusually high volume = something is happening. Up-day = buyers
+    (accumulation, bullish), down-day = sellers (distribution, bearish).
+    Returns (elo_pts, note_or_None)."""
+    rvol = row.get("rvol")
+    if not (_has(rvol) and rvol >= 1.8):
+        return 0, None
+    x = round(rvol, 1)
+    dret = row.get("daily_return_pct")
+    if _has(dret) and dret >= 1:
+        return (min(12, round((rvol - 1.8) * 5) + 5),
+                f"🔊 Ungewöhnlich hohes Volumen ({x}× normal) bei +{dret:.1f}% – Käufer aktiv (Akkumulation)")
+    if _has(dret) and dret <= -1:
+        return (-min(12, round((rvol - 1.8) * 5) + 5),
+                f"🔊 Ungewöhnlich hohes Volumen ({x}× normal) bei {dret:.1f}% – Verkaufsdruck (Distribution)")
+    return 0, f"🔊 Erhöhtes Volumen ({x}× normal) – gesteigerte Aufmerksamkeit"
 
 
 def trend_phase(row):

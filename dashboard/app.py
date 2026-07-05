@@ -132,6 +132,10 @@ CSS = """
 .card .downside-down{background:#fef2f2;color:#b91c1c;}
 .card .macro{margin:6px 0 0;font-size:12px;color:#475569;background:#f1f5f9;border:1px solid #e2e8f0;padding:4px 9px;border-radius:7px;}
 .card .intraday{margin:6px 0 0;font-size:12px;color:#3730a3;background:#eef2ff;border:1px solid #c7d2fe;padding:4px 9px;border-radius:7px;}
+.card .vol-note{margin:6px 0 0;font-size:12px;font-weight:600;padding:4px 9px;border-radius:7px;}
+.card .vol-up{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;}
+.card .vol-down{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;}
+.card .vol-soon{background:#fffbeb;color:#a16207;border:1px solid #fde68a;}
 .macrobar{margin:2px 0 8px;padding:7px 12px;border:1px solid #e2e8f0;border-radius:9px;font-size:13px;color:#334155;}
 .macrobar b{color:#0f172a;}
 /* --- Logo, Kopf, Tabs, Mobile --- */
@@ -273,6 +277,9 @@ with st.expander("ℹ️ Legende – was bedeuten die Zahlen?"):
   **🎯 Chance-Szenario** (optimistisch: Kurs erreicht die Ziel-Zone) · **🛑 Risiko-Szenario** (Stop-Loss wird
   ausgelöst). So siehst du auf einen Blick, was *wahrscheinlich*, was *im besten* und was *im schlechtesten*
   Fall passiert – bewusst **kein** einzelnes „Gewinnpotenzial" mehr, sondern sauber klassifiziert.
+- **🔊 Volumen-Signal** – erkennt **plötzlich ungewöhnlich hohes Handelsvolumen** (Vielfaches des
+  Normalen). Volumen-Spike **bei steigendem** Kurs = Käufer/**Akkumulation** (grün, hebt Score leicht),
+  **bei fallendem** = **Verkaufsdruck/Distribution** (rot, senkt Score). Wird bei jedem 15-Min-Lauf frisch geprüft.
 - **🕐 Tageszeit-Muster** – aus echter Intraday-Historie (30-Min-Kurse, ~1 Monat): wie sich die Aktie
   **nach Handelsstart**, **zum Schluss** und **über Nacht (Gap)** typisch verhält – z.B. „neigt nach dem
   Open zum Abverkauf → oft besser 1–2 h später einsteigen". Nur angezeigt, wenn ein Muster erkennbar ist.
@@ -524,6 +531,15 @@ def _downside_html(r):
             f'{_esc(dn.get("verdict",""))}{sup}</div>')
 
 
+def _volume_html(r):
+    """Sudden unusual-volume flag (accumulation / distribution), if any."""
+    note = r.get("volume_note")
+    if not note:
+        return ""
+    tone = "up" if "Akkumulation" in note else "down" if "Distribution" in note else "soon"
+    return f'<div class="vol-note vol-{tone}">{_esc(note)}</div>'
+
+
 def _intraday_html(r):
     """Time-of-day pattern hint (when to enter intraday), if a pattern exists."""
     note = r.get("intraday_note")
@@ -767,6 +783,7 @@ def card_html(r, idx=None, context="invest"):
         f'{_scenario_html(r, context)}'
         f'{_trend_html(r)}'
         f'{_entry_why(r)}'
+        f'{_volume_html(r)}'
         f'{_intraday_html(r)}'
         f'{_downside_html(r)}'
         f'{_macro_html(r)}'

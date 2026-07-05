@@ -27,7 +27,7 @@ from .rating import (radar_elo, radar_score, stars, plain_summary, suggest_actio
                      quality_score as calc_quality, potential_score as calc_potential,
                      conviction, urgency, upside_pct, entry_score, entry_reason,
                      downside_analysis, trade_plan, risk_warnings, bull_thesis, priced_in_note,
-                     trend_phase)
+                     trend_phase, volume_signal)
 from .geo import country_flag
 from .fx import currency_for, get_fx_rates
 from .macro import fetch_macro, macro_adjust
@@ -286,8 +286,11 @@ def run(with_news=True, with_fundamentals=True):
         r["tech_volume"] = tech_volume_score(r)
 
     # --- Intraday time-of-day patterns (full run only; bounded + cached) ---
+    # Prioritise the top picks so your most important stocks get the 🕐 pattern first.
     if not intraday:
-        pats = fetch_intraday_patterns([r["symbol"] for r in rows])
+        ordered = [r["symbol"] for r in sorted(
+            rows, key=lambda r: r.get("investment_score") or 0, reverse=True)]
+        pats = fetch_intraday_patterns(ordered)
         for r in rows:
             r["intraday_note"] = pattern_note(pats.get(r["symbol"]))
 
@@ -307,6 +310,7 @@ def run(with_news=True, with_fundamentals=True):
         r["country"], r["cc"] = country_flag(r["symbol"])
         r["aschenbrenner"] = stance_for(r["symbol"], asch_data)
         r["macro_pts"], r["macro_notes"] = macro_adjust(r, macro)
+        r["volume_pts"], r["volume_note"] = volume_signal(r)
         elo, rating_label, color = radar_elo(r)
         r["radar_elo"] = elo
         r["radar_rating"] = rating_label
