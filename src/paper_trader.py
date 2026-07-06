@@ -135,13 +135,8 @@ def update_portfolio(rows, today=None):
                 ret = (cur / pos["entry_price"] - 1) * 100
                 se, sx = pos.get("score_at_entry"), score_by.get(sym)
                 held = _days_between(pos.get("entry_date"), today)
-                extra = []
-                if se is not None and sx is not None and se != sx:
-                    extra.append(f"Rating {se}→{sx}")
-                if held is not None:
-                    extra.append(f"{held} T gehalten")
-                gv = "Gewinn" if pnl >= 0 else "Verlust"
-                full_reason = f"{reason} · {gv} ${pnl:+,.0f}" + (" · " + " · ".join(extra) if extra else "")
+                full_reason = reason + (f" · Rating {se}→{sx}"
+                                        if (se is not None and sx is not None and se != sx) else "")
                 p["cash"] += value
                 p["realized_pnl"] += pnl
                 p["trade_log"].append({

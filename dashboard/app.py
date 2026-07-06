@@ -4,6 +4,7 @@ clearly separated Aschenbrenner section. Run: streamlit run dashboard/app.py
 """
 import html
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pandas as pd
@@ -944,10 +945,18 @@ with tabs[6]:
         elif curve:
             st.caption("📈 Kurve baut sich ab dem 2. Handelstag auf.")
 
+        def _days_held(entry_date):
+            try:
+                return (datetime.now(timezone.utc).date()
+                        - datetime.strptime(entry_date, "%Y-%m-%d").date()).days
+            except Exception:  # noqa: BLE001
+                return None
+
         st.markdown("**Aktuelle Positionen**")
         if pos:
             hold = pd.DataFrame([{
                 "Symbol": s, "Name": p.get("name"), "seit": p.get("entry_date"),
+                "Tage gehalten": _days_held(p.get("entry_date")),
                 "Kaufkurs $": p.get("entry_price"), "akt. Kurs $": p.get("last_price"),
                 "Rendite %": p.get("pnl_pct"), "Einsatz $": p.get("stake_eur"),
                 "Wert $": p.get("value_eur"), "G/V $": p.get("pnl_eur"),
@@ -962,20 +971,25 @@ with tabs[6]:
         if log:
             lines = []
             for e in reversed(log[-30:]):
-                icon = "🟢 **Kauf**" if e.get("action") == "BUY" else "🔴 **Verkauf**"
+                is_sell = e.get("action") == "SELL"
+                icon = "🔴 **Verkauf**" if is_sell else "🟢 **Kauf**"
                 pnl = e.get("pnl_eur")
                 pnl_txt = (f" · {'Gewinn' if pnl >= 0 else 'Verlust'} **${pnl:+,.0f}** "
-                           f"({e.get('pnl_pct'):+.1f} %)") if e.get("action") == "SELL" and pnl is not None else ""
+                           f"({e.get('pnl_pct'):+.1f} %)") if is_sell and pnl is not None else ""
+                hd = e.get("held_days")
+                held_txt = f" · nach **{hd} Tagen**" if is_sell and hd is not None else ""
                 lines.append(f"- **{e.get('date')}** · {icon} **{e.get('symbol')}** "
-                             f"({_esc(e.get('name') or '')}) @ ${e.get('price')}{pnl_txt} — "
+                             f"({_esc(e.get('name') or '')}) @ ${e.get('price')}{pnl_txt}{held_txt} — "
                              f"{_esc(e.get('reason') or '')}")
             st.markdown("\n".join(lines))
             with st.expander("📋 Vollständiges Handels-Protokoll als Tabelle"):
-                ldf = pd.DataFrame(list(reversed(log)))[
-                    ["date", "action", "symbol", "name", "price", "stake_eur",
-                     "value_eur", "pnl_eur", "pnl_pct", "reason"]]
-                ldf.columns = ["Datum", "Aktion", "Symbol", "Name", "Kurs $", "Einsatz $",
-                               "Wert $", "G/V $", "G/V %", "Grund"]
+                ldf = pd.DataFrame(list(reversed(log)))
+                if "held_days" not in ldf.columns:
+                    ldf["held_days"] = None
+                ldf = ldf[["date", "action", "symbol", "name", "price", "held_days",
+                           "stake_eur", "value_eur", "pnl_eur", "pnl_pct", "reason"]]
+                ldf.columns = ["Datum", "Aktion", "Symbol", "Name", "Kurs $", "Tage",
+                               "Einsatz $", "Wert $", "G/V $", "G/V %", "Grund"]
                 st.dataframe(ldf, width="stretch", hide_index=True)
         else:
             st.caption("Noch keine Trades.")
