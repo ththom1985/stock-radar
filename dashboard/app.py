@@ -939,11 +939,43 @@ with tabs[6]:
         m[4].metric("Positionen", len(pos))
 
         curve = pf.get("equity_curve", [])
+        st.markdown("**📈 Depot-Entwicklung**")
+        _ranges = {"1 Woche": 7, "1 Monat": 30, "3 Monate": 91, "6 Monate": 182,
+                   "12 Monate": 365, "Gesamt": None}
+        _sel = st.radio("Zeitraum", list(_ranges.keys()), index=5, horizontal=True,
+                        key="depot_range", label_visibility="collapsed")
         if len(curve) >= 2:
-            cdf = pd.DataFrame(curve).set_index("date")[["equity"]]
-            st.line_chart(cdf, height=220)
-        elif curve:
+            cdf = pd.DataFrame(curve)
+            cdf["date"] = pd.to_datetime(cdf["date"])
+            _days = _ranges[_sel]
+            if _days:
+                _cut = pd.Timestamp(datetime.now(timezone.utc).date()) - pd.Timedelta(days=_days)
+                cdf = cdf[cdf["date"] >= _cut]
+            cdf = cdf.set_index("date")[["equity"]]
+            if len(cdf) >= 2:
+                st.line_chart(cdf, height=240)
+            else:
+                st.caption(f"Für „{_sel}\" noch zu wenige Datenpunkte – wähle einen größeren Zeitraum.")
+        else:
             st.caption("📈 Kurve baut sich ab dem 2. Handelstag auf.")
+
+        # --- Statistik über abgeschlossene Trades ---
+        _sells = [e for e in pf.get("trade_log", []) if e.get("action") == "SELL"]
+        _rets = [e["pnl_pct"] for e in _sells if isinstance(e.get("pnl_pct"), (int, float))]
+        _holds = [e["held_days"] for e in _sells if isinstance(e.get("held_days"), (int, float))]
+        st.markdown("**📊 Statistik (abgeschlossene Trades)**")
+        if _rets:
+            _wins = [x for x in _rets if x > 0]
+            _loss = [x for x in _rets if x <= 0]
+            _avg = lambda xs: (sum(xs) / len(xs)) if xs else 0
+            sc = st.columns(5)
+            sc[0].metric("Trades", len(_sells))
+            sc[1].metric("Trefferquote", f"{len(_wins) / len(_rets) * 100:.0f} %")
+            sc[2].metric("Ø-Rendite/Trade", f"{_avg(_rets):+.1f} %")
+            sc[3].metric("Ø-Haltedauer", f"{_avg(_holds):.0f} T" if _holds else "–")
+            sc[4].metric("Ø Gewinner / Verlierer", f"{_avg(_wins):+.1f}% / {_avg(_loss):+.1f}%")
+        else:
+            st.caption("📊 Erscheint, sobald die ersten Positionen verkauft wurden.")
 
         def _days_held(entry_date):
             try:
