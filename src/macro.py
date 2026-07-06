@@ -101,6 +101,8 @@ def fetch_macro(today=None, verbose=True):
     vix, vix_prev = _last_and_prev("^VIX")
     tnx, tnx_prev = _last_and_prev("^TNX")          # 10Y yield (sometimes ×10, sometimes direct)
     spx, spx_prev = _last_and_prev("^GSPC")
+    ndx, _ = _last_and_prev("^NDX")            # Nasdaq 100
+    world, _ = _last_and_prev("URTH")          # MSCI World (iShares ETF proxy)
     dxy, dxy_p = _last_and_prev("DX-Y.NYB")
     oil, oil_p = _last_and_prev("CL=F")
     gold, gold_p = _last_and_prev("GC=F")
@@ -145,6 +147,7 @@ def fetch_macro(today=None, verbose=True):
         "tnx_pct": tnx_pct, "tnx_prev_pct": tnx_prev_pct,
         "rate_dir": rate_dir,
         "spx": spx, "spx_up": (spx is not None and spx_prev is not None and spx > spx_prev),
+        "ndx": ndx, "world": world,
         "dxy": dxy, "oil": oil, "gold": gold, "copper": copper, "silver": silver, "btc": btc,
         "dxy_dir": _dir(dxy, dxy_p, 1.5), "oil_dir": _dir(oil, oil_p),
         "gold_dir": _dir(gold, gold_p), "copper_dir": _dir(copper, copper_p),

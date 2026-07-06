@@ -365,7 +365,8 @@ def run(with_news=True, with_fundamentals=True):
     )[:TOP_N]
 
     # --- Virtual paper-trading self-check (persists in data/portfolio.json) ---
-    paper = update_portfolio(rows)
+    paper = update_portfolio(rows, benchmarks={
+        "sp500": macro.get("spx"), "ndx": macro.get("ndx"), "world": macro.get("world")})
 
     result = {
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),

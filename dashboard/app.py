@@ -945,19 +945,31 @@ with tabs[6]:
         _sel = st.radio("Zeitraum", list(_ranges.keys()), index=5, horizontal=True,
                         key="depot_range", label_visibility="collapsed")
         if len(curve) >= 2:
-            cdf = pd.DataFrame(curve)
-            cdf["date"] = pd.to_datetime(cdf["date"])
+            _sc = pf.get("start_capital", 10000)
+            full = pd.DataFrame(curve)
+            full["date"] = pd.to_datetime(full["date"])
+            plot = full[["date", "equity"]].rename(columns={"equity": "Depot"})
+            # benchmarks rebased to start capital at inception (value of an equal
+            # investment in each index since the depot started)
+            for _col, _lbl in (("bench_sp500", "S&P 500"), ("bench_ndx", "Nasdaq 100"),
+                               ("bench_world", "MSCI World")):
+                if _col in full.columns:
+                    _b = full[_col].dropna()
+                    if len(_b):
+                        plot[_lbl] = full[_col] / _b.iloc[0] * _sc
             _days = _ranges[_sel]
             if _days:
                 _cut = pd.Timestamp(datetime.now(timezone.utc).date()) - pd.Timedelta(days=_days)
-                cdf = cdf[cdf["date"] >= _cut]
-            cdf = cdf.set_index("date")[["equity"]]
-            if len(cdf) >= 2:
-                st.line_chart(cdf, height=240)
+                plot = plot[plot["date"] >= _cut]
+            plot = plot.set_index("date")
+            if len(plot) >= 2:
+                st.line_chart(plot, height=260)
+                st.caption("Alle Linien starten beim gleichen Kapital – so siehst du, ob dein Depot die "
+                           "Indizes schlägt (Benchmarks = gleiche Summe in den Index investiert).")
             else:
                 st.caption(f"Für „{_sel}\" noch zu wenige Datenpunkte – wähle einen größeren Zeitraum.")
         else:
-            st.caption("📈 Kurve baut sich ab dem 2. Handelstag auf.")
+            st.caption("📈 Kurve (inkl. Index-Vergleich) baut sich ab dem 2. Handelstag auf.")
 
         # --- Statistik über abgeschlossene Trades ---
         _sells = [e for e in pf.get("trade_log", []) if e.get("action") == "SELL"]

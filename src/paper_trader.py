@@ -99,8 +99,12 @@ def _sell_reason(pos, cur, score, phase, in_top_hyst):
     return None
 
 
-def update_portfolio(rows, today=None):
-    """Run the intelligent paper strategy against today's analysed rows."""
+def update_portfolio(rows, today=None, benchmarks=None):
+    """Run the intelligent paper strategy against today's analysed rows.
+
+    benchmarks: optional {sp500, ndx, world} current index levels, stored in the
+    daily snapshot so the dashboard can compare the depot against the indices.
+    """
     today = today or _today()
     p = _load(today)
 
@@ -184,6 +188,10 @@ def update_portfolio(rows, today=None):
     equity = round(p["cash"] + invested, 2)
     snap = {"date": today, "equity": equity, "cash": round(p["cash"], 2),
             "invested": round(invested, 2), "n_positions": len(p["positions"])}
+    b = benchmarks or {}
+    for k in ("sp500", "ndx", "world"):
+        if isinstance(b.get(k), (int, float)):
+            snap[f"bench_{k}"] = round(b[k], 2)
     if p["equity_curve"] and p["equity_curve"][-1]["date"] == today:
         p["equity_curve"][-1] = snap
     else:
