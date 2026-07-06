@@ -53,6 +53,8 @@ _mark("ca", "Kanada", "GOLD FNV AEM WPM KGC TECK CCJ NXE DNN BN RY TD TRP CNQ SU
 def country_flag(symbol):
     """Return (country_name, iso2) for a ticker. iso2 -> flag image."""
     s = (symbol or "").upper()
+    if s.endswith("-USD"):
+        return ("Krypto", None)          # coins have no country -> no flag
     if s in _ADR:
         return _ADR[s]
     if "." in s:

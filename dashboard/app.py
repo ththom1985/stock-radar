@@ -99,6 +99,7 @@ CSS = """
 .card .expert-badge{display:inline-block;background:#fef3c7;color:#92400e;border:1px solid #fcd34d;font-weight:700;font-size:11px;padding:2px 8px;border-radius:999px;margin:2px 0 0 4px;}
 .card .theme-badge{display:inline-block;background:#eef2ff;color:#4338ca;border:1px solid #c7d2fe;font-weight:700;font-size:11px;padding:2px 8px;border-radius:999px;margin:2px 0 0 4px;}
 .card .etf-badge{display:inline-block;background:#0f172a;color:#fff;font-weight:800;font-size:11px;padding:2px 8px;border-radius:999px;margin:2px 0 0 4px;}
+.card .crypto-badge{display:inline-block;background:#f7931a;color:#fff;font-weight:800;font-size:11px;padding:2px 8px;border-radius:999px;margin:2px 0 0 4px;}
 .card .vol-badge{display:inline-block;background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;font-weight:700;font-size:11px;padding:2px 8px;border-radius:999px;margin:2px 0 0 4px;}
 .card .riskbar{margin:8px 0 0;padding:7px 11px;border-radius:8px;background:#fef2f2;border:1px solid #fca5a5;border-left:4px solid #dc2626;color:#b91c1c;font-weight:700;font-size:12px;line-height:1.5;}
 .card .entry-why{margin:6px 0 0;font-size:12px;font-weight:600;padding:4px 9px;border-radius:7px;}
@@ -301,6 +302,11 @@ with st.expander("ℹ️ Legende – was bedeuten die Zahlen?"):
   Volumen – keine Bilanz). **Rohstoffe/Devisen** (Öl/Gold/Kupfer/Silber/Dollar, oben im Banner mit Pfeil)
   wirken als **Rückenwind/Gegenwind** auf passende Aktien: Öl↑→Energiewerte+, Gold↑→Goldminen+, starker
   Dollar→Emerging Markets−. Erscheint in der 🌍-Makro-Zeile der Karte.
+- **₿ Krypto** – **Coins** (Bitcoin, Ethereum, Solana … als „-USD") und **Krypto-Aktien/-ETFs** (Miner wie
+  MARA/RIOT, MicroStrategy, Coinbase, IBIT) sind mit orangem **₿-Badge** markiert. Coins werden **rein
+  technisch** bewertet (kein Land/keine Bilanz). **Bitcoin-Trend** wirkt als Rückenwind auf Krypto-Aktien/Miner
+  (Bitcoin↑ → +, ↓ → −). Filterbar im Themen-Tab unter „Krypto". Hinweis: Coins handeln 24/7, das Tool
+  aktualisiert aber im Mo–Fr-Takt.
 - **🌍 Marktumfeld-Banner (oben) & Makro-Zeile je Karte** – berücksichtigt das **Gesamtumfeld**: **VIX**
   (Angst-Index: hoch = Risk-Off), **10-Jahres-Zins** + Richtung (steigende Zinsen drücken teure Growth-Aktien,
   helfen Banken; fallende helfen REITs/Versorger/Wachstum), und die **Fed-Sitzung** (Datum + heuristische
@@ -699,9 +705,9 @@ def card_html(r, idx=None, context="invest"):
     esrc = r.get("expert_sources") or []
     expert_badge = (f'<span class="expert-badge">⭐ {_esc(" · ".join(esrc))}</span>' if esrc else "")
     thl = r.get("themes") or []
-    _is_etf = "ETF" in thl
-    etf_badge = '<span class="etf-badge">📊 ETF</span>' if _is_etf else ""
-    _thshow = [t for t in thl if t != "ETF"][:3]
+    etf_badge = '<span class="etf-badge">📊 ETF</span>' if "ETF" in thl else ""
+    crypto_badge = '<span class="crypto-badge">₿ Krypto</span>' if "Krypto" in thl else ""
+    _thshow = [t for t in thl if t not in ("ETF", "Krypto")][:3]
     theme_badge = (f'<span class="theme-badge">🧭 {_esc(" · ".join(_thshow))}</span>' if _thshow else "")
     atrp, beta = r.get("atr_pct"), r.get("beta")
     _volatile = (isinstance(atrp, (int, float)) and atrp >= 5) or (isinstance(beta, (int, float)) and beta >= 1.8)
@@ -790,7 +796,7 @@ def card_html(r, idx=None, context="invest"):
         f'<div class="name"><div class="tk">{flag_img}{_esc(r["symbol"])} · {_esc(r.get("name") or "")}</div>'
         f'{price_line}'
         f'<div class="rt" style="color:{color}">{_esc(r.get("radar_rating"))}</div></div>'
-        f'{sector_badge}{etf_badge}{expert_badge}{theme_badge}{vol_badge}{asch_badge}</div>'
+        f'{sector_badge}{etf_badge}{crypto_badge}{expert_badge}{theme_badge}{vol_badge}{asch_badge}</div>'
         f'{stat_row}'
         f'{_thesis_html(r)}'
         f'{_proj_html(r.get(proj_key), context)}'

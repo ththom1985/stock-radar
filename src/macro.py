@@ -242,8 +242,18 @@ def macro_adjust(row, macro):
             pts += 4
             notes.append("Schwacher Dollar: Rückenwind für Emerging Markets")
 
+    # Bitcoin -> crypto miners / proxies (not the coins themselves)
+    if "Krypto" in themes and not (row.get("symbol") or "").upper().endswith("-USD"):
+        bd = macro.get("btc_dir")
+        if bd == "rising":
+            pts += 6
+            notes.append("Bitcoin steigt: Rückenwind für Krypto-Aktien/Miner")
+        elif bd == "falling":
+            pts -= 6
+            notes.append("Bitcoin fällt: Gegenwind für Krypto-Aktien/Miner")
+
     fd = macro.get("fomc_in_days")
     if isinstance(fd, int) and 0 <= fd <= 3:
         notes.append(f"📅 Fed-Entscheidung in {fd} T – bis dahin oft erhöhte Schwankung")
 
-    return max(-16, min(16, pts)), notes
+    return max(-18, min(18, pts)), notes
