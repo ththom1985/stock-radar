@@ -18,7 +18,7 @@ from .config import DATA
 DEEP_CACHE = DATA / "deep_fundamentals.json"
 MAX_AGE_DAYS = 30
 # Bounded per run so CI stays fast; raise via env for the one-time full build.
-MAX_NEW_PER_RUN = int(os.environ.get("STOCK_RADAR_DEEP_MAX", "45"))
+MAX_NEW_PER_RUN = int(os.environ.get("STOCK_RADAR_DEEP_MAX", "60"))
 FETCH_PAUSE = 0.4
 
 

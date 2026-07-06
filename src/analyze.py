@@ -270,7 +270,10 @@ def run(with_news=True, with_fundamentals=True):
         r["rs_rating"] = round((i + 1) / nrs * 100) if nrs else None
     if with_fundamentals:
         mcaps = {r["symbol"]: (fund.get(r["symbol"], {}) or {}).get("market_cap") for r in rows}
-        deep = fetch_deep([r["symbol"] for r in rows], mcaps)
+        # Prioritise the top picks so Piotroski/Altman fill for your best stocks first.
+        ordered = [r["symbol"] for r in sorted(
+            rows, key=lambda r: r.get("investment_score") or 0, reverse=True)]
+        deep = fetch_deep(ordered, mcaps)
         for r in rows:
             d = deep.get(r["symbol"], {})
             r["piotroski"] = d.get("piotroski")

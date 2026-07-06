@@ -17,6 +17,7 @@ Simplifications (documented for honesty): virtual/fractional sizing, no fees or
 slippage. All prices are already converted to USD upstream.
 """
 import json
+from collections import Counter
 from datetime import datetime, timezone
 
 from .config import DATA
@@ -32,6 +33,8 @@ TRAIL_GIVEBACK = 10.0  # % — sell if it gives back this much from its own peak
 SELL_SCORE = 50        # rating below this -> thesis gone, sell
 HOLD_SCORE = 60        # a top-dropout may be kept only while still this strong
 BUY_SCORE = 60         # only buy fresh picks at least this strong
+MAX_PER_SECTOR = 3     # diversification: at most this many holdings per sector
+CAND_POOL = 50         # draw buys from the top-N by score (not just the top K)
 MIN_STAKE = 50.0
 
 
@@ -153,21 +156,32 @@ def update_portfolio(rows, today=None, benchmarks=None):
                 })
                 del p["positions"][sym]
 
-        # --- BUY: refill empty slots with the best fresh picks (skip downtrends) ---
+        # --- BUY: refill empty slots with the best fresh picks (diversified) ---
         invested = sum(pos["value_eur"] for pos in p["positions"].values())
         equity = p["cash"] + invested
         target_stake = equity / K
         slots = K - len(p["positions"])
+        sector_by = {r["symbol"]: (r.get("sector") or "?") for r in rows}
+        sec_count = Counter(sector_by.get(s, "?") for s in p["positions"])
+        top_pool = set(ranked[:CAND_POOL])
         candidates = [s for s in ranked
-                      if s in top_k and s not in p["positions"] and price_by.get(s)
+                      if s in top_pool and s not in p["positions"] and price_by.get(s)
                       and (score_by.get(s) or 0) >= BUY_SCORE
                       and not phase_by.get(s, "").startswith("Abwärtstrend")
                       and not (asch_by.get(s) and asch_by[s]["stance"] == "SHORT_BET")]
-        for sym in candidates[:max(0, slots)]:
+        bought = 0
+        for sym in candidates:
+            if bought >= max(0, slots):
+                break
+            sec = sector_by.get(sym, "?")
+            if sec and sec != "?" and sec_count[sec] >= MAX_PER_SECTOR:
+                continue  # sector already full -> diversify into the next pick
             stake = min(target_stake, p["cash"])
             if stake < MIN_STAKE:
                 break
             cur = price_by[sym]
+            sec_count[sec] += 1
+            bought += 1
             p["cash"] -= stake
             p["positions"][sym] = {
                 "name": name_by.get(sym), "entry_price": round(cur, 4),

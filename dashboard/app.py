@@ -688,10 +688,17 @@ def card_html(r, idx=None, context="invest"):
     asch_cls = " asch" if asch else ""
     asch_badge = (f'<span class="asch-badge">{_esc(asch["label"])} · {asch.get("weight_pct")}%</span>'
                   if asch else "")
-    bars = (_bar("Trend", r.get("longterm_score"), "#0ea5e9")
-            + _bar("Value", r.get("value_score"), "#22c55e")
-            + _bar("Quality", r.get("quality_score"), "#8b5cf6")
-            + _bar("Growth", r.get("growth_score"), "#f59e0b"))
+    _fundless = ("ETF" in (r.get("themes") or [])) or r["symbol"].endswith("-USD")
+    if _fundless:
+        # ETFs/Coins have no balance sheet -> only the technical trend bar is meaningful
+        bars = (_bar("Trend", r.get("longterm_score"), "#0ea5e9")
+                + '<div style="flex:3;align-self:center;font-size:11px;color:#64748b">'
+                  'rein technisch bewertet (keine Fundamentaldaten)</div>')
+    else:
+        bars = (_bar("Trend", r.get("longterm_score"), "#0ea5e9")
+                + _bar("Value", r.get("value_score"), "#22c55e")
+                + _bar("Quality", r.get("quality_score"), "#8b5cf6")
+                + _bar("Growth", r.get("growth_score"), "#f59e0b"))
     chips = "".join(f'<span class="chip-{a["tone"]}">{_esc(a["text"])}</span>'
                     for a in (r.get("actions") or []))
     news = r.get("news") or []
@@ -966,6 +973,26 @@ with tabs[6]:
                 st.line_chart(plot, height=260)
                 st.caption("Alle Linien starten beim gleichen Kapital – so siehst du, ob dein Depot die "
                            "Indizes schlägt (Benchmarks = gleiche Summe in den Index investiert).")
+                # --- Klartext-Bilanz: Depot vs. Indizes über den Zeitraum ---
+                _f, _l = plot.iloc[0], plot.iloc[-1]
+                if _f.get("Depot") and _l.get("Depot"):
+                    _dep = (_l["Depot"] / _f["Depot"] - 1) * 100
+                    _parts, _diffs = [f"Depot **{_dep:+.1f} %**"], []
+                    for _col in ("S&P 500", "Nasdaq 100", "MSCI World"):
+                        if _col in plot.columns and pd.notna(_f.get(_col)) and _f.get(_col):
+                            _ir = (_l[_col] / _f[_col] - 1) * 100
+                            _parts.append(f"{_col} {_ir:+.1f} %")
+                            _diffs.append(_dep - _ir)
+                    if _diffs:
+                        _avg = sum(_diffs) / len(_diffs)
+                        _v = (f"→ du **schlägst** den Markt im Schnitt um **+{_avg:.1f} Punkte** 🎉"
+                              if _avg >= 0 else
+                              f"→ du liegst im Schnitt **{_avg:.1f} Punkte** hinter dem Markt")
+                        _clr = "#16a34a" if _avg >= 0 else "#b91c1c"
+                        st.markdown(f'<div style="font-size:14px;margin:2px 0 4px"><b>📊 Bilanz '
+                                    f'({_sel}):</b> {" · ".join(_parts)} '
+                                    f'<span style="color:{_clr};font-weight:700">{_v}</span></div>',
+                                    unsafe_allow_html=True)
             else:
                 st.caption(f"Für „{_sel}\" noch zu wenige Datenpunkte – wähle einen größeren Zeitraum.")
         else:
