@@ -46,14 +46,21 @@ def _spearman(a, b):
     return round(num / (da * db), 4) if da and db else None
 
 
-def run_backtest(symbols, start="2021-01-01", fwd=21, buckets=5, min_hist=220, verbose=True):
+def _avg(xs):
+    return round(sum(xs) / len(xs), 3) if xs else None
+
+
+def run_backtest(symbols, start="2020-01-01", horizons=(21, 63, 126, 252),
+                 buckets=5, min_hist=220, verbose=True):
+    """Score is horizon-independent, so compute it once per (name, month) and
+    measure forward returns over several horizons. Returns results per horizon."""
     if verbose:
         print(f"Backtest: lade Historie für {len(symbols)} Titel …")
     hist = {}
     for i, s in enumerate(symbols, 1):
         try:
             df = yf.Ticker(s).history(start=start, auto_adjust=True)
-            if df is not None and len(df) > min_hist + fwd:
+            if df is not None and len(df) > min_hist + max(horizons):
                 hist[s] = df
         except Exception:  # noqa: BLE001
             pass
@@ -62,19 +69,17 @@ def run_backtest(symbols, start="2021-01-01", fwd=21, buckets=5, min_hist=220, v
     if len(hist) < buckets * 3:
         return {"error": "zu wenig Daten"}
 
-    # monthly rebalance dates = last trading day per (year, month)
     all_dates = sorted(set().union(*[set(df.index) for df in hist.values()]))
     last_of_month = {}
     for d in all_dates:
         last_of_month[(d.year, d.month)] = d
     rebal = sorted(last_of_month.values())
 
-    ic_list, spreads = [], []
-    bucket_rets = {b: [] for b in range(buckets)}
-    top_beats = 0
-    n_used = 0
+    # per horizon accumulators
+    acc = {h: {"ic": [], "spread": [], "top_beats": 0, "n_spread": 0,
+               "buckets": {b: [] for b in range(buckets)}} for h in horizons}
     for t in rebal:
-        scored = []
+        scored = []   # (score, {h: fwd_ret})
         for s, df in hist.items():
             sub = df[df.index <= t]
             if len(sub) < min_hist:
@@ -83,44 +88,51 @@ def run_backtest(symbols, start="2021-01-01", fwd=21, buckets=5, min_hist=220, v
             if not f:
                 continue
             sc, _ = score_longterm(f)
-            fut = df[df.index > t]
-            if len(fut) < fwd:
-                continue
             p0 = float(sub["Close"].iloc[-1])
-            p1 = float(fut["Close"].iloc[fwd - 1])
-            if p0:
-                scored.append((s, sc, (p1 / p0 - 1) * 100))
+            fut = df[df.index > t]
+            if not p0 or len(fut) < min(horizons):
+                continue
+            frs = {}
+            for h in horizons:
+                if len(fut) >= h:
+                    frs[h] = (float(fut["Close"].iloc[h - 1]) / p0 - 1) * 100
+            if frs:
+                scored.append((sc, frs))
         if len(scored) < buckets * 3:
             continue
-        n_used += 1
-        scored.sort(key=lambda x: x[1])          # ascending score
-        n = len(scored)
-        this = {b: [] for b in range(buckets)}
-        for rank, (_s, _sc, fr) in enumerate(scored):
-            b = min(buckets - 1, rank * buckets // n)
-            bucket_rets[b].append(fr)
-            this[b].append(fr)
-        ic = _spearman([x[1] for x in scored], [x[2] for x in scored])
-        if ic is not None:
-            ic_list.append(ic)
-        if this[buckets - 1] and this[0]:
-            sp = sum(this[buckets - 1]) / len(this[buckets - 1]) - sum(this[0]) / len(this[0])
-            spreads.append(sp)
-            if sp > 0:
-                top_beats += 1
+        for h in horizons:
+            sub_scored = [(sc, frs[h]) for sc, frs in scored if h in frs]
+            if len(sub_scored) < buckets * 3:
+                continue
+            sub_scored.sort(key=lambda x: x[0])
+            n = len(sub_scored)
+            this = {b: [] for b in range(buckets)}
+            for rank, (_sc, fr) in enumerate(sub_scored):
+                b = min(buckets - 1, rank * buckets // n)
+                acc[h]["buckets"][b].append(fr)
+                this[b].append(fr)
+            ic = _spearman([x[0] for x in sub_scored], [x[1] for x in sub_scored])
+            if ic is not None:
+                acc[h]["ic"].append(ic)
+            if this[buckets - 1] and this[0]:
+                sp = _avg(this[buckets - 1]) - _avg(this[0])
+                acc[h]["spread"].append(sp)
+                acc[h]["n_spread"] += 1
+                if sp > 0:
+                    acc[h]["top_beats"] += 1
 
-    def _avg(xs):
-        return round(sum(xs) / len(xs), 3) if xs else None
-    result = {
-        "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-        "n_names": len(hist), "n_months": n_used, "fwd_days": fwd, "buckets": buckets,
-        "avg_ic": _avg(ic_list),
-        "bucket_avg_fwd_ret_pct": {b: _avg(bucket_rets[b]) for b in range(buckets)},
-        "top_minus_bottom_pct": _avg(spreads),
-        "hit_rate_top_beats_bottom_pct": round(top_beats / len(spreads) * 100, 1) if spreads else None,
-    }
+    out = {"generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+           "n_names": len(hist), "n_months": len(rebal), "buckets": buckets, "by_horizon": {}}
+    for h in horizons:
+        a = acc[h]
+        out["by_horizon"][f"{h}d"] = {
+            "avg_ic": _avg(a["ic"]),
+            "bucket_avg_fwd_ret_pct": {b: _avg(a["buckets"][b]) for b in range(buckets)},
+            "top_minus_bottom_pct": _avg(a["spread"]),
+            "hit_rate_top_beats_bottom_pct": round(a["top_beats"] / a["n_spread"] * 100, 1) if a["n_spread"] else None,
+        }
     try:
-        BACKTEST_CACHE.write_text(json.dumps(result, ensure_ascii=False, indent=1), encoding="utf-8")
+        BACKTEST_CACHE.write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
     except Exception:  # noqa: BLE001
         pass
-    return result
+    return out
