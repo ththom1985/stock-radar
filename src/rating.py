@@ -338,6 +338,15 @@ def entry_score(row):
             score += 8                       # cushioned by nearby support
         elif room >= 4 * atrp:
             score -= 8                       # air below → can fall further
+    # Consistency caps: the entry timing must not contradict the trend phase or
+    # the short-term trend shown on the same card.
+    ph = (row.get("trend_phase") or {}).get("phase", "")
+    if ph.startswith("Abwärts"):
+        score = min(score, 25)               # downtrend -> never a good entry
+    elif "Top-Gefahr" in ph:
+        score = min(score, 44)               # late-stage -> at best "wait for pullback"
+    if row.get("daytrade_direction") == "SHORT":
+        score = min(score, 41)               # short-term falling -> not "buy now"
     return _entry_vol_adjust(score, row)
 
 
@@ -501,6 +510,7 @@ def trade_plan(row, context="invest"):
     alt = row.get("altman_z")
     avoid = side == "long" and (
         row.get("weinstein_stage") == 4
+        or (row.get("trend_phase") or {}).get("phase", "").startswith("Abwärts")
         or (isinstance(alt, (int, float)) and alt < 1.81)
         or row.get("radar_rating") == "Meiden"
         or (row.get("longterm_score") or 50) < 30

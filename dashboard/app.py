@@ -109,6 +109,8 @@ CSS = """
 .card .entry-why-down{background:#fef2f2;color:#b91c1c;}
 .card .thesis{margin:6px 0 0;font-size:12.5px;color:#166534;background:#f0fdf4;border:1px solid #bbf7d0;padding:5px 9px;border-radius:7px;}
 .card .thesis b{color:#14532d;}
+.card .thesis-weak{color:#a16207;background:#fffbeb;border-color:#fde68a;}
+.card .thesis-weak b{color:#854d0e;}
 .card .pricedin{margin:4px 0 0;font-size:11.5px;color:#a16207;background:#fffbeb;border:1px solid #fde68a;padding:4px 9px;border-radius:7px;font-weight:600;}
 .card .flag{display:inline-block;width:26px;height:18px;margin-right:6px;vertical-align:-3px;border:1px solid #cbd5e1;border-radius:2px;overflow:hidden;line-height:0;}
 .card .flag svg{width:26px;height:18px;display:block;}
@@ -511,12 +513,18 @@ def _trend_html(r):
 
 
 def _thesis_html(r):
-    """Consolidated 'why could it rise?' + how much is already priced in."""
+    """Consolidated bull case + how much is already priced in. Header adapts to
+    the trend/rating so we don't ask 'why is it rising?' on a falling/Meiden stock."""
     th = r.get("bull_thesis")
     if not th:
         return ""
     pi = r.get("priced_in")
     pi_html = f'<div class="pricedin">⚖️ {_esc(pi)}</div>' if pi else ""
+    weak = (r.get("radar_rating") == "Meiden"
+            or (r.get("trend_phase") or {}).get("tone") == "down")
+    if weak:
+        return (f'<div class="thesis thesis-weak">🔻 <b>Pro-Argumente</b> (Trend/Rating aber '
+                f'schwach): {_esc(th)}</div>{pi_html}')
     return f'<div class="thesis">🔼 <b>Warum steigt es?</b> {_esc(th)}</div>{pi_html}'
 
 
@@ -672,16 +680,21 @@ def _direction(r, context):
         if dd == "SHORT":
             return "📉 FALLEND", "down"
         return "➡️ SEITWÄRTS", "side"
-    centre = None
-    for p in (r.get("projection_long") or []):
-        if str(p.get("label", "")).startswith("12"):
-            centre = p.get("center_pct")
+    # invest: the CURRENT trend direction from the trend phase (technical truth),
+    # so the top verdict matches the "Trendphase" line. The 12M expectation is a
+    # separate number (a downtrend can still have a positive 12M expectation).
+    tone = (r.get("trend_phase") or {}).get("tone")
+    if tone == "up":
+        return "📈 Trend aufwärts", "up"
+    if tone == "down":
+        return "📉 Trend abwärts", "down"
+    if tone == "soon":
+        return "➡️ Trend seitwärts", "side"
+    centre = next((p.get("center_pct") for p in (r.get("projection_long") or [])
+                   if str(p.get("label", "")).startswith("12")), None)
     base = centre if isinstance(centre, (int, float)) else ((r.get("investment_score") or 50) - 50)
-    if base >= 3:
-        return "📈 STEIGEND", "up"
-    if base <= -3:
-        return "📉 FALLEND", "down"
-    return "➡️ SEITWÄRTS", "side"
+    return (("📈 Trend aufwärts", "up") if base >= 3
+            else ("📉 Trend abwärts", "down") if base <= -3 else ("➡️ Trend seitwärts", "side"))
 
 
 def card_html(r, idx=None, context="invest"):
