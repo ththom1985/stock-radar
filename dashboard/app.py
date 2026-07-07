@@ -590,7 +590,10 @@ def _plan_html(r, context="invest"):
         return ""
     pot, risk, rrr = tp.get("potential_pct"), tp.get("risk_pct"), tp.get("rrr")
     is_short = tp.get("side") == "short"
-    buy_lbl = "Verkaufen (Short)" if is_short else "Einstieg – kaufen"
+    _when = tp.get("entry_when")
+    buy_lbl = ("Verkaufen (Short)" if is_short
+               else "Kaufzone bei Rücksetzer" if _when == "dip"
+               else "Einstieg – kaufen")
     sell_lbl = "Eindecken (Ziel)" if is_short else "Ausstieg – Ziel-Zone"
     pot_txt = f'+{pot:.0f}%' if isinstance(pot, (int, float)) else '–'
     risk_txt = f'−{risk:.0f}%' if isinstance(risk, (int, float)) else '–'

@@ -518,10 +518,20 @@ def trade_plan(row, context="invest"):
     def above(cands):
         return sorted([c for c in cands if isinstance(c, (int, float)) and c > P])
 
+    es = row.get("entry_score")
+    wait = isinstance(es, (int, float)) and es < 42   # poor timing -> buy on a pullback
     if side == "long":
-        near_sup = next((s for s in below(supports) if s >= P - 2.2 * a), None)
-        entry_low = min(near_sup if near_sup else P - a, P - 0.3 * a)
-        entry_high = P + 0.2 * a
+        supp_below = below(supports)
+        near_sup = next((s for s in supp_below if s >= P - 2.2 * a), None)
+        if wait:
+            # bad timing (too hot/extended): the buy zone must sit BELOW the current
+            # price, so it reads as "wait for a pullback" and not "buy now".
+            entry_high = near_sup if (near_sup and near_sup < P - 0.3 * a) else P - 0.5 * a
+            deeper = next((s for s in supp_below if s < entry_high - 0.1 * a), None)
+            entry_low = deeper if deeper else entry_high - 1.2 * a
+        else:
+            entry_low = min(near_sup if near_sup else P - a, P - 0.3 * a)
+            entry_high = P + (0.2 * a if (isinstance(es, (int, float)) and es >= 55) else 0.0)
         res_above = above(resist)
         t1 = next((r for r in res_above if r >= P + 2 * a), None) or (P + 3 * a)
         hi = [t1 + 2 * a, P + 6 * a]
@@ -555,17 +565,17 @@ def trade_plan(row, context="invest"):
     days = abs(target_mid - entry_mid) / (0.35 * a) if a else None
     hold = _eta_label(days, context)
 
-    es = row.get("entry_score")
     if avoid:
-        action, tone = "🚫 Meiden – aktuell kein sauberes Kaufsetup", "neg"
+        action, tone, when = "🚫 Meiden – aktuell kein sauberes Kaufsetup", "neg", "avoid"
     elif side == "short":
-        action, tone = "📉 Nur für Profis: Wette auf fallende Kurse (Short)", "neg"
+        action, tone, when = "📉 Nur für Profis: Wette auf fallende Kurse (Short)", "neg", "short"
     elif isinstance(es, (int, float)) and es >= 55:
-        action, tone = "✅ Jetzt in der Einstiegszone kaufen", "pos"
+        action, tone, when = "✅ Jetzt in der Einstiegszone kaufen", "pos", "now"
     elif isinstance(es, (int, float)) and es >= 42:
-        action, tone = "🟡 Gestaffelt kaufen (Teilpositionen)", "neutral"
+        action, tone, when = "🟡 Gestaffelt kaufen (Teilpositionen)", "neutral", "now"
     else:
-        action, tone = "⏳ Auf Rücksetzer in die Zone warten", "neutral"
+        action, tone, when = ("⏳ Zu teuer/heiß – erst auf Rücksetzer in die Kaufzone "
+                              "(unter aktuellem Kurs) warten", "neutral", "dip")
 
     def r2(x):
         return round(x, 2)
@@ -584,6 +594,7 @@ def trade_plan(row, context="invest"):
         "hold": hold,
         "action": action,
         "action_tone": tone,
+        "entry_when": when,
     }
 
 
