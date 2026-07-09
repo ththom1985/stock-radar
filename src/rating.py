@@ -301,6 +301,45 @@ def falling_knife(row):
     return None
 
 
+def bottoming_signal(row):
+    """Base/bottom detector: fires only AFTER a real decline, once the stock is no
+    longer a falling knife and MULTIPLE stabilisation/turn-up signals align.
+    Bottom-picking is unreliable -> requires >=4 confirmations, labelled speculative.
+    Returns {strength, n, signals} or None."""
+    if row.get("knife_warn"):
+        return None                          # still crashing -> not a bottom yet
+    pfh, r60, r20 = row.get("pct_from_high52"), row.get("ret_60d"), row.get("ret_20d")
+    declined = ((_has(pfh) and pfh <= -20) or (_has(r60) and r60 <= -20)
+                or (_has(r20) and r20 <= -12))
+    if not declined:
+        return None
+    price = row.get("price")
+    sig = []
+    if _has(price) and _has(row.get("low20")) and price > row["low20"] * 1.03:
+        sig.append("keine neuen Tiefs")
+    if _has(price) and _has(row.get("ema9")) and price > row["ema9"]:
+        sig.append("über EMA9")
+    if _macd_turning_up(row):
+        sig.append("MACD dreht hoch")
+    k, dd = row.get("stoch_k"), row.get("stoch_d")
+    if _has(k) and _has(dd) and k > dd and k < 45:
+        sig.append("Stochastik-Kreuz")
+    rsi = row.get("rsi")
+    if _has(rsi) and 32 <= rsi <= 52:
+        sig.append("RSI erholt sich")
+    if row.get("daytrade_direction") == "LONG":
+        sig.append("Käufer aktiv")
+    bw = row.get("bb_bandwidth")
+    if _has(bw) and bw < 12:
+        sig.append("Schwankung beruhigt sich")
+    au, ad = row.get("aroon_up"), row.get("aroon_down")
+    if _has(au) and _has(ad) and au > ad:
+        sig.append("Aroon dreht")
+    if len(sig) >= 4:
+        return {"strength": min(100, 40 + len(sig) * 8), "n": len(sig), "signals": sig}
+    return None
+
+
 def entry_score(row):
     """0-100: how good NOW is as a BUY entry — regime-aware.
 
@@ -315,7 +354,7 @@ def entry_score(row):
     regime = _regime(row)
 
     # Confirmed downtrend → dips are falling-knife risk, cap low.
-    if regime == "down":
+    if regime == "down" and not row.get("bottoming"):
         base = 20
         if _has(rsi) and rsi < 30 and _macd_turning_up(row):
             base = 34  # only a speculative oversold bounce
@@ -364,15 +403,25 @@ def entry_score(row):
     # Consistency caps: the entry timing must not contradict the trend phase or
     # the short-term trend shown on the same card.
     ph = (row.get("trend_phase") or {}).get("phase", "")
+    bot = row.get("bottoming")
     if row.get("knife_warn"):
-        score = min(score, 15)               # falling knife -> hard block "buy now"
-    if ph.startswith("Abwärts"):
-        score = min(score, 25)               # downtrend -> never a good entry
+        score = min(score, 15)               # falling knife (priority) -> hard block
+    elif ph.startswith("Abwärts"):
+        # a confirmed base forming after a crash IS the moment to enter early
+        score = min(score, 52 if bot else 25)
     elif "Top-Gefahr" in ph:
         score = min(score, 44)               # late-stage -> at best "wait for pullback"
-    if row.get("daytrade_direction") == "SHORT":
+    if row.get("daytrade_direction") == "SHORT" and not bot:
         score = min(score, 41)               # short-term falling -> not "buy now"
-    return _entry_vol_adjust(score, row)
+    if bot:
+        score += min(14, bot["n"] * 2)       # confirmed base -> better entry timing
+    score = _entry_vol_adjust(score, row)
+    if bot:
+        # a confirmed base is a DECENT but SPECULATIVE entry: clamp into a "gut"
+        # band (~54-66), never "sehr gut" (>=70), and never "schlecht" (<45).
+        lo = min(66, 42 + bot["n"] * 3)
+        score = max(min(score, 66), lo)
+    return score
 
 
 def entry_reason(row):
@@ -533,12 +582,15 @@ def trade_plan(row, context="invest"):
 
     side = "short" if (context == "trade" and row.get("daytrade_direction") == "SHORT") else "long"
     alt = row.get("altman_z")
+    bot = row.get("bottoming")
     avoid = side == "long" and (
-        row.get("weinstein_stage") == 4
-        or (row.get("trend_phase") or {}).get("phase", "").startswith("Abwärts")
-        or (isinstance(alt, (int, float)) and alt < 1.81)
-        or row.get("radar_rating") == "Meiden"
-        or (row.get("longterm_score") or 50) < 30
+        (isinstance(alt, (int, float)) and alt < 1.81)     # bankruptcy risk -> always avoid
+        or row.get("radar_rating") == "Meiden"             # overall meiden -> avoid
+        # trend-based avoids, UNLESS a base is forming (that's the turnaround entry)
+        or (not bot and (
+            row.get("weinstein_stage") == 4
+            or (row.get("trend_phase") or {}).get("phase", "").startswith("Abwärts")
+            or (row.get("longterm_score") or 50) < 30))
     )
 
     supports = [row.get(k) for k in ("sma20", "sma50", "sma150", "sma200",
@@ -604,6 +656,8 @@ def trade_plan(row, context="invest"):
         action, tone, when = "🚫 Meiden – aktuell kein sauberes Kaufsetup", "neg", "avoid"
     elif row.get("knife_warn") and side == "long":
         action, tone, when = "🔪 Fallendes Messer – nicht greifen, erst Boden/Stabilisierung abwarten", "neg", "dip"
+    elif bot and side == "long":
+        action, tone, when = "🟢 Bodenbildung nach Absturz – frühe, spekulative Einstiegschance", "pos", "now"
     elif side == "short":
         action, tone, when = "📉 Nur für Profis: Wette auf fallende Kurse (Short)", "neg", "short"
     elif isinstance(es, (int, float)) and es >= 55:

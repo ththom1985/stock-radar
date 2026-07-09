@@ -27,7 +27,7 @@ from .rating import (radar_elo, radar_score, stars, plain_summary, suggest_actio
                      quality_score as calc_quality, potential_score as calc_potential,
                      conviction, urgency, upside_pct, entry_score, entry_reason,
                      downside_analysis, trade_plan, risk_warnings, bull_thesis, priced_in_note,
-                     trend_phase, volume_signal, falling_knife)
+                     trend_phase, volume_signal, falling_knife, bottoming_signal)
 from .geo import country_flag
 from .fx import currency_for, get_fx_rates
 from .macro import fetch_macro, macro_adjust
@@ -334,6 +334,7 @@ def run(with_news=True, with_fundamentals=True):
         r["urgency"], r["urgency_tone"] = u_label, u_tone
         r["upside_pct"] = upside_pct(r)
         r["knife_warn"] = falling_knife(r)
+        r["bottoming"] = bottoming_signal(r)
         r["entry_score"] = entry_score(r)
         r["entry_reason"] = entry_reason(r)
         r["risk_warnings"] = risk_warnings(r)

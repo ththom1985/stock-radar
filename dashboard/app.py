@@ -110,6 +110,8 @@ CSS = """
 .card .thesis{margin:6px 0 0;font-size:12.5px;color:#166534;background:#f0fdf4;border:1px solid #bbf7d0;padding:5px 9px;border-radius:7px;}
 .card .thesis b{color:#14532d;}
 .card .knife{margin:7px 0 0;padding:7px 11px;border-radius:8px;background:#dc2626;color:#fff;font-weight:800;font-size:12.5px;line-height:1.45;}
+.card .bottom{margin:7px 0 0;padding:7px 11px;border-radius:8px;background:#f0fdf4;color:#15803d;border:1px solid #86efac;font-weight:600;font-size:12.5px;line-height:1.45;}
+.card .bottom b{color:#14532d;}
 .card .thesis-weak{color:#a16207;background:#fffbeb;border-color:#fde68a;}
 .card .thesis-weak b{color:#854d0e;}
 .card .pricedin{margin:4px 0 0;font-size:11.5px;color:#a16207;background:#fffbeb;border:1px solid #fde68a;padding:4px 9px;border-radius:7px;font-weight:600;}
@@ -331,6 +333,12 @@ with st.expander("ℹ️ Legende – was bedeuten die Zahlen?"):
   automatisch „jetzt kaufen" (Einstieg-Score gedeckelt, Aktion „erst Boden abwarten") – damit du nicht ins
   fallende Messer greifst, nur weil's billig aussieht. Auch bei Kurssturz *innerhalb* eines Aufwärtstrends
   (z.B. Gap nach Zahlen).
+- **🟢 Bodenbildung nach Absturz** (grüne Zeile) – das **Gegenstück** zum fallenden Messer: erscheint erst,
+  wenn eine stark gefallene Aktie **kein fallendes Messer mehr** ist und **mehrere Stabilisierungs-Signale
+  zusammenkommen** (keine neuen Tiefs · zurück über EMA9 · MACD dreht · Stochastik-Kreuz · RSI erholt sich ·
+  Käufer aktiv · Schwankung beruhigt · Aroon dreht). Mind. **4 Signale** nötig – dann hebt sie die Abwärts-
+  Sperre auf und markiert eine **frühe Einstiegschance** (bewusst **spekulativ**, Boden-Picken ist unsicher;
+  bei Pleiterisiko/Meiden bleibt die Sperre). Kollidiert nicht mit dem 🔪-Messer (schließen sich aus).
 - **📉 Abwärtsrisiko** (grün/gelb/rote Zeile) – **wie weit könnte die Aktie noch fallen?** Zeigt die
   **nächste(n) Unterstützung(en)** unter dem Kurs (Kurslevel + % Abstand) und ein Urteil: *„Boden
   wahrscheinlicher"* (nahe Unterstützung + Momentum dreht) vs. *„viel Luft nach unten – Rückschlagrisiko"*
@@ -522,6 +530,16 @@ def _knife_html(r):
     """Loud falling-knife safeguard, shown at the very top of the card."""
     w = r.get("knife_warn")
     return f'<div class="knife">{_esc(w)}</div>' if w else ""
+
+
+def _bottoming_html(r):
+    """Base/bottom-forming signal (opportunity after a crash), if confirmed."""
+    b = r.get("bottoming")
+    if not b:
+        return ""
+    sigs = " · ".join(b.get("signals") or [])
+    return (f'<div class="bottom">🟢 <b>Bodenbildung nach Absturz</b> ({b.get("n")} Signale): '
+            f'{_esc(sigs)} – frühe, spekulative Einstiegschance (keine Garantie)</div>')
 
 
 def _thesis_html(r):
@@ -835,6 +853,7 @@ def card_html(r, idx=None, context="invest"):
         f'{sector_badge}{etf_badge}{crypto_badge}{expert_badge}{theme_badge}{vol_badge}{asch_badge}</div>'
         f'{stat_row}'
         f'{_knife_html(r)}'
+        f'{_bottoming_html(r)}'
         f'{_thesis_html(r)}'
         f'{_proj_html(r.get(proj_key), context)}'
         f'{_scenario_html(r, context)}'
