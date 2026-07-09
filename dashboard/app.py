@@ -154,6 +154,8 @@ CSS = """
 .app-logo .txt .nm b{color:#16a34a;font-weight:900;}
 .app-logo .txt .th{color:#2563eb;}
 .app-logo .txt .sub{font-size:11.5px;color:#64748b;font-weight:600;margin-top:1px;}
+.top3{font-size:14px;color:#0f172a;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:9px;padding:8px 12px;margin:2px 0 6px;line-height:1.6;}
+.top3 b{color:#14532d;}
 .statusline{font-size:12px;color:#64748b;margin:3px 0 8px;}
 .statusline b{color:#334155;font-weight:700;}
 .stTabs [data-baseweb="tab-list"]{gap:2px;flex-wrap:wrap;}
@@ -912,11 +914,51 @@ def entry_opportunity(r):
     return round(es * 0.60 + rs * 0.30 + dbonus + warn, 1)
 
 
+def daily_conviction(r):
+    """Ranking for 'if you had to buy today': quality (radar) + entry timing now +
+    signal agreement (conviction) - downside risk. Higher = better deal today."""
+    es = r.get("entry_score") or 0
+    rs = r.get("radar_score") or 0
+    conv = r.get("conviction") or 50
+    dn = (r.get("downside") or {}).get("risk")
+    db = {"gering": 10, "mittel": 0, "hoch": -25}.get(dn, 0)
+    spec = -8 if r.get("bottoming") else 0            # base plays are lower conviction
+    return round(rs * 0.40 + es * 0.35 + conv * 0.15 + db + spec, 1)
+
+
+def daily_top3(rows):
+    """The 3 highest-conviction, clean, actionable BUY setups right now (stocks only)."""
+    cand = [r for r in rows
+            if "ETF" not in (r.get("themes") or []) and not r["symbol"].endswith("-USD")
+            and not r.get("knife_warn")
+            and not (r.get("risk_warnings") or [])
+            and (r.get("entry_score") or 0) >= 55
+            and (r.get("radar_score") or 0) >= 55
+            and (r.get("downside") or {}).get("risk") != "hoch"
+            and (r.get("trade_plan_long") or {}).get("entry_when") == "now"]
+    return sorted(cand, key=daily_conviction, reverse=True)[:3]
+
+
 tabs = st.tabs(["🎯 Heute", "🚀 Daytrading", "🏦 Langzeit", "📊 Fundamental", "🧠 Aschenbrenner",
                 "🔥 Social", "💼 Paper-Depot", "🔎 Alle", "⭐ Experten", "🧭 Themen", "🎯 Einstieg heute",
                 "🔍 Suche"])
 
 with tabs[0]:
+    _t3 = daily_top3(data["all"])
+    st.markdown('<div class="day-h">🏆 Wenn du heute handeln müsstest – die 3 besten Geschäfte</div>',
+                unsafe_allow_html=True)
+    if _t3:
+        _line = " · ".join(
+            f'<b>{i}. {_esc(r["symbol"])}</b> ({_esc((r.get("name") or "")[:20])}) – halten '
+            f'<b>{_esc((r.get("trade_plan_long") or {}).get("hold", "?"))}</b>'
+            for i, r in enumerate(_t3, 1))
+        st.markdown(f'<div class="top3">{_line}</div>', unsafe_allow_html=True)
+        grid(_t3, numbered=True, context="invest")
+    else:
+        st.info("Heute gibt es **kein sauberes Top-Setup** (gutes Timing jetzt + Qualität + geringes "
+                "Risiko, ohne fallendes Messer/Warnung). Wenn du dich nicht festlegen müsstest: abwarten.")
+    st.markdown('<hr style="margin:14px 0;border:none;border-top:1px solid #e5e7eb">', unsafe_allow_html=True)
+
     st.caption("**Deine Top-Chancen heute**, nach Rang. Jede Karte zeigt oben: **Richtung** "
                "(📈 steigend / 📉 fallend), 🎯 **Sicherheit** (wie überzeugt), 🚀 **Potenzial/Ziel** und "
                "⏱️ **Dringlichkeit**. Die große Zahl links ist der Rang.")
