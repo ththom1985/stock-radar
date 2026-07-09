@@ -109,6 +109,7 @@ CSS = """
 .card .entry-why-down{background:#fef2f2;color:#b91c1c;}
 .card .thesis{margin:6px 0 0;font-size:12.5px;color:#166534;background:#f0fdf4;border:1px solid #bbf7d0;padding:5px 9px;border-radius:7px;}
 .card .thesis b{color:#14532d;}
+.card .knife{margin:7px 0 0;padding:7px 11px;border-radius:8px;background:#dc2626;color:#fff;font-weight:800;font-size:12.5px;line-height:1.45;}
 .card .thesis-weak{color:#a16207;background:#fffbeb;border-color:#fde68a;}
 .card .thesis-weak b{color:#854d0e;}
 .card .pricedin{margin:4px 0 0;font-size:11.5px;color:#a16207;background:#fffbeb;border:1px solid #fde68a;padding:4px 9px;border-radius:7px;font-weight:600;}
@@ -325,6 +326,11 @@ with st.expander("ℹ️ Legende – was bedeuten die Zahlen?"):
   Spitzenzyklus, Rüstungs-Kriegsprämie, Retail-Hype).
 - **🎯 Einstieg-heute-Tab** – ein eigener Algorithmus rankt **tagesaktuell** nur die besten Einstiege:
   gutes Timing + geringes Abwärtsrisiko + solider Score, minus rote Warnungen. Deine Kaufkandidaten-Kurzliste.
+- **🔪 Fallendes-Messer-Sicherung** (rote Zeile ganz oben) – erscheint, wenn eine Aktie **gerade steil
+  abstürzt** (≥ 8 % in 1 Woche oder ≥ 15 % in 1 Monat) und sich **noch nicht stabilisiert** hat. Blockiert
+  automatisch „jetzt kaufen" (Einstieg-Score gedeckelt, Aktion „erst Boden abwarten") – damit du nicht ins
+  fallende Messer greifst, nur weil's billig aussieht. Auch bei Kurssturz *innerhalb* eines Aufwärtstrends
+  (z.B. Gap nach Zahlen).
 - **📉 Abwärtsrisiko** (grün/gelb/rote Zeile) – **wie weit könnte die Aktie noch fallen?** Zeigt die
   **nächste(n) Unterstützung(en)** unter dem Kurs (Kurslevel + % Abstand) und ein Urteil: *„Boden
   wahrscheinlicher"* (nahe Unterstützung + Momentum dreht) vs. *„viel Luft nach unten – Rückschlagrisiko"*
@@ -510,6 +516,12 @@ def _trend_html(r):
     tone = tp.get("tone", "soon")
     return (f'<div class="trend trend-{tone}">📈 <b>Trendphase:</b> {_esc(tp.get("phase",""))} '
             f'· 🔔 <b>Verkauf:</b> {_esc(tp.get("sell",""))}</div>')
+
+
+def _knife_html(r):
+    """Loud falling-knife safeguard, shown at the very top of the card."""
+    w = r.get("knife_warn")
+    return f'<div class="knife">{_esc(w)}</div>' if w else ""
 
 
 def _thesis_html(r):
@@ -822,6 +834,7 @@ def card_html(r, idx=None, context="invest"):
         f'<div class="rt" style="color:{color}">{_esc(r.get("radar_rating"))}</div></div>'
         f'{sector_badge}{etf_badge}{crypto_badge}{expert_badge}{theme_badge}{vol_badge}{asch_badge}</div>'
         f'{stat_row}'
+        f'{_knife_html(r)}'
         f'{_thesis_html(r)}'
         f'{_proj_html(r.get(proj_key), context)}'
         f'{_scenario_html(r, context)}'

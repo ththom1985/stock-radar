@@ -278,6 +278,29 @@ def downside_analysis(row):
     }
 
 
+def falling_knife(row):
+    """Safeguard: is the stock crashing RIGHT NOW without having stabilised?
+    A steep recent drop that is still falling (below the fast averages, momentum
+    not turning up) = don't catch the falling knife. Returns a warning or None."""
+    r5, r20 = row.get("ret_5d"), row.get("ret_20d")
+    price, sma20, ema9 = row.get("price"), row.get("sma20"), row.get("ema9")
+    steep_fast = _has(r5) and r5 <= -8
+    steep_slow = _has(r20) and r20 <= -15
+    if not (steep_fast or steep_slow):
+        return None
+    # still falling? (no upward momentum turn, below the fast EMA, or short-term down)
+    still_falling = (row.get("daytrade_direction") == "SHORT"
+                     or not _macd_turning_up(row)
+                     or (_has(price) and _has(ema9) and price < ema9))
+    below_fast = _has(price) and _has(sma20) and price < sma20
+    if still_falling and below_fast:
+        mag = r5 if steep_fast else r20
+        span = "in 1 Woche" if steep_fast else "in 1 Monat"
+        return (f"🔪 Fallendes Messer: Kurs stürzt aktuell steil ({mag:.0f}% {span}) und hat sich "
+                f"noch nicht stabilisiert – nicht hineingreifen, erst einen Boden/Aufwärts-Dreh abwarten.")
+    return None
+
+
 def entry_score(row):
     """0-100: how good NOW is as a BUY entry — regime-aware.
 
@@ -341,6 +364,8 @@ def entry_score(row):
     # Consistency caps: the entry timing must not contradict the trend phase or
     # the short-term trend shown on the same card.
     ph = (row.get("trend_phase") or {}).get("phase", "")
+    if row.get("knife_warn"):
+        score = min(score, 15)               # falling knife -> hard block "buy now"
     if ph.startswith("Abwärts"):
         score = min(score, 25)               # downtrend -> never a good entry
     elif "Top-Gefahr" in ph:
@@ -577,6 +602,8 @@ def trade_plan(row, context="invest"):
 
     if avoid:
         action, tone, when = "🚫 Meiden – aktuell kein sauberes Kaufsetup", "neg", "avoid"
+    elif row.get("knife_warn") and side == "long":
+        action, tone, when = "🔪 Fallendes Messer – nicht greifen, erst Boden/Stabilisierung abwarten", "neg", "dip"
     elif side == "short":
         action, tone, when = "📉 Nur für Profis: Wette auf fallende Kurse (Short)", "neg", "short"
     elif isinstance(es, (int, float)) and es >= 55:
