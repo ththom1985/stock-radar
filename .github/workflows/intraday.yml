@@ -15,10 +15,8 @@ on:
     # --- US-Close 20:00 UTC (22:00 dt.): dicht ---
     - cron: "2,12,22,32,42,52 19 * * 1-5"
     - cron: "2,12 20 * * 1-5"
-    # --- Europa-Open ~07:00 UTC (09:00 dt.): alle 20 Min ---
-    - cron: "2,22,42 7 * * 1-5"
-    # --- Europa-Vormittag: stündlich (leicht) ---
-    - cron: "2 8-12 * * 1-5"
+    # --- Europa-Handelszeit 07:00-12:00 UTC (09-14 dt.): alle 20 Min ---
+    - cron: "2,22,42 7-12 * * 1-5"
     # --- Asien Open/Close: nur je 1 Touch ---
     - cron: "2 1 * * 1-5"
     - cron: "2 6 * * 1-5"
