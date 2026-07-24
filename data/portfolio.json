@@ -2,20 +2,8 @@
  "start_capital": 10000.0,
  "created": "2026-07-03",
  "cash": 0.0,
- "last_trade_date": "2026-07-23",
+ "last_trade_date": "2026-07-24",
  "positions": {
-  "GOOGL": {
-   "name": "Alphabet A",
-   "entry_price": 359.91,
-   "entry_date": "2026-07-03",
-   "stake_eur": 1000.0,
-   "score_at_entry": 96,
-   "last_price": 317.69,
-   "value_eur": 882.69,
-   "pnl_eur": -117.31,
-   "pnl_pct": -11.73,
-   "peak_price": 372.88
-  },
   "TSM": {
    "name": "TSMC",
    "entry_price": 434.16,
@@ -46,10 +34,10 @@
    "entry_date": "2026-07-03",
    "stake_eur": 1000.0,
    "score_at_entry": 96,
-   "last_price": 176.57,
-   "value_eur": 873.29,
-   "pnl_eur": -126.71,
-   "pnl_pct": -12.67,
+   "last_price": 168.8,
+   "value_eur": 834.86,
+   "pnl_eur": -165.14,
+   "pnl_pct": -16.51,
    "peak_price": 207.69
   },
   "CSCO": {
@@ -82,10 +70,10 @@
    "entry_date": "2026-07-03",
    "stake_eur": 1000.0,
    "score_at_entry": 92,
-   "last_price": 17.11,
-   "value_eur": 1004.11,
-   "pnl_eur": 4.11,
-   "pnl_pct": 0.41,
+   "last_price": 17.06,
+   "value_eur": 1001.17,
+   "pnl_eur": 1.17,
+   "pnl_pct": 0.12,
    "peak_price": 17.22
   },
   "AGCO": {
@@ -123,6 +111,18 @@
    "pnl_eur": 35.81,
    "pnl_pct": 3.58,
    "peak_price": 591.05
+  },
+  "STLD": {
+   "name": "STLD",
+   "entry_price": 240.57,
+   "peak_price": 240.57,
+   "entry_date": "2026-07-24",
+   "stake_eur": 882.69,
+   "score_at_entry": 94,
+   "last_price": 240.57,
+   "value_eur": 882.69,
+   "pnl_eur": 0.0,
+   "pnl_pct": 0.0
   }
  },
  "trade_log": [
@@ -245,6 +245,33 @@
    "pnl_eur": 0.0,
    "pnl_pct": 0.0,
    "reason": "Top-Tipp"
+  },
+  {
+   "date": "2026-07-24",
+   "action": "SELL",
+   "symbol": "GOOGL",
+   "name": "Alphabet A",
+   "price": 317.69,
+   "stake_eur": 1000.0,
+   "value_eur": 882.69,
+   "pnl_eur": -117.31,
+   "pnl_pct": -11.73,
+   "score_entry": 96,
+   "score_exit": 53,
+   "held_days": 21,
+   "reason": "aus den Top-Tipps gefallen (-12%) · Rating 96→53"
+  },
+  {
+   "date": "2026-07-24",
+   "action": "BUY",
+   "symbol": "STLD",
+   "name": "STLD",
+   "price": 240.57,
+   "stake_eur": 882.69,
+   "value_eur": 882.69,
+   "pnl_eur": 0.0,
+   "pnl_pct": 0.0,
+   "reason": "Top-Tipp gekauft (Score 94)"
   }
  ],
  "equity_curve": [
@@ -391,7 +418,17 @@
    "bench_sp500": 7408.3,
    "bench_ndx": 28454.81,
    "bench_world": 200.61
+  },
+  {
+   "date": "2026-07-24",
+   "equity": 9408.06,
+   "cash": 0.0,
+   "invested": 9408.06,
+   "n_positions": 10,
+   "bench_sp500": 7408.3,
+   "bench_ndx": 28454.81,
+   "bench_world": 200.61
   }
  ],
- "realized_pnl": 0.0
+ "realized_pnl": -117.30710455391636
 }
