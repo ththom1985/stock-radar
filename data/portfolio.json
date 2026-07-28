@@ -2,7 +2,7 @@
  "start_capital": 10000.0,
  "created": "2026-07-03",
  "cash": 0.0,
- "last_trade_date": "2026-07-27",
+ "last_trade_date": "2026-07-28",
  "positions": {
   "TSM": {
    "name": "TSMC",
@@ -27,18 +27,6 @@
    "pnl_eur": -51.76,
    "pnl_pct": -5.18,
    "peak_price": 22.84
-  },
-  "005930.KS": {
-   "name": "Samsung Electronics",
-   "entry_price": 202.19,
-   "entry_date": "2026-07-03",
-   "stake_eur": 1000.0,
-   "score_at_entry": 96,
-   "last_price": 170.22,
-   "value_eur": 841.88,
-   "pnl_eur": -158.12,
-   "pnl_pct": -15.81,
-   "peak_price": 207.69
   },
   "CSCO": {
    "name": "Cisco Systems",
@@ -70,10 +58,10 @@
    "entry_date": "2026-07-03",
    "stake_eur": 1000.0,
    "score_at_entry": 92,
-   "last_price": 17.61,
-   "value_eur": 1033.45,
-   "pnl_eur": 33.45,
-   "pnl_pct": 3.35,
+   "last_price": 16.81,
+   "value_eur": 986.5,
+   "pnl_eur": -13.5,
+   "pnl_pct": -1.35,
    "peak_price": 17.63
   },
   "AGCO": {
@@ -123,6 +111,18 @@
    "value_eur": 918.28,
    "pnl_eur": 35.59,
    "pnl_pct": 4.03
+  },
+  "DBC": {
+   "name": "Rohstoffkorb",
+   "entry_price": 29.01,
+   "peak_price": 29.01,
+   "entry_date": "2026-07-28",
+   "stake_eur": 759.63,
+   "score_at_entry": 94,
+   "last_price": 29.01,
+   "value_eur": 759.63,
+   "pnl_eur": 0.0,
+   "pnl_pct": 0.0
   }
  },
  "trade_log": [
@@ -269,6 +269,33 @@
    "price": 240.57,
    "stake_eur": 882.69,
    "value_eur": 882.69,
+   "pnl_eur": 0.0,
+   "pnl_pct": 0.0,
+   "reason": "Top-Tipp gekauft (Score 94)"
+  },
+  {
+   "date": "2026-07-28",
+   "action": "SELL",
+   "symbol": "005930.KS",
+   "name": "Samsung Electronics",
+   "price": 153.59,
+   "stake_eur": 1000.0,
+   "value_eur": 759.63,
+   "pnl_eur": -240.37,
+   "pnl_pct": -24.04,
+   "score_entry": 96,
+   "score_exit": 82,
+   "held_days": 25,
+   "reason": "Not-Stop (-24%) · Rating 96→82"
+  },
+  {
+   "date": "2026-07-28",
+   "action": "BUY",
+   "symbol": "DBC",
+   "name": "Rohstoffkorb",
+   "price": 29.01,
+   "stake_eur": 759.63,
+   "value_eur": 759.63,
    "pnl_eur": 0.0,
    "pnl_pct": 0.0,
    "reason": "Top-Tipp gekauft (Score 94)"
@@ -438,7 +465,17 @@
    "bench_sp500": 7413.18,
    "bench_ndx": 28039.21,
    "bench_world": 201.26
+  },
+  {
+   "date": "2026-07-28",
+   "equity": 9185.41,
+   "cash": 0.0,
+   "invested": 9185.41,
+   "n_positions": 10,
+   "bench_sp500": 7413.18,
+   "bench_ndx": 28039.21,
+   "bench_world": 201.26
   }
  ],
- "realized_pnl": -117.30710455391636
+ "realized_pnl": -357.6750752745256
 }
