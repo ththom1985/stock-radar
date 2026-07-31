@@ -2,7 +2,7 @@
  "start_capital": 10000.0,
  "created": "2026-07-03",
  "cash": 0.0,
- "last_trade_date": "2026-07-30",
+ "last_trade_date": "2026-07-31",
  "positions": {
   "TSM": {
    "name": "TSMC",
@@ -58,23 +58,11 @@
    "entry_date": "2026-07-03",
    "stake_eur": 1000.0,
    "score_at_entry": 92,
-   "last_price": 17.13,
-   "value_eur": 1005.28,
-   "pnl_eur": 5.28,
-   "pnl_pct": 0.53,
+   "last_price": 17.05,
+   "value_eur": 1000.59,
+   "pnl_eur": 0.59,
+   "pnl_pct": 0.06,
    "peak_price": 17.63
-  },
-  "AGCO": {
-   "name": "AGCO",
-   "entry_price": 116.49,
-   "entry_date": "2026-07-03",
-   "stake_eur": 1000.0,
-   "score_at_entry": 90,
-   "last_price": 107.13,
-   "value_eur": 919.65,
-   "pnl_eur": -80.35,
-   "pnl_pct": -8.04,
-   "peak_price": 123.75
   },
   "ELG.DE": {
    "name": "Elmos Semiconductor",
@@ -123,6 +111,18 @@
    "value_eur": 767.75,
    "pnl_eur": 8.12,
    "pnl_pct": 1.07
+  },
+  "EME": {
+   "name": "EMCOR",
+   "entry_price": 802.37,
+   "peak_price": 802.37,
+   "entry_date": "2026-07-31",
+   "stake_eur": 919.65,
+   "score_at_entry": 93,
+   "last_price": 802.37,
+   "value_eur": 919.65,
+   "pnl_eur": 0.0,
+   "pnl_pct": 0.0
   }
  },
  "trade_log": [
@@ -299,6 +299,33 @@
    "pnl_eur": 0.0,
    "pnl_pct": 0.0,
    "reason": "Top-Tipp gekauft (Score 94)"
+  },
+  {
+   "date": "2026-07-31",
+   "action": "SELL",
+   "symbol": "AGCO",
+   "name": "AGCO",
+   "price": 107.13,
+   "stake_eur": 1000.0,
+   "value_eur": 919.65,
+   "pnl_eur": -80.35,
+   "pnl_pct": -8.04,
+   "score_entry": 90,
+   "score_exit": 48,
+   "held_days": 28,
+   "reason": "Rating auf 48 gefallen → These weg (-8%) · Rating 90→48"
+  },
+  {
+   "date": "2026-07-31",
+   "action": "BUY",
+   "symbol": "EME",
+   "name": "EMCOR",
+   "price": 802.37,
+   "stake_eur": 919.65,
+   "value_eur": 919.65,
+   "pnl_eur": 0.0,
+   "pnl_pct": 0.0,
+   "reason": "Top-Tipp gekauft (Score 93)"
   }
  ],
  "equity_curve": [
@@ -495,7 +522,17 @@
    "bench_sp500": 7437.63,
    "bench_ndx": 28106.35,
    "bench_world": 202.98
+  },
+  {
+   "date": "2026-07-31",
+   "equity": 9226.24,
+   "cash": 0.0,
+   "invested": 9226.24,
+   "n_positions": 10,
+   "bench_sp500": 7437.63,
+   "bench_ndx": 28106.35,
+   "bench_world": 202.98
   }
  ],
- "realized_pnl": -357.6750752745256
+ "realized_pnl": -438.0253199307192
 }
