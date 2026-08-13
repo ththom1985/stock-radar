@@ -47,6 +47,7 @@ from .insights import (
     INSIGHT_CONTRACT_VERSION,
     INSIGHT_STATUS,
     PROVENANCE_CATALOG,
+    SWEET_SPOT_CONTRACT,
     enrich_rows_and_rankings,
     rehydrate_rankings,
 )
@@ -893,6 +894,7 @@ def run(with_news=True, with_fundamentals=True):
             "core_ranking_unchanged": True,
             "scenario_ranges_used_in_core_ranking": False,
             "provenance_catalog": PROVENANCE_CATALOG,
+            "sweet_spot_contract": SWEET_SPOT_CONTRACT,
         },
         "universe_size": len(symbols),
         "configured_universe_size": len(full_universe),

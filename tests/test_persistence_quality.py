@@ -29,6 +29,8 @@ class PersistenceQualityTests(ProjectTempMixin, unittest.TestCase):
     def _empty_insights(enabled=True):
         categories = {}
         for key in (
+            "in_sweet_spot",
+            "approaching_sweet_spot",
             "daily_setups",
             "undervalued_quality",
             "analyst_potential",
@@ -48,7 +50,7 @@ class PersistenceQualityTests(ProjectTempMixin, unittest.TestCase):
                 "eligible_count": 0,
             }
         return {
-            "contract_version": 2,
+            "contract_version": 3,
             "model_status": "heuristic_unvalidated",
             "actionable": False,
             "enabled": enabled,

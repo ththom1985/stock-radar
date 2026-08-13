@@ -20,6 +20,7 @@ from src.data_quality import (
     validate_portfolio_contract,
 )
 from src.persistence import PersistenceError, load_json
+from src.sweet_spot import format_price
 
 LATEST = ROOT / "data" / "output" / "latest.json"
 PORTFOLIO = ROOT / "data" / "portfolio.json"
@@ -139,6 +140,111 @@ def _render_points(title, points, *, kind="info"):
         getattr(st, kind)(point)
 
 
+def _render_sweet_spot(row):
+    sweet = row.get("sweet_spot") or {}
+    st.markdown("#### Sweet-Spot-Beobachtungszone")
+    st.caption("Technische Einstiegsbeobachtung · Beobachtungszone, keine Ordermarke")
+    status_labels = {
+        "in_zone_confirmed": "Im Sweet Spot",
+        "in_zone_risk_filtered": "In Zone, Investor-Risiko gefiltert",
+        "approaching": "Nähert sich der Zone",
+        "setup_waiting_confirmation": "Bestätigung ausstehend",
+        "safety_blocked": "Sicherheitsfilter blockiert",
+        "broken_below": "Unter Invalidation Reference",
+        "far_above": "Weit oberhalb der Zone",
+        "reference_only_far": "Nur Referenzzone",
+        "unavailable": "Zone nicht verfügbar",
+    }
+    label = status_labels.get(
+        sweet.get("combined_status"),
+        sweet.get("combined_status") or "Zone nicht verfügbar",
+    )
+    tone = sweet.get("tone")
+    message = (
+        f"{label} · combined_status={sweet.get('combined_status') or 'unavailable'} · "
+        "heuristic_unvalidated / actionable false"
+    )
+    if tone == "green":
+        st.success(message)
+    elif tone == "amber":
+        st.warning(message)
+    elif tone == "red":
+        st.error(message)
+    else:
+        st.info(message)
+    if not sweet.get("available"):
+        st.caption("Keine belastbare Referenzzone; es werden keine Marken erzeugt.")
+        return
+    if sweet.get("zone_tier") == "reference_only":
+        st.info(
+            "Nur Einzelanker, keine Confluence · "
+            f"{sweet.get('anchor_scope') or 'reference'} / "
+            f"{sweet.get('anchor_distance_class') or 'unclassified'} · "
+            "mathematische Referenzzone, Bestätigung fehlt."
+        )
+    zone_values = [
+        sweet.get("lower"),
+        sweet.get("ideal"),
+        sweet.get("upper"),
+    ]
+    zone_metrics = st.columns(4)
+    zone_metrics[0].metric(
+        "Untergrenze USD",
+        format_price(sweet.get("lower"), zone_values),
+    )
+    zone_metrics[1].metric(
+        "IDEAL USD",
+        format_price(sweet.get("ideal"), zone_values),
+    )
+    zone_metrics[2].metric(
+        "Obergrenze USD",
+        format_price(sweet.get("upper"), zone_values),
+    )
+    zone_metrics[3].metric(
+        "Aktueller Kurs USD",
+        format_price(sweet.get("current_price"), [*zone_values, sweet.get("current_price")]),
+    )
+    st.caption(
+        f"{format_price(sweet.get('lower'), zone_values)} – IDEAL "
+        f"{format_price(sweet.get('ideal'), zone_values)} – "
+        f"{format_price(sweet.get('upper'), zone_values)} USD · Abstand zu IDEAL "
+        f"{_number(sweet.get('current_distance_pct'), 2, '%')} · Abstand zur Zone "
+        f"{_number(sweet.get('distance_to_zone_pct'), 2, '%')} · Reliabilität "
+        f"{_number(sweet.get('reliability_score'), 0, '/100')} "
+        f"· {sweet.get('independent_family_count', 0)} unabhängige "
+        f"{'Quellenfamilie' if sweet.get('independent_family_count') == 1 else 'Quellenfamilien'} "
+        "(heuristische Evidenzqualität, keine Wahrscheinlichkeit)"
+    )
+    components = sweet.get("components") or []
+    if components:
+        st.markdown(
+            "**Konfluenzquellen:** "
+            + " ".join(
+                f"`{item.get('label')} "
+                f"{format_price(item.get('value'), [*zone_values, item.get('value')])} USD`"
+                for item in components
+            )
+        )
+    _render_points("Warum diese Zone", sweet.get("why_zone_here"))
+    _render_points(
+        "Warum Grün oder nicht",
+        sweet.get("why_green_or_not"),
+        kind="success" if tone == "green" else "error" if tone == "red" else "warning",
+    )
+    _render_points("Was bestätigt", sweet.get("confirmation_needed"))
+    _render_points("Was invalidiert", sweet.get("invalidation_signals"), kind="error")
+    _render_points(
+        "Investor-Overlay",
+        sweet.get("investor_overlay_reasons"),
+        kind="warning",
+    )
+    alignment = sweet.get("valuation_alignment") or {}
+    st.caption(
+        f"Bewertungsabgleich: {alignment.get('status') or 'unavailable'} · "
+        f"{alignment.get('note') or ''}"
+    )
+
+
 def _research_card(row, rank=None):
     prefix = f"{rank}. " if rank is not None else ""
     with st.container(border=True):
@@ -169,6 +275,7 @@ def _research_card(row, rank=None):
             st.error("China-Risikokontext (heuristic_unvalidated; kein bewiesener Abschlag)")
             for reason in jurisdiction.get("reasons") or []:
                 st.warning(reason)
+        _render_sweet_spot(row)
         header = st.columns(6)
         header[0].metric("Completed-bar close (USD)", _number(row.get("price"), 2))
         header[1].metric("Completed bar", row.get("bar_date") or "—")
@@ -258,13 +365,6 @@ def _research_card(row, rank=None):
                 f"{_number(downside.get('support1'), 2)} USD "
                 f"({_number(downside.get('support1_pct'), 1, '%')})"
             )
-        zone = row.get("technical_observation_zone")
-        if zone:
-            st.caption(
-                f"{zone.get('label')}: {_number(zone.get('lower'), 2)}–"
-                f"{_number(zone.get('upper'), 2)} USD. {zone.get('note')}"
-            )
-
         scores = pd.DataFrame(
             [
                 {
@@ -374,6 +474,7 @@ def _research_card(row, rank=None):
 
 tabs = st.tabs(
     [
+        "Sweet Spot",
         "Tages-Setups",
         "Unterbewertet",
         "Potenzial",
@@ -464,27 +565,127 @@ def _render_insight_category(category_key, *, key):
 
 
 with tabs[0]:
-    _render_insight_category("daily_setups", key="daily")
+    currencies = sorted(
+        {
+            row.get("currency")
+            for row in rows_by_symbol.values()
+            if (row.get("sweet_spot") or {}).get("combined_status")
+            in {
+                "in_zone_confirmed",
+                "in_zone_risk_filtered",
+                "approaching",
+                "setup_waiting_confirmation",
+            }
+            and row.get("currency")
+        }
+    )
+    st.caption(
+        "Bestätigtes Grün zuerst, danach Amber-Beobachtungen · nach Handelswährung "
+        "getrennt · Beobachtungszone, keine Ordermarke."
+    )
+    if not currencies:
+        st.info("Keine bestätigten oder sich nähernden Sweet-Spot-Beobachtungen.")
+    else:
+        default_index = currencies.index("USD") if "USD" in currencies else 0
+        currency = st.selectbox(
+            "Handelswährung",
+            currencies,
+            index=default_index,
+            key="sweet_currency",
+        )
+        currency_rows = [
+            row for row in rows_by_symbol.values() if row.get("currency") == currency
+        ]
+        confirmed_rows = sorted(
+            [
+                row
+                for row in currency_rows
+                if (row.get("sweet_spot") or {}).get("combined_status")
+                == "in_zone_confirmed"
+            ],
+            key=lambda row: (
+                -(row.get("sweet_spot") or {}).get("reliability_score", 0),
+                row.get("symbol") or "",
+            ),
+        )
+        approaching_rows = sorted(
+            [
+                row
+                for row in currency_rows
+                if (row.get("sweet_spot") or {}).get("combined_status")
+                in {
+                    "in_zone_risk_filtered",
+                    "approaching",
+                    "setup_waiting_confirmation",
+                }
+            ],
+            key=lambda row: (
+                -(row.get("sweet_spot") or {}).get("reliability_score", 0),
+                row.get("symbol") or "",
+            ),
+        )
+        items = [
+            {
+                "symbol": row.get("symbol"),
+                "score": (row.get("sweet_spot") or {}).get("reliability_score"),
+            }
+            for row in (*confirmed_rows, *approaching_rows)
+        ]
+        overview = pd.DataFrame(
+            [
+                {
+                    "Rang": index,
+                    "Symbol": item.get("symbol"),
+                    "Vollständiger Name": (
+                        rows_by_symbol.get(item.get("symbol")) or {}
+                    ).get("display_name_full"),
+                    "Status": (
+                        (rows_by_symbol.get(item.get("symbol")) or {}).get("sweet_spot")
+                        or {}
+                    ).get("combined_status"),
+                    "Evidenzqualität": item.get("score"),
+                    "Branche": (
+                        rows_by_symbol.get(item.get("symbol")) or {}
+                    ).get("industry_display"),
+                    "Land/Exposure": (
+                        rows_by_symbol.get(item.get("symbol")) or {}
+                    ).get("economic_exposure_country"),
+                }
+                for index, item in enumerate(items, 1)
+            ]
+        )
+        st.dataframe(overview, hide_index=True, width="stretch")
+        symbols = [
+            item.get("symbol")
+            for item in items
+            if item.get("symbol") in rows_by_symbol
+        ]
+        if symbols:
+            selected = st.selectbox("Detail", symbols, key="sweet_symbol")
+            _research_card(rows_by_symbol[selected], symbols.index(selected) + 1)
 
 with tabs[1]:
-    _render_insight_category("undervalued_quality", key="value")
+    _render_insight_category("daily_setups", key="daily")
 
 with tabs[2]:
-    _render_insight_category("analyst_potential", key="potential")
+    _render_insight_category("undervalued_quality", key="value")
 
 with tabs[3]:
-    _render_insight_category("entry_watchlist", key="entry")
+    _render_insight_category("analyst_potential", key="potential")
 
 with tabs[4]:
-    _render_insight_category("falling_knives", key="knives")
+    _render_insight_category("entry_watchlist", key="entry")
 
 with tabs[5]:
-    _render_insight_category("bottoming_watch", key="bottom")
+    _render_insight_category("falling_knives", key="knives")
 
 with tabs[6]:
-    _render_insight_category("risk_watch", key="risk")
+    _render_insight_category("bottoming_watch", key="bottom")
 
 with tabs[7]:
+    _render_insight_category("risk_watch", key="risk")
+
+with tabs[8]:
     columns = [
         "symbol",
         "name",
@@ -528,7 +729,7 @@ with tabs[7]:
             selected = st.selectbox("Detailansicht", symbols, key="search_detail")
             _research_card(rows_by_symbol[selected])
 
-with tabs[9]:
+with tabs[10]:
     st.warning(
         "Simulation is UNVALIDATED and performance is non-actionable. Orders fill only "
         "on a completed bar dated at least two UTC dates after order observation, with "
@@ -620,7 +821,7 @@ with tabs[9]:
         st.metric("Recorded commissions", f"${total_cost:,.2f}")
         st.dataframe(pd.DataFrame(fills[-50:]), hide_index=True, width="stretch")
 
-with tabs[10]:
+with tabs[11]:
     st.warning(
         "The deployed composite remains UNVALIDATED. The available backtest covers "
         "technical score only and must not be interpreted as alpha evidence."
@@ -647,7 +848,7 @@ with tabs[10]:
     else:
         st.info("No v2 backtest has been run.")
 
-with tabs[8]:
+with tabs[9]:
     st.subheader("Completed-bar age distribution")
     st.json(status.get("bar_age_distribution") or {})
     st.subheader("FX source status")

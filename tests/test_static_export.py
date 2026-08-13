@@ -7,6 +7,7 @@ from src.export_static import (
     MAX_STATIC_BYTES,
     STATIC_SCHEMA_VERSION,
     TARGET_STATIC_BYTES,
+    _hydrate_compact_sweet,
     export_static,
     validate_static_payload,
 )
@@ -35,6 +36,8 @@ class StaticExportTests(ProjectTempMixin, unittest.TestCase):
         self.assertGreater(len(loaded["instruments"]), 1000)
         self.assertIn("USD", loaded["rankings"])
         self.assertIn("daily_setups", loaded["insight_rankings"]["categories"])
+        self.assertIn("in_sweet_spot", loaded["insight_rankings"]["categories"])
+        self.assertIn("approaching_sweet_spot", loaded["insight_rankings"]["categories"])
         self.assertIn("entry_timing_score", loaded["instruments"][0])
         self.assertIn("downside_structure", loaded["instruments"][0])
         for field in (
@@ -47,6 +50,7 @@ class StaticExportTests(ProjectTempMixin, unittest.TestCase):
             "jurisdiction_risk",
             "valuation_thesis",
             "entry_thesis",
+            "sweet_spot",
         ):
             self.assertIn(field, loaded["instruments"][0])
         self.assertNotIn("trade_plan_long", loaded["instruments"][0])
@@ -56,6 +60,12 @@ class StaticExportTests(ProjectTempMixin, unittest.TestCase):
             loaded["instrument_contract"]["group_provenance"],
             "insight_metadata.provenance_catalog",
         )
+        self.assertEqual(
+            loaded["sweet_spot_contract"]["model_status"],
+            "heuristic_unvalidated",
+        )
+        self.assertFalse(loaded["sweet_spot_contract"]["actionable"])
+        self.assertIsInstance(loaded["sweet_spot_reason_catalog"], list)
         self.assertEqual(raw, expected)
         self.assertEqual(size, len(expected))
         self.assertLess(size, MAX_STATIC_BYTES)
@@ -117,6 +127,28 @@ class StaticExportTests(ProjectTempMixin, unittest.TestCase):
                 compact_row["jurisdiction_risk"]["reasons"],
                 source_row["jurisdiction_risk"]["reasons"],
             )
+            sweet = compact_row["sweet_spot"]
+            source_sweet = source_row["sweet_spot"]
+            hydrated_sweet = _hydrate_compact_sweet(
+                sweet,
+                reason_catalog=loaded["sweet_spot_reason_catalog"],
+                current_price=compact_row["price"],
+            )
+            self.assertEqual(
+                hydrated_sweet["combined_status"],
+                source_sweet["combined_status"],
+            )
+            self.assertEqual(hydrated_sweet["tone"], source_sweet["tone"])
+            self.assertEqual(hydrated_sweet["components"], source_sweet["components"])
+            if hydrated_sweet["available"]:
+                self.assertLess(
+                    hydrated_sweet["lower"],
+                    hydrated_sweet["ideal"],
+                )
+                self.assertLess(
+                    hydrated_sweet["ideal"],
+                    hydrated_sweet["upper"],
+                )
             self.assertEqual(
                 len(compact_row["scenario_long"]),
                 min(4, len(source_row["scenario_long"])),
@@ -165,6 +197,101 @@ class StaticExportTests(ProjectTempMixin, unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_static_payload(payload)
 
+    def test_static_validator_recomputes_green_invariants(self):
+        payload = export_static(DEFAULT_INPUT, self.work / "green-invariants.json")
+        row = next(
+            item
+            for item in payload["instruments"]
+            if (item.get("sweet_spot") or {}).get("combined_status")
+            == "in_zone_confirmed"
+            and item.get("asset_type") == "company_equity"
+        )
+        gate_fields = payload["sweet_spot_contract"]["gate_evidence_fields"]
+        gate_index = {name: index for index, name in enumerate(gate_fields)}
+        pivot_family_ref = payload["sweet_spot_contract"]["source_families"].index(
+            "pivot"
+        )
+
+        def evidence(name, value):
+            row["sweet_spot"]["gate_evidence"][gate_index[name]] = value
+
+        original = json.loads(json.dumps(row))
+        mutations = {
+            "outside": lambda: row.update(
+                {"price": row["sweet_spot"]["upper"] + 1}
+            ),
+            "stage4": lambda: evidence("weinstein_stage", 4),
+            "timing": lambda: row.update({"entry_timing_score": 54}),
+            "macd": lambda: (
+                evidence("macd_hist", -1.0),
+                evidence("macd_hist_prev", 0.0),
+                evidence("atr", 1.0),
+            ),
+            "stale": lambda: evidence("bar_age_days", 5),
+            "reliability": lambda: row["sweet_spot"].update(
+                {"reliability_score": 64.0}
+            ),
+            "families": lambda: (
+                [
+                    component.__setitem__(1, pivot_family_ref)
+                    for component in row["sweet_spot"]["components"]
+                ],
+                row["sweet_spot"].update({"independent_family_count": 1}),
+            ),
+            "investor": lambda: row["jurisdiction_risk"].update({"level": "high"}),
+        }
+        row_index = payload["instruments"].index(row)
+        for label, mutate in mutations.items():
+            with self.subTest(label=label):
+                payload["instruments"][row_index] = json.loads(json.dumps(original))
+                row = payload["instruments"][row_index]
+                mutate()
+                with self.assertRaises(ValueError):
+                    validate_static_payload(payload)
+        payload["instruments"][row_index] = original
+        validate_static_payload(payload)
+
+    def test_static_reference_only_cannot_claim_or_rank_as_green(self):
+        payload = export_static(DEFAULT_INPUT, self.work / "reference-only.json")
+        reference_tier_ref = payload["sweet_spot_contract"]["zone_tiers"].index(
+            "reference_only"
+        )
+        row = next(
+            item
+            for item in payload["instruments"]
+            if (item.get("sweet_spot") or {}).get("zone_tier_ref")
+            == reference_tier_ref
+        )
+        original = json.loads(json.dumps(row))
+        row["sweet_spot"].update(
+            {
+                "combined_status": "in_zone_confirmed",
+                "technical_status": "in_zone_confirmed",
+                "tone": "green",
+            }
+        )
+        with self.assertRaises(ValueError):
+            validate_static_payload(payload)
+
+        row.update(original)
+        categories = payload["insight_rankings"]["categories"]
+        source_item = next(
+            item
+            for items in categories["approaching_sweet_spot"][
+                "items_by_currency"
+            ].values()
+            for item in items
+        )
+        leaked = json.loads(json.dumps(source_item))
+        leaked["symbol"] = row["symbol"]
+        currency = row["currency"]
+        categories["approaching_sweet_spot"]["items_by_currency"].setdefault(
+            currency,
+            [],
+        ).append(leaked)
+        with self.assertRaises(ValueError):
+            validate_static_payload(payload)
+
         payload = export_static(DEFAULT_INPUT, self.work / "nested-row.json")
         payload["instruments"][0]["entry_thesis"]["actionable"] = True
         with self.assertRaises(ValueError):
@@ -181,6 +308,7 @@ class StaticExportTests(ProjectTempMixin, unittest.TestCase):
             "Bodenbildung",
             "Alle suchen",
             "Datenqualität",
+            "Sweet Spot",
         ):
             self.assertIn(label, html)
         self.assertIn("--cp-success", html)
@@ -199,6 +327,18 @@ class StaticExportTests(ProjectTempMixin, unittest.TestCase):
         self.assertIn("China-Risikokontext", html)
         self.assertIn("Warum es günstig aussieht", html)
         self.assertIn("Benötigte Bestätigung", html)
+        self.assertIn("Sweet-Spot-Beobachtungszone", html)
+        self.assertIn("technische Einstiegsbeobachtung", html)
+        self.assertIn("Beobachtungszone, keine Ordermarke", html)
+        self.assertIn("IDEAL", html)
+        self.assertIn("hydrateSweetSpotReasons", html)
+        self.assertIn("function priceDigits(values)", html)
+        self.assertIn("const $price =", html)
+        self.assertIn("$price(sweet.lower, zoneValues)", html)
+        self.assertIn("item.source_family", html)
+        self.assertIn("var(--cp-success)", html)
+        self.assertIn("var(--cp-warning)", html)
+        self.assertIn("var(--cp-danger)", html)
         self.assertIn("Vollständiger Name", html)
         self.assertIn("Hauptsitz (Provider)", html)
         self.assertIn("Juristischer Sitz (verifiziert)", html)

@@ -13,6 +13,12 @@ from .data_quality import (
 )
 from .identity import enrich_identity
 from .persistence import schema_meta, utc_now
+from .sweet_spot import FORMULA as SWEET_SPOT_FORMULA
+from .sweet_spot import MODEL_VERSION as SWEET_SPOT_MODEL_VERSION
+from .sweet_spot import SOURCE_FAMILY_DEFINITION
+from .sweet_spot import THRESHOLDS as SWEET_SPOT_THRESHOLDS
+from .sweet_spot import build_sweet_spot
+from .sweet_spot import confirmed_status_violations
 from .rating import (
     bottoming_signal,
     bull_thesis,
@@ -29,7 +35,7 @@ from .rating import (
 )
 
 INSIGHT_STATUS = "heuristic_unvalidated"
-INSIGHT_CONTRACT_VERSION = 2
+INSIGHT_CONTRACT_VERSION = 3
 MAX_CATEGORY_ITEMS = 20
 PROVENANCE_CATALOG = {
     "entry": ["completed-daily trend/momentum/volatility/support features"],
@@ -44,11 +50,24 @@ PROVENANCE_CATALOG = {
     "bottom": ["decline plus multi-signal stabilization observations"],
     "downside": ["price supports and ATR-scaled distance"],
     "trend": ["Weinstein stage, RSI, SMA50, MACD and earnings proximity"],
-    "zone": ["nearest support, ATR and current price"],
+    "sweet_spot": [
+        "completed-daily moving averages, prior pivot, Pivot S1, 20T low, ATR",
+        "explicit technical safety gates and separate company investor overlay",
+    ],
     "identity": ["provider identity, configured short name and listing metadata"],
     "jurisdiction": ["issuer domicile, listing venue and conservative exposure overrides"],
     "valuation_thesis": ["raw value/quality score and bounded visible risk penalties"],
     "entry_thesis": ["completed-daily momentum, trend, support, ATR and event context"],
+}
+SWEET_SPOT_CONTRACT = {
+    "model_status": INSIGHT_STATUS,
+    "model_version": SWEET_SPOT_MODEL_VERSION,
+    "actionable": False,
+    "formula": SWEET_SPOT_FORMULA,
+    "thresholds": SWEET_SPOT_THRESHOLDS,
+    "source_families": SOURCE_FAMILY_DEFINITION,
+    "currency": "USD",
+    "completed_daily_only": True,
 }
 
 _GENERIC_FUNDAMENTAL_EXCLUSIONS = (
@@ -729,28 +748,11 @@ def _potential_context(
     }
 
 
-def _observation_zone(
+def enrich_row(
     row: dict[str, Any],
-    downside: dict[str, Any] | None,
-) -> dict[str, Any] | None:
-    if not downside or not _finite(downside.get("support1")):
-        return None
-    support = downside["support1"]
-    atr = row.get("atr")
-    price = row.get("price")
-    if not (_finite(atr) and atr > 0 and _finite(price) and price > 0):
-        return None
-    return {
-        **_provenance(["support1", "atr", "price"]),
-        "label": "Technische Beobachtungszone",
-        "lower": support,
-        "upper": min(price, support + 0.5 * atr),
-        "currency_display": "USD",
-        "note": "Support/ATR observation only; not an entry order, target or stop.",
-    }
-
-
-def enrich_row(row: dict[str, Any]) -> dict[str, Any]:
+    *,
+    data_ready: bool | None = None,
+) -> dict[str, Any]:
     """Add insight fields without changing conservative core scores/rankings."""
     enrich_identity(row)
     for key in (
@@ -927,7 +929,8 @@ def enrich_row(row: dict[str, Any]) -> dict[str, Any]:
         analyst=analyst,
     )
     row["potential_context"] = potential
-    row["technical_observation_zone"] = _observation_zone(row, downside)
+    row.pop("technical_observation_zone", None)
+    row["sweet_spot"] = build_sweet_spot(row, data_ready=data_ready)
 
     row["bull_thesis"] = bull_thesis(narrative_row)
     row["priced_in_note"] = priced_in_note(narrative_row)
@@ -1038,6 +1041,8 @@ def build_insight_rankings(
     blockers: list[str] | None = None,
 ) -> dict[str, Any]:
     categories: dict[str, list[dict[str, Any]]] = {
+        "in_sweet_spot": [],
+        "approaching_sweet_spot": [],
         "daily_setups": [],
         "undervalued_quality": [],
         "analyst_potential": [],
@@ -1058,6 +1063,68 @@ def build_insight_rankings(
             warnings = row.get("risk_warnings") or []
             knife = row.get("falling_knife")
             bottom = row.get("bottoming")
+            sweet = row.get("sweet_spot") or {}
+
+            if sweet.get("combined_status") == "in_zone_confirmed":
+                violations = confirmed_status_violations(
+                    row,
+                    sweet,
+                    data_ready=enabled,
+                )
+                if violations:
+                    raise RuntimeError(
+                        "Confirmed sweet spot violates centralized invariants: "
+                        + "; ".join(violations)
+                    )
+                categories["in_sweet_spot"].append(
+                    _item(
+                        row,
+                        sweet.get("reliability_score") or 0,
+                        {
+                            "reliability": sweet.get("reliability_score"),
+                            "independent_family_count": sweet.get(
+                                "independent_family_count"
+                            ),
+                            "distance_to_ideal_pct": sweet.get("current_distance_pct"),
+                            "combined_status": sweet.get("combined_status"),
+                        },
+                        [
+                            *sweet.get("why_zone_here", []),
+                            *sweet.get("why_green_or_not", []),
+                        ],
+                        combined_status=sweet.get("combined_status"),
+                    )
+                )
+            elif (
+                sweet.get("zone_tier") == "confirmed_confluence"
+                and sweet.get("tone") == "amber"
+                and sweet.get("combined_status")
+                in {
+                    "in_zone_risk_filtered",
+                    "approaching",
+                    "setup_waiting_confirmation",
+                }
+            ):
+                categories["approaching_sweet_spot"].append(
+                    _item(
+                        row,
+                        sweet.get("reliability_score") or 0,
+                        {
+                            "reliability": sweet.get("reliability_score"),
+                            "independent_family_count": sweet.get(
+                                "independent_family_count"
+                            ),
+                            "distance_to_zone_pct": sweet.get("distance_to_zone_pct"),
+                            "combined_status": sweet.get("combined_status"),
+                        },
+                        [
+                            *sweet.get("why_green_or_not", []),
+                            *sweet.get("confirmation_needed", []),
+                            *sweet.get("investor_overlay_reasons", []),
+                        ],
+                        combined_status=sweet.get("combined_status"),
+                    )
+                )
 
             critical_warning = bool(
                 knife
@@ -1178,6 +1245,18 @@ def build_insight_rankings(
                 and not knife
                 and not bottom
                 and (row.get("trend_phase") or {}).get("tone") != "down"
+                and (
+                    (
+                        sweet.get("current_position") == "in"
+                        and sweet.get("combined_status")
+                        in {
+                            "in_zone_confirmed",
+                            "in_zone_risk_filtered",
+                            "setup_waiting_confirmation",
+                        }
+                    )
+                    or sweet.get("combined_status") == "approaching"
+                )
             ):
                 score = 0.65 * timing + 0.35 * (trend if _finite(trend) else 0)
                 entry_thesis = row.get("entry_thesis") or {}
@@ -1187,10 +1266,11 @@ def build_insight_rankings(
                         score,
                         {"entry_timing": timing, "trend": trend},
                         [
-                            *entry_thesis.get("why_timing_may_be_good", []),
-                            *entry_thesis.get("what_confirms", []),
+                            *sweet.get("why_green_or_not", []),
+                            *sweet.get("confirmation_needed", []),
                             *entry_thesis.get("strongest_counterarguments", []),
                         ],
+                        sweet_spot_status=sweet.get("combined_status"),
                     )
                 )
 
@@ -1279,6 +1359,18 @@ def build_insight_rankings(
                 )
 
     definitions = {
+        "in_sweet_spot": (
+            "Im Sweet Spot",
+            "Nur combined_status=in_zone_confirmed: Kurs in mathematischer Zone, "
+            "unabhängige Quellenfamilien >=2, Reliabilität >=65 und alle technischen sowie anwendbaren "
+            "Investor-Sicherheitsfilter passiert; Score = heuristische Evidenzqualität",
+        ),
+        "approaching_sweet_spot": (
+            "Sweet Spot – Beobachtung",
+            "Amber: <=1 ATR oberhalb der Zone, Bestätigung ausstehend oder technisch "
+            "in der Zone mit separat nicht passiertem Investor-Risikofilter; "
+            "Score = heuristische Evidenzqualität",
+        ),
         "daily_setups": (
             "Tages-Setups",
             "45% trend + 35% entry timing + 20% completed-daily context; "
@@ -1298,8 +1390,9 @@ def build_insight_rankings(
         ),
         "entry_watchlist": (
             "Timing-Beobachtung",
-            "65% entry timing + 35% trend; no negative daily context, falling knife "
-            "or high downside structure; valuation is not an entry reason",
+            "65% entry timing + 35% trend; mathematisch in der Sweet-Spot-Zone oder "
+            "<=1 ATR darüber, no negative daily context, falling knife or high "
+            "downside structure; valuation is not a technical timing reason",
         ),
         "falling_knives": (
             "Fallende Messer",
@@ -1341,8 +1434,9 @@ def enrich_rows_and_rankings(
     rankings_enabled: bool,
     blockers: list[str] | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    data_ready = rankings_enabled and not blockers
     for row in rows:
-        enrich_row(row)
+        enrich_row(row, data_ready=data_ready)
     return rows, build_insight_rankings(
         rows,
         enabled=rankings_enabled,
@@ -1394,7 +1488,11 @@ def enrich_snapshot(snapshot: dict[str, Any]) -> dict[str, Any]:
 
     enriched = copy.deepcopy(snapshot)
     status = enriched.get("data_status") or {}
-    enabled = status.get("status") == "ok" and status.get("data_actionable") is True
+    enabled = (
+        status.get("status") == "ok"
+        and status.get("data_actionable") is True
+        and not status.get("blocking_reasons")
+    )
     rows, rankings = enrich_rows_and_rankings(
         enriched["all"],
         rankings_enabled=enabled,
@@ -1424,6 +1522,7 @@ def enrich_snapshot(snapshot: dict[str, Any]) -> dict[str, Any]:
         "core_ranking_rows_rehydrated": True,
         "scenario_ranges_used_in_core_ranking": False,
         "provenance_catalog": PROVENANCE_CATALOG,
+        "sweet_spot_contract": SWEET_SPOT_CONTRACT,
     }
     enriched["schema_version"] = OUTPUT_SCHEMA_VERSION
     enriched["_meta"] = schema_meta(

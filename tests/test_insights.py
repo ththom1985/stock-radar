@@ -598,6 +598,122 @@ class InsightTests(unittest.TestCase):
         with self.assertRaises(DataContractError):
             validate_insight_contract(valid, [prescriptive])
 
+    def test_green_invariant_mutations_are_rejected_centrally(self):
+        row = base_row("GREEN")
+        row.update(
+            {
+                "completed_bars_only": True,
+                "bar_age_days": 1,
+                "sma20": 99.4,
+                "ema21": 99.7,
+                "sma50": 99.9,
+                "pivot": 100.1,
+                "pivot_s1": 98.0,
+                "low20": 94.0,
+            }
+        )
+        enrich_row(row, data_ready=True)
+        self.assertEqual(
+            row["sweet_spot"]["combined_status"],
+            "in_zone_confirmed",
+        )
+        valid = build_insight_rankings([row], enabled=True)
+        validate_insight_contract(valid, [row])
+
+        def collapse_families(mutated):
+            for component in mutated["sweet_spot"]["components"]:
+                component["source_family"] = "pivot"
+            mutated["sweet_spot"]["independent_family_count"] = 1
+
+        mutations = {
+            "outside_zone": lambda item: item.update(
+                {"price": item["sweet_spot"]["upper"] + item["atr"]}
+            ),
+            "technical_status": lambda item: item["sweet_spot"].update(
+                {"technical_status": "approaching"}
+            ),
+            "knife": lambda item: item.update(
+                {"falling_knife": {"warning": "active"}}
+            ),
+            "bottoming": lambda item: item.update(
+                {"bottoming": {"speculative": True}}
+            ),
+            "stage4": lambda item: item.update({"weinstein_stage": 4}),
+            "top_danger": lambda item: item["trend_phase"].update(
+                {"phase": "Spätphase (Top-Gefahr)"}
+            ),
+            "longterm": lambda item: item.update({"longterm_score": 59.0}),
+            "timing": lambda item: item.update({"entry_timing_score": 54.0}),
+            "daily": lambda item: item.update(
+                {"daily_signal_direction": "NEGATIVE"}
+            ),
+            "macd": lambda item: item.update(
+                {"macd_hist": -1.0, "macd_hist_prev": 0.0}
+            ),
+            "rsi": lambda item: item.update({"rsi": 71.0}),
+            "downside": lambda item: item["downside_structure"].update(
+                {"risk": "hoch"}
+            ),
+            "atr_pct": lambda item: item.update({"atr_pct": 5.1}),
+            "annual_volatility": lambda item: item.update(
+                {"vol_annual_pct": 60.1}
+            ),
+            "earnings": lambda item: item.update({"earnings_in_days": 7}),
+            "stale_bar": lambda item: item.update({"bar_age_days": 5}),
+            "partial_bar": lambda item: item.update(
+                {"completed_bars_only": False}
+            ),
+            "reliability": lambda item: item["sweet_spot"].update(
+                {"reliability_score": 64.0}
+            ),
+            "families": collapse_families,
+            "investor_overlay": lambda item: item["jurisdiction_risk"].update(
+                {"level": "high"}
+            ),
+        }
+        for label, mutate in mutations.items():
+            with self.subTest(label=label):
+                mutated = copy.deepcopy(row)
+                mutate(mutated)
+                with self.assertRaises(DataContractError):
+                    validate_insight_contract(valid, [mutated])
+
+    def test_reference_only_tier_cannot_claim_green(self):
+        row = base_row("REFERENCE")
+        row.update(
+            {
+                "completed_bars_only": True,
+                "bar_age_days": 1,
+                "sma20": None,
+                "ema21": None,
+                "sma50": 95.0,
+                "sma150": None,
+                "sma200": None,
+                "pivot": None,
+                "pivot_s1": None,
+                "low20": None,
+                "weinstein_stage": 4,
+            }
+        )
+        enrich_row(row, data_ready=True)
+        self.assertEqual(row["sweet_spot"]["zone_tier"], "reference_only")
+        valid = build_insight_rankings([row], enabled=True)
+        validate_insight_contract(valid, [row])
+
+        mutated = copy.deepcopy(row)
+        mutated["sweet_spot"].update(
+            {
+                "combined_status": "in_zone_confirmed",
+                "technical_status": "in_zone_confirmed",
+                "tone": "green",
+                "why_green_or_not": [
+                    "Kurs liegt in der Zone und alle anwendbaren Sicherheits-Gates sind passiert."
+                ],
+            }
+        )
+        with self.assertRaises(DataContractError):
+            validate_insight_contract(valid, [mutated])
+
     def test_provider_free_snapshot_migration_preserves_core_rank(self):
         row = base_row()
         second = base_row("BBB")

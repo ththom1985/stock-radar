@@ -9,12 +9,15 @@ from statistics import median
 from typing import Any
 
 from .persistence import SCHEMA_VERSION
+from .sweet_spot import confirmed_status_violations, green_invariant_blockers
 
 
 OUTPUT_SCHEMA = "stock-radar-output"
 OUTPUT_SCHEMA_VERSION = 3
-INSIGHT_CONTRACT_VERSION = 2
+INSIGHT_CONTRACT_VERSION = 3
 REQUIRED_INSIGHT_CATEGORIES = (
+    "in_sweet_spot",
+    "approaching_sweet_spot",
     "daily_setups",
     "undervalued_quality",
     "analyst_potential",
@@ -78,7 +81,7 @@ _RESEARCH_LANGUAGE_FIELDS = (
     "bottoming",
     "bull_thesis",
     "priced_in_note",
-    "technical_observation_zone",
+    "sweet_spot",
     "trade_plan_long",
     "trade_plan_short",
     "urgency",
@@ -248,6 +251,7 @@ def validate_insight_contract(
         required_groups = (
             "entry_timing",
             "entry_thesis",
+            "sweet_spot",
             "analyst_context",
             "valuation_context",
             "valuation_thesis",
@@ -271,7 +275,6 @@ def validate_insight_contract(
             "trend_phase",
             "research_summary",
             "research_actions",
-            "technical_observation_zone",
             "display_name_full",
             "short_name",
             "provider_country",
@@ -310,7 +313,6 @@ def validate_insight_contract(
                 "bottoming",
                 "downside_structure",
                 "trend_phase",
-                "technical_observation_zone",
             ):
                 if row[optional_group] is not None:
                     _require_heuristic_group(
@@ -411,6 +413,181 @@ def validate_insight_contract(
                     isinstance(item, str) for item in entry_thesis[key]
                 ):
                     raise DataContractError("entry thesis narratives are invalid")
+            sweet = row["sweet_spot"]
+            for key in (
+                "why_zone_here",
+                "why_green_or_not",
+                "confirmation_needed",
+                "invalidation_signals",
+                "investor_overlay_reasons",
+            ):
+                if not isinstance(sweet.get(key), list) or not all(
+                    isinstance(item, str) for item in sweet[key]
+                ):
+                    raise DataContractError("sweet-spot narratives are invalid")
+            if (
+                not isinstance(sweet.get("available"), bool)
+                or sweet.get("currency") != "USD"
+                or sweet.get("technical_status")
+                not in {
+                    "unavailable",
+                    "in_zone_confirmed",
+                    "approaching",
+                    "setup_waiting_confirmation",
+                    "safety_blocked",
+                    "broken_below",
+                    "far_above",
+                    "reference_only_far",
+                }
+                or sweet.get("combined_status")
+                not in {
+                    "unavailable",
+                    "in_zone_confirmed",
+                    "in_zone_risk_filtered",
+                    "approaching",
+                    "setup_waiting_confirmation",
+                    "safety_blocked",
+                    "broken_below",
+                    "far_above",
+                    "reference_only_far",
+                }
+                or sweet.get("tone") not in {"green", "amber", "red", "neutral"}
+                or sweet.get("zone_tier")
+                not in {
+                    "confirmed_confluence",
+                    "single_anchor",
+                    "reference_only",
+                    "unavailable",
+                }
+                or not isinstance(sweet.get("confluence_count"), int)
+                or sweet["confluence_count"] < 0
+                or not isinstance(sweet.get("independent_family_count"), int)
+                or sweet["independent_family_count"] < 0
+                or not isinstance(sweet.get("reliability_score"), (int, float))
+                or not math.isfinite(sweet["reliability_score"])
+                or not 0 <= sweet["reliability_score"] <= 100
+                or not isinstance(sweet.get("components"), list)
+                or sweet.get("current_position")
+                not in {"below", "in", "above", "unavailable"}
+            ):
+                raise DataContractError("sweet-spot status contract is invalid")
+            if any(
+                not isinstance(component, dict)
+                or not isinstance(component.get("label"), str)
+                or component.get("source_family")
+                not in {
+                    "pivot",
+                    "moving_average_fast",
+                    "moving_average_medium",
+                    "moving_average_long",
+                    "price_structure",
+                }
+                or not isinstance(component.get("value"), (int, float))
+                or not math.isfinite(component["value"])
+                or component["value"] <= 0
+                or not isinstance(component.get("distance_atr"), (int, float))
+                or not math.isfinite(component["distance_atr"])
+                or not isinstance(component.get("weight"), (int, float))
+                or not math.isfinite(component["weight"])
+                or component["weight"] <= 0
+                for component in sweet["components"]
+            ):
+                raise DataContractError("sweet-spot components are invalid")
+            expected_tone = {
+                "in_zone_confirmed": "green",
+                "in_zone_risk_filtered": "amber",
+                "approaching": "amber",
+                "setup_waiting_confirmation": "amber",
+                "safety_blocked": "red",
+                "broken_below": "red",
+                "far_above": "neutral",
+                "reference_only_far": "neutral",
+                "unavailable": "neutral",
+            }[sweet["combined_status"]]
+            if sweet["tone"] != expected_tone:
+                raise DataContractError("sweet-spot tone/status mapping is invalid")
+            if sweet["available"]:
+                lower, ideal, upper = (
+                    sweet.get("lower"),
+                    sweet.get("ideal"),
+                    sweet.get("upper"),
+                )
+                if (
+                    not all(
+                        isinstance(value, (int, float))
+                        and math.isfinite(value)
+                        and value > 0
+                        for value in (lower, ideal, upper)
+                    )
+                    or not lower < ideal < upper
+                    or not isinstance(sweet.get("zone_width_pct"), (int, float))
+                    or sweet["zone_width_pct"] <= 0
+                    or len(sweet["components"]) != sweet["confluence_count"]
+                    or len(
+                        {
+                            component["source_family"]
+                            for component in sweet["components"]
+                        }
+                    )
+                    != sweet["independent_family_count"]
+                ):
+                    raise DataContractError("sweet-spot zone geometry is invalid")
+                tier = sweet["zone_tier"]
+                if tier == "confirmed_confluence" and sweet[
+                    "independent_family_count"
+                ] < 2:
+                    raise DataContractError(
+                        "confirmed-confluence tier needs two independent families"
+                    )
+                if tier in {"single_anchor", "reference_only"} and (
+                    sweet["confluence_count"] != 1
+                    or sweet["independent_family_count"] != 1
+                    or sweet["reliability_score"] > 49
+                    or sweet["combined_status"] == "in_zone_confirmed"
+                ):
+                    raise DataContractError("single-anchor tier safety is invalid")
+                if tier == "reference_only" and sweet["combined_status"] not in {
+                    "reference_only_far",
+                    "safety_blocked",
+                }:
+                    raise DataContractError(
+                        "reference-only tier has an invalid combined status"
+                    )
+            elif any(
+                sweet.get(key) is not None for key in ("lower", "ideal", "upper")
+            ):
+                raise DataContractError("unavailable sweet spot exposes numeric zone")
+            elif sweet.get("zone_tier") != "unavailable":
+                raise DataContractError("unavailable sweet spot has invalid tier")
+            expected_blockers = green_invariant_blockers(
+                row,
+                sweet,
+                data_ready=insight["enabled"],
+            )
+            expected_reasons = list(
+                dict.fromkeys(reason for _, reason in expected_blockers)
+            )
+            actual_reasons = sweet["why_green_or_not"]
+            if expected_reasons:
+                if actual_reasons != expected_reasons:
+                    raise DataContractError(
+                        "sweet-spot blockers do not match recomputed failed gates"
+                    )
+            elif actual_reasons != [
+                "Kurs liegt in der Zone und alle anwendbaren Sicherheits-Gates sind passiert."
+            ]:
+                raise DataContractError("sweet-spot green explanation is inconsistent")
+            if sweet.get("combined_status") == "in_zone_confirmed":
+                violations = confirmed_status_violations(
+                    row,
+                    sweet,
+                    data_ready=insight["enabled"],
+                )
+                if violations:
+                    raise DataContractError(
+                        "confirmed sweet spot violates safety gates: "
+                        + "; ".join(violations)
+                    )
             if _has_actionable_true(
                 {key: row[key] for key in (*required_groups, *required_fields)}
             ):
@@ -425,6 +602,39 @@ def validate_insight_contract(
                 if any(item["symbol"] not in row_symbols for item in items):
                     raise DataContractError(
                         "Insight category references an unknown instrument"
+                    )
+        confirmed_symbols = {
+            item["symbol"]
+            for items in categories["in_sweet_spot"]["items_by_currency"].values()
+            for item in items
+        }
+        approaching_symbols = {
+            item["symbol"]
+            for items in categories["approaching_sweet_spot"][
+                "items_by_currency"
+            ].values()
+            for item in items
+        }
+        for row in rows:
+            if (
+                (row.get("sweet_spot") or {}).get("zone_tier")
+                == "reference_only"
+                and row.get("symbol")
+                in confirmed_symbols | approaching_symbols
+            ):
+                raise DataContractError(
+                    "reference-only zone leaked into a sweet-spot category"
+                )
+            if row.get("symbol") in confirmed_symbols:
+                violations = confirmed_status_violations(
+                    row,
+                    row.get("sweet_spot") or {},
+                    data_ready=insight["enabled"],
+                )
+                if violations:
+                    raise DataContractError(
+                        "confirmed sweet-spot category violates row safety contract: "
+                        + "; ".join(violations)
                     )
     return insight
 
@@ -637,6 +847,15 @@ def validate_output_contract(data: Any) -> dict[str, Any]:
         or _has_actionable_true(insight_metadata)
     ):
         raise DataContractError("Insight metadata contract is invalid")
+    sweet_metadata = insight_metadata.get("sweet_spot_contract")
+    if sweet_metadata is not None and (
+        not isinstance(sweet_metadata, dict)
+        or sweet_metadata.get("model_status") != "heuristic_unvalidated"
+        or sweet_metadata.get("actionable") is not False
+        or not isinstance(sweet_metadata.get("formula"), str)
+        or not isinstance(sweet_metadata.get("thresholds"), dict)
+    ):
+        raise DataContractError("Sweet-spot metadata contract is invalid")
     expected_insight_enabled = (
         status["status"] == "ok"
         and status["data_actionable"] is True
@@ -673,6 +892,7 @@ def validate_output_contract(data: Any) -> dict[str, Any]:
             "valuation_context",
             "valuation_thesis",
             "entry_thesis",
+            "sweet_spot",
         )
         for members in by_asset.values():
             for member in members:

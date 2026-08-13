@@ -76,6 +76,10 @@
     .subtitle, .muted { color: var(--cp-text-muted); }
     .status-chip, .badge { border: 1px solid var(--cp-border); border-radius: 999px; padding: 6px 10px; font-weight: 700; font-size: 12px; }
     .status-chip { border-color: var(--cp-warning); }
+    .badge.green { border-color: var(--cp-success); color: var(--cp-success); }
+    .badge.amber { border-color: var(--cp-warning); color: var(--cp-warning); }
+    .badge.red { border-color: var(--cp-danger); color: var(--cp-danger); }
+    .badge.neutral { border-color: var(--cp-border-strong); color: var(--cp-text-muted); }
     .metrics { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin: 18px 0; }
     .metric, .panel, .detail { background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 14px; }
     .metric { padding: 14px; }
@@ -104,6 +108,18 @@
     .stat span { display: block; color: var(--cp-text-muted); font-size: 11px; margin-bottom: 3px; }
     .stat strong { overflow-wrap: anywhere; }
     .summary { border-left: 4px solid var(--cp-accent); padding: 10px 12px; line-height: 1.55; margin: 14px 0; background: var(--cp-surface-soft); }
+    .sweet-zone { border: 1px solid var(--cp-border); border-left-width: 5px; border-radius: 12px; padding: 13px; margin: 14px 0; background: var(--cp-surface-soft); }
+    .sweet-zone.green { border-left-color: var(--cp-success); }
+    .sweet-zone.amber { border-left-color: var(--cp-warning); }
+    .sweet-zone.red { border-left-color: var(--cp-danger); }
+    .sweet-zone.neutral { border-left-color: var(--cp-border-strong); }
+    .sweet-zone-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .sweet-values { font-size: 18px; font-weight: 800; margin: 10px 0 4px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .chip { border: 1px solid var(--cp-border); border-radius: 999px; padding: 4px 8px; font-size: 11px; color: var(--cp-text-muted); background: var(--cp-surface); }
+    .sweet-green { color: var(--cp-success); }
+    .sweet-amber { color: var(--cp-warning); }
+    .sweet-red { color: var(--cp-danger); }
     .section { margin-top: 16px; }
     .section h3 { font-size: 15px; margin-bottom: 7px; }
     .callout { padding: 9px 11px; border: 1px solid var(--cp-border); border-left-width: 4px; border-radius: 8px; margin: 7px 0; line-height: 1.4; }
@@ -160,7 +176,8 @@
       </section>
       <div class="notice">Keine Anlageberatung. Alle Insights sind <strong>heuristic_unvalidated</strong>, nicht handlungsleitend und keine Prognosen, Wahrscheinlichkeiten oder Kauf-/Verkaufsempfehlungen. Szenarien fließen nicht in das Core-Ranking ein.</div>
       <nav id="nav" class="nav">
-        <button class="nav-button active" data-view="daily_setups">Tages-Setups</button>
+        <button class="nav-button active" data-view="sweet_spot">Sweet Spot</button>
+        <button class="nav-button" data-view="daily_setups">Tages-Setups</button>
         <button class="nav-button" data-view="undervalued_quality">Unterbewertet</button>
         <button class="nav-button" data-view="analyst_potential">Potenzial</button>
         <button class="nav-button" data-view="entry_watchlist">Einstiegs-Timing</button>
@@ -194,9 +211,10 @@
   </main>
   <script>
     const MAX_OUTPUT_AGE_HOURS = 36;
-    const state = { data: null, bySymbol: new Map(), view: "daily_setups", selected: null, gateFailures: [] };
+    const state = { data: null, bySymbol: new Map(), view: "sweet_spot", selected: null, gateFailures: [] };
     const $ = (id) => document.getElementById(id);
     const categoryTitles = {
+      sweet_spot: "Sweet-Spot-Beobachtungszone",
       daily_setups: "Tages-Setups",
       undervalued_quality: "Unterbewertet",
       analyst_potential: "Analysten-Potenzial",
@@ -210,13 +228,113 @@
     const assetLabels = { company_equity: "Aktie", etf_fund: "ETF/Fonds", crypto: "Krypto", index_other: "Index/Sonstige", unknown: "Unbekannt" };
     const $number = (value, digits = 2) => Number.isFinite(value) ? new Intl.NumberFormat("de-DE", { maximumFractionDigits: digits }).format(value) : "–";
     const percent = (value, digits = 1) => Number.isFinite(value) ? `${$number(value, digits)} %` : "–";
+    function priceDigits(values) {
+      const finite = values.filter(Number.isFinite);
+      if (!finite.length) return 2;
+      const magnitude = Math.max(...finite.map((value) => Math.abs(value)));
+      const positive = finite.filter((value) => value !== 0).map(Math.abs);
+      const smallBase = positive.length ? Math.max(6, -Math.floor(Math.log10(Math.min(...positive))) + 4) : 8;
+      const base = magnitude >= 10 ? 2 : magnitude >= 1 ? 3 : magnitude >= 0.01 ? 4 : smallBase;
+      const distinct = new Set(finite.map(String)).size;
+      for (let digits = base; digits <= 14; digits += 1) {
+        if (new Set(finite.map((value) => value.toFixed(digits))).size === distinct) return digits;
+      }
+      return 14;
+    }
+    const $price = (value, context = []) => {
+      if (!Number.isFinite(value)) return "–";
+      const digits = priceDigits([...context, value]);
+      return new Intl.NumberFormat("de-DE", { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(value);
+    };
     const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[char]));
-    const category = () => state.data.insight_rankings?.categories?.[state.view] || null;
+    const category = () => state.view === "sweet_spot"
+      ? { formula: "Bestätigtes Grün zuerst, danach Amber-Beobachtungen; Score = heuristische Evidenzqualität, keine Wahrscheinlichkeit" }
+      : state.data.insight_rankings?.categories?.[state.view] || null;
 
     function hasActionableTrue(value) {
       if (!value || typeof value !== "object") return false;
       if (value.actionable === true) return true;
       return Object.values(value).some(hasActionableTrue);
+    }
+
+    function hydrateSweetSpotReasons(data) {
+      const catalog = data.sweet_spot_reason_catalog || [];
+      const contract = data.sweet_spot_contract || {};
+      const fields = contract.reason_catalog_fields || [];
+      const defaults = contract.row_defaults || {};
+      const componentLabels = contract.component_labels || [];
+      const sourceFamilies = contract.source_families || [];
+      const zoneTiers = contract.zone_tiers || [];
+      const anchorScopes = contract.anchor_scopes || [];
+      const anchorDistanceClasses = contract.anchor_distance_classes || [];
+      const resolve = (value) => Number.isInteger(value) ? catalog[value] : value;
+      for (const row of data.instruments || []) {
+        const sweet = row.sweet_spot;
+        if (!sweet || typeof sweet !== "object") continue;
+        Object.entries(defaults).forEach(([key, value]) => {
+          if (!(key in sweet)) sweet[key] = value;
+        });
+        fields.forEach((field) => {
+          sweet[field] = (sweet[field] || []).map(resolve);
+        });
+        if (sweet.valuation_alignment && "note_ref" in sweet.valuation_alignment) {
+          sweet.valuation_alignment.note = resolve(sweet.valuation_alignment.note_ref);
+          delete sweet.valuation_alignment.note_ref;
+        }
+        sweet.components = (sweet.components || []).map(([labelRef, familyRef, value, distanceAtr, weight]) => ({
+          label: componentLabels[labelRef],
+          source_family: sourceFamilies[familyRef],
+          value,
+          distance_atr: distanceAtr,
+          weight
+        }));
+        if (Array.isArray(sweet.nearest_support)) {
+          const [labelRef, familyRef, value, distanceAtr] = sweet.nearest_support;
+          sweet.nearest_support = {
+            label: componentLabels[labelRef],
+            source_family: sourceFamilies[familyRef],
+            value,
+            distance_atr: distanceAtr
+          };
+        }
+        sweet.zone_tier = zoneTiers[sweet.zone_tier_ref];
+        sweet.anchor_scope = Number.isInteger(sweet.anchor_scope_ref)
+          ? anchorScopes[sweet.anchor_scope_ref]
+          : null;
+        sweet.anchor_distance_class = Number.isInteger(sweet.anchor_distance_class_ref)
+          ? anchorDistanceClasses[sweet.anchor_distance_class_ref]
+          : null;
+        delete sweet.zone_tier_ref;
+        delete sweet.anchor_scope_ref;
+        delete sweet.anchor_distance_class_ref;
+        sweet.current_price = row.price;
+        sweet.confluence_count = sweet.components.length;
+        sweet.independent_family_count = new Set(sweet.components.map((component) => component.source_family)).size;
+        sweet.available = sweet.zone_tier !== "unavailable";
+        sweet.tone = {
+          in_zone_confirmed: "green",
+          in_zone_risk_filtered: "amber",
+          approaching: "amber",
+          setup_waiting_confirmation: "amber",
+          safety_blocked: "red",
+          broken_below: "red",
+          far_above: "neutral",
+          reference_only_far: "neutral",
+          unavailable: "neutral"
+        }[sweet.combined_status];
+        if (sweet.available) {
+          sweet.current_position = row.price < sweet.lower ? "below" : row.price > sweet.upper ? "above" : "in";
+          sweet.zone_width_pct = (sweet.upper - sweet.lower) / sweet.ideal * 100;
+          sweet.current_distance_pct = (row.price / sweet.ideal - 1) * 100;
+          sweet.distance_to_zone_pct = row.price > sweet.upper
+            ? (row.price / sweet.upper - 1) * 100
+            : row.price < sweet.lower
+              ? (row.price / sweet.lower - 1) * 100
+              : 0;
+        } else {
+          sweet.current_position = "unavailable";
+        }
+      }
     }
 
     function staticGateFailures(data, nowMs = Date.now()) {
@@ -237,7 +355,7 @@
       if (insights.model_status !== "heuristic_unvalidated" || insights.actionable !== false || insights.enabled !== true) failures.push("Insight-Gate ist nicht freigegeben.");
       if (hasActionableTrue(insights)) failures.push("Verschachteltes actionable=true erkannt.");
       if (instrumentContract.model_status !== "heuristic_unvalidated" || instrumentContract.actionable !== false) failures.push("Kompakter Instrumentvertrag ist nicht sicher.");
-      const identityFields = ["display_name_full", "short_name", "headquarters_country", "legal_domicile", "listing_country", "listing_market", "economic_exposure_country", "sector_display", "industry_display", "jurisdiction_risk", "valuation_context", "valuation_thesis", "entry_thesis", "analyst_context"];
+      const identityFields = ["display_name_full", "short_name", "headquarters_country", "legal_domicile", "listing_country", "listing_market", "economic_exposure_country", "sector_display", "industry_display", "jurisdiction_risk", "valuation_context", "valuation_thesis", "entry_thesis", "sweet_spot", "analyst_context"];
       for (const row of data?.instruments || []) {
         if (!identityFields.every((field) => Object.prototype.hasOwnProperty.call(row, field))) failures.push(`Identitäts-/Thesenfelder fehlen bei ${row.symbol || "unbekannt"}.`);
         for (const group of [row.jurisdiction_risk, row.valuation_thesis, row.entry_thesis]) {
@@ -261,7 +379,21 @@
           symbol: row.symbol, score: row.radar_score, reasons: [row.research_summary || ""], components: {}
         }));
       }
-      let items = category()?.items_by_currency?.[currency] || [];
+      let items;
+      if (state.view === "sweet_spot") {
+        const toItem = (row) => ({
+          symbol: row.symbol,
+          score: row.sweet_spot?.reliability_score,
+          reasons: row.sweet_spot?.why_green_or_not || [],
+          components: { combined_status: row.sweet_spot?.combined_status }
+        });
+        const byEvidence = (a, b) => (b.sweet_spot?.reliability_score || 0) - (a.sweet_spot?.reliability_score || 0) || String(a.symbol).localeCompare(String(b.symbol));
+        const confirmed = state.data.instruments.filter((row) => row.currency === currency && row.sweet_spot?.combined_status === "in_zone_confirmed").sort(byEvidence);
+        const approaching = state.data.instruments.filter((row) => row.currency === currency && ["in_zone_risk_filtered", "approaching", "setup_waiting_confirmation"].includes(row.sweet_spot?.combined_status)).sort(byEvidence);
+        items = [...confirmed, ...approaching].map(toItem);
+      } else {
+        items = category()?.items_by_currency?.[currency] || [];
+      }
       if (query) {
         items = items.filter((item) => {
           const row = state.bySymbol.get(item.symbol) || {};
@@ -287,7 +419,7 @@
         const row = state.bySymbol.get(item.symbol) || {};
         return `<button class="list-row ${item.symbol === state.selected ? "selected" : ""}" data-symbol="${escapeHtml(item.symbol)}">
           <span>${index + 1}</span><span class="symbol">${escapeHtml(item.symbol)}</span>
-          <span title="${escapeHtml(row.display_name_full || row.short_name || row.symbol || "")}"><strong class="row-name">${escapeHtml(row.display_name_full || row.short_name || "")}</strong><small class="row-meta">${escapeHtml(row.economic_exposure_country || row.headquarters_country || "Exposure n. v.")} · ${escapeHtml(row.industry_display || "Branche n. v.")}</small></span>
+          <span title="${escapeHtml(row.display_name_full || row.short_name || row.symbol || "")}"><strong class="row-name">${escapeHtml(row.display_name_full || row.short_name || "")}</strong><small class="row-meta">${escapeHtml(row.economic_exposure_country || row.headquarters_country || "Exposure n. v.")} · ${escapeHtml(row.industry_display || "Branche n. v.")}</small><small class="row-meta sweet-${escapeHtml(row.sweet_spot?.tone || "neutral")}">${escapeHtml(row.sweet_spot?.combined_status || "unavailable")}</small></span>
           <span class="score">${$number(item.score, 0)}${state.view === "undervalued_quality" ? `<small class="row-meta">adjustiert</small>` : ""}</span>
         </button>`;
       }).join("");
@@ -317,6 +449,7 @@
       const valuation = row.valuation_context || {};
       const valuationThesis = row.valuation_thesis || {};
       const entryThesis = row.entry_thesis || {};
+      const sweet = row.sweet_spot || {};
       const jurisdiction = row.jurisdiction_risk || {};
       const phase = row.trend_phase || {};
       const scenarios = (row.scenario_long || []).map((item) => `<div class="scenario">
@@ -337,6 +470,32 @@
       const news = (row.news || []).map((item) => `<div class="headline">${escapeHtml(item.published_at || "")} · ${
         item.link ? `<a href="${escapeHtml(item.link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.title || "")}</a>` : escapeHtml(item.title || "")
       }</div>`).join("");
+      const sweetStatus = {
+        in_zone_confirmed: "Im Sweet Spot",
+        in_zone_risk_filtered: "In Zone, Investor-Risiko gefiltert",
+        approaching: "Nähert sich der Zone",
+        setup_waiting_confirmation: "Bestätigung ausstehend",
+        safety_blocked: "Sicherheitsfilter blockiert",
+        broken_below: "Unter Invalidation Reference",
+        far_above: "Weit oberhalb der Zone",
+        reference_only_far: "Nur Referenzzone",
+        unavailable: "Zone nicht verfügbar"
+      }[sweet.combined_status] || sweet.combined_status || "Zone nicht verfügbar";
+      const zoneValues = [sweet.lower, sweet.ideal, sweet.upper];
+      const sweetChips = (sweet.components || []).map((item) =>
+        `<span class="chip">${escapeHtml(item.label)} · ${escapeHtml(item.source_family)} · ${$price(item.value, [...zoneValues, item.value])} USD · ${$number(item.distance_atr, 2)} ATR</span>`
+      ).join("");
+      const tierNotice = sweet.zone_tier === "reference_only"
+        ? `<div class="callout">Nur Einzelanker, keine Confluence · ${escapeHtml(sweet.anchor_scope || "reference")} / ${escapeHtml(sweet.anchor_distance_class || "unclassified")} · mathematische Referenzzone, Bestätigung fehlt.</div>`
+        : "";
+      const sweetPanel = sweet.available ? `<div class="sweet-zone ${escapeHtml(sweet.tone || "neutral")}">
+        <div class="sweet-zone-head"><div><strong>Sweet-Spot-Beobachtungszone</strong><div class="muted">technische Einstiegsbeobachtung</div></div><span class="badge ${escapeHtml(sweet.tone || "neutral")}">${escapeHtml(sweetStatus)}</span></div>
+        <div class="sweet-values">${$price(sweet.lower, zoneValues)} – IDEAL ${$price(sweet.ideal, zoneValues)} – ${$price(sweet.upper, zoneValues)} USD</div>
+        <div>Kurs ${$price(row.price, [...zoneValues, row.price])} USD · Abstand zu IDEAL ${percent(sweet.current_distance_pct)} · Abstand zur Zone ${percent(sweet.distance_to_zone_pct)} · Reliabilität ${$number(sweet.reliability_score, 0)}/100 · ${sweet.independent_family_count} ${sweet.independent_family_count === 1 ? "Quellenfamilie" : "Quellenfamilien"}</div>
+        <div class="chips">${sweetChips}</div>
+        ${tierNotice}
+        <div class="muted">Beobachtungszone, keine Ordermarke · ${escapeHtml(sweet.valuation_alignment?.note || "")}</div>
+      </div>` : `<div class="sweet-zone neutral"><div class="sweet-zone-head"><strong>Sweet-Spot-Beobachtungszone</strong><span class="badge neutral">Nicht verfügbar</span></div><div class="muted">Keine belastbare Referenzzone; es werden keine Marken erzeugt. Beobachtungszone, keine Ordermarke.</div></div>`;
       $("detail").innerHTML = `
         <div class="detail-head"><div><div class="eyebrow">Vollständiger Name</div><h2>${escapeHtml(row.display_name_full || row.short_name || row.symbol || "")}</h2><div class="symbol">${escapeHtml(row.symbol)}</div>
         <div class="muted">Branche: ${escapeHtml(row.industry_display || "nicht verfügbar")} · Sektor: ${escapeHtml(row.sector_display || "nicht verfügbar")}</div>
@@ -345,6 +504,12 @@
         <div class="muted">Börsenland/Markt: ${escapeHtml(row.listing_country || "nicht verfügbar")} / ${escapeHtml(row.listing_market || "nicht verfügbar")}</div>
         <div class="muted">${escapeHtml(assetLabels[row.asset_type] || row.asset_type)} · ${escapeHtml(row.currency || "")} · Bar ${escapeHtml(row.bar_date || "–")}</div></div>
         <span class="badge">${$number(row.entry_timing_score, 0)}/100 Timing</span></div>
+        ${sweetPanel}
+        ${thesisList("Warum diese Zone", sweet.why_zone_here)}
+        ${thesisList("Warum Grün oder nicht", sweet.why_green_or_not, sweet.tone === "green" ? "success" : sweet.tone === "red" ? "danger" : "warning")}
+        ${thesisList("Was bestätigt", sweet.confirmation_needed)}
+        ${thesisList("Was invalidiert", sweet.invalidation_signals, "danger")}
+        ${thesisList("Investor-Overlay", sweet.investor_overlay_reasons, "warning")}
         ${row.economic_exposure_country === "China" ? `<div class="section"><h3>China-Risikokontext</h3>${(jurisdiction.reasons || []).map((reason) => callout(reason, "danger")).join("")}<div class="muted">${escapeHtml(jurisdiction.heuristic_note || "")}</div></div>` : ""}
         <div class="summary"><strong>Research-Fazit:</strong> ${escapeHtml(row.research_summary || row.heuristic_summary || "–")}</div>
         <div class="detail-grid">
@@ -373,7 +538,6 @@
         </div>
         <div class="section"><h3>Abwärtsstruktur und Beobachtungszone</h3>
           <div class="callout ${downside.risk === "hoch" ? "danger" : "warning"}">Risiko ${escapeHtml(downside.risk || "–")} · ${escapeHtml(downside.verdict || "–")} · Support ${$number(downside.support1)} USD (${percent(downside.support1_pct)})</div>
-          ${row.technical_observation_zone ? `<div class="muted">${escapeHtml(row.technical_observation_zone.label)}: ${$number(row.technical_observation_zone.lower)}–${$number(row.technical_observation_zone.upper)} USD · keine Ordermarke</div>` : ""}
         </div>
         <div class="section"><h3>Fundamentaldaten (deskriptiv)</h3><div class="detail-grid">${fundRows}</div>
           <div class="muted">${escapeHtml((valuation.reasons || []).join(" · ") || valuation.comparison_note || valuation.unavailable_reason || "Keine vollständigen aktuellen Fundamentaldaten.")}</div>
@@ -430,6 +594,7 @@
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         state.data = await response.json();
         if (state.data.schema !== "stock-radar-static" || state.data.schema_version !== 3) throw new Error("Nicht unterstützter Datenvertrag");
+        hydrateSweetSpotReasons(state.data);
         state.bySymbol = new Map(state.data.instruments.map((row) => [row.symbol, row]));
         const currencies = new Set(Object.keys(state.data.rankings || {}));
         Object.values(state.data.insight_rankings?.categories || {}).forEach((cat) => Object.keys(cat.items_by_currency || {}).forEach((currency) => currencies.add(currency)));
