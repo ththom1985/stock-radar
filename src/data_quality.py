@@ -1,6 +1,7 @@
 """Output-contract validation and conservative completed-bar quality gates."""
 from __future__ import annotations
 
+import json
 import math
 import os
 from datetime import date, datetime, timezone
@@ -12,6 +13,7 @@ from .persistence import SCHEMA_VERSION
 
 OUTPUT_SCHEMA = "stock-radar-output"
 OUTPUT_SCHEMA_VERSION = 3
+INSIGHT_CONTRACT_VERSION = 2
 REQUIRED_INSIGHT_CATEGORIES = (
     "daily_setups",
     "undervalued_quality",
@@ -42,6 +44,46 @@ MIN_RANK_COVERAGE_PCT = {
 MIN_COMPANY_FUNDAMENTAL_COVERAGE_PCT = float(
     os.environ.get("STOCK_RADAR_MIN_COMPANY_FUNDAMENTAL_COVERAGE_PCT", "60")
 )
+FORBIDDEN_RESEARCH_PHRASES = (
+    "tipps des tages",
+    "guter einstieg",
+    "kaufen/halten",
+    "attraktiver einstieg",
+    "klassischer einstiegspunkt",
+    "einstieg wird interessanter",
+    "sofort (heute)",
+    "kaufen",
+    "jetzt kaufen",
+    "gestaffelt kaufen",
+    "kaufsetup",
+    "kaufzone",
+    "meiden",
+    "starker kauf",
+    "konsens „kauf",
+    "konsens „halten",
+)
+_RESEARCH_LANGUAGE_FIELDS = (
+    "research_summary",
+    "plain_summary",
+    "research_actions",
+    "entry_timing_reason",
+    "longterm_reasons",
+    "daily_signal_reasons",
+    "entry_thesis",
+    "valuation_thesis",
+    "trend_phase",
+    "weinstein_label",
+    "risk_warnings",
+    "falling_knife",
+    "bottoming",
+    "bull_thesis",
+    "priced_in_note",
+    "technical_observation_zone",
+    "trade_plan_long",
+    "trade_plan_short",
+    "urgency",
+    "actions",
+)
 
 
 class DataContractError(RuntimeError):
@@ -56,6 +98,15 @@ def _has_actionable_true(value: Any) -> bool:
     if isinstance(value, list):
         return any(_has_actionable_true(item) for item in value)
     return False
+
+
+def _forbidden_research_phrases(row: dict[str, Any]) -> list[str]:
+    text = json.dumps(
+        {key: row.get(key) for key in _RESEARCH_LANGUAGE_FIELDS},
+        ensure_ascii=False,
+        default=str,
+    ).casefold()
+    return [phrase for phrase in FORBIDDEN_RESEARCH_PHRASES if phrase in text]
 
 
 def _require_heuristic_group(value: Any, label: str) -> None:
@@ -76,7 +127,8 @@ def validate_insight_contract(
     if not isinstance(insight, dict):
         raise DataContractError("Insight ranking root must be an object")
     if (
-        insight.get("model_status") != "heuristic_unvalidated"
+        insight.get("contract_version") != INSIGHT_CONTRACT_VERSION
+        or insight.get("model_status") != "heuristic_unvalidated"
         or insight.get("actionable") is not False
         or not isinstance(insight.get("enabled"), bool)
         or not isinstance(insight.get("blocking_reasons"), list)
@@ -136,8 +188,58 @@ def validate_insight_contract(
                     raise DataContractError(
                         f"Insight category {key!r} contains an invalid item"
                     )
+                if key == "undervalued_quality":
+                    components = item["components"]
+                    required_penalties = (
+                        "raw_value_quality_score",
+                        "jurisdiction_penalty",
+                        "size_liquidity_penalty",
+                        "cyclical_peak_penalty",
+                        "shrinking_fundamentals_penalty",
+                        "weak_trend_downside_penalty",
+                        "total_risk_penalty",
+                        "risk_adjusted_score",
+                        "score_formula",
+                    )
+                    if any(name not in components for name in required_penalties):
+                        raise DataContractError(
+                            "Undervalued item is missing visible risk-adjustment components"
+                        )
+                    if (
+                        not 0 <= components["total_risk_penalty"] <= 45
+                        or components["risk_adjusted_score"] != item["score"]
+                    ):
+                        raise DataContractError(
+                            "Undervalued item risk adjustment is invalid"
+                        )
+                    evidence = item.get("penalty_evidence_ids")
+                    if not isinstance(evidence, dict) or any(
+                        not isinstance(values, list)
+                        or not all(isinstance(value, str) for value in values)
+                        for values in evidence.values()
+                    ):
+                        raise DataContractError(
+                            "Undervalued item penalty evidence is invalid"
+                        )
     if _has_actionable_true(insight):
         raise DataContractError("Nested actionable=true is forbidden in insights")
+    category_language = json.dumps(
+        {
+            key: {
+                "label": value.get("label"),
+                "formula": value.get("formula"),
+            }
+            for key, value in categories.items()
+        },
+        ensure_ascii=False,
+    ).casefold()
+    category_forbidden = [
+        phrase for phrase in FORBIDDEN_RESEARCH_PHRASES if phrase in category_language
+    ]
+    if category_forbidden:
+        raise DataContractError(
+            f"Insight labels contain recommendation-oriented language: {category_forbidden}"
+        )
 
     if rows is not None:
         row_symbols = {
@@ -145,10 +247,13 @@ def validate_insight_contract(
         }
         required_groups = (
             "entry_timing",
+            "entry_thesis",
             "analyst_context",
             "valuation_context",
+            "valuation_thesis",
             "potential_context",
             "risk_context",
+            "jurisdiction_risk",
             "thesis_context",
             "research_context",
             "insight_provenance",
@@ -167,6 +272,28 @@ def validate_insight_contract(
             "research_summary",
             "research_actions",
             "technical_observation_zone",
+            "display_name_full",
+            "short_name",
+            "provider_country",
+            "headquarters_country",
+            "headquarters_country_code",
+            "legal_domicile",
+            "legal_domicile_code",
+            "legal_domicile_verified",
+            "legal_domicile_source",
+            "issuer_country",
+            "listing_country",
+            "listing_market",
+            "economic_exposure_country",
+            "economic_exposure_country_code",
+            "economic_exposure_region",
+            "economic_exposure_classification_status",
+            "jurisdiction_code",
+            "sector_display",
+            "industry_display",
+            "identity_source",
+            "identity_semantics",
+            "identity_status",
         )
         for row in rows:
             if not isinstance(row, dict):
@@ -203,10 +330,96 @@ def validate_insight_contract(
                 isinstance(item, str) for item in row["risk_warnings"]
             ):
                 raise DataContractError("risk_warnings are invalid")
+            if (
+                not isinstance(row["display_name_full"], str)
+                or not row["display_name_full"].strip()
+                or row["identity_status"] not in {"complete", "partial", "fallback"}
+                or not isinstance(row["identity_source"], dict)
+                or not isinstance(row["identity_semantics"], dict)
+                or row["economic_exposure_classification_status"]
+                not in {"classified", "unclassified", "unavailable"}
+                or not isinstance(row["sector_display"], str)
+                or not isinstance(row["industry_display"], str)
+            ):
+                raise DataContractError("row identity fields are invalid")
+            jurisdiction = row["jurisdiction_risk"]
+            if (
+                jurisdiction.get("level") not in {"low", "medium", "high", "unknown"}
+                or not isinstance(jurisdiction.get("penalty_points"), (int, float))
+                or not 0 <= jurisdiction["penalty_points"] <= 20
+                or not isinstance(jurisdiction.get("reasons"), list)
+                or not all(isinstance(reason, str) for reason in jurisdiction["reasons"])
+            ):
+                raise DataContractError("jurisdiction risk context is invalid")
+            valuation_thesis = row["valuation_thesis"]
+            evidence = valuation_thesis.get("penalty_evidence_ids")
+            if not isinstance(evidence, dict) or any(
+                not isinstance(values, list)
+                or not all(isinstance(value, str) for value in values)
+                for values in evidence.values()
+            ):
+                raise DataContractError("valuation penalty evidence is invalid")
+            if set(evidence.get("cyclical_peak_penalty") or []) & set(
+                evidence.get("shrinking_fundamentals_penalty") or []
+            ):
+                raise DataContractError(
+                    "cyclical and shrinking penalties cannot share evidence"
+                )
+            for key in (
+                "why_it_looks_cheap",
+                "why_discount_may_be_justified",
+                "strongest_positive_evidence",
+                "strongest_counterarguments",
+                "penalty_reasons",
+            ):
+                if not isinstance(valuation_thesis.get(key), list) or not all(
+                    isinstance(item, str) for item in valuation_thesis[key]
+                ):
+                    raise DataContractError("valuation thesis narratives are invalid")
+            if valuation_thesis.get("available"):
+                raw = valuation_thesis.get("raw_score")
+                penalty = valuation_thesis.get("risk_penalty")
+                adjusted = valuation_thesis.get("risk_adjusted_score")
+                if (
+                    not all(
+                        isinstance(value, (int, float)) and math.isfinite(value)
+                        for value in (raw, penalty, adjusted)
+                    )
+                    or not 0 <= raw <= 100
+                    or not 0 <= penalty <= 45
+                    or adjusted != round(max(0.0, min(100.0, raw - penalty)), 2)
+                    or valuation_thesis.get("value_trap_risk")
+                    not in {"low", "medium", "high"}
+                ):
+                    raise DataContractError("valuation thesis scores are invalid")
+            elif any(
+                valuation_thesis.get(key) is not None
+                for key in ("raw_score", "risk_penalty", "risk_adjusted_score")
+            ):
+                raise DataContractError(
+                    "Unavailable valuation thesis must not expose scores"
+                )
+            entry_thesis = row["entry_thesis"]
+            for key in (
+                "why_timing_may_be_good",
+                "what_confirms",
+                "what_invalidates",
+                "strongest_supporting_evidence",
+                "strongest_counterarguments",
+            ):
+                if not isinstance(entry_thesis.get(key), list) or not all(
+                    isinstance(item, str) for item in entry_thesis[key]
+                ):
+                    raise DataContractError("entry thesis narratives are invalid")
             if _has_actionable_true(
                 {key: row[key] for key in (*required_groups, *required_fields)}
             ):
                 raise DataContractError("Nested row actionable=true is forbidden")
+            forbidden = _forbidden_research_phrases(row)
+            if forbidden:
+                raise DataContractError(
+                    f"Research row contains recommendation-oriented language: {forbidden}"
+                )
         for category in categories.values():
             for items in category["items_by_currency"].values():
                 if any(item["symbol"] not in row_symbols for item in items):
@@ -409,6 +622,14 @@ def validate_output_contract(data: Any) -> dict[str, Any]:
             "Deployed output must remain explicitly unvalidated and non-actionable"
         )
     validate_insight_contract(data["insight_rankings"], data["all"])
+    for key in ("aschenbrenner_holdings",):
+        for row in data.get(key) or []:
+            if isinstance(row, dict):
+                forbidden = _forbidden_research_phrases(row)
+                if forbidden:
+                    raise DataContractError(
+                        f"{key} contains recommendation-oriented language: {forbidden}"
+                    )
     insight_metadata = data["insight_metadata"]
     if (
         insight_metadata.get("model_status") != "heuristic_unvalidated"
@@ -435,6 +656,44 @@ def validate_output_contract(data: Any) -> dict[str, Any]:
             for asset_type, members in by_asset.items()
         ):
             raise DataContractError("Asset ranking partitions have invalid shape")
+        required_ranking_fields = (
+            "display_name_full",
+            "provider_country",
+            "headquarters_country",
+            "legal_domicile",
+            "economic_exposure_country",
+            "listing_country",
+            "listing_market",
+            "industry_display",
+            "sector_display",
+            "identity_semantics",
+        )
+        required_ranking_groups = (
+            "jurisdiction_risk",
+            "valuation_context",
+            "valuation_thesis",
+            "entry_thesis",
+        )
+        for members in by_asset.values():
+            for member in members:
+                absent = [
+                    key
+                    for key in (*required_ranking_fields, *required_ranking_groups)
+                    if key not in member
+                ]
+                if absent:
+                    raise DataContractError(
+                        f"Ranking row {member.get('symbol')!r} is missing context: {absent}"
+                    )
+                for group in required_ranking_groups:
+                    _require_heuristic_group(
+                        member[group],
+                        f"ranking.{member.get('symbol')}.{group}",
+                    )
+                if _has_actionable_true(member):
+                    raise DataContractError(
+                        "Nested ranking-row actionable=true is forbidden"
+                    )
     return data
 
 

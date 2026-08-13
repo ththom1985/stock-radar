@@ -34,6 +34,15 @@ Every output row contains:
 - source interval (`1d`);
 - local and USD price provenance;
 - asset type and feature-coverage flags.
+- a separated identity contract: configured `short_name`, provider-preferred
+  `display_name_full`, normalized provider headquarters (`provider_country` /
+  `headquarters_country`), nullable verified `legal_domicile`, listing
+  market/country, sector/industry, and conservatively mapped economic exposure.
+  Provider country is not legal domicile. `issuer_country` is retained only as an
+  explicitly deprecated alias of verified `legal_domicile`; listing country is
+  never silently used as domicile or exposure. Provider headquarters is also
+  never used as an economic-exposure proxy: without a documented ticker override
+  or the explicit Hong Kong listing rule, exposure remains `Nicht verfügbar`.
 
 `data/output/latest.json` uses schema `stock-radar-output`, version 3, and contains:
 
@@ -54,12 +63,18 @@ The public GitHub Pages dashboard is available without a Streamlit account:
 
 **https://ththom1985.github.io/stock-radar/**
 
-`python -m src.export_static` creates the compact schema-v2 `docs/data.json`
+`python -m src.export_static` creates the compact schema-v3 `docs/data.json`
 payload from the validated output-v3 snapshot. Both analysis workflows regenerate and publish this
 payload after a successful run, so the Pages dashboard stays synchronized with
 `data/output/latest.json`.
-The exporter serializes one deterministic compact UTF-8 byte sequence, measures
-that exact sequence, and atomically writes it only when it remains below 10 MiB.
+The exporter keeps all rendered identity, metric, scenario, news (up to three),
+jurisdiction, valuation-thesis and entry-thesis content. Repeated per-row
+provenance/actionability fields and non-rendered compatibility/context duplicates
+are represented once by the top-level `instrument_contract` and
+`insight_metadata.provenance_catalog`. It serializes one deterministic compact
+UTF-8 byte sequence and measures that exact sequence. The hard write guard remains
+10 MiB; the real-payload regression target is at most 8.5 MiB to retain at least
+15% operational headroom.
 
 ## Reliability model
 
@@ -98,16 +113,23 @@ The useful insight layer is separate from the conservative core technical
 partition. Every group is marked `heuristic_unvalidated`, records its inputs and
 missing inputs, and remains `actionable: false`.
 
-- **Tipps des Tages / `daily_setups`**: 45% completed-daily trend, 35% entry
+- **Tages-Setups / `daily_setups`**: 45% completed-daily trend, 35% entry
   timing, 20% completed-daily momentum context; falling knives and high critical
   downside structures are excluded.
-- **Unterbewertet / `undervalued_quality`**: 55% Value + 45% Quality, only for
-  company equities with complete/current fundamentals. Banks, insurers, REITs
-  and other generic non-comparable cases are excluded.
+- **Unterbewertet / `undervalued_quality`**: raw score = 55% Value + 45% Quality,
+  only for company equities with complete/current fundamentals. The visible
+  risk-adjusted score is
+  `clamp(raw - min(45, jurisdiction[0..20] + size/liquidity[0..12] +
+  cyclical-peak[0..8] + shrinking-fundamentals[0..10] +
+  weak-trend/downside[0..10]), 0, 100)`. Every component remains dimensionless
+  and is exported with its reason/evidence IDs; raw Value and Quality scores are
+  unchanged. Cyclical-peak evidence uses positive peak-cycle conditions and cannot
+  reuse the negative-growth evidence owned by the shrinking component.
+  Banks, insurers, REITs and other generic non-comparable cases remain excluded.
 - **Potenzial / `analyst_potential`**: analyst target gap with at least five
   analysts, plus visible trend/timing components and explicit overbought or
   weak-trend penalties. Analyst consensus is not a model forecast.
-- **Guter Einstieg / `entry_watchlist`**: timing and trend observation with
+- **Einstiegs-Timing / `entry_watchlist`**: timing and trend observation with
   nearby support, non-negative completed-day context and no falling knife.
 - **Fallende Messer**: warning severity from 5/20-day deterioration without
   stabilization; never an opportunity recommendation.
@@ -120,6 +142,31 @@ valuation context, risks, thesis, priced-in warning, technical observation zone,
 news and 1M/6M/12M/24M heuristic scenario ranges. Scenario ranges remain
 excluded from every core comparable rank and are never described as probable,
 median or expected outcomes.
+
+`jurisdiction_risk` is a bounded `heuristic_unvalidated` context, not a precise
+DCF or mathematically proven discount. China economic exposure is explicitly
+separated from provider headquarters (for example PDD/Ireland and
+TCOM/Singapore) and
+records policy/data regulation, capital-control/state-influence, geopolitical,
+audit/delisting context. Cayman/VIE wording is emitted only for the verified
+BABA, PDD and TCOM legal-domicile/structure overrides, sourced to their cited
+2026 SEC Form 20-F accessions; a configured ADR without that evidence is labelled
+only as ADR context.
+Hong Kong/China listings are distinguished from US listings. Explicit Argentina,
+Brazil/state-linked and selected emerging-market exposures receive their own
+currency/policy/governance context rather than a blanket non-US penalty.
+
+Current complete comparable fundamentals also produce `valuation_thesis`
+(`why_it_looks_cheap`, justified-discount evidence, strongest evidence and
+counterarguments, raw/penalty/adjusted scores and value-trap risk). Completed
+technical inputs produce `entry_thesis` with concrete RSI, SMA50/200, MACD,
+20/60-day, support/ATR and earnings context, plus confirmation and invalidation.
+Analyst context stays separate. Both groups are always `actionable: false`;
+stale/incomplete fundamentals produce no valuation score or ranking.
+User-facing setup and timing language is observational (`Tages-Setups`,
+`Einstiegs-Timing`); recommendation-oriented legacy wording is rejected by the
+deep output contract. Provider analyst keys are translated only as explicitly
+attributed analyst consensus labels such as `Buy-Konsens`.
 
 If current/complete company fundamentals are unavailable, retained cache scores
 are never used in narratives or the static UI: valuation, profitability and
@@ -183,7 +230,8 @@ python -m venv .venv
 ```
 
 The reliability cache/portfolio schemas remain independently versioned. Output
-schema v3 adds only the provider-free insight contract.
+schema v3 carries the provider-free insight, identity, jurisdiction and thesis
+contract.
 
 Run the dashboard:
 
@@ -198,7 +246,7 @@ Build the login-free static dashboard payload:
 .\.venv\Scripts\python.exe -m src.export_static
 ```
 
-Provider-free one-time enrichment of an existing v2 snapshot and static export:
+Provider-free enrichment of an existing v2/v3 snapshot and static export:
 
 ```powershell
 .\.venv\Scripts\python.exe -m src.enrich_snapshot --in-place --export-static
@@ -206,7 +254,11 @@ Provider-free one-time enrichment of an existing v2 snapshot and static export:
 
 Without `--in-place`, the utility writes
 `data/output/latest.enriched.json` for review. All writes are atomic and no
-provider request is made.
+provider request is made. The command may merge identity, listing and USD-normalized
+market-cap context from the existing local `data/fundamentals.json` cache and
+`data/tickers.csv`; it does not refresh either source. It rehydrates every core
+ranking member from the enriched symbol row while preserving exact
+currency/asset/symbol order.
 
 Run deterministic tests:
 

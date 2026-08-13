@@ -51,11 +51,11 @@ def weinstein_stage(f):
         return None, None
     slope = ((ma - ma_prev) / ma) if (_has(ma_prev) and ma) else 0.0
     if price > ma and slope > 0.005:
-        return 2, "Phase 2 – Aufwärtstrend (kaufen/halten)"
+        return 2, "Phase 2 – Aufwärtstrend / technisch konstruktiv"
     if price < ma and slope < -0.005:
-        return 4, "Phase 4 – Abwärtstrend (meiden)"
+        return 4, "Phase 4 – Abwärtstrend / negative Struktur"
     if price >= ma and slope <= 0.005:
-        return 3, "Phase 3 – Topbildung (Gewinne sichern)"
+        return 3, "Phase 3 – Topbildungsrisiko"
     return 1, "Phase 1 – Bodenbildung (beobachten)"
 
 

@@ -121,19 +121,19 @@ def score_longterm(f):
     if _ok(rsi):
         if 40 <= rsi <= 55:
             score += 20
-            reasons.append(f"Gesunder Rücksetzer (RSI {rsi:.0f}) – attraktiver Einstieg statt überkauft")
+            reasons.append(f"Gesunder Rücksetzer (RSI {rsi:.0f}) – konstruktive Timing-Beobachtung")
         elif rsi < 40:
             score += 10
             reasons.append(f"RSI niedrig ({rsi:.0f}) – möglicher Boden, aber Trend prüfen")
         elif rsi > 70:
             score -= 10
-            reasons.append(f"RSI überkauft ({rsi:.0f}) – schlechter Langfrist-Einstieg")
+            reasons.append(f"RSI überkauft ({rsi:.0f}) – ungünstiger längerfristiger Timing-Kontext")
 
     if _ok(sma50) and _ok(sma200) and price > sma200:
         dist = (price / sma50 - 1) * 100
         if -3 <= dist <= 3:
             score += 15
-            reasons.append("Kurs testet die 50-Tage-Linie im Aufwärtstrend – klassischer Einstiegspunkt")
+            reasons.append("Test der 50-Tage-Linie im Aufwärtstrend")
 
     pfh = f.get("pct_from_high52")
     if _ok(pfh):

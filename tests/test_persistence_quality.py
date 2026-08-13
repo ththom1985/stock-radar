@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import unittest
 from datetime import datetime, timedelta, timezone
 from unittest.mock import patch
@@ -47,6 +48,7 @@ class PersistenceQualityTests(ProjectTempMixin, unittest.TestCase):
                 "eligible_count": 0,
             }
         return {
+            "contract_version": 2,
             "model_status": "heuristic_unvalidated",
             "actionable": False,
             "enabled": enabled,
@@ -143,6 +145,12 @@ class PersistenceQualityTests(ProjectTempMixin, unittest.TestCase):
         allowed, reasons = dashboard_gate(loaded, now=now)
         self.assertTrue(allowed, reasons)
         self.assertFalse(loaded["model_status"]["actionable"])
+        broken = copy.deepcopy(output)
+        del broken["rankings_by_currency_asset"]["USD"]["company_equity"][0][
+            "valuation_thesis"
+        ]
+        with self.assertRaises(DataContractError):
+            validate_output_contract(broken)
 
     def test_one_percent_rank_eligibility_blocks_complete_prices(self):
         rows = [

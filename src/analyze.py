@@ -48,6 +48,7 @@ from .insights import (
     INSIGHT_STATUS,
     PROVENANCE_CATALOG,
     enrich_rows_and_rankings,
+    rehydrate_rankings,
 )
 from .macro import fetch_macro, macro_adjust
 from .news_engine import fetch_all_ticker_news, fetch_market_news, news_signal
@@ -142,17 +143,21 @@ def _technical_complete(row: dict) -> bool:
 def _copy_fundamental_context(row: dict, fundamental: dict) -> None:
     row["sector"] = fundamental.get("sector")
     row["industry"] = fundamental.get("industry")
+    row["provider_long_name"] = fundamental.get("provider_long_name")
     row["analyst_rating"] = fundamental.get("rec_key")
     row["analyst_mean"] = _json_value(fundamental.get("rec_mean"))
     row["analyst_n"] = _json_value(fundamental.get("analyst_n"))
     row["target_price_local"] = _json_value(fundamental.get("target_price"))
     row["pe"] = _json_value(fundamental.get("pe"))
     row["forward_pe"] = _json_value(fundamental.get("forward_pe"))
+    row["pb"] = _json_value(fundamental.get("pb"))
     row["earnings_growth"] = _json_value(fundamental.get("earnings_growth"))
     row["roe_pct"] = _percent(fundamental.get("roe"))
     row["revenue_growth_pct"] = _percent(fundamental.get("revenue_growth"))
     row["beta"] = _json_value(fundamental.get("beta"))
     row["provider_country"] = fundamental.get("provider_country")
+    row["reported_currency"] = fundamental.get("reported_currency")
+    row["market_cap_local"] = _json_value(fundamental.get("market_cap"))
     row["issuer_uuid"] = fundamental.get("issuer_uuid")
     fetched_at = fundamental.get("last_success_at") or fundamental.get("fetched_at")
     age_days = None
@@ -270,6 +275,15 @@ def _convert_to_usd(row: dict, rate: float) -> None:
     row["avg_dollar_volume_20_usd"] = (
         row["avg_dollar_volume_20_local"] * rate
         if isinstance(row.get("avg_dollar_volume_20_local"), (int, float))
+        else None
+    )
+    row["market_cap_usd"] = (
+        row["market_cap_local"] * rate
+        if isinstance(row.get("market_cap_local"), (int, float))
+        and (
+            not row.get("reported_currency")
+            or row.get("reported_currency") == row.get("currency")
+        )
         else None
     )
     row["corporate_actions"] = [
@@ -414,6 +428,7 @@ def run(with_news=True, with_fundamentals=True):
     dry_run = os.environ.get("STOCK_RADAR_DRY_RUN") == "1"
     symbols = [item["symbol"] for item in universe]
     names = {item["symbol"]: item["name"] for item in universe}
+    exchanges = {item["symbol"]: item.get("exchange", "") for item in universe}
     configured_types = {
         symbol: configured_types_full[symbol] for symbol in symbols
     }
@@ -439,6 +454,9 @@ def run(with_news=True, with_fundamentals=True):
             {
                 "symbol": symbol,
                 "name": names.get(symbol, ""),
+                "short_name": names.get(symbol, ""),
+                "exchange": exchanges.get(symbol, ""),
+                "listing_market": exchanges.get(symbol, ""),
                 "configured_asset_type": configured_types.get(symbol, "unknown"),
                 "price_local": _json_value(features["price"]),
                 "price": _json_value(features["price"]),
@@ -752,6 +770,10 @@ def run(with_news=True, with_fundamentals=True):
         rows,
         rankings_enabled=data_status["data_actionable"],
         blockers=data_status["blocking_reasons"],
+    )
+    rankings_by_currency_asset = rehydrate_rankings(
+        rankings_by_currency_asset,
+        rows,
     )
 
     benchmarks, benchmark_failures = (

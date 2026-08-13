@@ -91,10 +91,12 @@
     .panel { overflow: hidden; }
     .panel-head { display: flex; justify-content: space-between; gap: 10px; padding: 15px 17px; border-bottom: 1px solid var(--cp-border); }
     .list { max-height: 720px; overflow: auto; }
-    .list-row { width: 100%; display: grid; grid-template-columns: 36px 95px 1fr 70px; gap: 8px; align-items: center; padding: 10px 12px; border: 0; border-bottom: 1px solid var(--cp-border); border-radius: 0; background: var(--cp-surface); text-align: left; cursor: pointer; }
+    .list-row { width: 100%; display: grid; grid-template-columns: 36px 82px minmax(0, 1fr) 70px; gap: 8px; align-items: center; padding: 10px 12px; border: 0; border-bottom: 1px solid var(--cp-border); border-radius: 0; background: var(--cp-surface); text-align: left; cursor: pointer; }
     .list-row:hover, .list-row.selected { background: var(--cp-accent-soft); }
     .symbol { font-family: Consolas, "Courier New", monospace; font-weight: 800; }
     .score { color: var(--cp-accent); font-weight: 800; text-align: right; }
+    .row-name { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .row-meta { display: block; color: var(--cp-text-muted); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 2px; }
     .detail { padding: 18px; min-height: 520px; }
     .detail-head { display: flex; justify-content: space-between; gap: 12px; }
     .detail-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; margin: 14px 0; }
@@ -158,10 +160,10 @@
       </section>
       <div class="notice">Keine Anlageberatung. Alle Insights sind <strong>heuristic_unvalidated</strong>, nicht handlungsleitend und keine Prognosen, Wahrscheinlichkeiten oder Kauf-/Verkaufsempfehlungen. Szenarien fließen nicht in das Core-Ranking ein.</div>
       <nav id="nav" class="nav">
-        <button class="nav-button active" data-view="daily_setups">Tipps des Tages</button>
+        <button class="nav-button active" data-view="daily_setups">Tages-Setups</button>
         <button class="nav-button" data-view="undervalued_quality">Unterbewertet</button>
         <button class="nav-button" data-view="analyst_potential">Potenzial</button>
-        <button class="nav-button" data-view="entry_watchlist">Guter Einstieg</button>
+        <button class="nav-button" data-view="entry_watchlist">Einstiegs-Timing</button>
         <button class="nav-button" data-view="falling_knives">Fallende Messer</button>
         <button class="nav-button" data-view="bottoming_watch">Bodenbildung</button>
         <button class="nav-button" data-view="risk_watch">Risiken</button>
@@ -176,7 +178,7 @@
       <section id="cockpit" class="layout">
         <div class="panel">
           <div class="panel-head">
-            <div><h2 id="list-title">Tipps des Tages</h2><div id="list-subtitle" class="muted"></div></div>
+            <div><h2 id="list-title">Tages-Setups</h2><div id="list-subtitle" class="muted"></div></div>
             <div id="result-count" class="muted"></div>
           </div>
           <div id="rows" class="list"></div>
@@ -195,10 +197,10 @@
     const state = { data: null, bySymbol: new Map(), view: "daily_setups", selected: null, gateFailures: [] };
     const $ = (id) => document.getElementById(id);
     const categoryTitles = {
-      daily_setups: "Tipps des Tages",
+      daily_setups: "Tages-Setups",
       undervalued_quality: "Unterbewertet",
       analyst_potential: "Analysten-Potenzial",
-      entry_watchlist: "Guter Einstieg",
+      entry_watchlist: "Einstiegs-Timing",
       falling_knives: "Fallende Messer",
       bottoming_watch: "Bodenbildung",
       risk_watch: "Risiken",
@@ -222,6 +224,7 @@
       const status = data?.data_status || {};
       const model = data?.model_status || {};
       const insights = data?.insight_rankings || {};
+      const instrumentContract = data?.instrument_contract || {};
       if (status.status !== "ok") failures.push("Datenstatus ist nicht OK.");
       if (status.data_actionable !== true) failures.push("Daten-Gate ist nicht freigegeben.");
       if ((status.blocking_reasons || []).length) failures.push(...status.blocking_reasons);
@@ -233,6 +236,15 @@
       if (model.validation !== "unvalidated" || model.actionable !== false) failures.push("Unsicherer Modellstatus.");
       if (insights.model_status !== "heuristic_unvalidated" || insights.actionable !== false || insights.enabled !== true) failures.push("Insight-Gate ist nicht freigegeben.");
       if (hasActionableTrue(insights)) failures.push("Verschachteltes actionable=true erkannt.");
+      if (instrumentContract.model_status !== "heuristic_unvalidated" || instrumentContract.actionable !== false) failures.push("Kompakter Instrumentvertrag ist nicht sicher.");
+      const identityFields = ["display_name_full", "short_name", "headquarters_country", "legal_domicile", "listing_country", "listing_market", "economic_exposure_country", "sector_display", "industry_display", "jurisdiction_risk", "valuation_context", "valuation_thesis", "entry_thesis", "analyst_context"];
+      for (const row of data?.instruments || []) {
+        if (!identityFields.every((field) => Object.prototype.hasOwnProperty.call(row, field))) failures.push(`Identitäts-/Thesenfelder fehlen bei ${row.symbol || "unbekannt"}.`);
+        for (const group of [row.jurisdiction_risk, row.valuation_thesis, row.entry_thesis]) {
+          if (!group || typeof group !== "object") failures.push(`Kompakter Kontext fehlt bei ${row.symbol || "unbekannt"}.`);
+        }
+      }
+      if (hasActionableTrue(data?.instruments || [])) failures.push("Verschachteltes actionable=true in Instrumentdaten erkannt.");
       return [...new Set(failures)];
     }
 
@@ -242,7 +254,7 @@
       if (state.view === "all") {
         const rows = state.data.instruments.filter((row) => {
           if (!query && currency && row.currency !== currency) return false;
-          const text = `${row.symbol || ""} ${row.name || ""} ${row.sector || ""} ${row.industry || ""}`.toLowerCase();
+          const text = `${row.symbol || ""} ${row.display_name_full || ""} ${row.short_name || ""} ${row.sector_display || ""} ${row.industry_display || ""} ${row.headquarters_country || ""} ${row.legal_domicile || ""} ${row.economic_exposure_country || ""} ${row.listing_country || ""}`.toLowerCase();
           return !query || text.includes(query);
         });
         return rows.sort((a, b) => String(a.symbol).localeCompare(String(b.symbol))).slice(0, query ? 250 : 100).map((row) => ({
@@ -253,7 +265,7 @@
       if (query) {
         items = items.filter((item) => {
           const row = state.bySymbol.get(item.symbol) || {};
-          return `${row.symbol || ""} ${row.name || ""} ${row.sector || ""} ${row.industry || ""}`.toLowerCase().includes(query);
+          return `${row.symbol || ""} ${row.display_name_full || ""} ${row.short_name || ""} ${row.sector_display || ""} ${row.industry_display || ""} ${row.headquarters_country || ""} ${row.legal_domicile || ""} ${row.economic_exposure_country || ""} ${row.listing_country || ""}`.toLowerCase().includes(query);
         });
       }
       return items;
@@ -275,8 +287,8 @@
         const row = state.bySymbol.get(item.symbol) || {};
         return `<button class="list-row ${item.symbol === state.selected ? "selected" : ""}" data-symbol="${escapeHtml(item.symbol)}">
           <span>${index + 1}</span><span class="symbol">${escapeHtml(item.symbol)}</span>
-          <span><strong>${escapeHtml(row.name || "")}</strong></span>
-          <span class="score">${$number(item.score, 0)}</span>
+          <span title="${escapeHtml(row.display_name_full || row.short_name || row.symbol || "")}"><strong class="row-name">${escapeHtml(row.display_name_full || row.short_name || "")}</strong><small class="row-meta">${escapeHtml(row.economic_exposure_country || row.headquarters_country || "Exposure n. v.")} · ${escapeHtml(row.industry_display || "Branche n. v.")}</small></span>
+          <span class="score">${$number(item.score, 0)}${state.view === "undervalued_quality" ? `<small class="row-meta">adjustiert</small>` : ""}</span>
         </button>`;
       }).join("");
       $("rows").querySelectorAll(".list-row").forEach((button) => button.addEventListener("click", () => {
@@ -293,11 +305,19 @@
       return text ? `<div class="callout ${tone}">${escapeHtml(text)}</div>` : "";
     }
 
+    function thesisList(title, items, tone = "") {
+      if (!items?.length) return `<div class="section"><h3>${escapeHtml(title)}</h3><div class="muted">Keine belastbaren Angaben aus den verfügbaren Eingaben.</div></div>`;
+      return `<div class="section"><h3>${escapeHtml(title)}</h3>${items.map((item) => callout(item, tone)).join("")}</div>`;
+    }
+
     function renderDetail(row) {
       if (!row) { $("detail").innerHTML = `<div class="muted">Keine Instrumente erfüllen diese Auswahl.</div>`; return; }
       const analyst = row.analyst_context || {};
       const downside = row.downside_structure || {};
       const valuation = row.valuation_context || {};
+      const valuationThesis = row.valuation_thesis || {};
+      const entryThesis = row.entry_thesis || {};
+      const jurisdiction = row.jurisdiction_risk || {};
       const phase = row.trend_phase || {};
       const scenarios = (row.scenario_long || []).map((item) => `<div class="scenario">
         <strong>${escapeHtml(item.label || "")}</strong>
@@ -318,9 +338,14 @@
         item.link ? `<a href="${escapeHtml(item.link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.title || "")}</a>` : escapeHtml(item.title || "")
       }</div>`).join("");
       $("detail").innerHTML = `
-        <div class="detail-head"><div><div class="symbol">${escapeHtml(row.symbol)}</div><h2>${escapeHtml(row.name || "")}</h2>
+        <div class="detail-head"><div><div class="eyebrow">Vollständiger Name</div><h2>${escapeHtml(row.display_name_full || row.short_name || row.symbol || "")}</h2><div class="symbol">${escapeHtml(row.symbol)}</div>
+        <div class="muted">Branche: ${escapeHtml(row.industry_display || "nicht verfügbar")} · Sektor: ${escapeHtml(row.sector_display || "nicht verfügbar")}</div>
+        <div class="muted">Hauptsitz (Provider): ${escapeHtml(row.headquarters_country || "nicht verfügbar")} · Wirtschaftliches Exposure: ${escapeHtml(row.economic_exposure_country || "nicht verfügbar")} / ${escapeHtml(row.economic_exposure_region || "nicht verfügbar")}</div>
+        ${row.legal_domicile_verified ? `<div class="muted">Juristischer Sitz (verifiziert): ${escapeHtml(row.legal_domicile)} · ${escapeHtml(row.legal_domicile_source || "")}</div>` : ""}
+        <div class="muted">Börsenland/Markt: ${escapeHtml(row.listing_country || "nicht verfügbar")} / ${escapeHtml(row.listing_market || "nicht verfügbar")}</div>
         <div class="muted">${escapeHtml(assetLabels[row.asset_type] || row.asset_type)} · ${escapeHtml(row.currency || "")} · Bar ${escapeHtml(row.bar_date || "–")}</div></div>
         <span class="badge">${$number(row.entry_timing_score, 0)}/100 Timing</span></div>
+        ${row.economic_exposure_country === "China" ? `<div class="section"><h3>China-Risikokontext</h3>${(jurisdiction.reasons || []).map((reason) => callout(reason, "danger")).join("")}<div class="muted">${escapeHtml(jurisdiction.heuristic_note || "")}</div></div>` : ""}
         <div class="summary"><strong>Research-Fazit:</strong> ${escapeHtml(row.research_summary || row.heuristic_summary || "–")}</div>
         <div class="detail-grid">
           <div class="stat"><span>Trendphase</span><strong>${escapeHtml(phase.phase || "–")}</strong></div>
@@ -329,6 +354,15 @@
           <div class="stat"><span>Kurs USD</span><strong>${$number(row.price)}</strong></div>
         </div>
         ${callout(row.entry_timing_reason, "success")}
+        <div class="section"><h3>Entry-These (technischer Tageskontext)</h3>
+          <div class="detail-grid">
+            <div class="stat"><span>Timing-Score</span><strong>${$number(entryThesis.timing_score, 0)}/100</strong></div>
+            <div class="stat"><span>Trend</span><strong>${$number(entryThesis.trend, 0)}/100</strong></div>
+            <div class="stat"><span>Regime</span><strong>${escapeHtml(entryThesis.regime || "–")}</strong></div>
+            <div class="stat"><span>Knife/Boden</span><strong>${escapeHtml(entryThesis.falling_knife_bottoming_status || "–")}</strong></div>
+          </div>
+          ${entryThesis.available ? `${thesisList("Warum das Timing konstruktiv wirken kann", entryThesis.why_timing_may_be_good, "success")}${thesisList("Benötigte Bestätigung", entryThesis.what_confirms)}${thesisList("Invalidation", entryThesis.what_invalidates, "danger")}${thesisList("Stärkste Timing-Evidenz", entryThesis.strongest_supporting_evidence, "success")}${thesisList("Stärkste Gegenargumente", entryThesis.strongest_counterarguments, "warning")}` : `<div class="muted">Keine vollständigen technischen Tagesdaten; keine Entry-These.</div>`}
+        </div>
         ${row.falling_knife ? callout(row.falling_knife.warning, "danger") : ""}
         ${row.bottoming ? callout(`Spekulative Bodenbildung: ${(row.bottoming.signals || []).join(" · ")}`, "warning") : ""}
         ${callout(row.bull_thesis, "success")}${callout(row.priced_in_note, "warning")}
@@ -343,6 +377,19 @@
         </div>
         <div class="section"><h3>Fundamentaldaten (deskriptiv)</h3><div class="detail-grid">${fundRows}</div>
           <div class="muted">${escapeHtml((valuation.reasons || []).join(" · ") || valuation.comparison_note || valuation.unavailable_reason || "Keine vollständigen aktuellen Fundamentaldaten.")}</div>
+        </div>
+        <div class="section"><h3>Bewertungsthese (risikoadjustierte Heuristik)</h3>
+          ${valuationThesis.available ? `<div class="detail-grid">
+            <div class="stat"><span>Raw Value/Quality</span><strong>${$number(valuationThesis.raw_score, 1)}/100</strong></div>
+            <div class="stat"><span>Sichtbarer Risikoabschlag</span><strong>−${$number(valuationThesis.risk_penalty, 1)}</strong></div>
+            <div class="stat"><span>Risikoadjustiert</span><strong>${$number(valuationThesis.risk_adjusted_score, 1)}/100</strong></div>
+            <div class="stat"><span>Jurisdiktion / Value Trap</span><strong>${escapeHtml(jurisdiction.level || "low")} / ${escapeHtml(valuationThesis.value_trap_risk || "–")}</strong></div>
+          </div>
+          <div class="muted">${escapeHtml(valuationThesis.formula || "")}</div>
+          ${thesisList("Warum es günstig aussieht", valuationThesis.why_it_looks_cheap, "success")}
+          ${thesisList("Warum der Abschlag gerechtfertigt sein kann", valuationThesis.why_discount_may_be_justified, "warning")}
+          ${thesisList("Stärkste positive Evidenz", valuationThesis.strongest_positive_evidence, "success")}
+          ${thesisList("Gegenargumente / Value-Trap-Risiken", valuationThesis.strongest_counterarguments, "danger")}` : `<div class="callout warning">${escapeHtml(valuation.unavailable_reason || "Keine aktuellen vollständigen Fundamentaldaten; keine Bewertungsthese oder Rangbildung.")}</div>`}
         </div>
         <div class="section"><h3>Technisches Tagesbild</h3><table class="data-table">${technicalRows}</table></div>
         <div class="section"><h3>News und Termine</h3>
@@ -382,7 +429,7 @@
         const response = await fetch("./data.json", { cache: "no-store" });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         state.data = await response.json();
-        if (state.data.schema !== "stock-radar-static" || state.data.schema_version !== 2) throw new Error("Nicht unterstützter Datenvertrag");
+        if (state.data.schema !== "stock-radar-static" || state.data.schema_version !== 3) throw new Error("Nicht unterstützter Datenvertrag");
         state.bySymbol = new Map(state.data.instruments.map((row) => [row.symbol, row]));
         const currencies = new Set(Object.keys(state.data.rankings || {}));
         Object.values(state.data.insight_rankings?.categories || {}).forEach((cat) => Object.keys(cat.items_by_currency || {}).forEach((currency) => currencies.add(currency)));

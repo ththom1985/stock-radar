@@ -130,11 +130,45 @@ def _scenario_table(row):
     return pd.DataFrame(records)
 
 
+def _render_points(title, points, *, kind="info"):
+    st.markdown(f"**{title}**")
+    if not points:
+        st.caption("Keine belastbaren Angaben aus den verfügbaren Eingaben.")
+        return
+    for point in points:
+        getattr(st, kind)(point)
+
+
 def _research_card(row, rank=None):
     prefix = f"{rank}. " if rank is not None else ""
     with st.container(border=True):
         valuation = row.get("valuation_context") or {}
-        st.subheader(f"{prefix}{row.get('symbol')} · {row.get('name') or ''}")
+        valuation_thesis = row.get("valuation_thesis") or {}
+        entry_thesis = row.get("entry_thesis") or {}
+        jurisdiction = row.get("jurisdiction_risk") or {}
+        st.caption("Vollständiger Name")
+        st.subheader(
+            f"{prefix}{row.get('display_name_full') or row.get('short_name') or row.get('symbol')}"
+        )
+        st.markdown(f"**{row.get('symbol')}**")
+        st.caption(
+            f"Branche: {row.get('industry_display') or 'nicht verfügbar'} · "
+            f"Sektor: {row.get('sector_display') or 'nicht verfügbar'} · "
+            f"Hauptsitz (Provider): {row.get('headquarters_country') or 'nicht verfügbar'} · "
+            f"Wirtschaftliches Exposure: {row.get('economic_exposure_country') or 'nicht verfügbar'}"
+            f"/{row.get('economic_exposure_region') or 'nicht verfügbar'} · "
+            f"Börsenland/Markt: {row.get('listing_country') or 'nicht verfügbar'} / "
+            f"{row.get('listing_market') or 'nicht verfügbar'}"
+        )
+        if row.get("legal_domicile_verified"):
+            st.caption(
+                f"Juristischer Sitz (verifiziert): {row.get('legal_domicile')} · "
+                f"{row.get('legal_domicile_source') or ''}"
+            )
+        if row.get("economic_exposure_country") == "China":
+            st.error("China-Risikokontext (heuristic_unvalidated; kein bewiesener Abschlag)")
+            for reason in jurisdiction.get("reasons") or []:
+                st.warning(reason)
         header = st.columns(6)
         header[0].metric("Completed-bar close (USD)", _number(row.get("price"), 2))
         header[1].metric("Completed bar", row.get("bar_date") or "—")
@@ -147,6 +181,42 @@ def _research_card(row, rank=None):
             f"Timing: {row.get('entry_timing_label') or '—'} · "
             f"{row.get('entry_timing_reason') or 'keine ausreichenden Eingaben'}"
         )
+        st.markdown("#### Entry-These")
+        if entry_thesis.get("available"):
+            entry_metrics = st.columns(4)
+            entry_metrics[0].metric("Timing", _number(entry_thesis.get("timing_score"), 0, "/100"))
+            entry_metrics[1].metric("Trend", _number(entry_thesis.get("trend"), 0, "/100"))
+            entry_metrics[2].metric("Regime", entry_thesis.get("regime") or "—")
+            entry_metrics[3].metric(
+                "Knife/Boden",
+                entry_thesis.get("falling_knife_bottoming_status") or "—",
+            )
+            _render_points(
+                "Warum das Timing konstruktiv wirken kann",
+                entry_thesis.get("why_timing_may_be_good"),
+                kind="success",
+            )
+            _render_points(
+                "Benötigte Bestätigung",
+                entry_thesis.get("what_confirms"),
+            )
+            _render_points(
+                "Invalidation",
+                entry_thesis.get("what_invalidates"),
+                kind="error",
+            )
+            _render_points(
+                "Stärkste Timing-Evidenz",
+                entry_thesis.get("strongest_supporting_evidence"),
+                kind="success",
+            )
+            _render_points(
+                "Stärkste Gegenargumente",
+                entry_thesis.get("strongest_counterarguments"),
+                kind="warning",
+            )
+        else:
+            st.warning("Keine vollständigen technischen Tagesdaten; keine Entry-These.")
         for action in row.get("research_actions") or []:
             tone = action.get("tone")
             text = action.get("text") or ""
@@ -212,6 +282,52 @@ def _research_card(row, rank=None):
             st.caption("Fundamental: " + " · ".join(valuation.get("reasons") or []))
         else:
             st.caption(valuation.get("unavailable_reason") or "Fundamentaldaten nicht verfügbar.")
+        st.markdown("#### Bewertungsthese")
+        if valuation_thesis.get("available"):
+            valuation_metrics = st.columns(4)
+            valuation_metrics[0].metric(
+                "Raw Value/Quality",
+                _number(valuation_thesis.get("raw_score"), 1, "/100"),
+            )
+            valuation_metrics[1].metric(
+                "Risikoabschlag",
+                _number(valuation_thesis.get("risk_penalty"), 1),
+            )
+            valuation_metrics[2].metric(
+                "Risikoadjustiert",
+                _number(valuation_thesis.get("risk_adjusted_score"), 1, "/100"),
+            )
+            valuation_metrics[3].metric(
+                "Jurisdiktion / Value Trap",
+                f"{jurisdiction.get('level') or 'low'} / "
+                f"{valuation_thesis.get('value_trap_risk') or '—'}",
+            )
+            st.caption(valuation_thesis.get("formula") or "")
+            _render_points(
+                "Warum es günstig aussieht",
+                valuation_thesis.get("why_it_looks_cheap"),
+                kind="success",
+            )
+            _render_points(
+                "Warum der Abschlag gerechtfertigt sein kann",
+                valuation_thesis.get("why_discount_may_be_justified"),
+                kind="warning",
+            )
+            _render_points(
+                "Stärkste positive Evidenz",
+                valuation_thesis.get("strongest_positive_evidence"),
+                kind="success",
+            )
+            _render_points(
+                "Gegenargumente / Value-Trap-Risiken",
+                valuation_thesis.get("strongest_counterarguments"),
+                kind="error",
+            )
+        else:
+            st.warning(
+                valuation.get("unavailable_reason")
+                or "Keine aktuellen vollständigen Fundamentaldaten; keine Bewertungsthese."
+            )
 
         technical = pd.DataFrame(
             [{
@@ -258,10 +374,10 @@ def _research_card(row, rank=None):
 
 tabs = st.tabs(
     [
-        "Tipps des Tages",
+        "Tages-Setups",
         "Unterbewertet",
         "Potenzial",
-        "Guter Einstieg",
+        "Einstiegs-Timing",
         "Fallende Messer",
         "Bodenbildung",
         "Risiken",
@@ -308,8 +424,29 @@ def _render_insight_category(category_key, *, key):
             {
                 "Rang": index,
                 "Symbol": item.get("symbol"),
-                "Name": (rows_by_symbol.get(item.get("symbol")) or {}).get("name"),
+                "Vollständiger Name": (
+                    rows_by_symbol.get(item.get("symbol")) or {}
+                ).get("display_name_full"),
+                "Hauptsitz (Provider) / Exposure": " / ".join(
+                    filter(
+                        None,
+                        [
+                            (rows_by_symbol.get(item.get("symbol")) or {}).get(
+                                "headquarters_country"
+                            ),
+                            (rows_by_symbol.get(item.get("symbol")) or {}).get(
+                                "economic_exposure_country"
+                            ),
+                        ],
+                    )
+                ),
+                "Branche": (
+                    rows_by_symbol.get(item.get("symbol")) or {}
+                ).get("industry_display"),
                 "Insight-Score": item.get("score"),
+                "Raw": item.get("raw_score"),
+                "Risikoabschlag": item.get("risk_penalty"),
+                "Risiko": item.get("risk_level"),
                 "Komponenten": " · ".join(
                     f"{name}: {_number(value, 1)}"
                     for name, value in (item.get("components") or {}).items()
@@ -351,6 +488,13 @@ with tabs[7]:
     columns = [
         "symbol",
         "name",
+        "display_name_full",
+        "headquarters_country",
+        "legal_domicile",
+        "economic_exposure_country",
+        "listing_country",
+        "sector_display",
+        "industry_display",
         "asset_type",
         "bar_date",
         "bar_age_days",

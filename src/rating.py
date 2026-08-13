@@ -420,7 +420,7 @@ def entry_reason(row):
     if _has(rsi) and rsi < 35 and turning:
         return "stark abverkauft und dreht nach oben – spekulativer Rebound"
     if turning:
-        return "Momentum dreht nach oben – Einstieg wird interessanter"
+        return "Momentum dreht nach oben – Timing verbessert sich"
     return "kein klares Timing-Signal im abgeschlossenen Tagesbild"
 
 
@@ -428,14 +428,14 @@ def entry_label(score):
     if score is None:
         return "–", "calm"
     if score >= 70:
-        return "sehr gut", "up"
+        return "stark konstruktiv", "up"
     if score >= 55:
-        return "gut", "up"
+        return "konstruktiv", "up"
     if score >= 45:
-        return "okay", "soon"
+        return "gemischt", "soon"
     if score >= 32:
-        return "eher abwarten", "soon"
-    return "schlecht (teuer/heiß)", "down"
+        return "Bestätigung abwarten", "soon"
+    return "ungünstig (teuer/heiß)", "down"
 
 
 _CYCLICAL_KEYS = ("semiconductor", "memory", "material", "metal", "mining", "steel",
@@ -503,7 +503,7 @@ def urgency(row):
     dt, dd = row.get("daytrade_score") or 0, row.get("daytrade_direction")
     ed = row.get("earnings_in_days")
     if (dd in ("LONG", "SHORT") and dt >= 55) or row.get("hype_surging") or (_has(ed) and 0 <= ed <= 2):
-        return "⏱️ Sofort (heute)", "urgent"
+        return "⏱️ Zeitnaher Beobachtungskontext (heute)", "urgent"
     if dt >= 45 or (_has(ed) and 0 <= ed <= 7):
         return "📅 Diese Woche", "soon"
     return "🧘 In Ruhe (Langzeit)", "calm"
@@ -558,7 +558,7 @@ def trade_plan(row, context="invest"):
     bot = row.get("bottoming")
     avoid = side == "long" and (
         (isinstance(alt, (int, float)) and alt < 1.81)     # bankruptcy risk -> always avoid
-        or row.get("radar_rating") == "Meiden"             # overall meiden -> avoid
+        or row.get("radar_rating") == "schwaches heuristisches Signal"
         # trend-based avoids, UNLESS a base is forming (that's the turnaround entry)
         or (not bot and (
             row.get("weinstein_stage") == 4
@@ -626,20 +626,20 @@ def trade_plan(row, context="invest"):
     hold = _eta_label(days, context)
 
     if avoid:
-        action, tone, when = "🚫 Meiden – aktuell kein sauberes Kaufsetup", "neg", "avoid"
+        action, tone, when = "🚫 Negative Struktur – kein konstruktives technisches Setup bestätigt", "neg", "avoid"
     elif row.get("knife_warn") and side == "long":
-        action, tone, when = "🔪 Fallendes Messer – nicht greifen, erst Boden/Stabilisierung abwarten", "neg", "dip"
+        action, tone, when = "🔪 Fallendes Messer – Stabilisierung noch nicht bestätigt", "neg", "dip"
     elif bot and side == "long":
-        action, tone, when = "🟢 Bodenbildung nach Absturz – frühe, spekulative Einstiegschance", "pos", "now"
+        action, tone, when = "🟢 Bodenbildung nach Absturz – frühe spekulative Beobachtung", "pos", "now"
     elif side == "short":
-        action, tone, when = "📉 Nur für Profis: Wette auf fallende Kurse (Short)", "neg", "short"
+        action, tone, when = "📉 Negative Trendbeobachtung (Short-Kontext nur als Risikoindikator)", "neg", "short"
     elif isinstance(es, (int, float)) and es >= 55:
-        action, tone, when = "✅ Jetzt in der Einstiegszone kaufen", "pos", "now"
+        action, tone, when = "✅ Konstruktive Timing-Beobachtung innerhalb der technischen Zone", "pos", "now"
     elif isinstance(es, (int, float)) and es >= 42:
-        action, tone, when = "🟡 Gestaffelt kaufen (Teilpositionen)", "neutral", "now"
+        action, tone, when = "🟡 Gemischte Timing-Beobachtung; weitere Bestätigung abwarten", "neutral", "now"
     else:
-        action, tone, when = ("⏳ Zu teuer/heiß – erst auf Rücksetzer in die Kaufzone "
-                              "(unter aktuellem Kurs) warten", "neutral", "dip")
+        action, tone, when = ("⏳ Gestreckt – Rücksetzer in die technische Beobachtungszone "
+                              "abwarten", "neutral", "dip")
 
     def r2(x):
         return round(x, 2)
@@ -831,11 +831,12 @@ def plain_summary(row):
     # Analyst consensus
     au, an = row.get("analyst_upside_pct"), row.get("analyst_n") or 0
     if _has(au) and an >= 3:
-        rating_de = {"strong_buy": "starker Kauf", "buy": "Kauf", "hold": "Halten",
-                     "underperform": "Untergewichten", "sell": "Verkauf"}.get(
+        rating_de = {"strong_buy": "Strong Buy-Konsens", "buy": "Buy-Konsens",
+                     "hold": "Hold-Konsens", "underperform": "Underperform-Konsens",
+                     "sell": "Sell-Konsens", "none": "Kein Analystenkonsens"}.get(
                          row.get("analyst_rating"), row.get("analyst_rating") or "—")
         arrow = f"+{au:.0f}%" if au >= 0 else f"{au:.0f}%"
-        parts.append(f"{an} Analysten: Konsens „{rating_de}\", Ø-Kursziel {arrow} zum aktuellen Kurs.")
+        parts.append(f"{an} Analysten: {rating_de}, Ø-Kursziel {arrow} zum aktuellen Kurs.")
 
     # Expert frameworks
     if _has(row.get("minervini_score")) and row["minervini_score"] >= 80:

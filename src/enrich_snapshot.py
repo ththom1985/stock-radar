@@ -7,9 +7,50 @@ from pathlib import Path
 from .config import OUTPUT
 from .insights import enrich_snapshot
 from .persistence import atomic_write_json, load_json
+from .universe import load_universe
 
 DEFAULT_INPUT = OUTPUT / "latest.json"
 DEFAULT_PREVIEW = OUTPUT / "latest.enriched.json"
+
+
+def _merge_provider_free_context(snapshot: dict) -> None:
+    """Merge existing local caches/config only; never contact a provider."""
+    fundamentals = load_json(
+        OUTPUT.parent / "fundamentals.json",
+        expected_type=dict,
+        default={},
+    )
+    configured = {item["symbol"]: item for item in load_universe()}
+    for row in snapshot.get("all") or []:
+        symbol = row.get("symbol")
+        if not symbol:
+            continue
+        cached = fundamentals.get(symbol) or {}
+        universe_row = configured.get(symbol) or {}
+        row["short_name"] = row.get("short_name") or row.get("name")
+        row["exchange"] = row.get("exchange") or universe_row.get("exchange")
+        row["listing_market"] = row.get("listing_market") or row.get("exchange")
+        for key in (
+            "provider_long_name",
+            "provider_country",
+            "reported_currency",
+            "sector",
+            "industry",
+        ):
+            if not row.get(key) and cached.get(key):
+                row[key] = cached[key]
+        market_cap = cached.get("market_cap")
+        fx_usd = row.get("fx_usd")
+        reported = cached.get("reported_currency")
+        if (
+            isinstance(market_cap, (int, float))
+            and market_cap > 0
+            and isinstance(fx_usd, (int, float))
+            and fx_usd > 0
+            and (not reported or reported == row.get("currency"))
+        ):
+            row["market_cap_local"] = market_cap
+            row["market_cap_usd"] = market_cap * fx_usd
 
 
 def recompute(
@@ -17,6 +58,7 @@ def recompute(
     output_path: Path = DEFAULT_PREVIEW,
 ) -> dict:
     source = load_json(input_path, required=True, expected_type=dict)
+    _merge_provider_free_context(source)
     enriched = enrich_snapshot(source)
     atomic_write_json(output_path, enriched)
     return enriched
