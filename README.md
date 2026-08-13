@@ -46,6 +46,17 @@ Every output row contains:
 The dashboard refuses to render research cards when the snapshot is corrupt,
 stale, incomplete, or uses an unsupported schema.
 
+## Login-free online dashboard
+
+The public GitHub Pages dashboard is available without a Streamlit account:
+
+**https://ththom1985.github.io/stock-radar/**
+
+`python -m src.export_static` creates the compact `docs/data.json` payload from
+the validated v2 snapshot. Both analysis workflows regenerate and publish this
+payload after a successful run, so the Pages dashboard stays synchronized with
+`data/output/latest.json`.
+
 ## Reliability model
 
 - JSON state is replaced atomically using a flushed sibling temporary file.
@@ -136,6 +147,12 @@ Run the dashboard:
 ```powershell
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 .\.venv\Scripts\streamlit.exe run dashboard/app.py
+```
+
+Build the login-free static dashboard payload:
+
+```powershell
+.\.venv\Scripts\python.exe -m src.export_static
 ```
 
 Run deterministic tests:
