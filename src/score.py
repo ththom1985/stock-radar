@@ -11,11 +11,11 @@ def _ok(x):
     return x is not None and not (isinstance(x, float) and np.isnan(x))
 
 
-def score_daytrade(f):
-    """Short-term trading opportunity.
+def score_daily_signal(f):
+    """Completed-daily-bar momentum context.
 
-    Returns (score 0-100, direction LONG/SHORT/NEUTRAL, list[str] reasons).
-    Driven by momentum, breakouts, volume spikes and volatility.
+    Returns (score 0-100, direction POSITIVE/NEGATIVE/NEUTRAL, reasons).
+    This is an unvalidated heuristic and is not an intraday or trading forecast.
     """
     score = 0.0
     reasons = []
@@ -31,11 +31,11 @@ def score_daytrade(f):
     if _ok(f.get("high20")) and price > f["high20"]:
         score += 20
         long_sig += 1
-        reasons.append(f"Ausbruch über 20-Tage-Hoch ({f['high20']:.2f}) – Long-Momentum")
+        reasons.append(f"Ausbruch über 20-Tage-Hoch ({f['high20']:.2f}) – positives Momentum")
     if _ok(f.get("low20")) and price < f["low20"]:
         score += 20
         short_sig += 1
-        reasons.append(f"Bruch unter 20-Tage-Tief ({f['low20']:.2f}) – Short-Momentum")
+        reasons.append(f"Bruch unter 20-Tage-Tief ({f['low20']:.2f}) – negatives Momentum")
 
     mh, mhp = f.get("macd_hist"), f.get("macd_hist_prev")
     if _ok(mh) and _ok(mhp):
@@ -57,7 +57,7 @@ def score_daytrade(f):
         elif rsi >= 70:
             score += 12
             short_sig += 1
-            reasons.append(f"RSI überkauft ({rsi:.0f}) – Rücksetzer-Chance (Short)")
+            reasons.append(f"RSI überkauft ({rsi:.0f}) – erhöhtes Rücksetzerrisiko")
 
     atrp = f.get("atr_pct")
     if _ok(atrp):
@@ -80,10 +80,17 @@ def score_daytrade(f):
     if long_sig == 0 and short_sig == 0:
         direction = "NEUTRAL"
     elif long_sig >= short_sig:
-        direction = "LONG"
+        direction = "POSITIVE"
     else:
-        direction = "SHORT"
+        direction = "NEGATIVE"
     return round(_clamp(score), 1), direction, reasons
+
+
+def score_daytrade(f):
+    """Deprecated compatibility wrapper for pre-v2 consumers."""
+    score, direction, reasons = score_daily_signal(f)
+    legacy = {"POSITIVE": "LONG", "NEGATIVE": "SHORT"}.get(direction, "NEUTRAL")
+    return score, legacy, reasons
 
 
 def score_longterm(f):

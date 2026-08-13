@@ -6,7 +6,6 @@ This is CONTEXT, not prediction: it produces a risk regime that nudges scores
 near an FOMC decision, raise caution). Everything is free (yfinance + Fed RSS)
 and cached, refreshed on every pipeline run (~3x/trading day via GitHub Actions).
 """
-import json
 import re
 import urllib.request
 from datetime import datetime, timezone, timedelta
@@ -14,6 +13,7 @@ from datetime import datetime, timezone, timedelta
 import yfinance as yf
 
 from .config import DATA
+from .persistence import atomic_write_json, load_json, schema_meta, utc_now
 
 MACRO_CACHE = DATA / "macro.json"
 MAX_AGE_HOURS = 2
@@ -29,12 +29,7 @@ _DOVE = ("cut", "lower", "ease", "accommodative", "softening", "cooling", "rate 
 
 
 def _load():
-    if MACRO_CACHE.exists():
-        try:
-            return json.loads(MACRO_CACHE.read_text(encoding="utf-8"))
-        except Exception:  # noqa: BLE001
-            return {}
-    return {}
+    return load_json(MACRO_CACHE, expected_type=dict, default={})
 
 
 def _fresh(cache):
@@ -78,13 +73,29 @@ def _fomc_tone():
         items = re.findall(r"<item>(.*?)</item>", xml, re.S)
         for it in items:
             title = (re.search(r"<title>(.*?)</title>", it, re.S) or [None, ""])[1]
-            if "FOMC" in title or "Federal Open Market" in title or "monetary policy" in title.lower():
+            lower_title = re.sub(r"<[^>]+>", "", title).strip().lower()
+            if "fomc statement" in lower_title or "federal open market committee statement" in lower_title:
+                document_type = "statement"
+            elif (
+                "minutes of the federal open market committee" in lower_title
+                or "fomc minutes" in lower_title
+            ):
+                document_type = "minutes"
+            else:
+                continue
+            if document_type:
                 blob = it.lower()
                 h = sum(blob.count(w) for w in _HAWK)
                 d = sum(blob.count(w) for w in _DOVE)
                 tone = "hawkish" if h > d else "dovish" if d > h else "neutral"
                 date = (re.search(r"<pubDate>(.*?)</pubDate>", it, re.S) or [None, ""])[1][:16]
-                return {"tone": tone, "headline": re.sub(r"<[^>]+>", "", title).strip()[:120], "date": date}
+                return {
+                    "tone": tone,
+                    "headline": re.sub(r"<[^>]+>", "", title).strip()[:120],
+                    "date": date,
+                    "document_type": document_type,
+                    "model_status": "heuristic_context_only",
+                }
     except Exception:  # noqa: BLE001
         pass
     return None
@@ -97,7 +108,7 @@ def fetch_macro(today=None, verbose=True):
         return cache
 
     if verbose:
-        print("Makro-Umfeld laden (VIX, Zinsen, Fed) …")
+        print("Refresh macro context (VIX, rates, Fed) ...")
     vix, vix_prev = _last_and_prev("^VIX")
     tnx, tnx_prev = _last_and_prev("^TNX")          # 10Y yield (sometimes ×10, sometimes direct)
     spx, spx_prev = _last_and_prev("^GSPC")
@@ -142,7 +153,7 @@ def fetch_macro(today=None, verbose=True):
     tone = _fomc_tone()
 
     macro = {
-        "fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "fetched_at": utc_now(),
         "vix": vix, "vix_prev": vix_prev,
         "tnx_pct": tnx_pct, "tnx_prev_pct": tnx_prev_pct,
         "rate_dir": rate_dir,
@@ -155,11 +166,20 @@ def fetch_macro(today=None, verbose=True):
         "regime": regime, "regime_label": regime_label,
         "fomc_next": fomc_date, "fomc_in_days": fomc_days,
         "fomc_tone": tone,
+        "context_only": True,
+        "calendar_coverage_through": "2026-12-09",
     }
-    try:
-        MACRO_CACHE.write_text(json.dumps(macro, ensure_ascii=False, indent=1), encoding="utf-8")
-    except Exception:  # noqa: BLE001
-        pass
+    stale_fields = []
+    for key, value in list(macro.items()):
+        if value is None and cache.get(key) is not None:
+            macro[key] = cache[key]
+            stale_fields.append(key)
+    macro["_source_status"] = {
+        "stale_good_fields": stale_fields,
+        "status": "stale_partial" if stale_fields else "fresh",
+    }
+    macro["_meta"] = schema_meta("stock-radar-macro-cache")
+    atomic_write_json(MACRO_CACHE, macro, indent=1)
     return macro
 
 

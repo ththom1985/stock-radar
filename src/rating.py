@@ -11,88 +11,35 @@ def _has(x):
 
 
 def radar_elo(row):
-    """Overall opportunity rating on a ~700-2200 scale (like a chess ELO).
+    """Comparable core heuristic using only broadly available score inputs.
 
-    Anchored on the long-term investment score, nudged by short-term momentum
-    and by whether smart money (Aschenbrenner) is long or betting against it.
-    Returns (elo:int, rating_label:str, color:str).
+    Optional analyst, news, social, expert, deep-fundamental and macro features
+    are context only and deliberately cannot move the cross-sectional ranking.
     """
-    base = row.get("investment_score")
-    if not _has(base):
-        base = row.get("longterm_score") or 50
+    # Generic fundamentals are descriptive only until robust sector-neutral
+    # point-in-time peer ranks exist.
+    base = row.get("longterm_score") or 50
     elo = 1000 + base * 10
 
-    dt = row.get("daytrade_score") or 0
-    if row.get("daytrade_direction") == "LONG" and dt > 40:
-        elo += min(80, (dt - 40) * 2)
-    elif row.get("daytrade_direction") == "SHORT" and dt > 40:
-        elo -= min(60, (dt - 40) * 1.5)
-
-    asch = row.get("aschenbrenner")
-    if asch:
-        if asch["stance"] == "LONG":
-            elo += 60
-        elif asch["stance"] == "SHORT_BET":
-            elo -= 70
-
-    ns = row.get("news_score")
-    if _has(ns) and (row.get("news_n") or 0) >= 2:
-        elo += max(-55, min(55, (ns - 50) * 1.4))
-
-    if row.get("hype_surging") and _has(row.get("hype_score")):
-        elo += min(40, row["hype_score"] * 0.4)  # retail momentum (short-term)
-
-    an = row.get("analyst_n") or 0
-    if an >= 3:
-        # Analyst input deliberately down-weighted (targets are laggy & get revised).
-        au = row.get("analyst_upside_pct")
-        if _has(au):
-            elo += max(-22, min(28, au * 0.55))         # halved vs. before
-        am = row.get("analyst_mean")
-        if _has(am):
-            elo += max(-18, min(18, (3 - am) * 9))      # consensus, down-weighted
-
-    # Expert frameworks
-    mv = row.get("minervini_score")
-    if _has(mv):
-        elo += (mv - 50) * 0.4                          # ±20 trend-template alignment
-    pio = row.get("piotroski")
-    if _has(pio):
-        elo += (pio - 4.5) * 7                          # Piotroski 9→+31, 0→-31
-    alt = row.get("altman_z")
-    if _has(alt):
-        if alt < 1.81:
-            elo -= 45                                   # bankruptcy distress zone
-        elif alt > 2.99:
-            elo += 12
-    stg = row.get("weinstein_stage")
-    if stg == 4:
-        elo -= 30
-    elif stg == 2:
-        elo += 15
-
-    # Macro context (VIX regime, rates, Fed) — small nudge, computed upstream
-    mp = row.get("macro_pts")
-    if _has(mp):
-        elo += mp
-    # Sudden unusual volume (accumulation / distribution)
-    vp = row.get("volume_pts")
-    if _has(vp):
-        elo += vp
+    daily = row.get("daily_signal_score") or 0
+    direction = row.get("daily_signal_direction")
+    if direction == "POSITIVE" and daily > 40:
+        elo += min(40, daily - 40)
+    elif direction == "NEGATIVE" and daily > 40:
+        elo -= min(40, daily - 40)
 
     elo = int(round(max(700, min(2200, elo)) / 5) * 5)
 
     for thr, label, color in [
-        (1950, "Top-Chance", "#16a34a"),
-        (1800, "Stark", "#65a30d"),
-        (1650, "Solide", "#ca8a04"),
-        (1500, "Neutral", "#6b7280"),
-        (1350, "Schwach", "#ea580c"),
-        (0, "Meiden", "#dc2626"),
+        (1850, "sehr starkes heuristisches Signal", "#16a34a"),
+        (1700, "starkes heuristisches Signal", "#65a30d"),
+        (1550, "mittleres heuristisches Signal", "#ca8a04"),
+        (1400, "neutrales heuristisches Signal", "#6b7280"),
+        (0, "schwaches heuristisches Signal", "#ea580c"),
     ]:
         if elo >= thr:
             return elo, label, color
-    return elo, "Meiden", "#dc2626"
+    return elo, "schwaches heuristisches Signal", "#ea580c"
 
 
 def radar_score(elo):
@@ -255,7 +202,7 @@ def downside_analysis(row):
     atrp = row.get("atr_pct") or 3
     s1 = sup[0] if sup else None
     s2 = sup[1] if len(sup) > 1 else None
-    room1 = (P / s1 - 1) * 100 if s1 else None
+    room1 = ((P - s1) / P) * 100 if s1 and P else None
     turning = _macd_turning_up(row) and row.get("daytrade_direction") != "SHORT"
     near = room1 is not None and room1 <= 1.5 * atrp
     regime = _regime(row)
@@ -273,7 +220,7 @@ def downside_analysis(row):
         risk, verdict = "mittel", "moderater Puffer bis zur nächsten Unterstützung."
     return {
         "support1": s1, "support1_pct": round(-room1, 1) if room1 is not None else None,
-        "support2": s2, "support2_pct": round(-(P / s2 - 1) * 100, 1) if s2 else None,
+        "support2": s2, "support2_pct": round((s2 / P - 1) * 100, 1) if s2 and P else None,
         "risk": risk, "verdict": verdict,
     }
 
@@ -395,7 +342,7 @@ def entry_score(row):
     sup = _supports_below(row)
     atrp = row.get("atr_pct")
     if sup and _has(atrp) and atrp > 0:
-        room = (row["price"] / sup[0] - 1) * 100
+        room = (row["price"] - sup[0]) / row["price"] * 100
         if room <= 1.2 * atrp:
             score += 8                       # cushioned by nearby support
         elif room >= 4 * atrp:

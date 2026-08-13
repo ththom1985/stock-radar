@@ -71,7 +71,10 @@ def advanced_indicators(df):
     # --- CCI (Commodity Channel Index) ---
     tp = (h + l + c) / 3
     sma_tp = tp.rolling(20).mean()
-    mad = (tp - sma_tp).abs().rolling(20).mean()
+    mad = tp.rolling(20).apply(
+        lambda values: np.mean(np.abs(values - np.mean(values))),
+        raw=True,
+    )
     out["cci"] = _f(((tp - sma_tp) / (0.015 * mad)).iloc[-1])
 
     # --- ROC (Rate of Change, 10) ---
@@ -96,8 +99,8 @@ def advanced_indicators(df):
     # --- Aroon (25) ---
     n = 25
     if len(c) > n:
-        aroon_up = h.rolling(n + 1).apply(lambda x: (n - x.argmax()) / n * 100, raw=True)
-        aroon_dn = l.rolling(n + 1).apply(lambda x: (n - x.argmin()) / n * 100, raw=True)
+        aroon_up = h.rolling(n + 1).apply(lambda x: x.argmax() / n * 100, raw=True)
+        aroon_dn = l.rolling(n + 1).apply(lambda x: x.argmin() / n * 100, raw=True)
         out["aroon_up"] = _f(aroon_up.iloc[-1])
         out["aroon_down"] = _f(aroon_dn.iloc[-1])
 
@@ -161,9 +164,12 @@ def advanced_indicators(df):
     # --- Ichimoku Cloud ---
     tenkan = (h.rolling(9).max() + l.rolling(9).min()) / 2
     kijun = (h.rolling(26).max() + l.rolling(26).min()) / 2
-    span_a = ((tenkan + kijun) / 2)
-    span_b = (h.rolling(52).max() + l.rolling(52).min()) / 2
+    # The cloud visible at the current session was calculated 26 sessions ago.
+    span_a = ((tenkan + kijun) / 2).shift(26)
+    span_b = ((h.rolling(52).max() + l.rolling(52).min()) / 2).shift(26)
     a_now, b_now = _f(span_a.iloc[-1]), _f(span_b.iloc[-1])
+    out["ichimoku_span_a"] = a_now
+    out["ichimoku_span_b"] = b_now
     if a_now is not None and b_now is not None and price is not None:
         top, bot = max(a_now, b_now), min(a_now, b_now)
         out["ichimoku"] = ("über Wolke" if price > top else "unter Wolke" if price < bot else "in Wolke")
@@ -182,11 +188,12 @@ def advanced_indicators(df):
     roll_max = c.cummax()
     out["max_drawdown_pct"] = _f(((c / roll_max - 1).min()) * 100)
 
-    # --- Classic Pivot Points (from last completed bar) ---
-    P = (h.iloc[-1] + l.iloc[-1] + c.iloc[-1]) / 3
+    # --- Classic Pivot Points for the next session from latest completed bar ---
+    pivot_index = -1
+    P = (h.iloc[pivot_index] + l.iloc[pivot_index] + c.iloc[pivot_index]) / 3
     out["pivot"] = _f(P)
-    out["pivot_r1"] = _f(2 * P - l.iloc[-1])
-    out["pivot_s1"] = _f(2 * P - h.iloc[-1])
+    out["pivot_r1"] = _f(2 * P - l.iloc[pivot_index])
+    out["pivot_s1"] = _f(2 * P - h.iloc[pivot_index])
 
     # --- Fibonacci retracement position within 52-week range ---
     win = min(len(c), 252)

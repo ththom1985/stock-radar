@@ -4,13 +4,20 @@ Fundamentals change slowly, so we cache per symbol and only refetch entries
 older than FUND_MAX_AGE_DAYS. This keeps the daily technical run fast while a
 weekly refresh keeps valuations current.
 """
-import json
 import time
 from datetime import datetime, timezone, timedelta
 
 import yfinance as yf
 
 from .config import DATA
+from .persistence import (
+    atomic_write_json,
+    cache_failure,
+    clear_cache_failure,
+    load_json,
+    schema_meta,
+    utc_now,
+)
 
 FUND_CACHE = DATA / "fundamentals.json"
 FUND_MAX_AGE_DAYS = 7
@@ -50,20 +57,22 @@ _FIELDS = {
     "bookValue": "bvps",
     "beta": "beta",
     "totalRevenue": "revenue",
+    "quoteType": "quote_type",
+    "currency": "reported_currency",
+    "uuid": "issuer_uuid",
+    "longName": "provider_long_name",
+    "country": "provider_country",
 }
 
 
 def _load_cache():
-    if FUND_CACHE.exists():
-        try:
-            return json.loads(FUND_CACHE.read_text(encoding="utf-8"))
-        except Exception:  # noqa: BLE001
-            return {}
-    return {}
+    return load_json(FUND_CACHE, expected_type=dict, default={})
 
 
 def _save_cache(cache):
-    FUND_CACHE.write_text(json.dumps(cache, ensure_ascii=False, indent=1), encoding="utf-8")
+    cache = dict(cache)
+    cache["_meta"] = schema_meta("stock-radar-fundamentals-cache")
+    atomic_write_json(FUND_CACHE, cache, indent=1)
 
 
 def _extract(info):
@@ -95,19 +104,21 @@ def fetch_fundamentals(symbols, max_age_days=FUND_MAX_AGE_DAYS, force=False, ver
 
     if verbose:
         fresh = len(symbols) - len(stale)
-        print(f"Fundamentaldaten: {fresh} aus Cache, {len(stale)} werden neu geladen …")
+        print(f"Fundamentals: {fresh} cached, refreshing {len(stale)} ...")
 
     for i, sym in enumerate(stale, 1):
         try:
             info = yf.Ticker(sym).info
             data = _extract(info)
-            data["fetched_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
-            cache[sym] = data
+            if not data:
+                raise ValueError("provider returned no usable fundamental fields")
+            data["fetched_at"] = utc_now()
+            data["last_success_at"] = data["fetched_at"]
+            cache[sym] = clear_cache_failure(data)
         except Exception as exc:  # noqa: BLE001
-            cache[sym] = {"fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-                          "error": str(exc)[:120]}
+            cache[sym] = cache_failure(cache.get(sym), exc)
         if verbose and i % 25 == 0:
-            print(f"  {i}/{len(stale)} …")
+            print(f"  {i}/{len(stale)} ...")
         time.sleep(FETCH_PAUSE)
 
     if stale:

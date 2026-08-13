@@ -6,7 +6,6 @@ Financial statements are slow to fetch, so results are cached with a long
 staleness and only a bounded number of new tickers is fetched per run — the
 cache fills up over a few runs and daily runs stay fast. Failures never raise.
 """
-import json
 import os
 import time
 from datetime import datetime, timezone, timedelta
@@ -14,6 +13,7 @@ from datetime import datetime, timezone, timedelta
 import yfinance as yf
 
 from .config import DATA
+from .persistence import atomic_write_json, cache_failure, load_json, schema_meta, utc_now
 
 DEEP_CACHE = DATA / "deep_fundamentals.json"
 MAX_AGE_DAYS = 30
@@ -23,16 +23,13 @@ FETCH_PAUSE = 0.4
 
 
 def _load():
-    if DEEP_CACHE.exists():
-        try:
-            return json.loads(DEEP_CACHE.read_text(encoding="utf-8"))
-        except Exception:  # noqa: BLE001
-            return {}
-    return {}
+    return load_json(DEEP_CACHE, expected_type=dict, default={})
 
 
 def _save(cache):
-    DEEP_CACHE.write_text(json.dumps(cache, ensure_ascii=False, indent=1), encoding="utf-8")
+    cache = dict(cache)
+    cache["_meta"] = schema_meta("stock-radar-deep-fundamentals-cache")
+    atomic_write_json(DEEP_CACHE, cache, indent=1)
 
 
 def _row(df, names, col=0):
@@ -135,22 +132,21 @@ def fetch_deep(symbols, market_caps, max_new=MAX_NEW_PER_RUN, verbose=True):
 
     todo = stale[:max_new]
     if verbose:
-        print(f"Bilanz-Kennzahlen (Piotroski/Altman): {len(symbols) - len(stale)} aus Cache, "
-              f"{len(todo)} neu (von {len(stale)} offen) …")
+        print(f"Deep fundamentals (Piotroski/Altman): {len(symbols) - len(stale)} cached, "
+              f"refreshing {len(todo)} of {len(stale)} ...")
 
     for sym in todo:
-        rec = {"fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds")}
         try:
             t = yf.Ticker(sym)
             inc, bs, cf = t.income_stmt, t.balance_sheet, t.cashflow
             pio, pion = _piotroski(inc, bs, cf)
+            rec = {"fetched_at": utc_now(), "last_success_at": utc_now()}
             rec["piotroski"] = pio if pion >= 5 else None
             rec["piotroski_n"] = pion
             rec["altman_z"] = _altman_z(inc, bs, market_caps.get(sym))
-        except Exception:  # noqa: BLE001
-            rec["piotroski"] = None
-            rec["altman_z"] = None
-        cache[sym] = rec
+            cache[sym] = rec
+        except Exception as exc:  # noqa: BLE001
+            cache[sym] = cache_failure(cache.get(sym), exc)
         time.sleep(FETCH_PAUSE)
 
     if todo:

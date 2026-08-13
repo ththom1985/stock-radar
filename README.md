@@ -1,74 +1,233 @@
-# 📈 Stock Radar
+# Stock Radar — completed-daily-bar research
 
-Tägliches Research-Werkzeug: analysiert dein Aktienuniversum (Start: ~300, skalierbar auf 1500)
-technisch und liefert jeden Tag die **Top 10 Daytrading-Chancen** und **Top 10 Langzeit-Einstiege** –
-jeweils mit nachvollziehbarer Begründung und den passenden News-Headlines.
+Stock Radar is a **research tool**, not a trading system or investment adviser. It
+builds a conservative snapshot from completed Yahoo Finance daily bars and
+separately presents company equities, funds/ETFs, crypto, and other instruments.
 
-> ⚠️ **Keine Anlageberatung.** Alle Signale sind rein technisch berechnet. Entscheidungen triffst du selbst.
+## Validation status
 
-## Datenquelle & Kosten
+The deployed composite is **UNVALIDATED** and its output is always marked
+`actionable: false`.
 
-- **Kurse:** Yahoo Finance über `yfinance` – kostenlos, ~15 Min verzögert.
-- **News:** öffentliche Yahoo-Finance-RSS-Feeds pro Ticker (nur Headlines + Links).
-- **Financial Times:** aus Lizenzgründen **nicht** automatisiert eingebunden. FT-Artikel liest du im
-  eigenen Portal; öffentliche FT-Headlines lassen sich später als zusätzliche RSS-Quelle ergänzen.
+- No profitability, alpha, probability, confidence, expected-return, or
+  intraday claim is made.
+- Scenario ranges are uncalibrated log-return/volatility illustrations. They are
+  excluded from ranking and cannot produce negative prices.
+- The available backtest can validate only the technical score because reliable
+  point-in-time histories for fundamentals, analyst targets, and news are not
+  available. It cannot validate the deployed composite.
+- Optional news, analyst, macro, social/expert, and deep-fundamental context does
+  not change the comparable core ranking.
 
-## Ordnerstruktur
+## Daily data contract
 
-```
-Stock-Radar/
-├─ data/
-│  ├─ tickers.csv          # DEIN Universum (symbol,name,exchange)
-│  └─ output/latest.json   # Ergebnis der letzten Analyse
-├─ src/
-│  ├─ config.py            # Parameter (Indikator-Fenster, Top-N, Batchgröße)
-│  ├─ universe.py          # Ticker laden
-│  ├─ fetch.py             # Kurse holen (yfinance)
-│  ├─ indicators.py        # RSI, MACD, ATR, Bollinger, SMA, Volumen …
-│  ├─ score.py             # Scoring + deutsche Begründungen
-│  ├─ news.py              # News-Headlines pro Ticker
-│  └─ analyze.py           # Gesamt-Pipeline
-├─ dashboard/app.py        # Streamlit-Dashboard
-└─ .github/workflows/daily.yml  # automatische Läufe (mehrmals/Tag)
-```
+The pipeline downloads `1d` Yahoo bars with raw prices and available corporate
+actions. It preserves a provider timezone when present; naive indexes use
+conservative symbol-based US/Europe/Asia/24x7 session profiles. A same-date bar
+is accepted only after the mapped close plus a 90-minute buffer. Unknown and
+24x7 markets lag until the UTC day and buffer have ended.
 
-## Einmalige Einrichtung (Windows)
+Every output row contains:
+
+- completed `bar_date` and source timestamp;
+- completed-bar age;
+- source interval (`1d`);
+- local and USD price provenance;
+- asset type and feature-coverage flags.
+
+`data/output/latest.json` uses schema `stock-radar-output`, version 2, and contains:
+
+- `data_status`: price/fresh-bar coverage, SLA, age distribution, failures, and
+  blocking reasons;
+- `model_status`: explicit validation and non-actionability metadata;
+- `rankings_by_asset`: separate, coverage-consistent research rankings;
+- `all`: the complete analyzed-row contract.
+
+The dashboard refuses to render research cards when the snapshot is corrupt,
+stale, incomplete, or uses an unsupported schema.
+
+## Reliability model
+
+- JSON state is replaced atomically using a flushed sibling temporary file.
+- Existing corrupt JSON raises an explicit error; it is never silently replaced
+  with an empty cache or fresh portfolio.
+- Failed refreshes retain stale-good fundamentals, deep fundamentals, earnings,
+  FX, patterns, and news while recording failure metadata.
+- Missing non-USD FX excludes affected symbols. It never assumes a 1:1 USD rate.
+- Price ingestion retries, splits failed batches, retries missing names
+  individually, and writes `data/failed_symbols.json`.
+- Rankings are suppressed when coverage/freshness is below the configured SLA.
+
+## Asset comparability
+
+Asset type uses provider `quoteType` when available and conservative symbol/name
+fallbacks. Company fundamental scoring is disabled for ETFs, funds, crypto,
+indices, futures, and other non-company instruments.
+
+All overall rankings now use completed-daily technical context only. Generic
+absolute fundamental bands remain descriptive because robust sector-neutral,
+point-in-time peer ranks are not implemented; banks, insurers, REITs, and
+industrial companies are therefore not forced into one generic valuation rank.
+The output exposes complete/current peer counts and feature coverage.
+
+Rank-eligible, technical, and company-fundamental descriptive coverage are
+blocking data gates with configurable minima by asset class.
+
+There is no global cross-currency ordering. Research lists are partitioned by
+trading currency and asset class because current FX cannot make historical
+local-currency indicators point-in-time comparable.
+
+## Paper simulation
+
+The paper module is an **UNVALIDATED, non-actionable simulation**:
+
+- a completed-bar signal creates a pending long-only order at observation time;
+- no bar before UTC creation-date + two calendar dates may fill, and a verified
+  session-open timestamp must be later than order creation;
+- fills store signal/fill timestamps, quantity, raw/execution prices, commission,
+  slippage, not-before date, and fill-observation time;
+- only USD company equities are eligible until point-in-time historical FX exists;
+- issuer uniqueness, sector/country caps, minimum dollar volume, and maximum
+  ATR/annualized volatility apply (no correlation-optimization claim);
+- bounded sparse action history is replayed using stable symbol/type/ex-date/value
+  keys; late-reported actions remain eligible and corrected values apply explicit
+  delta/correction ledger entries exactly once;
+- legacy portfolio data is preserved and marked during migration, never reset.
+  Legacy positions are frozen because their historical fills are incompatible
+  with v2 accounting; starting a separate clean v2 simulation requires an
+  explicit user decision (`STOCK_RADAR_START_NEW_PAPER=1`). Legacy data remains
+  under `legacy_archive` / `legacy_frozen_positions`.
+
+Corporate-action coverage cannot be guaranteed across missed runs. Consequently,
+paper performance remains explicitly non-actionable.
+
+Portfolio benchmarks use the same completed-session ingestion contract. Values
+are stored with their own bar dates and rebased only on common portfolio/benchmark
+as-of dates.
+
+## Automation
+
+`.github/workflows/daily.yml` runs once on weekdays at **23:15 UTC**, after the
+major US markets are closed in both daylight-saving seasons. The legacy
+`intraday.yml` filename is manual-only and has no schedule or intraday mode.
+Both workflows skip their job unless `github.ref` is exactly
+`refs/heads/main`, explicitly check out `main`, and can therefore never publish
+a feature-branch dispatch into `main`.
+
+Workflows use verified action commit SHAs, pinned direct Python dependencies,
+non-persisted checkout credentials, complete cache publication, and failing
+pull/push retries. The deterministic unit suite is a blocking step before
+analysis. Publication failures are not converted into successful jobs.
+
+## Setup and execution
 
 ```powershell
-cd "C:\Users\ththomas\OneDrive\Thomas Mercantile\Stock-Radar"
-& "$env:LOCALAPPDATA\Programs\Python\Python312\python.exe" -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-```
-
-## Analyse laufen lassen
-
-```powershell
+cd "C:\path\to\Stock-Radar"
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements-ci.txt
 .\.venv\Scripts\python.exe -m src.analyze
 ```
 
-Erzeugt `data/output/latest.json` und gibt die Top-10-Listen in der Konsole aus.
+The first v2 run migrates legacy caches as they are refreshed and migrates the
+paper portfolio with its original accounting archived in-place.
 
-## Dashboard öffnen
+Run the dashboard:
 
 ```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
 .\.venv\Scripts\streamlit.exe run dashboard/app.py
 ```
 
-Öffnet sich im Browser (http://localhost:8501).
+Run deterministic tests:
 
-## Eigene Ticker einpflegen
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+```
 
-`data/tickers.csv` bearbeiten. Ein Yahoo-Symbol pro Zeile.
-Suffixe: US = kein Suffix (`AAPL`), Xetra = `.DE` (`SAP.DE`), Euronext Amsterdam = `.AS`,
-Paris = `.PA`, London = `.L`, SIX = `.SW`. Zeilen mit `#` werden ignoriert.
+### Safe bounded smoke run
 
-## Automatisierung (kostenlos)
+This exercises the real pipeline on a bounded universe while redirecting every
+JSON/cache/portfolio write away from tracked production data:
 
-Repo zu GitHub pushen → `.github/workflows/daily.yml` läuft an Handelstagen mehrmals,
-aktualisiert `latest.json` und committet es. Optional das Dashboard gratis auf
-Streamlit Community Cloud hosten (liest `latest.json` aus dem Repo).
+```powershell
+$env:STOCK_RADAR_DRY_RUN = "1"
+$env:STOCK_RADAR_DRY_RUN_DIR = "$PWD\data\dry-run"
+$env:STOCK_RADAR_MAX_SYMBOLS = "25"
+.\.venv\Scripts\python.exe -m src.analyze
+```
 
-## Parameter anpassen
+Unset those variables before a production run. `data/dry-run/` is ignored by Git.
 
-Alles in `src/config.py`: `TOP_N`, Indikator-Fenster, `FETCH_CHUNK`.
-Scoring-Logik und Begründungen in `src/score.py` – dort kannst du Gewichtungen ändern.
+### Full-universe provider-backed market-data contract run
+
+This scans every configured market-data symbol and validates classification,
+session mappings, completed-bar and feature coverage. Slow enrichment and paper
+simulation are explicitly skipped and declared in output; it does not claim full
+model readiness.
+
+```powershell
+Remove-Item Env:STOCK_RADAR_MAX_SYMBOLS -ErrorAction SilentlyContinue
+$env:STOCK_RADAR_DRY_RUN = "1"
+$env:STOCK_RADAR_DRY_RUN_DIR = "$PWD\data\dry-run-market-full"
+$env:STOCK_RADAR_MARKET_DATA_ONLY = "1"
+.\.venv\Scripts\python.exe -m src.analyze
+```
+
+### Full-universe full-pipeline dry run
+
+```powershell
+Remove-Item Env:STOCK_RADAR_MAX_SYMBOLS -ErrorAction SilentlyContinue
+Remove-Item Env:STOCK_RADAR_MARKET_DATA_ONLY -ErrorAction SilentlyContinue
+$env:STOCK_RADAR_DRY_RUN = "1"
+$env:STOCK_RADAR_DRY_RUN_DIR = "$PWD\data\dry-run-pipeline-full"
+.\.venv\Scripts\python.exe -m src.analyze
+```
+
+Both commands redirect caches, output, and portfolio state. Neither writes
+tracked production data and neither requires Anthropic.
+
+Run the technical-only validation backtest explicitly; it is intentionally not a
+production prerequisite:
+
+```python
+from src.backtest import run_backtest
+run_backtest(["AAPL", "MSFT", "..."], round_trip_cost_bps=20)
+```
+
+## Configuration
+
+Environment variables:
+
+- `STOCK_RADAR_MIN_COVERAGE_PCT` (default `97.0`)
+- `STOCK_RADAR_MAX_BAR_AGE_DAYS` (default `4`)
+- `STOCK_RADAR_MAX_OUTPUT_AGE_HOURS` (default `36`)
+- `STOCK_RADAR_MIN_RANK_COVERAGE_COMPANY_PCT` (default `70`)
+- `STOCK_RADAR_MIN_RANK_COVERAGE_FUND_PCT` (default `70`)
+- `STOCK_RADAR_MIN_RANK_COVERAGE_CRYPTO_PCT` (default `70`)
+- `STOCK_RADAR_MIN_RANK_COVERAGE_OTHER_PCT` (default `70`)
+- `STOCK_RADAR_MIN_COMPANY_FUNDAMENTAL_COVERAGE_PCT` (default `60`)
+- `STOCK_RADAR_DEEP_MAX` (default `60`)
+- `STOCK_RADAR_MIN_DOLLAR_VOLUME` (default `20000000`)
+- `STOCK_RADAR_MAX_PAPER_ATR_PCT` (default `5`)
+- `STOCK_RADAR_MAX_PAPER_ANNUAL_VOL_PCT` (default `60`)
+- `STOCK_RADAR_MAX_PAPER_PER_SECTOR` (default `3`)
+- `STOCK_RADAR_MAX_PAPER_PER_COUNTRY` (default `4`)
+- `STOCK_RADAR_PAPER_ORDER_MAX_AGE_DAYS` (default `7`)
+- `STOCK_RADAR_PAPER_SLIPPAGE_BPS` (default `10`)
+- `STOCK_RADAR_PAPER_COMMISSION_BPS` (default `5`)
+- `STOCK_RADAR_START_NEW_PAPER` (default unset; explicit legacy-migration decision)
+- `STOCK_RADAR_DRY_RUN`, `STOCK_RADAR_DRY_RUN_DIR`, `STOCK_RADAR_MAX_SYMBOLS`
+  (safe bounded smoke controls)
+- `STOCK_RADAR_MARKET_DATA_ONLY` (skip slow enrichment/paper and declare skipped layers)
+
+The ticker universe remains `data/tickers.csv`.
+
+## Session-map limitation
+
+Every suffix currently present in `data/tickers.csv` has an explicit
+conservative IANA-timezone/open/close profile. Additional reviewed profiles
+cover Saudi Arabia, Austria, Brazil, Mexico, South Africa, and Canadian NEO/CSE.
+Unknown suffixes and unverified derivative sessions are explicitly blocked,
+not silently treated as UTC. Exchange holiday calendars are not bundled; the
+90-minute close buffer and freshness gates remain conservative but cannot
+replace a full holiday calendar.

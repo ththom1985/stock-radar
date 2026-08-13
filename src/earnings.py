@@ -1,10 +1,10 @@
 """Next earnings (results) date per ticker via yfinance, with weekly caching."""
-import json
 from datetime import datetime, timezone, timedelta, date
 
 import yfinance as yf
 
 from .config import DATA
+from .persistence import atomic_write_json, cache_failure, load_json, schema_meta, utc_now
 
 EARN_CACHE = DATA / "earnings.json"
 EARN_MAX_AGE_DAYS = 7
@@ -12,30 +12,35 @@ FETCH_PAUSE = 0.15
 
 
 def _load():
-    if EARN_CACHE.exists():
-        try:
-            return json.loads(EARN_CACHE.read_text(encoding="utf-8"))
-        except Exception:  # noqa: BLE001
-            return {}
-    return {}
+    return load_json(EARN_CACHE, expected_type=dict, default={})
 
 
 def _save(cache):
-    EARN_CACHE.write_text(json.dumps(cache, ensure_ascii=False, indent=1), encoding="utf-8")
+    cache = dict(cache)
+    cache["_meta"] = schema_meta("stock-radar-earnings-cache")
+    atomic_write_json(EARN_CACHE, cache, indent=1)
 
 
-def _next_date(cal):
+def _earnings_dates(cal):
     try:
         dates = cal.get("Earnings Date") if isinstance(cal, dict) else None
         if not dates:
-            return None
+            return None, None
         today = date.today()
-        future = sorted(d for d in dates if isinstance(d, date))
-        upcoming = [d for d in future if d >= today]
-        pick = upcoming[0] if upcoming else (future[-1] if future else None)
-        return pick.isoformat() if pick else None
+        valid = sorted(d.date() if isinstance(d, datetime) else d for d in dates if isinstance(d, date))
+        upcoming = [d for d in valid if d >= today]
+        previous = [d for d in valid if d < today]
+        return (
+            upcoming[0].isoformat() if upcoming else None,
+            previous[-1].isoformat() if previous else None,
+        )
     except Exception:  # noqa: BLE001
-        return None
+        return None, None
+
+
+def _next_date(cal):
+    """Compatibility helper: future-only by contract."""
+    return _earnings_dates(cal)[0]
 
 
 def fetch_earnings(symbols, max_age_days=EARN_MAX_AGE_DAYS, verbose=True):
@@ -57,15 +62,19 @@ def fetch_earnings(symbols, max_age_days=EARN_MAX_AGE_DAYS, verbose=True):
             stale.append(s)
 
     if verbose:
-        print(f"Earnings-Termine: {len(symbols) - len(stale)} aus Cache, {len(stale)} neu …")
+        print(f"Earnings dates: {len(symbols) - len(stale)} cached, refreshing {len(stale)} ...")
 
     for sym in stale:
         try:
-            nd = _next_date(yf.Ticker(sym).calendar)
-        except Exception:  # noqa: BLE001
-            nd = None
-        cache[sym] = {"next_earnings": nd,
-                      "fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds")}
+            nd, previous = _earnings_dates(yf.Ticker(sym).calendar)
+            cache[sym] = {
+                "next_earnings": nd,
+                "previous_earnings": previous,
+                "fetched_at": utc_now(),
+                "last_success_at": utc_now(),
+            }
+        except Exception as exc:  # noqa: BLE001
+            cache[sym] = cache_failure(cache.get(sym), exc)
         time.sleep(FETCH_PAUSE)
 
     if stale:

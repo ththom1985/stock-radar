@@ -1,307 +1,605 @@
 {
- "start_capital": 10000.0,
+ "schema": "stock-radar-paper-portfolio",
+ "schema_version": 2,
+ "simulation_status": "legacy_frozen_unvalidated",
+ "performance_actionable": false,
  "created": "2026-07-03",
+ "base_currency": "USD",
+ "starting_cash": 10000.0,
  "cash": 0.0,
- "last_trade_date": "2026-07-10",
  "positions": {
   "GOOGL": {
-   "name": "Alphabet A",
-   "entry_price": 359.91,
-   "entry_date": "2026-07-03",
-   "stake_eur": 1000.0,
-   "score_at_entry": 96,
-   "last_price": 358.89,
-   "value_eur": 997.17,
-   "pnl_eur": -2.83,
-   "pnl_pct": -0.28,
-   "peak_price": 366.46
-  },
-  "TSM": {
-   "name": "TSMC",
-   "entry_price": 434.16,
-   "entry_date": "2026-07-03",
-   "stake_eur": 1000.0,
-   "score_at_entry": 96,
-   "last_price": 436.96,
-   "value_eur": 1006.45,
-   "pnl_eur": 6.45,
-   "pnl_pct": 0.64,
-   "peak_price": 451.79
-  },
-  "M12.DE": {
-   "name": "M1 Kliniken",
-   "entry_price": 21.06,
-   "entry_date": "2026-07-03",
-   "stake_eur": 1000.0,
-   "score_at_entry": 96,
-   "last_price": 22.05,
-   "value_eur": 1047.01,
-   "pnl_eur": 47.01,
-   "pnl_pct": 4.7,
-   "peak_price": 22.84
-  },
-  "005930.KS": {
-   "name": "Samsung Electronics",
-   "entry_price": 202.19,
-   "entry_date": "2026-07-03",
-   "stake_eur": 1000.0,
-   "score_at_entry": 96,
-   "last_price": 189.39,
-   "value_eur": 936.69,
-   "pnl_eur": -63.31,
-   "pnl_pct": -6.33,
-   "peak_price": 207.69
-  },
-  "CSCO": {
-   "name": "Cisco Systems",
-   "entry_price": 112.69,
-   "entry_date": "2026-07-03",
-   "stake_eur": 1000.0,
-   "score_at_entry": 92,
-   "last_price": 118.31,
-   "value_eur": 1049.87,
-   "pnl_eur": 49.87,
-   "pnl_pct": 4.99,
-   "peak_price": 119.43
-  },
-  "PRY.MI": {
-   "name": "Prysmian",
-   "entry_price": 167.14,
-   "entry_date": "2026-07-03",
-   "stake_eur": 1000.0,
-   "score_at_entry": 92,
-   "last_price": 155.35,
-   "value_eur": 929.46,
-   "pnl_eur": -70.54,
-   "pnl_pct": -7.05,
-   "peak_price": 167.37
-  },
-  "6326.T": {
-   "name": "Kubota",
-   "entry_price": 17.04,
-   "entry_date": "2026-07-03",
-   "stake_eur": 1000.0,
-   "score_at_entry": 92,
-   "last_price": 16.77,
-   "value_eur": 984.15,
-   "pnl_eur": -15.85,
-   "pnl_pct": -1.58,
-   "peak_price": 17.22
-  },
-  "AGCO": {
-   "name": "AGCO",
-   "entry_price": 116.49,
-   "entry_date": "2026-07-03",
-   "stake_eur": 1000.0,
-   "score_at_entry": 90,
-   "last_price": 113.26,
-   "value_eur": 972.27,
-   "pnl_eur": -27.73,
-   "pnl_pct": -2.77,
-   "peak_price": 118.32
-  },
-  "ELG.DE": {
-   "name": "Elmos Semiconductor",
-   "entry_price": 201.42,
-   "entry_date": "2026-07-03",
-   "stake_eur": 1000.0,
-   "score_at_entry": 90,
-   "last_price": 191.19,
-   "value_eur": 949.21,
-   "pnl_eur": -50.79,
-   "pnl_pct": -5.08,
-   "peak_price": 202.7
-  },
-  "WDC": {
-   "name": "Western Digital",
-   "entry_price": 539.0,
-   "entry_date": "2026-07-03",
-   "stake_eur": 1000.0,
-   "score_at_entry": 90,
-   "last_price": 578.05,
-   "value_eur": 1072.45,
-   "pnl_eur": 72.45,
-   "pnl_pct": 7.24,
-   "peak_price": 591.05
-  }
- },
- "trade_log": [
-  {
-   "date": "2026-07-03",
-   "action": "BUY",
    "symbol": "GOOGL",
    "name": "Alphabet A",
-   "price": 359.91,
-   "stake_eur": 1000.0,
-   "value_eur": 1000.0,
-   "pnl_eur": 0.0,
-   "pnl_pct": 0.0,
-   "reason": "Top-Tipp"
+   "quantity": 2.7784723958767468,
+   "entry_price": 359.91,
+   "cost_basis": 1000.0,
+   "entry_bar_date": "2026-07-03",
+   "last_price": 358.89,
+   "last_mark_bar_date": "2026-07-03",
+   "last_action_bar_date": "2026-08-13",
+   "legacy": true
   },
-  {
-   "date": "2026-07-03",
-   "action": "BUY",
+  "TSM": {
    "symbol": "TSM",
    "name": "TSMC",
-   "price": 434.16,
-   "stake_eur": 1000.0,
-   "value_eur": 1000.0,
-   "pnl_eur": 0.0,
-   "pnl_pct": 0.0,
-   "reason": "Top-Tipp"
+   "quantity": 2.3032983231988204,
+   "entry_price": 434.16,
+   "cost_basis": 1000.0,
+   "entry_bar_date": "2026-07-03",
+   "last_price": 436.96,
+   "last_mark_bar_date": "2026-07-03",
+   "last_action_bar_date": "2026-08-13",
+   "legacy": true
   },
-  {
-   "date": "2026-07-03",
-   "action": "BUY",
+  "M12.DE": {
    "symbol": "M12.DE",
    "name": "M1 Kliniken",
-   "price": 21.06,
-   "stake_eur": 1000.0,
-   "value_eur": 1000.0,
-   "pnl_eur": 0.0,
-   "pnl_pct": 0.0,
-   "reason": "Top-Tipp"
+   "quantity": 47.48338081671415,
+   "entry_price": 21.06,
+   "cost_basis": 1000.0,
+   "entry_bar_date": "2026-07-03",
+   "last_price": 22.05,
+   "last_mark_bar_date": "2026-07-03",
+   "last_action_bar_date": "2026-08-13",
+   "legacy": true
   },
-  {
-   "date": "2026-07-03",
-   "action": "BUY",
+  "005930.KS": {
    "symbol": "005930.KS",
    "name": "Samsung Electronics",
-   "price": 202.19,
-   "stake_eur": 1000.0,
-   "value_eur": 1000.0,
-   "pnl_eur": 0.0,
-   "pnl_pct": 0.0,
-   "reason": "Top-Tipp"
+   "quantity": 4.945843018942579,
+   "entry_price": 202.19,
+   "cost_basis": 1000.0,
+   "entry_bar_date": "2026-07-03",
+   "last_price": 189.39,
+   "last_mark_bar_date": "2026-07-03",
+   "last_action_bar_date": "2026-08-13",
+   "legacy": true
   },
-  {
-   "date": "2026-07-03",
-   "action": "BUY",
+  "CSCO": {
    "symbol": "CSCO",
    "name": "Cisco Systems",
-   "price": 112.69,
-   "stake_eur": 1000.0,
-   "value_eur": 1000.0,
-   "pnl_eur": 0.0,
-   "pnl_pct": 0.0,
-   "reason": "Top-Tipp"
+   "quantity": 8.873901854645489,
+   "entry_price": 112.69,
+   "cost_basis": 1000.0,
+   "entry_bar_date": "2026-07-03",
+   "last_price": 118.31,
+   "last_mark_bar_date": "2026-07-03",
+   "last_action_bar_date": "2026-08-13",
+   "legacy": true
   },
-  {
-   "date": "2026-07-03",
-   "action": "BUY",
+  "PRY.MI": {
    "symbol": "PRY.MI",
    "name": "Prysmian",
-   "price": 167.14,
-   "stake_eur": 1000.0,
-   "value_eur": 1000.0,
-   "pnl_eur": 0.0,
-   "pnl_pct": 0.0,
-   "reason": "Top-Tipp"
+   "quantity": 5.983008256551394,
+   "entry_price": 167.14,
+   "cost_basis": 1000.0,
+   "entry_bar_date": "2026-07-03",
+   "last_price": 155.35,
+   "last_mark_bar_date": "2026-07-03",
+   "last_action_bar_date": "2026-08-13",
+   "legacy": true
   },
-  {
-   "date": "2026-07-03",
-   "action": "BUY",
+  "6326.T": {
    "symbol": "6326.T",
    "name": "Kubota",
-   "price": 17.04,
-   "stake_eur": 1000.0,
-   "value_eur": 1000.0,
-   "pnl_eur": 0.0,
-   "pnl_pct": 0.0,
-   "reason": "Top-Tipp"
+   "quantity": 58.68544600938967,
+   "entry_price": 17.04,
+   "cost_basis": 1000.0,
+   "entry_bar_date": "2026-07-03",
+   "last_price": 16.77,
+   "last_mark_bar_date": "2026-07-03",
+   "last_action_bar_date": "2026-08-13",
+   "legacy": true
   },
-  {
-   "date": "2026-07-03",
-   "action": "BUY",
+  "AGCO": {
    "symbol": "AGCO",
    "name": "AGCO",
-   "price": 116.49,
-   "stake_eur": 1000.0,
-   "value_eur": 1000.0,
-   "pnl_eur": 0.0,
-   "pnl_pct": 0.0,
-   "reason": "Top-Tipp"
+   "quantity": 8.584427847883939,
+   "entry_price": 116.49,
+   "cost_basis": 1000.0,
+   "entry_bar_date": "2026-07-03",
+   "last_price": 113.26,
+   "last_mark_bar_date": "2026-07-03",
+   "last_action_bar_date": "2026-08-13",
+   "legacy": true
   },
-  {
-   "date": "2026-07-03",
-   "action": "BUY",
+  "ELG.DE": {
    "symbol": "ELG.DE",
    "name": "Elmos Semiconductor",
-   "price": 201.42,
-   "stake_eur": 1000.0,
-   "value_eur": 1000.0,
-   "pnl_eur": 0.0,
-   "pnl_pct": 0.0,
-   "reason": "Top-Tipp"
+   "quantity": 4.964750273061266,
+   "entry_price": 201.42,
+   "cost_basis": 1000.0,
+   "entry_bar_date": "2026-07-03",
+   "last_price": 191.19,
+   "last_mark_bar_date": "2026-07-03",
+   "last_action_bar_date": "2026-08-13",
+   "legacy": true
   },
-  {
-   "date": "2026-07-03",
-   "action": "BUY",
+  "WDC": {
    "symbol": "WDC",
    "name": "Western Digital",
+   "quantity": 1.8552875695732838,
+   "entry_price": 539.0,
+   "cost_basis": 1000.0,
+   "entry_bar_date": "2026-07-03",
+   "last_price": 578.05,
+   "last_mark_bar_date": "2026-07-03",
+   "last_action_bar_date": "2026-08-13",
+   "legacy": true
+  }
+ },
+ "pending_orders": [],
+ "ledger": [
+  {
+   "transaction_id": "80eeee7b-fe7d-41ce-ac85-81e73d97d80e",
+   "type": "LEGACY_MIGRATION",
+   "symbol": "GOOGL",
+   "quantity": 2.7784723958767468,
+   "price": 359.91,
+   "gross_value": 1000.0,
+   "timestamp": "2026-08-13T09:23:45+00:00",
+   "note": "Imported without claiming executable historical fills"
+  },
+  {
+   "transaction_id": "3d4fca73-578b-46a9-b6c2-52c34c804afc",
+   "type": "LEGACY_MIGRATION",
+   "symbol": "TSM",
+   "quantity": 2.3032983231988204,
+   "price": 434.16,
+   "gross_value": 1000.0,
+   "timestamp": "2026-08-13T09:23:45+00:00",
+   "note": "Imported without claiming executable historical fills"
+  },
+  {
+   "transaction_id": "7d6c6435-7c38-4a0e-ac1f-5b8d9e15b317",
+   "type": "LEGACY_MIGRATION",
+   "symbol": "M12.DE",
+   "quantity": 47.48338081671415,
+   "price": 21.06,
+   "gross_value": 1000.0,
+   "timestamp": "2026-08-13T09:23:45+00:00",
+   "note": "Imported without claiming executable historical fills"
+  },
+  {
+   "transaction_id": "c1aa7e5d-e29b-46d9-884f-fc1cb3f9bd83",
+   "type": "LEGACY_MIGRATION",
+   "symbol": "005930.KS",
+   "quantity": 4.945843018942579,
+   "price": 202.19,
+   "gross_value": 1000.0,
+   "timestamp": "2026-08-13T09:23:45+00:00",
+   "note": "Imported without claiming executable historical fills"
+  },
+  {
+   "transaction_id": "b04977b8-8dbc-4040-bc4b-555d7688a769",
+   "type": "LEGACY_MIGRATION",
+   "symbol": "CSCO",
+   "quantity": 8.873901854645489,
+   "price": 112.69,
+   "gross_value": 1000.0,
+   "timestamp": "2026-08-13T09:23:45+00:00",
+   "note": "Imported without claiming executable historical fills"
+  },
+  {
+   "transaction_id": "0902f609-7252-450b-884f-917a94ab51dd",
+   "type": "LEGACY_MIGRATION",
+   "symbol": "PRY.MI",
+   "quantity": 5.983008256551394,
+   "price": 167.14,
+   "gross_value": 1000.0,
+   "timestamp": "2026-08-13T09:23:45+00:00",
+   "note": "Imported without claiming executable historical fills"
+  },
+  {
+   "transaction_id": "ad12b14f-006e-43d2-8825-daeb2388a039",
+   "type": "LEGACY_MIGRATION",
+   "symbol": "6326.T",
+   "quantity": 58.68544600938967,
+   "price": 17.04,
+   "gross_value": 1000.0,
+   "timestamp": "2026-08-13T09:23:45+00:00",
+   "note": "Imported without claiming executable historical fills"
+  },
+  {
+   "transaction_id": "c1a72112-beac-4e70-9e99-0167cd99292f",
+   "type": "LEGACY_MIGRATION",
+   "symbol": "AGCO",
+   "quantity": 8.584427847883939,
+   "price": 116.49,
+   "gross_value": 1000.0,
+   "timestamp": "2026-08-13T09:23:45+00:00",
+   "note": "Imported without claiming executable historical fills"
+  },
+  {
+   "transaction_id": "96fb1e58-dee8-42cc-b7c7-2e0a9bddd6f3",
+   "type": "LEGACY_MIGRATION",
+   "symbol": "ELG.DE",
+   "quantity": 4.964750273061266,
+   "price": 201.42,
+   "gross_value": 1000.0,
+   "timestamp": "2026-08-13T09:23:45+00:00",
+   "note": "Imported without claiming executable historical fills"
+  },
+  {
+   "transaction_id": "f25814e8-555c-4311-a1cc-3c10072932c1",
+   "type": "LEGACY_MIGRATION",
+   "symbol": "WDC",
+   "quantity": 1.8552875695732838,
    "price": 539.0,
-   "stake_eur": 1000.0,
-   "value_eur": 1000.0,
-   "pnl_eur": 0.0,
-   "pnl_pct": 0.0,
-   "reason": "Top-Tipp"
+   "gross_value": 1000.0,
+   "timestamp": "2026-08-13T09:23:45+00:00",
+   "note": "Imported without claiming executable historical fills"
   }
  ],
  "equity_curve": [
   {
-   "date": "2026-07-03",
-   "equity": 10021.42,
+   "date": "2026-08-13",
+   "as_of_bar_date": null,
+   "valuation_status": "mixed_or_stale",
+   "position_valuation_dates": {
+    "GOOGL": null,
+    "TSM": null,
+    "M12.DE": null,
+    "005930.KS": null,
+    "CSCO": null,
+    "PRY.MI": null,
+    "6326.T": null,
+    "AGCO": null,
+    "ELG.DE": null,
+    "WDC": null
+   },
+   "equity": 9944.73542283283,
    "cash": 0.0,
-   "invested": 10021.42,
-   "n_positions": 10
-  },
-  {
-   "date": "2026-07-05",
-   "equity": 10022.23,
-   "cash": 0.0,
-   "invested": 10022.23,
-   "n_positions": 10
-  },
-  {
-   "date": "2026-07-06",
-   "equity": 10192.66,
-   "cash": 0.0,
-   "invested": 10192.66,
+   "invested": 9944.73542283283,
    "n_positions": 10,
-   "bench_sp500": 7483.24,
-   "bench_ndx": 29329.21,
-   "bench_world": 202.65
-  },
-  {
-   "date": "2026-07-07",
-   "equity": 9849.67,
-   "cash": 0.0,
-   "invested": 9849.67,
-   "n_positions": 10,
-   "bench_sp500": 7537.43,
-   "bench_ndx": 29697.87,
-   "bench_world": 204.44
-  },
-  {
-   "date": "2026-07-09",
-   "equity": 9929.86,
-   "cash": 0.0,
-   "invested": 9929.86,
-   "n_positions": 10,
-   "bench_sp500": 7543.64,
-   "bench_ndx": 29727.1,
-   "bench_world": 203.73
-  },
-  {
-   "date": "2026-07-10",
-   "equity": 9944.73,
-   "cash": 0.0,
-   "invested": 9944.73,
-   "n_positions": 10,
-   "bench_sp500": 7543.64,
-   "bench_ndx": 29727.1,
-   "bench_world": 203.73
+   "benchmark_status": {
+    "sp500": {
+     "portfolio_bar_date": null,
+     "benchmark_bar_date": "2026-08-12",
+     "aligned": false
+    },
+    "ndx": {
+     "portfolio_bar_date": null,
+     "benchmark_bar_date": "2026-08-12",
+     "aligned": false
+    },
+    "world": {
+     "portfolio_bar_date": null,
+     "benchmark_bar_date": "2026-08-12",
+     "aligned": false
+    }
+   }
   }
  ],
- "realized_pnl": 0.0
+ "assumptions": {
+  "long_only": true,
+  "execution": "strictly later completed daily bar open",
+  "slippage_bps": 10.0,
+  "commission_bps": 5.0,
+  "min_avg_dollar_volume": 20000000.0,
+  "max_atr_pct": 5.0,
+  "max_annual_vol_pct": 60.0,
+  "max_per_sector": 3,
+  "max_per_country": 4,
+  "currency": "USD only until point-in-time FX exists",
+  "diversification": "issuer uniqueness plus sector/country caps; no correlation claim",
+  "order_not_before": "UTC creation date + two calendar dates",
+  "corporate_actions": "best effort from Yahoo daily action columns; missed-run gaps are not guaranteed",
+  "legacy_accounting": "pre-v2 positions lacked next-bar fills, quantities and cost records; all performance remains non-actionable"
+ },
+ "_meta": {
+  "schema": "stock-radar-paper-portfolio",
+  "schema_version": 2,
+  "written_at": "2026-08-13T09:23:45+00:00"
+ },
+ "legacy_migrated": true,
+ "migration_requires_review": true,
+ "legacy_archive": {
+  "start_capital": 10000.0,
+  "created": "2026-07-03",
+  "cash": 0.0,
+  "last_trade_date": "2026-07-10",
+  "positions": {
+   "GOOGL": {
+    "name": "Alphabet A",
+    "entry_price": 359.91,
+    "entry_date": "2026-07-03",
+    "stake_eur": 1000.0,
+    "score_at_entry": 96,
+    "last_price": 358.89,
+    "value_eur": 997.17,
+    "pnl_eur": -2.83,
+    "pnl_pct": -0.28,
+    "peak_price": 366.46
+   },
+   "TSM": {
+    "name": "TSMC",
+    "entry_price": 434.16,
+    "entry_date": "2026-07-03",
+    "stake_eur": 1000.0,
+    "score_at_entry": 96,
+    "last_price": 436.96,
+    "value_eur": 1006.45,
+    "pnl_eur": 6.45,
+    "pnl_pct": 0.64,
+    "peak_price": 451.79
+   },
+   "M12.DE": {
+    "name": "M1 Kliniken",
+    "entry_price": 21.06,
+    "entry_date": "2026-07-03",
+    "stake_eur": 1000.0,
+    "score_at_entry": 96,
+    "last_price": 22.05,
+    "value_eur": 1047.01,
+    "pnl_eur": 47.01,
+    "pnl_pct": 4.7,
+    "peak_price": 22.84
+   },
+   "005930.KS": {
+    "name": "Samsung Electronics",
+    "entry_price": 202.19,
+    "entry_date": "2026-07-03",
+    "stake_eur": 1000.0,
+    "score_at_entry": 96,
+    "last_price": 189.39,
+    "value_eur": 936.69,
+    "pnl_eur": -63.31,
+    "pnl_pct": -6.33,
+    "peak_price": 207.69
+   },
+   "CSCO": {
+    "name": "Cisco Systems",
+    "entry_price": 112.69,
+    "entry_date": "2026-07-03",
+    "stake_eur": 1000.0,
+    "score_at_entry": 92,
+    "last_price": 118.31,
+    "value_eur": 1049.87,
+    "pnl_eur": 49.87,
+    "pnl_pct": 4.99,
+    "peak_price": 119.43
+   },
+   "PRY.MI": {
+    "name": "Prysmian",
+    "entry_price": 167.14,
+    "entry_date": "2026-07-03",
+    "stake_eur": 1000.0,
+    "score_at_entry": 92,
+    "last_price": 155.35,
+    "value_eur": 929.46,
+    "pnl_eur": -70.54,
+    "pnl_pct": -7.05,
+    "peak_price": 167.37
+   },
+   "6326.T": {
+    "name": "Kubota",
+    "entry_price": 17.04,
+    "entry_date": "2026-07-03",
+    "stake_eur": 1000.0,
+    "score_at_entry": 92,
+    "last_price": 16.77,
+    "value_eur": 984.15,
+    "pnl_eur": -15.85,
+    "pnl_pct": -1.58,
+    "peak_price": 17.22
+   },
+   "AGCO": {
+    "name": "AGCO",
+    "entry_price": 116.49,
+    "entry_date": "2026-07-03",
+    "stake_eur": 1000.0,
+    "score_at_entry": 90,
+    "last_price": 113.26,
+    "value_eur": 972.27,
+    "pnl_eur": -27.73,
+    "pnl_pct": -2.77,
+    "peak_price": 118.32
+   },
+   "ELG.DE": {
+    "name": "Elmos Semiconductor",
+    "entry_price": 201.42,
+    "entry_date": "2026-07-03",
+    "stake_eur": 1000.0,
+    "score_at_entry": 90,
+    "last_price": 191.19,
+    "value_eur": 949.21,
+    "pnl_eur": -50.79,
+    "pnl_pct": -5.08,
+    "peak_price": 202.7
+   },
+   "WDC": {
+    "name": "Western Digital",
+    "entry_price": 539.0,
+    "entry_date": "2026-07-03",
+    "stake_eur": 1000.0,
+    "score_at_entry": 90,
+    "last_price": 578.05,
+    "value_eur": 1072.45,
+    "pnl_eur": 72.45,
+    "pnl_pct": 7.24,
+    "peak_price": 591.05
+   }
+  },
+  "trade_log": [
+   {
+    "date": "2026-07-03",
+    "action": "BUY",
+    "symbol": "GOOGL",
+    "name": "Alphabet A",
+    "price": 359.91,
+    "stake_eur": 1000.0,
+    "value_eur": 1000.0,
+    "pnl_eur": 0.0,
+    "pnl_pct": 0.0,
+    "reason": "Top-Tipp"
+   },
+   {
+    "date": "2026-07-03",
+    "action": "BUY",
+    "symbol": "TSM",
+    "name": "TSMC",
+    "price": 434.16,
+    "stake_eur": 1000.0,
+    "value_eur": 1000.0,
+    "pnl_eur": 0.0,
+    "pnl_pct": 0.0,
+    "reason": "Top-Tipp"
+   },
+   {
+    "date": "2026-07-03",
+    "action": "BUY",
+    "symbol": "M12.DE",
+    "name": "M1 Kliniken",
+    "price": 21.06,
+    "stake_eur": 1000.0,
+    "value_eur": 1000.0,
+    "pnl_eur": 0.0,
+    "pnl_pct": 0.0,
+    "reason": "Top-Tipp"
+   },
+   {
+    "date": "2026-07-03",
+    "action": "BUY",
+    "symbol": "005930.KS",
+    "name": "Samsung Electronics",
+    "price": 202.19,
+    "stake_eur": 1000.0,
+    "value_eur": 1000.0,
+    "pnl_eur": 0.0,
+    "pnl_pct": 0.0,
+    "reason": "Top-Tipp"
+   },
+   {
+    "date": "2026-07-03",
+    "action": "BUY",
+    "symbol": "CSCO",
+    "name": "Cisco Systems",
+    "price": 112.69,
+    "stake_eur": 1000.0,
+    "value_eur": 1000.0,
+    "pnl_eur": 0.0,
+    "pnl_pct": 0.0,
+    "reason": "Top-Tipp"
+   },
+   {
+    "date": "2026-07-03",
+    "action": "BUY",
+    "symbol": "PRY.MI",
+    "name": "Prysmian",
+    "price": 167.14,
+    "stake_eur": 1000.0,
+    "value_eur": 1000.0,
+    "pnl_eur": 0.0,
+    "pnl_pct": 0.0,
+    "reason": "Top-Tipp"
+   },
+   {
+    "date": "2026-07-03",
+    "action": "BUY",
+    "symbol": "6326.T",
+    "name": "Kubota",
+    "price": 17.04,
+    "stake_eur": 1000.0,
+    "value_eur": 1000.0,
+    "pnl_eur": 0.0,
+    "pnl_pct": 0.0,
+    "reason": "Top-Tipp"
+   },
+   {
+    "date": "2026-07-03",
+    "action": "BUY",
+    "symbol": "AGCO",
+    "name": "AGCO",
+    "price": 116.49,
+    "stake_eur": 1000.0,
+    "value_eur": 1000.0,
+    "pnl_eur": 0.0,
+    "pnl_pct": 0.0,
+    "reason": "Top-Tipp"
+   },
+   {
+    "date": "2026-07-03",
+    "action": "BUY",
+    "symbol": "ELG.DE",
+    "name": "Elmos Semiconductor",
+    "price": 201.42,
+    "stake_eur": 1000.0,
+    "value_eur": 1000.0,
+    "pnl_eur": 0.0,
+    "pnl_pct": 0.0,
+    "reason": "Top-Tipp"
+   },
+   {
+    "date": "2026-07-03",
+    "action": "BUY",
+    "symbol": "WDC",
+    "name": "Western Digital",
+    "price": 539.0,
+    "stake_eur": 1000.0,
+    "value_eur": 1000.0,
+    "pnl_eur": 0.0,
+    "pnl_pct": 0.0,
+    "reason": "Top-Tipp"
+   }
+  ],
+  "equity_curve": [
+   {
+    "date": "2026-07-03",
+    "equity": 10021.42,
+    "cash": 0.0,
+    "invested": 10021.42,
+    "n_positions": 10
+   },
+   {
+    "date": "2026-07-05",
+    "equity": 10022.23,
+    "cash": 0.0,
+    "invested": 10022.23,
+    "n_positions": 10
+   },
+   {
+    "date": "2026-07-06",
+    "equity": 10192.66,
+    "cash": 0.0,
+    "invested": 10192.66,
+    "n_positions": 10,
+    "bench_sp500": 7483.24,
+    "bench_ndx": 29329.21,
+    "bench_world": 202.65
+   },
+   {
+    "date": "2026-07-07",
+    "equity": 9849.67,
+    "cash": 0.0,
+    "invested": 9849.67,
+    "n_positions": 10,
+    "bench_sp500": 7537.43,
+    "bench_ndx": 29697.87,
+    "bench_world": 204.44
+   },
+   {
+    "date": "2026-07-09",
+    "equity": 9929.86,
+    "cash": 0.0,
+    "invested": 9929.86,
+    "n_positions": 10,
+    "bench_sp500": 7543.64,
+    "bench_ndx": 29727.1,
+    "bench_world": 203.73
+   },
+   {
+    "date": "2026-07-10",
+    "equity": 9944.73,
+    "cash": 0.0,
+    "invested": 9944.73,
+    "n_positions": 10,
+    "bench_sp500": 7543.64,
+    "bench_ndx": 29727.1,
+    "bench_world": 203.73
+   }
+  ],
+  "realized_pnl": 0.0
+ }
 }

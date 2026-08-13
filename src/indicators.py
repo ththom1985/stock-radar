@@ -11,10 +11,14 @@ def _rsi(close, period=RSI_PERIOD):
     delta = close.diff()
     gain = delta.clip(lower=0)
     loss = -delta.clip(upper=0)
-    avg_gain = gain.ewm(alpha=1 / period, min_periods=period).mean()
-    avg_loss = loss.ewm(alpha=1 / period, min_periods=period).mean()
+    avg_gain = gain.ewm(alpha=1 / period, min_periods=period, adjust=False).mean()
+    avg_loss = loss.ewm(alpha=1 / period, min_periods=period, adjust=False).mean()
     rs = avg_gain / avg_loss.replace(0, np.nan)
-    return 100 - (100 / (1 + rs))
+    rsi = 100 - (100 / (1 + rs))
+    rsi = rsi.mask((avg_loss == 0) & (avg_gain > 0), 100.0)
+    rsi = rsi.mask((avg_gain == 0) & (avg_loss > 0), 0.0)
+    rsi = rsi.mask((avg_gain == 0) & (avg_loss == 0), 50.0)
+    return rsi
 
 
 def _atr(df, period=ATR_PERIOD):
@@ -24,7 +28,7 @@ def _atr(df, period=ATR_PERIOD):
         [(high - low), (high - prev_close).abs(), (low - prev_close).abs()],
         axis=1,
     ).max(axis=1)
-    return tr.ewm(alpha=1 / period, min_periods=period).mean()
+    return tr.ewm(alpha=1 / period, min_periods=period, adjust=False).mean()
 
 
 def _f(x):
@@ -88,6 +92,15 @@ def compute_features(df):
     f["vol"] = _f(volume.iloc[-1])
     f["vol_avg20"] = _f(volume.rolling(VOL_AVG_WINDOW).mean().iloc[-1])
     f["rvol"] = f["vol"] / f["vol_avg20"] if f["vol_avg20"] else np.nan
+    raw_close = df["RawClose"].astype(float) if "RawClose" in df.columns else close
+    dollar_volume = raw_close * volume
+    f["avg_dollar_volume_20"] = _f(dollar_volume.rolling(VOL_AVG_WINDOW).mean().iloc[-1])
+    f["raw_open"] = _f(
+        (df["RawOpen"] if "RawOpen" in df.columns else df["Open"]).iloc[-1]
+    )
+    f["raw_close"] = _f(raw_close.iloc[-1])
+    f["dividend"] = _f(df["Dividends"].iloc[-1]) if "Dividends" in df.columns else 0.0
+    f["stock_split"] = _f(df["Stock Splits"].iloc[-1]) if "Stock Splits" in df.columns else 0.0
 
     # Breakout levels (prior N-day high/low, excluding today)
     f["high20"] = _f(close.rolling(BREAKOUT_WINDOW).max().iloc[-2])

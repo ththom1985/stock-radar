@@ -5,7 +5,6 @@ Uses ~1 month of 30-minute bars (free via yfinance). Heavy to fetch, so it is
 bounded per run and cached for weeks (only recomputed occasionally). Patterns
 are HISTORICAL tendencies, noisy and not guarantees — labelled as such.
 """
-import json
 import os
 import time
 from datetime import datetime, timezone, timedelta
@@ -13,6 +12,7 @@ from datetime import datetime, timezone, timedelta
 import yfinance as yf
 
 from .config import DATA
+from .persistence import atomic_write_json, cache_failure, load_json, schema_meta, utc_now
 
 PAT_CACHE = DATA / "intraday_patterns.json"
 MAX_AGE_DAYS = 14
@@ -22,16 +22,13 @@ MIN_DAYS = 8
 
 
 def _load():
-    if PAT_CACHE.exists():
-        try:
-            return json.loads(PAT_CACHE.read_text(encoding="utf-8"))
-        except Exception:  # noqa: BLE001
-            return {}
-    return {}
+    return load_json(PAT_CACHE, expected_type=dict, default={})
 
 
 def _save(cache):
-    PAT_CACHE.write_text(json.dumps(cache, ensure_ascii=False, indent=1), encoding="utf-8")
+    cache = dict(cache)
+    cache["_meta"] = schema_meta("stock-radar-pattern-cache")
+    atomic_write_json(PAT_CACHE, cache, indent=1)
 
 
 def _analyse(df):
@@ -85,16 +82,21 @@ def fetch_intraday_patterns(symbols, max_new=MAX_NEW_PER_RUN, verbose=True):
 
     todo = stale[:max_new]
     if verbose:
-        print(f"Tageszeit-Muster (Intraday): {len(symbols) - len(stale)} aus Cache, "
-              f"{len(todo)} neu (von {len(stale)} offen) …")
+        print(f"Legacy time-of-day patterns: {len(symbols) - len(stale)} cached, "
+              f"refreshing {len(todo)} of {len(stale)} ...")
     for sym in todo:
-        rec = {"fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds")}
         try:
             df = yf.Ticker(sym).history(period="1mo", interval="30m")
-            rec.update(_analyse(df) or {})
-        except Exception:  # noqa: BLE001
-            pass
-        cache[sym] = rec
+            analysed = _analyse(df)
+            if not analysed:
+                raise ValueError("provider returned insufficient intraday-pattern data")
+            cache[sym] = {
+                "fetched_at": utc_now(),
+                "last_success_at": utc_now(),
+                **analysed,
+            }
+        except Exception as exc:  # noqa: BLE001
+            cache[sym] = cache_failure(cache.get(sym), exc)
         time.sleep(FETCH_PAUSE)
     if todo:
         _save(cache)
