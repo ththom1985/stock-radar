@@ -10,6 +10,24 @@ def _has(x):
     return isinstance(x, (int, float))
 
 
+def _daily_direction(row):
+    return row.get("daily_signal_direction") or "NEUTRAL"
+
+
+def _daily_score(row):
+    value = row.get("daily_signal_score")
+    return value if _has(value) else 0
+
+
+def _fundamentals_complete(row):
+    coverage = row.get("feature_coverage") or {}
+    return (
+        row.get("asset_type") == "company_equity"
+        and coverage.get("fundamental_complete") is True
+        and coverage.get("fundamental_current") is True
+    )
+
+
 def radar_elo(row):
     """Comparable core heuristic using only broadly available score inputs.
 
@@ -62,7 +80,7 @@ def quality_score(row):
     """0-100: how solid/safe the company is (fundamentals, trend, analyst consensus)."""
     parts = []
     fs = row.get("fundamental_score")
-    if _has(fs):
+    if _fundamentals_complete(row) and _has(fs):
         parts.append((fs, 0.5))
     lt = row.get("longterm_score")
     if _has(lt):
@@ -82,7 +100,7 @@ def potential_score(row):
     """0-100: upside potential (analyst target, momentum, room to run, growth, hype)."""
     parts = []
     au, an = row.get("analyst_upside_pct"), row.get("analyst_n") or 0
-    if _has(au) and an >= 3:
+    if _has(au) and an >= 5:
         parts.append((max(0, min(100, 50 + au * 1.25)), 0.22))   # analysts down-weighted
     dt, ddir = row.get("daytrade_score"), row.get("daytrade_direction")
     if _has(dt):
@@ -147,10 +165,10 @@ def _momentum_turn_score(row):
         s += 18 if h > hp else -18          # histogram rising = momentum improving
         if h > 0:
             s += 6
-    dd = row.get("daytrade_direction")
-    if dd == "LONG":
+    dd = _daily_direction(row)
+    if dd == "POSITIVE":
         s += 16
-    elif dd == "SHORT":
+    elif dd == "NEGATIVE":
         s -= 16
     price, ema9 = row.get("price"), row.get("ema9")
     if _has(price) and _has(ema9):
@@ -203,7 +221,7 @@ def downside_analysis(row):
     s1 = sup[0] if sup else None
     s2 = sup[1] if len(sup) > 1 else None
     room1 = ((P - s1) / P) * 100 if s1 and P else None
-    turning = _macd_turning_up(row) and row.get("daytrade_direction") != "SHORT"
+    turning = _macd_turning_up(row) and _daily_direction(row) != "NEGATIVE"
     near = room1 is not None and room1 <= 1.5 * atrp
     regime = _regime(row)
 
@@ -236,15 +254,15 @@ def falling_knife(row):
     if not (steep_fast or steep_slow):
         return None
     # still falling? (no upward momentum turn, below the fast EMA, or short-term down)
-    still_falling = (row.get("daytrade_direction") == "SHORT"
+    still_falling = (_daily_direction(row) == "NEGATIVE"
                      or not _macd_turning_up(row)
                      or (_has(price) and _has(ema9) and price < ema9))
     below_fast = _has(price) and _has(sma20) and price < sma20
     if still_falling and below_fast:
         mag = r5 if steep_fast else r20
         span = "in 1 Woche" if steep_fast else "in 1 Monat"
-        return (f"🔪 Fallendes Messer: Kurs stürzt aktuell steil ({mag:.0f}% {span}) und hat sich "
-                f"noch nicht stabilisiert – nicht hineingreifen, erst einen Boden/Aufwärts-Dreh abwarten.")
+        return (f"🔪 Fallendes Messer: Kurs fällt aktuell steil ({mag:.0f}% {span}); "
+                f"eine Stabilisierung oder ein Aufwärts-Dreh ist noch nicht bestätigt.")
     return None
 
 
@@ -274,8 +292,8 @@ def bottoming_signal(row):
     rsi = row.get("rsi")
     if _has(rsi) and 32 <= rsi <= 52:
         sig.append("RSI erholt sich")
-    if row.get("daytrade_direction") == "LONG":
-        sig.append("Käufer aktiv")
+    if _daily_direction(row) == "POSITIVE":
+        sig.append("positiver abgeschlossener Tagesbar")
     bw = row.get("bb_bandwidth")
     if _has(bw) and bw < 12:
         sig.append("Schwankung beruhigt sich")
@@ -325,13 +343,13 @@ def entry_score(row):
         parts.append((lt, 0.12))
     # 5) Cheap helps for the longer hold
     vs = row.get("value_score")
-    if _has(vs):
+    if _fundamentals_complete(row) and _has(vs):
         parts.append((vs, 0.08))
 
     if not parts:
         return None
     score = sum(v * w for v, w in parts) / sum(w for _, w in parts)
-    if row.get("daytrade_direction") == "SHORT":
+    if _daily_direction(row) == "NEGATIVE":
         score -= 18                          # still in a short-term downtrend
     if regime == "neutral":
         score -= 6                           # no clear trend to lean on
@@ -347,27 +365,35 @@ def entry_score(row):
             score += 8                       # cushioned by nearby support
         elif room >= 4 * atrp:
             score -= 8                       # air below → can fall further
-    # Consistency caps: the entry timing must not contradict the trend phase or
-    # the short-term trend shown on the same card.
     ph = (row.get("trend_phase") or {}).get("phase", "")
     bot = row.get("bottoming")
-    if row.get("knife_warn"):
-        score = min(score, 15)               # falling knife (priority) -> hard block
-    elif ph.startswith("Abwärts"):
-        # a confirmed base forming after a crash IS the moment to enter early
-        score = min(score, 52 if bot else 25)
-    elif "Top-Gefahr" in ph:
-        score = min(score, 44)               # late-stage -> at best "wait for pullback"
-    if row.get("daytrade_direction") == "SHORT" and not bot:
-        score = min(score, 41)               # short-term falling -> not "buy now"
-    if bot:
-        score += min(14, bot["n"] * 2)       # confirmed base -> better entry timing
-    score = _entry_vol_adjust(score, row)
-    if bot:
-        # a confirmed base is a DECENT but SPECULATIVE entry: clamp into a "gut"
-        # band (~54-66), never "sehr gut" (>=70), and never "schlecht" (<45).
+    safe_bottom_uplift = (
+        bot
+        and regime != "down"
+        and _has(lt)
+        and lt >= 45
+        and not ph.startswith("Abwärts")
+        and "Top-Gefahr" not in ph
+        and _daily_direction(row) != "NEGATIVE"
+    )
+    if safe_bottom_uplift:
+        score += min(14, bot["n"] * 2)
         lo = min(66, 42 + bot["n"] * 3)
         score = max(min(score, 66), lo)
+    score = _entry_vol_adjust(score, row)
+
+    # Safety caps are always final. A speculative bottoming flag can never
+    # override a falling knife, downtrend, late stage or structurally weak trend.
+    if row.get("knife_warn"):
+        score = min(score, 15)
+    if regime == "down" or ph.startswith("Abwärts"):
+        score = min(score, 25)
+    if "Top-Gefahr" in ph:
+        score = min(score, 44)
+    if _has(lt) and lt < 30:
+        score = min(score, 25)
+    if _daily_direction(row) == "NEGATIVE":
+        score = min(score, 41)
     return score
 
 
@@ -376,26 +402,26 @@ def entry_reason(row):
     if not _has(row.get("price")):
         return ""
     rsi = row.get("rsi")
-    dd = row.get("daytrade_direction")
+    dd = _daily_direction(row)
     ext = _extension_pct(row)
-    turning = _macd_turning_up(row) or dd == "LONG"
+    turning = _macd_turning_up(row) or dd == "POSITIVE"
     if _regime(row) == "down":
         if _has(rsi) and rsi < 30 and turning:
             return "Abwärtstrend, aber stark überverkauft und dreht – nur spekulativer Rebound"
-        return "Abwärtstrend – Rücksetzer sind Fallende-Messer-Risiko, besser meiden"
+        return "Abwärtstrend – Rücksetzer tragen erhöhtes Fallende-Messer-Risiko"
     if _has(rsi) and rsi >= 72:
         return "heißgelaufen (überkauft) – besser einen Rücksetzer abwarten"
     if ext is not None and ext > 15:
         return "weit über dem Durchschnitt (gestreckt) – nicht hinterherlaufen"
-    if dd == "SHORT":
-        return "kurzfristig noch fallend – auf Stabilisierung/Dreh nach oben warten"
+    if dd == "NEGATIVE":
+        return "abgeschlossener Tagesimpuls negativ – Stabilisierung noch nicht bestätigt"
     if ext is not None and -4 <= ext <= 8 and turning:
-        return "gesunder Rücksetzer im Aufwärtstrend, Momentum dreht – günstiges Fenster"
+        return "kontrollierter Rücksetzer im Aufwärtstrend; Momentum verbessert sich"
     if _has(rsi) and rsi < 35 and turning:
         return "stark abverkauft und dreht nach oben – spekulativer Rebound"
     if turning:
         return "Momentum dreht nach oben – Einstieg wird interessanter"
-    return "kein klares Einstiegssignal – abwarten oder nur klein antesten"
+    return "kein klares Timing-Signal im abgeschlossenen Tagesbild"
 
 
 def entry_label(score):
@@ -442,8 +468,8 @@ def risk_warnings(row):
             out.append("⚠️ Spitzenzyklus möglich – Gewinne evtl. nicht dauerhaft")
     inv, lt = row.get("investment_score"), row.get("longterm_score")
     bull = (isinstance(inv, (int, float)) and inv >= 58) or (isinstance(lt, (int, float)) and lt >= 62)
-    if bull and row.get("daytrade_direction") == "SHORT":
-        out.append("⚠️ Langfristig positiv, aber kurzfristig fallend – Timing schlecht")
+    if bull and _daily_direction(row) == "NEGATIVE":
+        out.append("⚠️ Langfristiger Trend positiv, Tagesimpuls jedoch negativ")
     return out
 
 
@@ -655,9 +681,7 @@ def volume_signal(row):
 
 
 def trend_phase(row):
-    """Where is the stock in its trend cycle, and when does selling get critical?
-    Uses Weinstein stage + how stretched/overbought it is + earnings timing
-    ('buy the rumor, sell the news'). Returns {phase, sell, tone}."""
+    """Trend-cycle context and observable deterioration risk."""
     stage = row.get("weinstein_stage")
     rsi = row.get("rsi")
     price, sma50 = row.get("price"), row.get("sma50")
@@ -669,39 +693,40 @@ def trend_phase(row):
 
     if stage == 4:
         phase, tone = "Abwärtstrend", "down"
-        sell = "bereits im Abwärtstrend – für Käufe meiden, kein Halten"
+        sell = "Trendstruktur bereits negativ; Stabilisierung nicht bestätigt"
     elif stage == 3 or (stage == 2 and late):
         phase, tone = "Spätphase (Top-Gefahr)", "soon"
         rl = f"RSI {rsi:.0f}" if _has(rsi) else "überdehnt"
-        sell = f"überkauft/überdehnt ({rl}) – Teilverkauf oder engen Trailing-Stop erwägen"
+        sell = f"überkauft/überdehnt ({rl}); erhöhte Rückschlaggefahr"
     elif stage == 2:
         if ext50 is not None and ext50 < 6 and _has(rsi) and rsi < 62:
             phase, tone = "früher Aufwärtstrend", "up"
         else:
             phase, tone = "Aufwärtstrend (mittendrin)", "up"
         sl = f" (${sma50:.2f})" if _has(sma50) else ""
-        sell = f"kritisch, sobald der Kurs unter die 50-Tage-Linie{sl} fällt (Trendbruch)"
+        sell = f"Trendbruchrisiko unterhalb der 50-Tage-Linie{sl}"
     elif stage == 1:
         phase, tone = "Bodenbildung (früh)", "soon"
-        sell = "noch kein Trend – erst den Ausbruch abwarten"
+        sell = "noch kein bestätigter Aufwärtstrend"
     else:
         phase, tone = "Seitwärts / unklar", "soon"
-        sell = "kein klarer Trend – nur mit engem Stop"
+        sell = "kein klarer Trend; Richtungsbestätigung fehlt"
 
     ed = row.get("earnings_in_days")
     if _has(ed) and 0 <= ed <= 5 and stage in (2, 3):
-        sell += f" · Zahlen in {ed} T.: „buy the rumor, sell the news\"-Risiko"
-    return {"phase": phase, "sell": sell, "tone": tone}
+        sell += f" · Zahlen in {ed} T.: erhöhtes Ereignisrisiko"
+    return {"phase": phase, "risk_observation": sell, "tone": tone}
 
 
 def bull_thesis(row):
     """One-line 'why could this rise?' — the strongest bullish drivers, ranked."""
     cl = []
+    complete_fundamentals = _fundamentals_complete(row)
     gs = row.get("growth_score")
-    if _has(gs) and gs >= 75:
+    if complete_fundamentals and _has(gs) and gs >= 75:
         cl.append(("Umsatz/Gewinn wachsen kräftig", 6))
     vs = row.get("value_score")
-    if _has(vs) and vs >= 65:
+    if complete_fundamentals and _has(vs) and vs >= 65:
         cl.append(("günstig bewertet", 5))
     pio = row.get("piotroski")
     if _has(pio) and pio >= 7:
@@ -712,10 +737,10 @@ def bull_thesis(row):
     elif row.get("weinstein_stage") == 2 and (row.get("longterm_score") or 0) >= 58:
         cl.append(("intakter Aufwärtstrend", 3))
     au, an = row.get("analyst_upside_pct"), row.get("analyst_n") or 0
-    if _has(au) and an >= 3 and au >= 12:
-        cl.append((f"Analysten sehen +{au:.0f}% Kursziel", 3))   # nett, aber nachrangig
-    if row.get("daytrade_direction") == "LONG":
-        cl.append(("kurzfristig kaufen die Anleger zu", 2))
+    if _has(au) and an >= 5 and au >= 12:
+        cl.append((f"Analystenkonsens sieht +{au:.0f}% bis zum Ziel", 3))
+    if _daily_direction(row) == "POSITIVE":
+        cl.append(("abgeschlossener Tagesimpuls positiv", 2))
     if row.get("news_sentiment") == "positiv":
         cl.append(("positive Nachrichtenlage", 2))
     th = row.get("themes") or []
@@ -742,7 +767,7 @@ def priced_in_note(row):
     if _has(rsi) and rsi >= 72:
         flags.append("technisch heißgelaufen")
     au, an = row.get("analyst_upside_pct"), row.get("analyst_n") or 0
-    if _has(au) and an >= 3 and au < 3:
+    if _has(au) and an >= 5 and au < 3:
         flags.append("kaum Luft zum Kursziel")
     if any("Spitzenzyklus" in w for w in (row.get("risk_warnings") or [])):
         flags.append("Spitzenzyklus")
@@ -773,7 +798,7 @@ def plain_summary(row):
         s = "Der langfristige Trend ist derzeit schwach"
     if _has(rsi):
         if 40 <= rsi <= 55 and lt >= 55:
-            s += ", und der Kurs ist gerade etwas zurückgekommen – oft ein günstiger Einstiegsmoment."
+            s += ", und der Kurs ist kontrolliert zurückgekommen – technisch konstruktives Timing."
         elif rsi > 70:
             s += " – der Kurs ist zuletzt aber heiß gelaufen (überkauft)."
         elif rsi < 30:
@@ -817,7 +842,7 @@ def plain_summary(row):
         parts.append("Erfüllt Minervinis Trend-Template (bestätigter Aufwärtstrend).")
     stg = row.get("weinstein_stage")
     if stg == 4:
-        parts.append("Weinstein-Phase 4 (Abwärtstrend) – für Käufe meiden.")
+        parts.append("Weinstein-Phase 4: negative Trendstruktur.")
     elif stg == 2 and not (_has(row.get("minervini_score")) and row["minervini_score"] >= 80):
         parts.append("Weinstein-Phase 2 (Aufwärtstrend).")
     pio = row.get("piotroski")
@@ -831,12 +856,12 @@ def plain_summary(row):
         parts.append(f"⚠️ Erhöhtes Pleiterisiko (Altman-Z {alt}).")
 
     # Short term
-    dt = row.get("daytrade_score") or 0
-    ddir = row.get("daytrade_direction")
-    if ddir == "LONG" and dt >= 45:
-        parts.append("Kurzfristig greifen gerade Käufer zu.")
-    elif ddir == "SHORT" and dt >= 45:
-        parts.append("Kurzfristig haben die Verkäufer die Oberhand.")
+    daily = _daily_score(row)
+    ddir = _daily_direction(row)
+    if ddir == "POSITIVE" and daily >= 45:
+        parts.append("Der abgeschlossene Tagesimpuls ist positiv.")
+    elif ddir == "NEGATIVE" and daily >= 45:
+        parts.append("Der abgeschlossene Tagesimpuls ist negativ.")
 
     # News sentiment
     ns = row.get("news_sentiment")
@@ -876,36 +901,36 @@ def plain_summary(row):
 
 
 def suggest_actions(row):
-    """Up to 3 concrete action ideas. Each: {text, tone} (pos/neg/neutral)."""
+    """Up to three non-prescriptive research observations."""
     out = []
     rsi = row.get("rsi")
     lt = row.get("longterm_score") or 0
     fs = row.get("fundamental_score")
     vs = row.get("value_score")
-    dt = row.get("daytrade_score") or 0
-    ddir = row.get("daytrade_direction")
+    dt = _daily_score(row)
+    ddir = _daily_direction(row)
     asch = row.get("aschenbrenner")
 
     if asch and asch["stance"] == "SHORT_BET":
         out.append({"text": "Vorsicht: Smart Money wettet dagegen", "tone": "neg"})
-    if ddir == "LONG" and dt >= 50:
-        out.append({"text": "Momentum-Long (kurzfristig)", "tone": "pos"})
-    elif ddir == "SHORT" and dt >= 50:
-        out.append({"text": "Short-Setup (kurzfristig)", "tone": "neg"})
+    if ddir == "POSITIVE" and dt >= 50:
+        out.append({"text": "Positiver abgeschlossener Tagesimpuls", "tone": "pos"})
+    elif ddir == "NEGATIVE" and dt >= 50:
+        out.append({"text": "Negativer abgeschlossener Tagesimpuls", "tone": "neg"})
     if lt >= 65 and _has(rsi) and 38 <= rsi <= 57:
-        out.append({"text": "Rücksetzer-Einstieg beobachten", "tone": "pos"})
-    if _has(fs) and fs >= 70 and _has(vs) and vs >= 60:
-        out.append({"text": "Günstige Qualität – fürs Langfrist-Depot", "tone": "pos"})
+        out.append({"text": "Kontrollierten Rücksetzer beobachten", "tone": "pos"})
+    if _fundamentals_complete(row) and _has(fs) and fs >= 70 and _has(vs) and vs >= 60:
+        out.append({"text": "Vollständige Fundamentaldaten: Qualität und Value stark", "tone": "pos"})
     if _has(rsi) and rsi >= 72 and _has(vs) and vs <= 40:
-        out.append({"text": "Abwarten – teuer & überkauft", "tone": "neg"})
+        out.append({"text": "Bewertung hoch und technisch überkauft", "tone": "neg"})
     if _has(rsi) and rsi <= 28:
         out.append({"text": "Spekulativer Rebound möglich", "tone": "neutral"})
     ns = row.get("news_score")
     nn = row.get("news_n") or 0
     if _has(ns) and nn >= 2 and ns <= 38:
-        out.append({"text": "Negative News – abwarten", "tone": "neg"})
+        out.append({"text": "Negative Nachrichtenlage", "tone": "neg"})
     elif _has(ns) and nn >= 2 and ns >= 62:
-        out.append({"text": "Positive News – Rückenwind", "tone": "pos"})
+        out.append({"text": "Positive Nachrichtenlage", "tone": "pos"})
     ed = row.get("earnings_in_days")
     if _has(ed) and 0 <= ed <= 7:
         out.append({"text": f"Zahlen in {ed} T. – Vorsicht", "tone": "neutral"})

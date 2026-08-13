@@ -151,6 +151,50 @@ def atomic_write_json(path: Path, value: Any, *, indent: int | None = 2) -> None
                 pass
 
 
+def atomic_write_bytes(path: Path, value: bytes) -> None:
+    """Atomically write exact bytes without re-serialization or added newlines."""
+    if not isinstance(value, bytes):
+        raise TypeError("atomic_write_bytes requires bytes")
+    path = effective_path(Path(path), for_write=True)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp_name: str | None = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="wb",
+            dir=path.parent,
+            prefix=f".{path.name}.",
+            suffix=".tmp",
+            delete=False,
+        ) as handle:
+            tmp_name = handle.name
+            handle.write(value)
+            handle.flush()
+            os.fsync(handle.fileno())
+        for attempt in range(5):
+            try:
+                os.replace(tmp_name, path)
+                break
+            except PermissionError:
+                if attempt == 4:
+                    raise
+                time.sleep(0.05 * (attempt + 1))
+        tmp_name = None
+        if os.name != "nt":
+            directory_fd = os.open(path.parent, os.O_RDONLY)
+            try:
+                os.fsync(directory_fd)
+            finally:
+                os.close(directory_fd)
+    except OSError as exc:
+        raise PersistenceError(f"Atomic byte write failed for {path}: {exc}") from exc
+    finally:
+        if tmp_name:
+            try:
+                Path(tmp_name).unlink(missing_ok=True)
+            except OSError:
+                pass
+
+
 def cache_failure(previous: dict[str, Any] | None, error: Exception | str) -> dict[str, Any]:
     """Return a copy of stale-good data annotated with the latest failed refresh."""
     entry = dict(previous or {})

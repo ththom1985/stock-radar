@@ -6,6 +6,7 @@ from unittest.mock import patch
 
 from src.data_quality import (
     OUTPUT_SCHEMA,
+    OUTPUT_SCHEMA_VERSION,
     DataContractError,
     build_data_status,
     dashboard_gate,
@@ -18,10 +19,48 @@ from src.persistence import (
     atomic_write_json,
     load_json,
 )
+from src.insights import enrich_row
 from tests.helpers import ProjectTempMixin
 
 
 class PersistenceQualityTests(ProjectTempMixin, unittest.TestCase):
+    @staticmethod
+    def _empty_insights(enabled=True):
+        categories = {}
+        for key in (
+            "daily_setups",
+            "undervalued_quality",
+            "analyst_potential",
+            "entry_watchlist",
+            "falling_knives",
+            "bottoming_watch",
+            "risk_watch",
+            "quality_momentum",
+        ):
+            categories[key] = {
+                "label": key,
+                "formula": "deterministic test formula",
+                "partitioned_by_currency": True,
+                "model_status": "heuristic_unvalidated",
+                "actionable": False,
+                "items_by_currency": {},
+                "eligible_count": 0,
+            }
+        return {
+            "model_status": "heuristic_unvalidated",
+            "actionable": False,
+            "enabled": enabled,
+            "blocking_reasons": [] if enabled else ["blocked fixture"],
+            "categories": categories,
+        }
+
+    @staticmethod
+    def _insight_metadata():
+        return {
+            "model_status": "heuristic_unvalidated",
+            "actionable": False,
+        }
+
     def test_atomic_json_roundtrip_and_no_temporary_sibling(self):
         path = self.work / "state.json"
         atomic_write_json(path, {"value": 3})
@@ -44,11 +83,13 @@ class PersistenceQualityTests(ProjectTempMixin, unittest.TestCase):
         )
         output = {
             "schema": OUTPUT_SCHEMA,
-            "schema_version": SCHEMA_VERSION,
+            "schema_version": OUTPUT_SCHEMA_VERSION,
             "generated_at": (now - timedelta(hours=48)).isoformat(),
             "data_status": status,
             "model_status": {"validation": "unvalidated", "actionable": False},
             "rankings_by_currency_asset": {},
+            "insight_rankings": self._empty_insights(),
+            "insight_metadata": self._insight_metadata(),
             "all": [],
         }
         self.assertIs(validate_output_contract(output), output)
@@ -66,17 +107,24 @@ class PersistenceQualityTests(ProjectTempMixin, unittest.TestCase):
         self.assertEqual(status["status"], "blocked")
         self.assertFalse(status["data_actionable"])
 
-    def test_synthetic_v2_output_roundtrip_contract(self):
+    def test_synthetic_v3_output_roundtrip_contract(self):
         now = datetime(2026, 8, 12, tzinfo=timezone.utc)
-        row = {
+        row = enrich_row({
             "symbol": "ABC",
             "bar_date": "2026-08-11",
             "asset_type": "company_equity",
-            "feature_coverage": {"rank_eligible": True},
-        }
+            "currency": "USD",
+            "feature_coverage": {
+                "rank_eligible": True,
+                "technical_complete": False,
+                "fundamental_complete": False,
+                "fundamental_current": False,
+            },
+            "scenario_long": [],
+        })
         output = {
             "schema": OUTPUT_SCHEMA,
-            "schema_version": SCHEMA_VERSION,
+            "schema_version": OUTPUT_SCHEMA_VERSION,
             "generated_at": now.isoformat(),
             "data_status": build_data_status(
                 universe_size=1, rows=[row], failed_symbols={}, now=now
@@ -85,6 +133,8 @@ class PersistenceQualityTests(ProjectTempMixin, unittest.TestCase):
             "rankings_by_currency_asset": {
                 "USD": {"company_equity": [row]}
             },
+            "insight_rankings": self._empty_insights(),
+            "insight_metadata": self._insight_metadata(),
             "all": [row],
         }
         path = self.work / "latest.json"
@@ -155,7 +205,7 @@ class PersistenceQualityTests(ProjectTempMixin, unittest.TestCase):
         now = datetime(2026, 8, 12, tzinfo=timezone.utc)
         output = {
             "schema": OUTPUT_SCHEMA,
-            "schema_version": SCHEMA_VERSION,
+            "schema_version": OUTPUT_SCHEMA_VERSION,
             "generated_at": now.isoformat(),
             "data_status": {
                 "status": "blocked",
@@ -168,6 +218,8 @@ class PersistenceQualityTests(ProjectTempMixin, unittest.TestCase):
             },
             "model_status": {"validation": "unvalidated", "actionable": False},
             "rankings_by_currency_asset": {},
+            "insight_rankings": self._empty_insights(False),
+            "insight_metadata": self._insight_metadata(),
             "all": [],
         }
         allowed, reasons = dashboard_gate(output, now=now)
@@ -194,7 +246,7 @@ class PersistenceQualityTests(ProjectTempMixin, unittest.TestCase):
     def test_malformed_coverage_is_rejected_before_dashboard_formatting(self):
         output = {
             "schema": OUTPUT_SCHEMA,
-            "schema_version": SCHEMA_VERSION,
+            "schema_version": OUTPUT_SCHEMA_VERSION,
             "generated_at": "2026-08-12T12:00:00+00:00",
             "data_status": {
                 "status": "ok",
@@ -207,6 +259,8 @@ class PersistenceQualityTests(ProjectTempMixin, unittest.TestCase):
             },
             "model_status": {"validation": "unvalidated", "actionable": False},
             "rankings_by_currency_asset": {},
+            "insight_rankings": self._empty_insights(),
+            "insight_metadata": self._insight_metadata(),
             "all": [],
         }
         with self.assertRaises(DataContractError):

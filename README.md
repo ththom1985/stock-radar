@@ -35,12 +35,14 @@ Every output row contains:
 - local and USD price provenance;
 - asset type and feature-coverage flags.
 
-`data/output/latest.json` uses schema `stock-radar-output`, version 2, and contains:
+`data/output/latest.json` uses schema `stock-radar-output`, version 3, and contains:
 
 - `data_status`: price/fresh-bar coverage, SLA, age distribution, failures, and
   blocking reasons;
 - `model_status`: explicit validation and non-actionability metadata;
-- `rankings_by_asset`: separate, coverage-consistent research rankings;
+- `rankings_by_currency_asset`: conservative technical partitions;
+- `insight_rankings`: transparent, research-only category formulas and items;
+- `insight_metadata`: explicit `heuristic_unvalidated` provenance;
 - `all`: the complete analyzed-row contract.
 
 The dashboard refuses to render research cards when the snapshot is corrupt,
@@ -52,10 +54,12 @@ The public GitHub Pages dashboard is available without a Streamlit account:
 
 **https://ththom1985.github.io/stock-radar/**
 
-`python -m src.export_static` creates the compact `docs/data.json` payload from
-the validated v2 snapshot. Both analysis workflows regenerate and publish this
+`python -m src.export_static` creates the compact schema-v2 `docs/data.json`
+payload from the validated output-v3 snapshot. Both analysis workflows regenerate and publish this
 payload after a successful run, so the Pages dashboard stays synchronized with
 `data/output/latest.json`.
+The exporter serializes one deterministic compact UTF-8 byte sequence, measures
+that exact sequence, and atomically writes it only when it remains below 10 MiB.
 
 ## Reliability model
 
@@ -87,6 +91,45 @@ blocking data gates with configurable minima by asset class.
 There is no global cross-currency ordering. Research lists are partitioned by
 trading currency and asset class because current FX cannot make historical
 local-currency indicators point-in-time comparable.
+
+## Insight cockpit
+
+The useful insight layer is separate from the conservative core technical
+partition. Every group is marked `heuristic_unvalidated`, records its inputs and
+missing inputs, and remains `actionable: false`.
+
+- **Tipps des Tages / `daily_setups`**: 45% completed-daily trend, 35% entry
+  timing, 20% completed-daily momentum context; falling knives and high critical
+  downside structures are excluded.
+- **Unterbewertet / `undervalued_quality`**: 55% Value + 45% Quality, only for
+  company equities with complete/current fundamentals. Banks, insurers, REITs
+  and other generic non-comparable cases are excluded.
+- **Potenzial / `analyst_potential`**: analyst target gap with at least five
+  analysts, plus visible trend/timing components and explicit overbought or
+  weak-trend penalties. Analyst consensus is not a model forecast.
+- **Guter Einstieg / `entry_watchlist`**: timing and trend observation with
+  nearby support, non-negative completed-day context and no falling knife.
+- **Fallende Messer**: warning severity from 5/20-day deterioration without
+  stabilization; never an opportunity recommendation.
+- **Bodenbildung**: multi-signal watchlist, always labelled speculative.
+- **Risiko-Watch**: transparent downside, volatility, earnings and knife flags.
+
+Per instrument the output includes German research summary, timing score/reason,
+falling-knife and bottoming state, support/downside structure, analyst and
+valuation context, risks, thesis, priced-in warning, technical observation zone,
+news and 1M/6M/12M/24M heuristic scenario ranges. Scenario ranges remain
+excluded from every core comparable rank and are never described as probable,
+median or expected outcomes.
+
+If current/complete company fundamentals are unavailable, retained cache scores
+are never used in narratives or the static UI: valuation, profitability and
+quality are shown as unavailable. Speculative bottoming observations remain
+separate from ordinary setup/timing lists and cannot override final downtrend,
+late-stage, weak-trend or falling-knife caps.
+
+The static cockpit applies the same fail-closed contract before rendering any
+tips: status must be `ok`, `data_actionable` true, blocking reasons empty, model
+and insight actionability false, and `generated_at` no older than 36 hours.
 
 ## Paper simulation
 
@@ -139,8 +182,8 @@ python -m venv .venv
 .\.venv\Scripts\python.exe -m src.analyze
 ```
 
-The first v2 run migrates legacy caches as they are refreshed and migrates the
-paper portfolio with its original accounting archived in-place.
+The reliability cache/portfolio schemas remain independently versioned. Output
+schema v3 adds only the provider-free insight contract.
 
 Run the dashboard:
 
@@ -154,6 +197,16 @@ Build the login-free static dashboard payload:
 ```powershell
 .\.venv\Scripts\python.exe -m src.export_static
 ```
+
+Provider-free one-time enrichment of an existing v2 snapshot and static export:
+
+```powershell
+.\.venv\Scripts\python.exe -m src.enrich_snapshot --in-place --export-static
+```
+
+Without `--in-place`, the utility writes
+`data/output/latest.enriched.json` for review. All writes are atomic and no
+provider request is made.
 
 Run deterministic tests:
 

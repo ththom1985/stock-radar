@@ -11,6 +11,17 @@ from .persistence import SCHEMA_VERSION
 
 
 OUTPUT_SCHEMA = "stock-radar-output"
+OUTPUT_SCHEMA_VERSION = 3
+REQUIRED_INSIGHT_CATEGORIES = (
+    "daily_setups",
+    "undervalued_quality",
+    "analyst_potential",
+    "entry_watchlist",
+    "falling_knives",
+    "bottoming_watch",
+    "risk_watch",
+    "quality_momentum",
+)
 MIN_COVERAGE_PCT = float(os.environ.get("STOCK_RADAR_MIN_COVERAGE_PCT", "97.0"))
 MAX_BAR_AGE_DAYS = int(os.environ.get("STOCK_RADAR_MAX_BAR_AGE_DAYS", "4"))
 MAX_OUTPUT_AGE_HOURS = int(os.environ.get("STOCK_RADAR_MAX_OUTPUT_AGE_HOURS", "36"))
@@ -35,6 +46,174 @@ MIN_COMPANY_FUNDAMENTAL_COVERAGE_PCT = float(
 
 class DataContractError(RuntimeError):
     pass
+
+
+def _has_actionable_true(value: Any) -> bool:
+    if isinstance(value, dict):
+        if value.get("actionable") is True:
+            return True
+        return any(_has_actionable_true(item) for item in value.values())
+    if isinstance(value, list):
+        return any(_has_actionable_true(item) for item in value)
+    return False
+
+
+def _require_heuristic_group(value: Any, label: str) -> None:
+    if (
+        not isinstance(value, dict)
+        or value.get("model_status") != "heuristic_unvalidated"
+        or value.get("actionable") is not False
+        or not isinstance(value.get("inputs_used"), list)
+        or not isinstance(value.get("missing_inputs"), list)
+    ):
+        raise DataContractError(f"{label} insight group is invalid")
+
+
+def validate_insight_contract(
+    insight: Any,
+    rows: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    if not isinstance(insight, dict):
+        raise DataContractError("Insight ranking root must be an object")
+    if (
+        insight.get("model_status") != "heuristic_unvalidated"
+        or insight.get("actionable") is not False
+        or not isinstance(insight.get("enabled"), bool)
+        or not isinstance(insight.get("blocking_reasons"), list)
+        or not isinstance(insight.get("categories"), dict)
+    ):
+        raise DataContractError("Insight ranking contract is invalid")
+    if insight["enabled"] and insight["blocking_reasons"]:
+        raise DataContractError("Enabled insight rankings cannot have blocking reasons")
+    if not insight["enabled"] and not insight["blocking_reasons"]:
+        raise DataContractError("Disabled insight rankings require blocking reasons")
+    categories = insight["categories"]
+    missing = [key for key in REQUIRED_INSIGHT_CATEGORIES if key not in categories]
+    if missing:
+        raise DataContractError(f"Missing insight categories: {missing}")
+    for key in REQUIRED_INSIGHT_CATEGORIES:
+        category = categories[key]
+        if (
+            not isinstance(category, dict)
+            or not isinstance(category.get("label"), str)
+            or not isinstance(category.get("formula"), str)
+            or category.get("partitioned_by_currency") is not True
+            or category.get("model_status") != "heuristic_unvalidated"
+            or category.get("actionable") is not False
+            or not isinstance(category.get("eligible_count"), int)
+            or category["eligible_count"] < 0
+            or not isinstance(category.get("items_by_currency"), dict)
+        ):
+            raise DataContractError(f"Insight category {key!r} is invalid")
+        for currency, items in category["items_by_currency"].items():
+            if not isinstance(currency, str) or not isinstance(items, list):
+                raise DataContractError(f"Insight category {key!r} partition is invalid")
+            for item in items:
+                if (
+                    not isinstance(item, dict)
+                    or not isinstance(item.get("symbol"), str)
+                    or not isinstance(item.get("reasons"), list)
+                    or not all(isinstance(reason, str) for reason in item["reasons"])
+                    or not isinstance(item.get("components"), dict)
+                    or not all(
+                        isinstance(name, str)
+                        and (
+                            value is None
+                            or isinstance(value, (str, bool))
+                            or (
+                                isinstance(value, (int, float))
+                                and math.isfinite(value)
+                            )
+                        )
+                        for name, value in item.get("components", {}).items()
+                    )
+                    or item.get("model_status") != "heuristic_unvalidated"
+                    or item.get("actionable") is not False
+                    or not isinstance(item.get("score"), (int, float))
+                    or not math.isfinite(item["score"])
+                    or not 0 <= item["score"] <= 100
+                ):
+                    raise DataContractError(
+                        f"Insight category {key!r} contains an invalid item"
+                    )
+    if _has_actionable_true(insight):
+        raise DataContractError("Nested actionable=true is forbidden in insights")
+
+    if rows is not None:
+        row_symbols = {
+            row.get("symbol") for row in rows if isinstance(row, dict)
+        }
+        required_groups = (
+            "entry_timing",
+            "analyst_context",
+            "valuation_context",
+            "potential_context",
+            "risk_context",
+            "thesis_context",
+            "research_context",
+            "insight_provenance",
+        )
+        required_fields = (
+            "entry_timing_score",
+            "entry_timing_label",
+            "entry_timing_reason",
+            "falling_knife",
+            "bottoming",
+            "downside_structure",
+            "risk_warnings",
+            "bull_thesis",
+            "priced_in_note",
+            "trend_phase",
+            "research_summary",
+            "research_actions",
+            "technical_observation_zone",
+        )
+        for row in rows:
+            if not isinstance(row, dict):
+                raise DataContractError("Insight row must be an object")
+            absent = [key for key in (*required_groups, *required_fields) if key not in row]
+            if absent:
+                raise DataContractError(
+                    f"Insight row {row.get('symbol')!r} is missing fields: {absent}"
+                )
+            for group in required_groups:
+                _require_heuristic_group(row[group], f"{row.get('symbol')}.{group}")
+            for optional_group in (
+                "falling_knife",
+                "bottoming",
+                "downside_structure",
+                "trend_phase",
+                "technical_observation_zone",
+            ):
+                if row[optional_group] is not None:
+                    _require_heuristic_group(
+                        row[optional_group],
+                        f"{row.get('symbol')}.{optional_group}",
+                    )
+            if not isinstance(row["research_summary"], str):
+                raise DataContractError("research_summary must be text")
+            if not isinstance(row["research_actions"], list) or not all(
+                isinstance(item, dict)
+                and isinstance(item.get("text"), str)
+                and item.get("tone") in {"pos", "neg", "neutral"}
+                for item in row["research_actions"]
+            ):
+                raise DataContractError("research_actions are invalid")
+            if not isinstance(row["risk_warnings"], list) or not all(
+                isinstance(item, str) for item in row["risk_warnings"]
+            ):
+                raise DataContractError("risk_warnings are invalid")
+            if _has_actionable_true(
+                {key: row[key] for key in (*required_groups, *required_fields)}
+            ):
+                raise DataContractError("Nested row actionable=true is forbidden")
+        for category in categories.values():
+            for items in category["items_by_currency"].values():
+                if any(item["symbol"] not in row_symbols for item in items):
+                    raise DataContractError(
+                        "Insight category references an unknown instrument"
+                    )
+    return insight
 
 
 def _percentile(values: list[float], q: float) -> float | None:
@@ -170,15 +349,18 @@ def validate_output_contract(data: Any) -> dict[str, Any]:
         raise DataContractError("Output root must be an object")
     if data.get("schema") != OUTPUT_SCHEMA:
         raise DataContractError(f"Unsupported output schema: {data.get('schema')!r}")
-    if data.get("schema_version") != SCHEMA_VERSION:
+    if data.get("schema_version") != OUTPUT_SCHEMA_VERSION:
         raise DataContractError(
-            f"Unsupported schema version {data.get('schema_version')!r}; expected {SCHEMA_VERSION}"
+            f"Unsupported schema version {data.get('schema_version')!r}; "
+            f"expected {OUTPUT_SCHEMA_VERSION}"
         )
     for key, kind in (
         ("generated_at", str),
         ("data_status", dict),
         ("model_status", dict),
         ("rankings_by_currency_asset", dict),
+        ("insight_rankings", dict),
+        ("insight_metadata", dict),
         ("all", list),
     ):
         if not isinstance(data.get(key), kind):
@@ -225,6 +407,23 @@ def validate_output_contract(data: Any) -> dict[str, Any]:
     if model.get("validation") != "unvalidated" or model.get("actionable") is not False:
         raise DataContractError(
             "Deployed output must remain explicitly unvalidated and non-actionable"
+        )
+    validate_insight_contract(data["insight_rankings"], data["all"])
+    insight_metadata = data["insight_metadata"]
+    if (
+        insight_metadata.get("model_status") != "heuristic_unvalidated"
+        or insight_metadata.get("actionable") is not False
+        or _has_actionable_true(insight_metadata)
+    ):
+        raise DataContractError("Insight metadata contract is invalid")
+    expected_insight_enabled = (
+        status["status"] == "ok"
+        and status["data_actionable"] is True
+        and not status["blocking_reasons"]
+    )
+    if data["insight_rankings"]["enabled"] is not expected_insight_enabled:
+        raise DataContractError(
+            "Insight enabled state is inconsistent with the output data gate"
         )
     for currency, by_asset in data["rankings_by_currency_asset"].items():
         if not isinstance(currency, str) or not isinstance(by_asset, dict):

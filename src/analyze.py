@@ -21,7 +21,7 @@ from .assets import (
     is_company,
 )
 from .config import DATA, OUTPUT, TOP_N
-from .data_quality import OUTPUT_SCHEMA, build_data_status
+from .data_quality import OUTPUT_SCHEMA, OUTPUT_SCHEMA_VERSION, build_data_status
 from .deep_fundamentals import fetch_deep
 from .earnings import days_until, fetch_earnings
 from .expert_signals import (
@@ -43,6 +43,12 @@ from .fundamentals import fetch_fundamentals
 from .fx import currency_for, get_fx_rates_with_status
 from .geo import country_flag
 from .indicators import compute_features
+from .insights import (
+    INSIGHT_CONTRACT_VERSION,
+    INSIGHT_STATUS,
+    PROVENANCE_CATALOG,
+    enrich_rows_and_rankings,
+)
 from .macro import fetch_macro, macro_adjust
 from .news_engine import fetch_all_ticker_news, fetch_market_news, news_signal
 from .paper_trader import update_portfolio
@@ -742,6 +748,12 @@ def run(with_news=True, with_fundamentals=True):
         rankings_by_currency_asset = {}
         top_fundamental = []
 
+    rows, insight_rankings = enrich_rows_and_rankings(
+        rows,
+        rankings_enabled=data_status["data_actionable"],
+        blockers=data_status["blocking_reasons"],
+    )
+
     benchmarks, benchmark_failures = (
         _fetch_benchmarks(now)
         if not market_data_only
@@ -837,7 +849,7 @@ def run(with_news=True, with_fundamentals=True):
     }
     result = {
         "schema": OUTPUT_SCHEMA,
-        "schema_version": SCHEMA_VERSION,
+        "schema_version": OUTPUT_SCHEMA_VERSION,
         "generated_at": utc_now(),
         "run_mode": "dry_run" if dry_run else "production",
         "pipeline_scope": (
@@ -851,6 +863,15 @@ def run(with_news=True, with_fundamentals=True):
         },
         "data_status": data_status,
         "model_status": model_status,
+        "insight_rankings": insight_rankings,
+        "insight_metadata": {
+            "contract_version": INSIGHT_CONTRACT_VERSION,
+            "model_status": INSIGHT_STATUS,
+            "actionable": False,
+            "core_ranking_unchanged": True,
+            "scenario_ranges_used_in_core_ranking": False,
+            "provenance_catalog": PROVENANCE_CATALOG,
+        },
         "universe_size": len(symbols),
         "configured_universe_size": len(full_universe),
         "expected_asset_counts": expected_asset_counts,
@@ -873,7 +894,11 @@ def run(with_news=True, with_fundamentals=True):
             row for row in rows if row.get("aschenbrenner")
         ],
         "all": rows,
-        "_meta": schema_meta("stock-radar-output"),
+        "_meta": schema_meta(
+            "stock-radar-output",
+            schema_version=OUTPUT_SCHEMA_VERSION,
+            insight_contract=INSIGHT_CONTRACT_VERSION,
+        ),
     }
     atomic_write_json(
         FAILED_MANIFEST,

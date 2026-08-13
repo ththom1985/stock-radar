@@ -3,12 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Stock Radar Research</title>
+  <title>Stock Radar Insight Cockpit</title>
   <script>
     (() => {
       const param = new URLSearchParams(window.location.search).get("scoutTheme");
-      const theme =
-        param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      const theme = param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
       document.documentElement.setAttribute("data-theme", theme);
     })();
   </script>
@@ -66,154 +65,75 @@
       --cp-highlight: rgba(253, 142, 161, 0.12);
     }
     * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: var(--cp-bg);
-      color: var(--cp-text);
-      font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif;
-    }
-    button, input, select { font: inherit; }
-    button, select, input {
-      color: var(--cp-text);
-      background: var(--cp-surface);
-      border: 1px solid var(--cp-border);
-      border-radius: 0.625rem;
-    }
+    body { margin: 0; background: var(--cp-bg); color: var(--cp-text); font-family: "Segoe UI", Aptos, Calibri, sans-serif; }
+    button, input, select { font: inherit; color: var(--cp-text); }
     a { color: var(--cp-link); }
-    .shell { max-width: 1440px; margin: 0 auto; padding: 28px 24px 56px; }
-    .hero {
-      display: flex;
-      justify-content: space-between;
-      gap: 24px;
-      align-items: flex-start;
-      margin-bottom: 20px;
-    }
-    .eyebrow {
-      color: var(--cp-accent);
-      font-weight: 700;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      font-size: 12px;
-    }
-    h1 { font-size: clamp(32px, 5vw, 54px); margin: 4px 0 8px; letter-spacing: -.04em; }
-    h2, h3 { margin: 0; }
-    .subtitle { color: var(--cp-text-muted); max-width: 760px; line-height: 1.5; }
-    .status-chip {
-      padding: 8px 12px;
-      border: 1px solid var(--cp-warning);
-      color: var(--cp-text);
-      background: var(--cp-surface);
-      border-radius: 0.625rem;
-      white-space: nowrap;
-      font-weight: 700;
-    }
-    .metrics {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 12px;
-      margin: 20px 0;
-    }
-    .metric, .panel, .detail {
-      background: var(--cp-surface);
-      border: 1px solid var(--cp-border);
-      border-radius: 16px;
-      box-shadow: 0 0 0 1px var(--cp-sheen);
-    }
-    .metric { padding: 16px; }
-    .metric-label { color: var(--cp-text-muted); font-size: 12px; margin-bottom: 8px; }
-    .metric-value { font-size: 22px; font-weight: 700; overflow-wrap: anywhere; }
-    .notice {
-      padding: 14px 16px;
-      border-left: 4px solid var(--cp-warning);
-      background: var(--cp-surface);
-      margin-bottom: 20px;
-      line-height: 1.5;
-    }
-    .toolbar {
-      display: grid;
-      grid-template-columns: 1fr 1fr 2fr auto;
-      gap: 12px;
-      padding: 16px;
-      background: var(--cp-bg-elevated);
-      border: 1px solid var(--cp-border);
-      border-radius: 16px;
-      position: sticky;
-      top: 0;
-      z-index: 2;
-    }
-    .field { display: grid; gap: 6px; }
-    .field label { font-size: 12px; color: var(--cp-text-muted); font-weight: 600; }
-    .field select, .field input { min-height: 42px; width: 100%; padding: 8px 12px; }
-    .button {
-      align-self: end;
-      min-height: 42px;
-      padding: 8px 16px;
-      cursor: pointer;
-      background: var(--cp-accent);
-      color: var(--cp-accent-fg);
-      border-color: var(--cp-accent);
-      font-weight: 700;
-    }
-    .button:hover { background: var(--cp-accent-hover); }
-    .layout { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(340px, .8fr); gap: 20px; margin-top: 20px; }
+    .shell { max-width: 1480px; margin: 0 auto; padding: 24px 22px 48px; }
+    .hero { display: flex; justify-content: space-between; gap: 20px; align-items: flex-start; }
+    .eyebrow { color: var(--cp-accent); font-weight: 800; letter-spacing: .08em; text-transform: uppercase; font-size: 12px; }
+    h1 { margin: 4px 0 8px; font-size: clamp(32px, 5vw, 52px); letter-spacing: -.04em; }
+    h2, h3, h4 { margin: 0; }
+    .subtitle, .muted { color: var(--cp-text-muted); }
+    .status-chip, .badge { border: 1px solid var(--cp-border); border-radius: 999px; padding: 6px 10px; font-weight: 700; font-size: 12px; }
+    .status-chip { border-color: var(--cp-warning); }
+    .metrics { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin: 18px 0; }
+    .metric, .panel, .detail { background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 14px; }
+    .metric { padding: 14px; }
+    .metric-label { color: var(--cp-text-muted); font-size: 12px; }
+    .metric-value { font-size: 20px; font-weight: 800; margin-top: 6px; overflow-wrap: anywhere; }
+    .notice { border-left: 4px solid var(--cp-warning); background: var(--cp-surface); padding: 12px 15px; line-height: 1.5; margin-bottom: 14px; }
+    .nav { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px; background: var(--cp-bg-elevated); border: 1px solid var(--cp-border); border-radius: 14px; position: sticky; top: 0; z-index: 3; }
+    .nav-button, .button { border: 1px solid var(--cp-border); border-radius: 9px; background: var(--cp-surface); padding: 9px 12px; cursor: pointer; font-weight: 700; }
+    .nav-button:hover, .nav-button.active, .button:hover { border-color: var(--cp-accent); background: var(--cp-accent-soft); color: var(--cp-accent); }
+    .controls { display: grid; grid-template-columns: minmax(160px, .7fr) minmax(240px, 1.5fr) auto; gap: 10px; margin: 14px 0; }
+    select, input { min-height: 42px; border: 1px solid var(--cp-border); border-radius: 9px; background: var(--cp-surface); padding: 8px 11px; width: 100%; }
+    .layout { display: grid; grid-template-columns: minmax(0, .8fr) minmax(420px, 1.2fr); gap: 16px; }
     .panel { overflow: hidden; }
-    .panel-head {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: center;
-      padding: 18px 20px;
-      border-bottom: 1px solid var(--cp-border);
-    }
-    .muted { color: var(--cp-text-muted); }
-    .table-wrap { overflow: auto; max-height: 680px; }
-    table { border-collapse: collapse; width: 100%; }
-    th, td { text-align: left; padding: 11px 12px; border-bottom: 1px solid var(--cp-border); }
-    th { color: var(--cp-text-muted); font-size: 12px; position: sticky; top: 0; background: var(--cp-surface); }
-    tbody tr { cursor: pointer; }
-    tbody tr:hover, tbody tr.selected { background: var(--cp-accent-soft); }
-    .symbol { font-family: Consolas, "Courier New", Courier, monospace; font-weight: 700; }
-    .score { font-weight: 700; color: var(--cp-accent); }
-    .detail { padding: 20px; min-height: 360px; }
-    .detail-title { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
-    .detail-symbol { font-family: Consolas, "Courier New", Courier, monospace; color: var(--cp-accent); }
-    .detail-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 18px 0; }
-    .detail-stat { background: var(--cp-surface-soft); border-radius: 0.625rem; padding: 12px; }
-    .detail-stat span { display: block; color: var(--cp-text-muted); font-size: 12px; margin-bottom: 4px; }
-    .summary { line-height: 1.55; margin: 16px 0; }
-    .section { margin-top: 20px; }
-    .section h3 { font-size: 15px; margin-bottom: 8px; }
-    .scenario {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 8px;
-      padding: 8px 0;
-      border-bottom: 1px solid var(--cp-border);
-      font-size: 13px;
-    }
-    .headline { padding: 8px 0; border-bottom: 1px solid var(--cp-border); font-size: 13px; line-height: 1.4; }
-    .health {
-      margin-top: 20px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-    .health .panel { padding: 20px; }
+    .panel-head { display: flex; justify-content: space-between; gap: 10px; padding: 15px 17px; border-bottom: 1px solid var(--cp-border); }
+    .list { max-height: 720px; overflow: auto; }
+    .list-row { width: 100%; display: grid; grid-template-columns: 36px 95px 1fr 70px; gap: 8px; align-items: center; padding: 10px 12px; border: 0; border-bottom: 1px solid var(--cp-border); border-radius: 0; background: var(--cp-surface); text-align: left; cursor: pointer; }
+    .list-row:hover, .list-row.selected { background: var(--cp-accent-soft); }
+    .symbol { font-family: Consolas, "Courier New", monospace; font-weight: 800; }
+    .score { color: var(--cp-accent); font-weight: 800; text-align: right; }
+    .detail { padding: 18px; min-height: 520px; }
+    .detail-head { display: flex; justify-content: space-between; gap: 12px; }
+    .detail-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; margin: 14px 0; }
+    .stat { background: var(--cp-surface-soft); border-radius: 9px; padding: 10px; }
+    .stat span { display: block; color: var(--cp-text-muted); font-size: 11px; margin-bottom: 3px; }
+    .stat strong { overflow-wrap: anywhere; }
+    .summary { border-left: 4px solid var(--cp-accent); padding: 10px 12px; line-height: 1.55; margin: 14px 0; background: var(--cp-surface-soft); }
+    .section { margin-top: 16px; }
+    .section h3 { font-size: 15px; margin-bottom: 7px; }
+    .callout { padding: 9px 11px; border: 1px solid var(--cp-border); border-left-width: 4px; border-radius: 8px; margin: 7px 0; line-height: 1.4; }
+    .success { border-left-color: var(--cp-success); }
+    .warning { border-left-color: var(--cp-warning); }
+    .danger { border-left-color: var(--cp-danger); }
+    .scenario-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .scenario { background: var(--cp-surface-soft); border-radius: 9px; padding: 10px; }
+    .scenario strong, .scenario span { display: block; }
+    .scenario span { color: var(--cp-text-muted); font-size: 12px; margin-top: 3px; }
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table td, .data-table th { border-bottom: 1px solid var(--cp-border); padding: 7px; text-align: left; font-size: 12px; }
+    .headline { padding: 7px 0; border-bottom: 1px solid var(--cp-border); font-size: 13px; }
+    .health { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .health .panel { padding: 17px; }
     .failure { display: grid; grid-template-columns: 100px 1fr; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--cp-border); }
-    .footer { color: var(--cp-text-muted); font-size: 12px; margin-top: 28px; line-height: 1.5; }
+    .footer { color: var(--cp-text-muted); font-size: 12px; margin-top: 24px; line-height: 1.5; }
     .loading, .error { padding: 48px; text-align: center; }
     .error { color: var(--cp-danger); }
-    @media (max-width: 960px) {
+    [hidden] { display: none !important; }
+    @media (max-width: 1020px) {
       .metrics { grid-template-columns: repeat(2, 1fr); }
-      .toolbar { grid-template-columns: 1fr 1fr; position: static; }
       .layout, .health { grid-template-columns: 1fr; }
-      .hero { display: block; }
-      .status-chip { display: inline-block; margin-top: 12px; }
+      .nav { position: static; }
+      .detail-grid { grid-template-columns: repeat(2, 1fr); }
     }
-    @media (max-width: 560px) {
-      .shell { padding: 20px 12px 40px; }
-      .metrics, .toolbar, .detail-grid { grid-template-columns: 1fr; }
-      th:nth-child(3), td:nth-child(3), th:nth-child(5), td:nth-child(5) { display: none; }
+    @media (max-width: 600px) {
+      .shell { padding: 16px 10px 36px; }
+      .hero { display: block; }
+      .status-chip { display: inline-block; margin-top: 10px; }
+      .metrics, .controls, .detail-grid, .scenario-grid { grid-template-columns: 1fr; }
+      .list-row { grid-template-columns: 32px 82px 1fr 55px; }
     }
   </style>
 </head>
@@ -223,16 +143,12 @@
     <div id="app" hidden>
       <header class="hero">
         <div>
-          <div class="eyebrow">Completed-daily research</div>
+          <div class="eyebrow">Completed-daily Insight Cockpit</div>
           <h1>Stock Radar</h1>
-          <div class="subtitle">
-            Schnelle, loginfreie Übersicht über Aktien, ETFs und Krypto. Rankings sind nur innerhalb
-            derselben Handelswährung und Assetklasse vergleichbar.
-          </div>
+          <div class="subtitle">Transparente tägliche Research-Hinweise zu Timing, Bewertung, Analysten, Chancen und Risiken.</div>
         </div>
         <div class="status-chip">UNVALIDATED · Research only</div>
       </header>
-
       <section class="metrics">
         <div class="metric"><div class="metric-label">Datenstand</div><div id="generated" class="metric-value"></div></div>
         <div class="metric"><div class="metric-label">Instrumente</div><div id="instrument-count" class="metric-value"></div></div>
@@ -240,236 +156,225 @@
         <div class="metric"><div class="metric-label">Frische Bars</div><div id="freshness" class="metric-value"></div></div>
         <div class="metric"><div class="metric-label">Fehlende Symbole</div><div id="failed-count" class="metric-value"></div></div>
       </section>
-
-      <div class="notice">
-        Keine Anlageberatung. Scores und Szenarien sind unvalidierte heuristische Research-Hilfen,
-        keine Prognosen, Wahrscheinlichkeiten, Kursziele oder Kauf-/Verkaufsempfehlungen.
-      </div>
-
-      <section class="toolbar">
-        <div class="field">
-          <label for="currency">Handelswährung</label>
-          <select id="currency"></select>
-        </div>
-        <div class="field">
-          <label for="asset">Assetklasse</label>
-          <select id="asset">
-            <option value="company_equity">Aktien</option>
-            <option value="etf_fund">ETFs / Fonds</option>
-            <option value="crypto">Krypto</option>
-            <option value="all">Alle Instrumente</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="search">Symbol oder Name</label>
-          <input id="search" type="search" placeholder="z. B. MSFT, SAP oder NVIDIA">
-        </div>
-        <button id="clear" class="button" type="button">Filter löschen</button>
+      <div class="notice">Keine Anlageberatung. Alle Insights sind <strong>heuristic_unvalidated</strong>, nicht handlungsleitend und keine Prognosen, Wahrscheinlichkeiten oder Kauf-/Verkaufsempfehlungen. Szenarien fließen nicht in das Core-Ranking ein.</div>
+      <nav id="nav" class="nav">
+        <button class="nav-button active" data-view="daily_setups">Tipps des Tages</button>
+        <button class="nav-button" data-view="undervalued_quality">Unterbewertet</button>
+        <button class="nav-button" data-view="analyst_potential">Potenzial</button>
+        <button class="nav-button" data-view="entry_watchlist">Guter Einstieg</button>
+        <button class="nav-button" data-view="falling_knives">Fallende Messer</button>
+        <button class="nav-button" data-view="bottoming_watch">Bodenbildung</button>
+        <button class="nav-button" data-view="risk_watch">Risiken</button>
+        <button class="nav-button" data-view="all">Alle suchen</button>
+        <button class="nav-button" data-view="health">Datenqualität</button>
+      </nav>
+      <section id="controls" class="controls">
+        <select id="currency" aria-label="Handelswährung"></select>
+        <input id="search" type="search" placeholder="Symbol, Name, Sektor oder Branche">
+        <button id="clear" class="button" type="button">Zurücksetzen</button>
       </section>
-
-      <section class="layout">
+      <section id="cockpit" class="layout">
         <div class="panel">
           <div class="panel-head">
-            <div>
-              <h2 id="list-title">Research-Liste</h2>
-              <div id="list-subtitle" class="muted"></div>
-            </div>
+            <div><h2 id="list-title">Tipps des Tages</h2><div id="list-subtitle" class="muted"></div></div>
             <div id="result-count" class="muted"></div>
           </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Symbol</th>
-                  <th>Name</th>
-                  <th>USD</th>
-                  <th>Bar</th>
-                  <th>Score</th>
-                </tr>
-              </thead>
-              <tbody id="rows"></tbody>
-            </table>
-          </div>
+          <div id="rows" class="list"></div>
         </div>
         <aside id="detail" class="detail"></aside>
       </section>
-
-      <section class="health">
-        <div class="panel">
-          <h2>Datenqualität</h2>
-          <div id="health-content" class="section"></div>
-        </div>
-        <div class="panel">
-          <h2>Fehlende Symbole</h2>
-          <div id="failures" class="section"></div>
-        </div>
+      <section id="health" class="health" hidden>
+        <div class="panel"><h2>Datenqualität</h2><div id="health-content" class="section"></div></div>
+        <div class="panel"><h2>Fehlende Symbole</h2><div id="failures" class="section"></div></div>
       </section>
-
-      <footer class="footer">
-        Quelle: Yahoo Finance über die Stock-Radar-Pipeline · abgeschlossene Tagesbars ·
-        öffentliches Research-Dashboard ohne Login · Modellstatus: UNVALIDATED.
-      </footer>
+      <footer class="footer">Yahoo Finance über die fail-closed Stock-Radar-Pipeline · abgeschlossene Tagesbars · öffentlich ohne Login · Modellstatus UNVALIDATED.</footer>
     </div>
   </main>
-
   <script>
-    const state = { data: null, bySymbol: new Map(), selected: null };
+    const MAX_OUTPUT_AGE_HOURS = 36;
+    const state = { data: null, bySymbol: new Map(), view: "daily_setups", selected: null, gateFailures: [] };
     const $ = (id) => document.getElementById(id);
-    const assetLabels = {
-      company_equity: "Aktien",
-      etf_fund: "ETFs / Fonds",
-      crypto: "Krypto",
-      index_other: "Indizes / Sonstige",
-      unknown: "Unbekannt"
+    const categoryTitles = {
+      daily_setups: "Tipps des Tages",
+      undervalued_quality: "Unterbewertet",
+      analyst_potential: "Analysten-Potenzial",
+      entry_watchlist: "Guter Einstieg",
+      falling_knives: "Fallende Messer",
+      bottoming_watch: "Bodenbildung",
+      risk_watch: "Risiken",
+      all: "Alle suchen",
+      health: "Datenqualität"
     };
-    const number = (value, digits = 2) =>
-      Number.isFinite(value) ? new Intl.NumberFormat("de-DE", { maximumFractionDigits: digits }).format(value) : "–";
-    const percent = (value) => Number.isFinite(value) ? `${number(value, 2)} %` : "–";
-    const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
-      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
-    }[char]));
+    const assetLabels = { company_equity: "Aktie", etf_fund: "ETF/Fonds", crypto: "Krypto", index_other: "Index/Sonstige", unknown: "Unbekannt" };
+    const $number = (value, digits = 2) => Number.isFinite(value) ? new Intl.NumberFormat("de-DE", { maximumFractionDigits: digits }).format(value) : "–";
+    const percent = (value, digits = 1) => Number.isFinite(value) ? `${$number(value, digits)} %` : "–";
+    const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[char]));
+    const category = () => state.data.insight_rankings?.categories?.[state.view] || null;
 
-    function rankedSymbols(currency, asset) {
-      return state.data.rankings?.[currency]?.[asset] || [];
+    function hasActionableTrue(value) {
+      if (!value || typeof value !== "object") return false;
+      if (value.actionable === true) return true;
+      return Object.values(value).some(hasActionableTrue);
     }
 
-    function filteredRows() {
+    function staticGateFailures(data, nowMs = Date.now()) {
+      const failures = [];
+      const status = data?.data_status || {};
+      const model = data?.model_status || {};
+      const insights = data?.insight_rankings || {};
+      if (status.status !== "ok") failures.push("Datenstatus ist nicht OK.");
+      if (status.data_actionable !== true) failures.push("Daten-Gate ist nicht freigegeben.");
+      if ((status.blocking_reasons || []).length) failures.push(...status.blocking_reasons);
+      const generatedMs = Date.parse(data?.generated_at || "");
+      const ageHours = (nowMs - generatedMs) / 3600000;
+      if (!Number.isFinite(generatedMs)) failures.push("Ungültiger Datenzeitstempel.");
+      else if (ageHours > MAX_OUTPUT_AGE_HOURS) failures.push(`Daten sind ${ageHours.toFixed(1)} Stunden alt (Limit ${MAX_OUTPUT_AGE_HOURS}).`);
+      else if (ageHours < -1) failures.push("Datenzeitstempel liegt in der Zukunft.");
+      if (model.validation !== "unvalidated" || model.actionable !== false) failures.push("Unsicherer Modellstatus.");
+      if (insights.model_status !== "heuristic_unvalidated" || insights.actionable !== false || insights.enabled !== true) failures.push("Insight-Gate ist nicht freigegeben.");
+      if (hasActionableTrue(insights)) failures.push("Verschachteltes actionable=true erkannt.");
+      return [...new Set(failures)];
+    }
+
+    function categoryItems() {
       const currency = $("currency").value;
-      const asset = $("asset").value;
       const query = $("search").value.trim().toLowerCase();
+      if (state.view === "all") {
+        const rows = state.data.instruments.filter((row) => {
+          if (!query && currency && row.currency !== currency) return false;
+          const text = `${row.symbol || ""} ${row.name || ""} ${row.sector || ""} ${row.industry || ""}`.toLowerCase();
+          return !query || text.includes(query);
+        });
+        return rows.sort((a, b) => String(a.symbol).localeCompare(String(b.symbol))).slice(0, query ? 250 : 100).map((row) => ({
+          symbol: row.symbol, score: row.radar_score, reasons: [row.research_summary || ""], components: {}
+        }));
+      }
+      let items = category()?.items_by_currency?.[currency] || [];
       if (query) {
-        return state.data.instruments.filter((row) => {
-          const assetMatch = asset === "all" || row.asset_type === asset;
-          const currencyMatch = !currency || row.currency === currency;
-          const text = `${row.symbol || ""} ${row.name || ""} ${row.sector || ""}`.toLowerCase();
-          return assetMatch && currencyMatch && text.includes(query);
-        }).slice(0, 250);
+        items = items.filter((item) => {
+          const row = state.bySymbol.get(item.symbol) || {};
+          return `${row.symbol || ""} ${row.name || ""} ${row.sector || ""} ${row.industry || ""}`.toLowerCase().includes(query);
+        });
       }
-      if (asset === "all") {
-        return state.data.instruments
-          .filter((row) => !currency || row.currency === currency)
-          .sort((a, b) => (b.radar_score ?? -1) - (a.radar_score ?? -1))
-          .slice(0, 100);
-      }
-      return rankedSymbols(currency, asset)
-        .map((symbol) => state.bySymbol.get(symbol))
-        .filter(Boolean);
+      return items;
     }
 
     function renderList() {
-      const rows = filteredRows();
-      const asset = $("asset").value;
-      const currency = $("currency").value;
-      const query = $("search").value.trim();
-      $("list-title").textContent = query ? "Suchergebnisse" : "Research-Liste";
-      $("list-subtitle").textContent =
-        `${currency || "Alle Währungen"} · ${asset === "all" ? "Alle Assetklassen" : assetLabels[asset]}`;
-      $("result-count").textContent = `${rows.length} sichtbar`;
-      $("rows").innerHTML = rows.map((row, index) => `
-        <tr data-symbol="${escapeHtml(row.symbol)}" class="${row.symbol === state.selected ? "selected" : ""}">
-          <td>${index + 1}</td>
-          <td class="symbol">${escapeHtml(row.symbol)}</td>
-          <td>${escapeHtml(row.name || "")}</td>
-          <td>${number(row.price)}</td>
-          <td>${escapeHtml(row.bar_date || "–")}</td>
-          <td class="score">${number(row.radar_score, 0)}</td>
-        </tr>
-      `).join("");
-      $("rows").querySelectorAll("tr").forEach((tr) => {
-        tr.addEventListener("click", () => {
-          state.selected = tr.dataset.symbol;
-          renderList();
-          renderDetail(state.bySymbol.get(state.selected));
-        });
-      });
-      if (!rows.length) {
-        state.selected = null;
-        renderDetail(null);
-      } else if (!rows.some((row) => row.symbol === state.selected)) {
-        state.selected = rows[0].symbol;
-        renderList();
-        renderDetail(rows[0]);
+      if (state.view === "health") return renderHealthView();
+      $("health").hidden = true;
+      $("cockpit").hidden = false;
+      $("controls").hidden = false;
+      const items = categoryItems();
+      const cat = category();
+      $("list-title").textContent = categoryTitles[state.view];
+      $("list-subtitle").textContent = state.view === "all"
+        ? "Alphabetische Suche, kein globales Cross-Currency-Ranking"
+        : `${$("currency").value} · ${cat?.formula || ""}`;
+      $("result-count").textContent = `${items.length} sichtbar`;
+      $("rows").innerHTML = items.map((item, index) => {
+        const row = state.bySymbol.get(item.symbol) || {};
+        return `<button class="list-row ${item.symbol === state.selected ? "selected" : ""}" data-symbol="${escapeHtml(item.symbol)}">
+          <span>${index + 1}</span><span class="symbol">${escapeHtml(item.symbol)}</span>
+          <span><strong>${escapeHtml(row.name || "")}</strong></span>
+          <span class="score">${$number(item.score, 0)}</span>
+        </button>`;
+      }).join("");
+      $("rows").querySelectorAll(".list-row").forEach((button) => button.addEventListener("click", () => {
+        state.selected = button.dataset.symbol; renderList(); renderDetail(state.bySymbol.get(state.selected));
+      }));
+      if (!items.length) {
+        state.selected = null; renderDetail(null);
+      } else if (!items.some((item) => item.symbol === state.selected)) {
+        state.selected = items[0].symbol; renderList(); renderDetail(state.bySymbol.get(state.selected));
       }
+    }
+
+    function callout(text, tone = "warning") {
+      return text ? `<div class="callout ${tone}">${escapeHtml(text)}</div>` : "";
     }
 
     function renderDetail(row) {
-      if (!row) {
-        $("detail").innerHTML = `<div class="muted">Kein Instrument für diese Auswahl gefunden.</div>`;
-        return;
-      }
-      const scenarios = (row.scenario_long || []).map((item) => `
-        <div class="scenario">
-          <strong>${escapeHtml(item.label || "")}</strong>
-          <span>${number(item.range_low_price)} USD</span>
-          <span>${number(item.range_high_price)} USD</span>
-        </div>
-      `).join("");
-      const headlines = (row.news || []).map((item) => `
-        <div class="headline">
-          ${escapeHtml(item.published_at || "")} ·
-          ${item.link ? `<a href="${escapeHtml(item.link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.title || "")}</a>` : escapeHtml(item.title || "")}
-        </div>
-      `).join("");
+      if (!row) { $("detail").innerHTML = `<div class="muted">Keine Instrumente erfüllen diese Auswahl.</div>`; return; }
+      const analyst = row.analyst_context || {};
+      const downside = row.downside_structure || {};
+      const valuation = row.valuation_context || {};
+      const phase = row.trend_phase || {};
+      const scenarios = (row.scenario_long || []).map((item) => `<div class="scenario">
+        <strong>${escapeHtml(item.label || "")}</strong>
+        <span>Referenzpfad: ${percent(item.reference_change_pct)}</span>
+        <span>Spanne: ${$number(item.range_low_price)}–${$number(item.range_high_price)} USD</span>
+      </div>`).join("");
+      const technicalRows = [
+        ["RSI", $number(row.rsi, 1)], ["MACD / Signal", `${$number(row.macd, 2)} / ${$number(row.macd_signal, 2)}`],
+        ["20T / 60T", `${percent(row.ret_20d)} / ${percent(row.ret_60d)}`], ["Abstand 52W-Hoch", percent(row.pct_from_high52)],
+        ["ATR / Vola p.a.", `${percent(row.atr_pct)} / ${percent(row.vol_annual_pct)}`], ["RVOL", `${$number(row.rvol, 2)}x`],
+        ["Minervini", `${$number(row.minervini_score, 0)}/100`], ["Weinstein", row.weinstein_label || "–"]
+      ].map(([label, value]) => `<tr><td>${escapeHtml(label)}</td><td>${escapeHtml(value)}</td></tr>`).join("");
+      const fundRows = valuation.available ? [
+        ["Value", valuation.value_score], ["Quality", valuation.quality_score], ["Growth", valuation.growth_score], ["Fundamental", valuation.fundamental_score]
+      ].map(([label, value]) => `<div class="stat"><span>${label}</span><strong>${$number(value, 0)}/100</strong></div>`).join("")
+        : `<div class="callout warning">${escapeHtml(valuation.unavailable_reason || "Aktuelle vollständige Fundamentaldaten fehlen; keine Bewertungs- oder Qualitätsaussage.")}</div>`;
+      const news = (row.news || []).map((item) => `<div class="headline">${escapeHtml(item.published_at || "")} · ${
+        item.link ? `<a href="${escapeHtml(item.link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.title || "")}</a>` : escapeHtml(item.title || "")
+      }</div>`).join("");
       $("detail").innerHTML = `
-        <div class="detail-title">
-          <div>
-            <div class="detail-symbol">${escapeHtml(row.symbol)}</div>
-            <h2>${escapeHtml(row.name || "")}</h2>
-            <div class="muted">${escapeHtml(assetLabels[row.asset_type] || row.asset_type)} · ${escapeHtml(row.currency || "")}</div>
-          </div>
-          <div class="score">${number(row.radar_score, 0)}/100</div>
-        </div>
+        <div class="detail-head"><div><div class="symbol">${escapeHtml(row.symbol)}</div><h2>${escapeHtml(row.name || "")}</h2>
+        <div class="muted">${escapeHtml(assetLabels[row.asset_type] || row.asset_type)} · ${escapeHtml(row.currency || "")} · Bar ${escapeHtml(row.bar_date || "–")}</div></div>
+        <span class="badge">${$number(row.entry_timing_score, 0)}/100 Timing</span></div>
+        <div class="summary"><strong>Research-Fazit:</strong> ${escapeHtml(row.research_summary || row.heuristic_summary || "–")}</div>
         <div class="detail-grid">
-          <div class="detail-stat"><span>Abschlusskurs USD</span><strong>${number(row.price)}</strong></div>
-          <div class="detail-stat"><span>Abgeschlossener Bar</span><strong>${escapeHtml(row.bar_date || "–")}</strong></div>
-          <div class="detail-stat"><span>Technischer Score</span><strong>${number(row.longterm_score, 0)}/100</strong></div>
-          <div class="detail-stat"><span>Fundamental deskriptiv</span><strong>${number(row.fundamental_score, 0)}/100</strong></div>
-          <div class="detail-stat"><span>Sektor</span><strong>${escapeHtml(row.sector || "–")}</strong></div>
-          <div class="detail-stat"><span>Nächste Zahlen</span><strong>${escapeHtml(row.next_earnings || "–")}</strong></div>
+          <div class="stat"><span>Trendphase</span><strong>${escapeHtml(phase.phase || "–")}</strong></div>
+          <div class="stat"><span>Timing</span><strong>${escapeHtml(row.entry_timing_label || "–")}</strong></div>
+          <div class="stat"><span>Tageskontext</span><strong>${escapeHtml(row.daily_signal_direction || "–")}</strong></div>
+          <div class="stat"><span>Kurs USD</span><strong>${$number(row.price)}</strong></div>
         </div>
-        <div class="summary">${escapeHtml(row.heuristic_summary || "")}</div>
-        ${scenarios ? `<div class="section"><h3>Heuristische Szenariospanne</h3>${scenarios}</div>` : ""}
-        ${headlines ? `<div class="section"><h3>Aktuelle Headlines</h3>${headlines}</div>` : ""}
-      `;
+        ${callout(row.entry_timing_reason, "success")}
+        ${row.falling_knife ? callout(row.falling_knife.warning, "danger") : ""}
+        ${row.bottoming ? callout(`Spekulative Bodenbildung: ${(row.bottoming.signals || []).join(" · ")}`, "warning") : ""}
+        ${callout(row.bull_thesis, "success")}${callout(row.priced_in_note, "warning")}
+        ${(row.risk_warnings || []).map((warning) => callout(warning, "danger")).join("")}
+        <div class="section"><h3>Upside und Analysten getrennt</h3>
+          ${analyst.available ? `<div class="callout success">${analyst.analyst_count} Analysten · Konsens ${escapeHtml(analyst.consensus || "–")} · Ziel ${$number(analyst.target_price)} USD · Abstand ${percent(analyst.upside_pct)}. Keine Modellprognose.</div>` : `<div class="muted">Keine ausreichende Analystenabdeckung (mindestens 5 erforderlich).</div>`}
+          ${scenarios ? `<div class="scenario-grid">${scenarios}</div>` : `<div class="muted">Keine Szenariospannen verfügbar.</div>`}
+        </div>
+        <div class="section"><h3>Abwärtsstruktur und Beobachtungszone</h3>
+          <div class="callout ${downside.risk === "hoch" ? "danger" : "warning"}">Risiko ${escapeHtml(downside.risk || "–")} · ${escapeHtml(downside.verdict || "–")} · Support ${$number(downside.support1)} USD (${percent(downside.support1_pct)})</div>
+          ${row.technical_observation_zone ? `<div class="muted">${escapeHtml(row.technical_observation_zone.label)}: ${$number(row.technical_observation_zone.lower)}–${$number(row.technical_observation_zone.upper)} USD · keine Ordermarke</div>` : ""}
+        </div>
+        <div class="section"><h3>Fundamentaldaten (deskriptiv)</h3><div class="detail-grid">${fundRows}</div>
+          <div class="muted">${escapeHtml((valuation.reasons || []).join(" · ") || valuation.comparison_note || valuation.unavailable_reason || "Keine vollständigen aktuellen Fundamentaldaten.")}</div>
+        </div>
+        <div class="section"><h3>Technisches Tagesbild</h3><table class="data-table">${technicalRows}</table></div>
+        <div class="section"><h3>News und Termine</h3>
+          ${row.next_earnings ? `<div class="callout warning">Nächste Zahlen: ${escapeHtml(row.next_earnings)} (${escapeHtml(row.earnings_in_days)} Tage)</div>` : ""}
+          ${news || `<div class="muted">Keine aktuellen altersgefilterten Headlines.</div>`}
+        </div>`;
     }
 
-    function renderHealth() {
-      const status = state.data.data_status || {};
-      const age = status.bar_age_distribution || {};
-      $("health-content").innerHTML = `
-        <div class="detail-grid">
-          <div class="detail-stat"><span>Status</span><strong>${escapeHtml(status.status || "–")}</strong></div>
-          <div class="detail-stat"><span>Coverage-SLA</span><strong>${percent(status.coverage_sla_pct)}</strong></div>
-          <div class="detail-stat"><span>Median Bar-Alter</span><strong>${number(age.median_days, 0)} Tage</strong></div>
-          <div class="detail-stat"><span>Max. Bar-Alter</span><strong>${number(age.max_days, 0)} Tage</strong></div>
-        </div>
-      `;
-      const failed = status.failed_symbols || {};
-      const entries = Object.entries(failed);
-      $("failures").innerHTML = entries.length
-        ? entries.map(([symbol, reason]) => `
-            <div class="failure"><span class="symbol">${escapeHtml(symbol)}</span><span>${escapeHtml(reason)}</span></div>
-          `).join("")
-        : `<div class="muted">Keine fehlenden Symbole.</div>`;
+    function renderHealthView() {
+      $("cockpit").hidden = true; $("controls").hidden = true; $("health").hidden = false;
+      const status = state.data.data_status || {}; const age = status.bar_age_distribution || {};
+      $("health-content").innerHTML = `${state.gateFailures.map((reason) => callout(reason, "danger")).join("")}<div class="detail-grid">
+        <div class="stat"><span>Status</span><strong>${escapeHtml(status.status || "–")}</strong></div>
+        <div class="stat"><span>Coverage</span><strong>${percent(status.coverage_pct)}</strong></div>
+        <div class="stat"><span>Frische Bars</span><strong>${percent(status.fresh_bar_coverage_pct)}</strong></div>
+        <div class="stat"><span>Median / Max Alter</span><strong>${$number(age.median_days, 0)} / ${$number(age.max_days, 0)} Tage</strong></div>
+      </div><div class="section"><h3>Blocking Reasons</h3>${(status.blocking_reasons || []).map((reason) => callout(reason, "danger")).join("") || `<div class="muted">Keine.</div>`}</div>`;
+      const failed = Object.entries(status.failed_symbols || {});
+      $("failures").innerHTML = failed.length ? failed.map(([symbol, reason]) => `<div class="failure"><span class="symbol">${escapeHtml(symbol)}</span><span>${escapeHtml(reason)}</span></div>`).join("") : `<div class="muted">Keine fehlenden Symbole.</div>`;
+    }
+
+    function setView(view) {
+      state.view = view; state.selected = null; $("search").value = "";
+      document.querySelectorAll(".nav-button").forEach((button) => button.classList.toggle("active", button.dataset.view === view));
+      renderList();
     }
 
     function bind() {
-      ["currency", "asset"].forEach((id) => $(id).addEventListener("change", () => {
-        state.selected = null;
-        renderList();
-      }));
-      $("search").addEventListener("input", () => {
-        state.selected = null;
-        renderList();
-      });
-      $("clear").addEventListener("click", () => {
-        $("currency").value = state.data.rankings.USD ? "USD" : Object.keys(state.data.rankings)[0];
-        $("asset").value = "company_equity";
-        $("search").value = "";
-        state.selected = null;
-        renderList();
-      });
+      document.querySelectorAll(".nav-button").forEach((button) => button.addEventListener("click", () => setView(button.dataset.view)));
+      $("currency").addEventListener("change", () => { state.selected = null; renderList(); });
+      $("search").addEventListener("input", () => { state.selected = null; renderList(); });
+      $("clear").addEventListener("click", () => { $("search").value = ""; state.selected = null; renderList(); });
     }
 
     async function start() {
@@ -477,24 +382,33 @@
         const response = await fetch("./data.json", { cache: "no-store" });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         state.data = await response.json();
+        if (state.data.schema !== "stock-radar-static" || state.data.schema_version !== 2) throw new Error("Nicht unterstützter Datenvertrag");
         state.bySymbol = new Map(state.data.instruments.map((row) => [row.symbol, row]));
-        const currencies = Object.keys(state.data.rankings).sort((a, b) =>
-          a === "USD" ? -1 : b === "USD" ? 1 : a.localeCompare(b)
-        );
-        $("currency").innerHTML = currencies.map((currency) =>
-          `<option value="${escapeHtml(currency)}">${escapeHtml(currency)}</option>`
-        ).join("");
-        $("currency").value = currencies.includes("USD") ? "USD" : currencies[0];
+        const currencies = new Set(Object.keys(state.data.rankings || {}));
+        Object.values(state.data.insight_rankings?.categories || {}).forEach((cat) => Object.keys(cat.items_by_currency || {}).forEach((currency) => currencies.add(currency)));
+        const sortedCurrencies = [...currencies].sort((a, b) => a === "USD" ? -1 : b === "USD" ? 1 : a.localeCompare(b));
+        $("currency").innerHTML = sortedCurrencies.map((currency) => `<option value="${escapeHtml(currency)}">${escapeHtml(currency)}</option>`).join("");
+        $("currency").value = sortedCurrencies.includes("USD") ? "USD" : sortedCurrencies[0];
         $("generated").textContent = new Date(state.data.generated_at).toLocaleString("de-DE");
-        $("instrument-count").textContent = number(state.data.instruments.length, 0);
+        $("instrument-count").textContent = $number(state.data.instruments.length, 0);
         $("coverage").textContent = percent(state.data.data_status.coverage_pct);
         $("freshness").textContent = percent(state.data.data_status.fresh_bar_coverage_pct);
-        $("failed-count").textContent = number(state.data.data_status.failed_symbol_count, 0);
+        $("failed-count").textContent = $number(state.data.data_status.failed_symbol_count, 0);
         bind();
-        renderHealth();
-        renderList();
-        $("loading").hidden = true;
-        $("app").hidden = false;
+        state.gateFailures = staticGateFailures(state.data);
+        if (state.gateFailures.length) {
+          document.querySelectorAll(".nav-button").forEach((button) => {
+            button.disabled = button.dataset.view !== "health";
+            button.classList.toggle("active", button.dataset.view === "health");
+          });
+          document.querySelector(".notice").textContent =
+            "Insights gesperrt: Daten sind stale, unvollständig oder vertraglich nicht freigegeben. Nur Datenqualität wird angezeigt.";
+          state.view = "health";
+          renderHealthView();
+        } else {
+          renderList();
+        }
+        $("loading").hidden = true; $("app").hidden = false;
       } catch (error) {
         $("loading").className = "error";
         $("loading").textContent = `Dashboard-Daten konnten nicht geladen werden: ${error.message}`;
