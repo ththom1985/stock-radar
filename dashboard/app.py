@@ -29,8 +29,8 @@ BACKTEST = ROOT / "data" / "backtest.json"
 st.set_page_config(page_title="Stock Radar Research", page_icon="📊", layout="wide")
 st.title("📊 Stock Radar — completed-daily-bar research")
 st.caption(
-    "Unvalidated heuristic research only. No intraday data, probability, confidence, "
-    "profitability or buy/sell claim is made."
+    "Heuristic radar sections remain unvalidated. Calibrated material-move "
+    "probabilities appear only after every strict release gate passes."
 )
 
 
@@ -57,7 +57,13 @@ if not allowed:
     st.error("Research cards are blocked because the freshness/completeness contract failed.")
     for reason in blockers:
         st.write(f"- {reason}")
-    st.json({"data_status": status, "model_status": model})
+    st.json(
+        {
+            "data_status": status,
+            "model_status": model,
+            "probability_validation": data.get("probability_validation"),
+        }
+    )
     failed = status.get("failed_symbols")
     if isinstance(failed, dict) and failed:
         st.dataframe(
@@ -78,7 +84,7 @@ metrics[4].metric("Model", str(model.get("validation", "unknown")).upper())
 
 st.warning(
     "The deployed composite is UNVALIDATED and non-actionable. Scenario ranges are "
-    "heuristic volatility illustrations, not expected returns, medians, confidence "
+    "heuristic volatility illustrations, not expected returns, medians, calibrated "
     "intervals, probabilities, targets, or recommendations."
 )
 st.info(
@@ -94,6 +100,7 @@ with st.expander("Data and model contract", expanded=not allowed):
             "schema_version": data.get("schema_version"),
             "data_status": status,
             "model_status": model,
+            "probability_validation": data.get("probability_validation"),
         }
     )
     feature_gate = status.get("feature_coverage") or {}
@@ -245,6 +252,111 @@ def _render_sweet_spot(row):
     )
 
 
+def _render_probability_forecast(row, shared_baselines=None):
+    forecast = row.get("probability_forecast") or {}
+    if (
+        not forecast.get("forecasts")
+        and not forecast.get("baselines")
+        and row.get("asset_type") == "company_equity"
+        and row.get("currency") == "USD"
+        and shared_baselines
+    ):
+        forecast = {**forecast, "baselines": shared_baselines}
+    st.markdown("#### Kalibrierte Wahrscheinlichkeiten")
+    st.caption(
+        "Separates Modell · kein Bestandteil von Radar-Score, Insight-Rang, "
+        "Sweet Spot oder Farbe · keine Anlageempfehlung"
+    )
+    if forecast.get("status") == "withheld":
+        st.warning(
+            f"{forecast.get('message') or 'No validated stock-specific probability edge'}."
+        )
+        st.caption(
+            "Status: Forward Validation erforderlich. Historische Basisraten sind "
+            "deskriptive Häufigkeiten des heutigen Survivor-Universums, keine "
+            "Aktienprognose und kein Konfidenzintervall."
+        )
+        for reason in forecast.get("reasons") or []:
+            st.write(f"- {reason}")
+    elif forecast.get("status") == "partial":
+        st.info(
+            "Nur die unten aufgeführten Horizont-/Schwellenmodelle haben alle "
+            "aktuellen Freigabekriterien erfüllt."
+        )
+    elif forecast.get("status") == "accepted":
+        st.info("Alle unten aufgeführten Modelle haben die strikten Freigabekriterien erfüllt.")
+    else:
+        st.warning("No validated stock-specific probability edge. Output contract unavailable.")
+
+    for item in forecast.get("forecasts") or []:
+        probabilities = item.get("probabilities_pct") or {}
+        intervals = item.get("model_interval_95_pct") or {}
+        bootstrap = item.get("fixed_oos_bootstrap") or {}
+        threshold = item.get("threshold_pct")
+        gross_boundary = (
+            threshold + 0.30 if isinstance(threshold, (int, float)) else None
+        )
+        st.markdown(
+            f"**{item.get('horizon_label')} / {threshold}% Materialschwelle:** "
+            f"Anstieg (Brutto) ≥ +{gross_boundary:.2f}% {probabilities.get('up')}%, "
+            f"Mitte {probabilities.get('middle')}%, "
+            f"Rückgang (Brutto) ≤ -{gross_boundary:.2f}% {probabilities.get('down')}%"
+        )
+        st.caption(
+            f"Modellfamilie {item.get('model_family') or 'independent-threshold-v1'} · "
+            "95% aggregate calibration-error interval approximation from fixed "
+            "OOS predictions; not an individual stock outcome interval. "
+            "Down/Mitte/Up: "
+            f"{(intervals.get('down') or ['—', '—'])[0]}–"
+            f"{(intervals.get('down') or ['—', '—'])[1]}% / "
+            f"{(intervals.get('middle') or ['—', '—'])[0]}–"
+            f"{(intervals.get('middle') or ['—', '—'])[1]}% / "
+            f"{(intervals.get('up') or ['—', '—'])[0]}–"
+            f"{(intervals.get('up') or ['—', '—'])[1]}% · "
+            f"Baseline {item.get('baseline_rates_pct')} · "
+            f"Brier skill {_number(item.get('brier_skill'), 3)} · "
+            f"ECE {item.get('classwise_ece')} · "
+            f"{item.get('full_test_fold_count') or item.get('fold_count')} volle "
+            f"Test-Folds · {_number(item.get('history_years'), 1)} nutzbare Jahre · "
+            f"min. Train {_number(item.get('min_usable_train_years'), 1)} Jahre · "
+            f"n={item.get('sample_size')} · "
+            f"OOS-Bootstrap {bootstrap.get('completed')}/"
+            f"{bootstrap.get('requested')} abgeschlossen"
+            f" ({bootstrap.get('skipped')} übersprungen) · "
+            f"{(item.get('threshold_monotonicity') or {}).get('disclosure') or ''}"
+        )
+    if not forecast.get("forecasts") and forecast.get("baselines"):
+        st.caption(
+            "Nur historische Basisraten; keine aktienspezifische Modellfreigabe. "
+            "Die Werte sind keine Prognose für dieses Unternehmen."
+        )
+        st.dataframe(
+            pd.DataFrame(
+                [
+                    {
+                        "Horizont": item.get("horizon_label"),
+                        "Schwelle": item.get("threshold_pct"),
+                        "Down %": (item.get("rates_pct") or {}).get("down"),
+                        "Mitte %": (item.get("rates_pct") or {}).get("middle"),
+                        "Up %": (item.get("rates_pct") or {}).get("up"),
+                        "Freigabe": item.get("accepted_stock_specific_model"),
+                        "Folds": item.get("fold_count"),
+                    }
+                    for item in forecast["baselines"]
+                ]
+            ),
+            hide_index=True,
+            width="stretch",
+        )
+    st.caption(
+        f"Signal: {forecast.get('signal_timestamp') or '—'} · "
+        f"Listing-Währung: {forecast.get('listing_currency') or '—'} · "
+        "Einstieg: erster adjustierter/raw-äquivalenter Open strikt nach t · "
+        "Kosten: 30 bp Round Trip. "
+        f"{forecast.get('survivorship_warning') or ''}"
+    )
+
+
 def _research_card(row, rank=None):
     prefix = f"{rank}. " if rank is not None else ""
     with st.container(border=True):
@@ -275,6 +387,9 @@ def _research_card(row, rank=None):
             st.error("China-Risikokontext (heuristic_unvalidated; kein bewiesener Abschlag)")
             for reason in jurisdiction.get("reasons") or []:
                 st.warning(reason)
+        _render_probability_forecast(
+            row, data.get("probability_baselines") or []
+        )
         _render_sweet_spot(row)
         header = st.columns(6)
         header[0].metric("Completed-bar close (USD)", _number(row.get("price"), 2))
@@ -847,6 +962,15 @@ with tabs[11]:
         st.info("Legacy backtest artifact detected; rerun it before relying on its methodology.")
     else:
         st.info("No v2 backtest has been run.")
+    st.subheader("Probability release validation")
+    probability_validation = data.get("probability_validation") or {}
+    st.json(probability_validation)
+    probability_models = probability_validation.get("models") or {}
+    if probability_models:
+        st.dataframe(
+            pd.DataFrame.from_dict(probability_models, orient="index"),
+            width="stretch",
+        )
 
 with tabs[9]:
     st.subheader("Completed-bar age distribution")
@@ -856,6 +980,8 @@ with tabs[9]:
         pd.DataFrame.from_dict(data.get("fx_status") or {}, orient="index"),
         width="stretch",
     )
+    st.subheader("Probability data health")
+    st.json(data.get("probability_validation") or {"status": "unavailable"})
     failed = status.get("failed_symbols") or {}
     st.subheader(f"Failed symbols ({len(failed)})")
     st.dataframe(

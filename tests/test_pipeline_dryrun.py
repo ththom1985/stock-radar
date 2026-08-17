@@ -143,6 +143,15 @@ class DryRunPipelineTests(ProjectTempMixin, unittest.TestCase):
         self.assertEqual(loaded["schema"], "stock-radar-output")
         self.assertEqual(loaded["universe_size"], 2)
         self.assertEqual(loaded["model_status"]["validation"], "unvalidated")
+        self.assertIn("probability_validation", loaded)
+        for row in loaded["all"]:
+            self.assertEqual(row["probability_forecast"]["status"], "withheld")
+            self.assertTrue(
+                row["probability_forecast"]["separate_from_radar_score"]
+            )
+            self.assertTrue(
+                row["probability_forecast"]["separate_from_sweet_spot"]
+            )
 
         market_dir = self.work / "market-contract"
         with patch.dict(

@@ -29,7 +29,8 @@ for _d in (DATA, PRICES, OUTPUT, HISTORY):
     _d.mkdir(parents=True, exist_ok=True)
 
 # --- Data fetching ---
-HISTORY_PERIOD = "1y"   # how much daily history to pull (needs >= 200 days for SMA200)
+HISTORY_PERIOD = "2y"   # >=252 prior bars are required by probability inference
+PROBABILITY_HISTORY_START = "2008-01-01"
 FETCH_CHUNK = 100       # tickers per yfinance batch request
 FETCH_PAUSE = 1.0       # seconds between batches (be gentle to Yahoo)
 

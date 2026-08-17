@@ -7,6 +7,7 @@ from src.export_static import (
     MAX_STATIC_BYTES,
     STATIC_SCHEMA_VERSION,
     TARGET_STATIC_BYTES,
+    _hydrate_compact_probability,
     _hydrate_compact_sweet,
     export_static,
     validate_static_payload,
@@ -40,6 +41,26 @@ class StaticExportTests(ProjectTempMixin, unittest.TestCase):
         self.assertIn("approaching_sweet_spot", loaded["insight_rankings"]["categories"])
         self.assertIn("entry_timing_score", loaded["instruments"][0])
         self.assertIn("downside_structure", loaded["instruments"][0])
+        self.assertIn("pf", loaded["instruments"][0])
+        self.assertEqual(
+            loaded["probability_contract"]["ranking_separation"],
+            "probability fields are excluded from radar scores, insight rankings, "
+            "Sweet Spot, and colors",
+        )
+        probability = _hydrate_compact_probability(
+            loaded["instruments"][0]["pf"],
+            reason_catalog=loaded["probability_reason_catalog"],
+            model_catalog=loaded["probability_model_catalog"],
+            baseline_catalog=loaded["probability_baseline_catalog"],
+            contract=loaded["probability_contract"],
+            listing_currency=loaded["instruments"][0]["currency"],
+            signal_timestamp=loaded["instruments"][0]["bar_date"],
+        )
+        self.assertEqual(probability["status"], "withheld")
+        self.assertEqual(
+            probability["message"],
+            "No validated stock-specific probability edge",
+        )
         for field in (
             "display_name_full",
             "headquarters_country",
@@ -323,6 +344,20 @@ class StaticExportTests(ProjectTempMixin, unittest.TestCase):
         self.assertIn("insights.actionable !== false", html)
         self.assertIn("instrumentContract.actionable !== false", html)
         self.assertIn("state.data.schema_version !== 3", html)
+        self.assertIn("Kalibrierte Wahrscheinlichkeiten", html)
+        self.assertIn("hydrateProbabilityForecasts", html)
+        self.assertIn("Probability-Validierung", html)
+        dashboard = (ROOT / "dashboard" / "app.py").read_text(encoding="utf-8")
+        for forbidden in (
+            "will rise",
+            "guaranteed",
+            "expected price",
+            "confidence",
+            "wird steigen",
+            "garantiert",
+            "erwarteter preis",
+        ):
+            self.assertNotIn(forbidden, (html + dashboard).casefold())
         self.assertIn("hasActionableTrue(data?.instruments || [])", html)
         self.assertIn("China-Risikokontext", html)
         self.assertIn("Warum es günstig aussieht", html)

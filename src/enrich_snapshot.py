@@ -7,6 +7,11 @@ from pathlib import Path
 from .config import OUTPUT
 from .insights import enrich_snapshot
 from .persistence import atomic_write_json, load_json
+from .probability_inference import (
+    attach_probability_forecasts,
+    load_probability_baselines,
+    load_probability_validation_summary,
+)
 from .universe import load_universe
 
 DEFAULT_INPUT = OUTPUT / "latest.json"
@@ -60,6 +65,13 @@ def recompute(
     source = load_json(input_path, required=True, expected_type=dict)
     _merge_provider_free_context(source)
     enriched = enrich_snapshot(source)
+    attach_probability_forecasts(
+        enriched["all"], {}, embed_baselines=False
+    )
+    enriched["probability_baselines"] = load_probability_baselines()
+    enriched["probability_validation"] = (
+        load_probability_validation_summary()
+    )
     atomic_write_json(output_path, enriched)
     return enriched
 

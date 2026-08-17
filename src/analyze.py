@@ -63,6 +63,11 @@ from .persistence import (
     utc_now,
 )
 from .projection import project
+from .probability_inference import (
+    attach_probability_forecasts,
+    load_probability_baselines,
+    load_probability_validation_summary,
+)
 from .rating import radar_elo, radar_score, stars
 from .score import score_daily_signal, score_longterm
 from .universe import load_universe
@@ -671,6 +676,18 @@ def run(with_news=True, with_fundamentals=True):
         row["intraday_note"] = None
         row["paper_eligibility"] = _paper_eligibility(row)
 
+    # Calibrated probabilities are a separate, fail-closed output.  This call
+    # only appends probability_forecast and cannot alter any score or list input.
+    attach_probability_forecasts(
+        rows,
+        fetched.prices,
+        spy_history=fetched.prices.get("SPY"),
+        now=now,
+        embed_baselines=False,
+    )
+    probability_baselines = load_probability_baselines()
+    probability_validation = load_probability_validation_summary()
+
     peer_counts = {}
     for row in rows:
         if (
@@ -835,6 +852,7 @@ def run(with_news=True, with_fundamentals=True):
             "expert holdings",
             "macro context",
             "generic company fundamental bands",
+            "calibrated probability forecasts",
         ],
         "scenario_status": "unvalidated heuristic range; not a probability or expected return",
         "validation_gate": {
@@ -896,6 +914,8 @@ def run(with_news=True, with_fundamentals=True):
             "provenance_catalog": PROVENANCE_CATALOG,
             "sweet_spot_contract": SWEET_SPOT_CONTRACT,
         },
+        "probability_validation": probability_validation,
+        "probability_baselines": probability_baselines,
         "universe_size": len(symbols),
         "configured_universe_size": len(full_universe),
         "expected_asset_counts": expected_asset_counts,

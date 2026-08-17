@@ -1,0 +1,22 @@
+{
+  "comparison": "independent-threshold-v1_summary.json",
+  "experiment": "ordered-vector-v1",
+  "fixed_oos_bootstrap_repetitions_release": 1000,
+  "fixed_oos_bootstrap_completion_required": 1000,
+  "fixed_oos_bootstrap_max_attempts": 3000,
+  "fixed_oos_bootstrap_reporting": "requested/attempted/completed/skipped",
+  "full_refit_bootstrap_repetitions_release": 200,
+  "model_family": "ordered-vector-v1",
+  "ordered_classes": 7,
+  "penalty_selection": "first 9 calibration months fit; last 3 months seven-class log loss; Brier tie-break; refit full year",
+  "publish_transform": "identity tail sums; no caps/projection",
+  "schema": "stock-radar-probability-preregistration",
+  "schema_version": 1,
+  "vector_penalty_grid": [
+    0.01,
+    0.1,
+    1.0,
+    10.0,
+    100.0
+  ]
+}

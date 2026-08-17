@@ -1,6 +1,7 @@
 """Export a compact, login-free GitHub Pages insight payload."""
 from __future__ import annotations
 
+import base64
 import copy
 import json
 from collections import Counter
@@ -10,6 +11,14 @@ from typing import Any
 from .data_quality import validate_insight_contract, validate_output_contract
 from .insights import INSIGHT_CONTRACT_VERSION
 from .persistence import atomic_write_bytes, load_json, schema_meta
+from .probability_inference import (
+    FORECAST_SCHEMA_VERSION,
+    WITHHELD_MESSAGE,
+    load_probability_validation_summary,
+    validate_probability_forecast,
+)
+from .probability_contract import HORIZONS
+from .probability_model import PUBLISH_TRANSFORM
 from .sweet_spot import FORMULA as SWEET_SPOT_FORMULA
 from .sweet_spot import MODEL_STATUS as SWEET_SPOT_MODEL_STATUS
 from .sweet_spot import MODEL_VERSION as SWEET_SPOT_MODEL_VERSION
@@ -84,6 +93,34 @@ _SWEET_ANCHOR_DISTANCE_CLASSES = (
     "far_below",
     "tactical",
 )
+_PROBABILITY_STATUS_CODES = ("withheld", "partial", "accepted")
+_PROBABILITY_CLASS_ORDER = ("down", "middle", "up")
+_PROBABILITY_ROW_DEFAULTS = {
+    "schema_version": FORECAST_SCHEMA_VERSION,
+    "actionable": False,
+    "separate_from_radar_score": True,
+    "separate_from_insight_ranking": True,
+    "separate_from_sweet_spot": True,
+    "supported_partition": "USD_company_equity",
+    "entry_assumption": (
+        "first adjusted/raw-equivalent open strictly after completed signal close"
+    ),
+    "cost_assumption_bps_round_trip": 30,
+    "outcome_definition": (
+        "DOWN gross return <= -(X+0.30%), MIDDLE between boundaries, "
+        "UP gross return >= +(X+0.30%); exit is adjusted close H sessions after t"
+    ),
+    "positive_net_return_probability": None,
+    "positive_net_return_note": (
+        "Not modeled/calibrated separately and not inferred from threshold classes."
+    ),
+    "artifact_created_at": None,
+    "training_cutoff": None,
+    "survivorship_warning": (
+        "Validation uses the currently observable eligible company universe and is "
+        "subject to current-universe survivorship bias."
+    ),
+}
 
 ROW_FIELDS = (
     "symbol",
@@ -172,6 +209,7 @@ def _compact_group(
 
 def _compact_row(row: dict[str, Any]) -> dict[str, Any]:
     compact = {key: row.get(key) for key in ROW_FIELDS}
+    compact["probability_forecast"] = row.get("probability_forecast")
     compact["news"] = (compact.get("news") or [])[:3]
     compact["scenario_long"] = [
         {
@@ -324,6 +362,381 @@ def _compact_row(row: dict[str, Any]) -> dict[str, Any]:
         row.get("major_counterargument"),
     ]
     return compact
+
+
+def _default_probability_forecast(row: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "schema_version": FORECAST_SCHEMA_VERSION,
+        "status": "withheld",
+        "message": WITHHELD_MESSAGE,
+        "actionable": False,
+        "separate_from_radar_score": True,
+        "separate_from_insight_ranking": True,
+        "separate_from_sweet_spot": True,
+        "listing_currency": row.get("currency"),
+        "supported_partition": "USD_company_equity",
+        "signal_timestamp": row.get("bar_date"),
+        "entry_assumption": (
+            "first adjusted/raw-equivalent open strictly after completed signal close"
+        ),
+        "cost_assumption_bps_round_trip": 30,
+        "outcome_definition": (
+            "DOWN gross return <= -(X+0.30%), MIDDLE between boundaries, "
+            "UP gross return >= +(X+0.30%); exit is adjusted close H sessions after t"
+        ),
+        "positive_net_return_probability": None,
+        "positive_net_return_note": (
+            "Not modeled/calibrated separately and not inferred from threshold classes."
+        ),
+        "reasons": ["Probability engine not present in the source snapshot."],
+        "ood": [],
+        "baselines": [],
+        "forecasts": [],
+        "artifact_created_at": None,
+        "training_cutoff": None,
+        "survivorship_warning": (
+            "Validation uses the currently observable eligible company universe and "
+            "is subject to current-universe survivorship bias."
+        ),
+    }
+
+
+def _pack_probability_octet(values: list[int]) -> bytes:
+    if len(values) != 8 or any(
+        not isinstance(value, int) or not 0 <= value <= 100 for value in values
+    ):
+        raise ValueError("Static probability values must be eight integers in 0..100")
+    output = bytearray()
+    buffer = 0
+    bit_count = 0
+    for value in values:
+        buffer |= value << bit_count
+        bit_count += 7
+        while bit_count >= 8:
+            output.append(buffer & 0xFF)
+            buffer >>= 8
+            bit_count -= 8
+    if bit_count:
+        output.append(buffer & 0xFF)
+    if len(output) != 7:
+        raise AssertionError("Static probability bit packing must produce seven bytes")
+    return bytes(output)
+
+
+def _unpack_probability_octet(value: bytes) -> list[int]:
+    if len(value) != 7:
+        raise ValueError("Static probability bit payload must contain seven bytes")
+    output = []
+    buffer = 0
+    bit_count = 0
+    cursor = 0
+    while len(output) < 8:
+        while bit_count < 7:
+            buffer |= value[cursor] << bit_count
+            cursor += 1
+            bit_count += 8
+        output.append(buffer & 0x7F)
+        buffer >>= 7
+        bit_count -= 7
+    if any(item > 100 for item in output):
+        raise ValueError("Static probability bit payload contains out-of-range values")
+    return output
+
+
+def _compact_probability_data(
+    rows: list[dict[str, Any]],
+) -> tuple[list[str], list[dict[str, Any]], list[dict[str, Any]]]:
+    """Intern model/baseline metadata; retain only row-varying integer forecasts."""
+    reason_values: set[str] = set()
+    models: dict[str, dict[str, Any]] = {}
+    baselines: dict[str, dict[str, Any]] = {}
+    normalized: list[dict[str, Any]] = []
+    for row in rows:
+        forecast = row.get("probability_forecast")
+        if not isinstance(forecast, dict):
+            forecast = _default_probability_forecast(row)
+        validate_probability_forecast(forecast)
+        normalized.append(forecast)
+        reason_values.update(
+            reason for reason in forecast.get("reasons") or [] if isinstance(reason, str)
+        )
+        for item in forecast.get("forecasts") or []:
+            key = item["model_key"]
+            metadata = {
+                field: item.get(field)
+                for field in (
+                    "model_key",
+                    "artifact_model_key",
+                    "model_family",
+                    "publish_transform",
+                    "horizon_sessions",
+                    "horizon_label",
+                    "threshold_pct",
+                    "sample_size",
+                    "baseline_rates_pct",
+                    "brier_skill",
+                    "log_loss_improvement",
+                    "classwise_ece",
+                    "maximum_gap",
+                    "fixed_oos_bootstrap",
+                    "fold_count",
+                    "full_test_fold_count",
+                    "history_years",
+                    "min_usable_train_years",
+                    "artifact_trained_at",
+                    "training_cutoff",
+                )
+            }
+            if key in models and models[key] != metadata:
+                raise ValueError(f"Inconsistent static probability model metadata: {key}")
+            models[key] = metadata
+        for item in forecast.get("baselines") or []:
+            key = item["model_key"]
+            metadata = {
+                field: item.get(field)
+                for field in (
+                    "model_key",
+                    "model_family",
+                    "source_model_key",
+                    "horizon_sessions",
+                    "horizon_label",
+                    "threshold_pct",
+                    "rates_pct",
+                    "sample_size",
+                    "accepted_stock_specific_model",
+                    "brier_skill",
+                    "classwise_ece",
+                    "fold_count",
+                    "full_test_fold_count",
+                    "history_years",
+                    "min_usable_train_years",
+                )
+            }
+            if key in baselines and baselines[key] != metadata:
+                raise ValueError(f"Inconsistent static probability baseline: {key}")
+            baselines[key] = metadata
+    reason_catalog = sorted(reason_values)
+    model_catalog = [models[key] for key in sorted(models)]
+    baseline_catalog = [baselines[key] for key in sorted(baselines)]
+    reason_refs = {value: index for index, value in enumerate(reason_catalog)}
+    model_refs = {
+        value["model_key"]: index for index, value in enumerate(model_catalog)
+    }
+    for row, forecast in zip(rows, normalized):
+        forecast_items = sorted(
+            forecast.get("forecasts") or [],
+            key=lambda item: model_refs[item["model_key"]],
+        )
+        compact_forecasts = bytearray()
+        if forecast_items:
+            if len(model_catalog) > 16:
+                raise ValueError("Static probability model catalog exceeds 16 models")
+            mask = 0
+            outside_count = 0
+            distance_ratio_pct = 0
+            tolerance_horizon_mask = 0
+            compact_forecasts.extend((0, 0, 0, 0, 0))
+        for item in forecast_items:
+            probability = item["probabilities_pct"]
+            intervals = item["model_interval_95_pct"]
+            ood = item.get("ood") or {}
+            distance = ood.get("robust_distance")
+            threshold = ood.get("distance_threshold")
+            item_distance_ratio_pct = (
+                int(round(float(distance) / float(threshold) * 100))
+                if isinstance(distance, (int, float))
+                and isinstance(threshold, (int, float))
+                and threshold > 0
+                else 0
+            )
+            model_ref = model_refs[item["model_key"]]
+            mask |= 1 << model_ref
+            if (item.get("threshold_monotonicity") or {}).get(
+                "tolerated_independent_threshold_inversion"
+            ):
+                tolerance_horizon_mask |= 1 << HORIZONS.index(
+                    int(item["horizon_sessions"])
+                )
+            outside_count = max(
+                outside_count, min(255, int(ood.get("outside_count") or 0))
+            )
+            distance_ratio_pct = max(
+                distance_ratio_pct,
+                min(255, max(0, item_distance_ratio_pct)),
+            )
+            compact_forecasts.extend(
+                _pack_probability_octet(
+                    [
+                    probability["down"],
+                    probability["up"],
+                    intervals["down"][0],
+                    intervals["down"][1],
+                    intervals["middle"][0],
+                    intervals["middle"][1],
+                    intervals["up"][0],
+                    intervals["up"][1],
+                    ]
+                )
+            )
+        if forecast_items:
+            compact_forecasts[0] = mask & 0xFF
+            compact_forecasts[1] = (mask >> 8) & 0xFF
+            compact_forecasts[2] = outside_count
+            compact_forecasts[3] = distance_ratio_pct
+            compact_forecasts[4] = tolerance_horizon_mask
+        row["pf"] = [
+            _PROBABILITY_STATUS_CODES.index(forecast["status"]),
+            [reason_refs[reason] for reason in forecast.get("reasons") or []],
+            base64.b64encode(bytes(compact_forecasts)).decode("ascii"),
+        ]
+        row.pop("probability_forecast", None)
+    return reason_catalog, model_catalog, baseline_catalog
+
+
+def _hydrate_compact_probability(
+    value: Any,
+    *,
+    reason_catalog: list[str],
+    model_catalog: list[dict[str, Any]],
+    baseline_catalog: list[dict[str, Any]],
+    contract: dict[str, Any],
+    listing_currency: Any,
+    signal_timestamp: Any,
+) -> dict[str, Any]:
+    if (
+        not isinstance(value, list)
+        or len(value) != 3
+        or not isinstance(value[0], int)
+        or not 0 <= value[0] < len(_PROBABILITY_STATUS_CODES)
+        or not isinstance(value[1], list)
+        or not isinstance(value[2], str)
+    ):
+        raise ValueError("Static compact probability forecast is invalid")
+    reasons = [reason_catalog[index] for index in value[1]]
+    try:
+        packed = base64.b64decode(value[2], validate=True)
+    except ValueError as exc:
+        raise ValueError("Static probability byte payload is invalid") from exc
+    if packed and len(packed) < 5:
+        raise ValueError("Static probability byte payload is missing its header")
+    mask = (packed[1] << 8 | packed[0]) if packed else 0
+    selected_refs = [
+        index for index in range(len(model_catalog)) if mask & (1 << index)
+    ]
+    if packed and len(packed) != 5 + 7 * len(selected_refs):
+        raise ValueError("Static probability byte payload has invalid stride")
+    forecasts = []
+    for position, model_ref in enumerate(selected_refs):
+        offset = 5 + position * 7
+        (
+            down,
+            up,
+            down_low,
+            down_high,
+            middle_low,
+            middle_high,
+            up_low,
+            up_high,
+        ) = _unpack_probability_octet(packed[offset : offset + 7])
+        metadata = copy.deepcopy(model_catalog[model_ref])
+        tolerated = bool(
+            packed[4]
+            & (1 << HORIZONS.index(int(metadata["horizon_sessions"])))
+        )
+        probabilities = {
+            "down": down,
+            "middle": 100 - down - up,
+            "up": up,
+        }
+        intervals = {
+            "down": [down_low, down_high],
+            "middle": [middle_low, middle_high],
+            "up": [up_low, up_high],
+        }
+        metadata.update(
+            {
+                "definition": (
+                    f"gross UP >= +{metadata['threshold_pct'] + 0.30:.2f}%; "
+                    f"gross DOWN <= -{metadata['threshold_pct'] + 0.30:.2f}%; "
+                    "otherwise MIDDLE"
+                ),
+                "publish_transform": metadata.get("publish_transform")
+                or contract["publish_transform"],
+                "model_interval_method": contract["model_interval_scope"],
+                "threshold_monotonicity": {
+                    "permitted": True,
+                    "reason_code": None,
+                    "tolerated_independent_threshold_inversion": (
+                        tolerated
+                    ),
+                    "disclosure": (
+                        "Independent-threshold tolerance applied: raw inversion is "
+                        "at most 0.5 percentage point, whole-percent display is "
+                        "monotonic, and raw probabilities are unchanged."
+                        if tolerated
+                        else (
+                            "Exact ordered-distribution tail sums; monotonic by "
+                            "construction within float64 machine epsilon."
+                        )
+                        if metadata.get("model_family")
+                        == "ordered-vector-v1"
+                        else "Raw independent-threshold probabilities are monotonic."
+                    ),
+                    "action": "never project; withhold horizon when not permitted",
+                },
+                "probabilities": {
+                    name: probabilities[name] / 100.0
+                    for name in _PROBABILITY_CLASS_ORDER
+                },
+                "probabilities_pct": probabilities,
+                "sum_pct": sum(probabilities.values()),
+                "model_interval_95_pct": intervals,
+                "listing_currency": listing_currency,
+                "signal_timestamp": signal_timestamp,
+                "entry_assumption": _PROBABILITY_ROW_DEFAULTS[
+                    "entry_assumption"
+                ],
+                "exit_assumption": (
+                    f"adjusted close {metadata.get('horizon_sessions')} sessions after t"
+                ),
+                "cost_assumption_bps_round_trip": 30,
+                "artifact_created_at": None,
+                "survivorship_warning": _PROBABILITY_ROW_DEFAULTS[
+                    "survivorship_warning"
+                ],
+                "ood": {
+                    "withhold": False,
+                    "reasons": [],
+                    "missing_features": [],
+                    "outside_features": [],
+                    "outside_count": packed[2],
+                    "robust_distance_ratio": packed[3] / 100.0,
+                },
+                "acceptance_passed": True,
+                "withholding_reasons": [],
+            }
+        )
+        forecasts.append(metadata)
+    status = _PROBABILITY_STATUS_CODES[value[0]]
+    hydrated = {
+        **contract["row_defaults"],
+        "status": status,
+        "message": (
+            WITHHELD_MESSAGE
+            if status == "withheld"
+            else "Strictly validated calibrated material-move probabilities"
+            if status == "accepted"
+            else "Only the listed horizon/threshold models passed all current gates"
+        ),
+        "listing_currency": listing_currency,
+        "signal_timestamp": signal_timestamp,
+        "reasons": reasons,
+        "ood": [],
+        "baselines": copy.deepcopy(baseline_catalog),
+        "forecasts": forecasts,
+    }
+    validate_probability_forecast(hydrated)
+    return hydrated
 
 
 def _intern_sweet_spot_text(rows: list[dict[str, Any]]) -> list[str]:
@@ -612,6 +1025,55 @@ def validate_static_payload(payload: Any) -> dict[str, Any]:
         or _contains_actionable_true(sweet_contract)
     ):
         raise ValueError("Static sweet-spot contract is invalid")
+    probability_contract = payload.get("probability_contract")
+    probability_reason_catalog = payload.get("probability_reason_catalog")
+    probability_model_catalog = payload.get("probability_model_catalog")
+    probability_baseline_catalog = payload.get("probability_baseline_catalog")
+    probability_validation = payload.get("probability_validation")
+    if (
+        not isinstance(probability_contract, dict)
+        or probability_contract.get("schema_version") != FORECAST_SCHEMA_VERSION
+        or probability_contract.get("status_codes")
+        != list(_PROBABILITY_STATUS_CODES)
+        or probability_contract.get("class_order")
+        != list(_PROBABILITY_CLASS_ORDER)
+        or probability_contract.get("row_storage_key") != "pf"
+        or probability_contract.get("publish_transform") != PUBLISH_TRANSFORM
+        or probability_contract.get("row_defaults")
+        != _PROBABILITY_ROW_DEFAULTS
+        or probability_contract.get("forecast_fields")
+        != [
+            "down_pct",
+            "up_pct",
+            "down_interval_low",
+            "down_interval_high",
+            "middle_interval_low",
+            "middle_interval_high",
+            "up_interval_low",
+            "up_interval_high",
+        ]
+        or probability_contract.get("forecast_header_fields")
+        != [
+            "model_mask_low",
+            "model_mask_high",
+            "ood_outside_count",
+            "ood_distance_ratio_pct",
+            "independent_threshold_tolerance_horizon_mask",
+        ]
+        or not isinstance(probability_reason_catalog, list)
+        or not all(
+            isinstance(reason, str) for reason in probability_reason_catalog
+        )
+        or not isinstance(probability_model_catalog, list)
+        or not all(isinstance(model, dict) for model in probability_model_catalog)
+        or not isinstance(probability_baseline_catalog, list)
+        or not all(
+            isinstance(baseline, dict)
+            for baseline in probability_baseline_catalog
+        )
+        or not isinstance(probability_validation, dict)
+    ):
+        raise ValueError("Static probability contract is invalid")
 
     def require_text_lists(group: dict[str, Any], keys: tuple[str, ...]) -> None:
         for key in keys:
@@ -640,6 +1102,15 @@ def validate_static_payload(payload: Any) -> dict[str, Any]:
             raise ValueError("Static payload instrument identity is invalid")
         if _contains_actionable_true(row):
             raise ValueError("Static payload instrument contains actionable=true")
+        _hydrate_compact_probability(
+            row.get("pf"),
+            reason_catalog=probability_reason_catalog,
+            model_catalog=probability_model_catalog,
+            baseline_catalog=probability_baseline_catalog,
+            contract=probability_contract,
+            listing_currency=row.get("currency"),
+            signal_timestamp=row.get("bar_date"),
+        )
         jurisdiction = row.get("jurisdiction_risk")
         if (
             not isinstance(jurisdiction, dict)
@@ -924,7 +1395,30 @@ def export_static(
         for row in snapshot["all"]
         if isinstance(row, dict) and row.get("symbol")
     ]
+    shared_probability_baselines = list(
+        snapshot.get("probability_baselines") or []
+    )
+    if shared_probability_baselines:
+        for row in compact_rows:
+            forecast = row.get("probability_forecast")
+            if (
+                isinstance(forecast, dict)
+                and not forecast.get("forecasts")
+                and not forecast.get("baselines")
+                and row.get("asset_type") == "company_equity"
+                and row.get("currency") == "USD"
+            ):
+                forecast["baselines"] = shared_probability_baselines
     sweet_spot_reason_catalog = _intern_sweet_spot_text(compact_rows)
+    (
+        probability_reason_catalog,
+        probability_model_catalog,
+        probability_baseline_catalog,
+    ) = _compact_probability_data(compact_rows)
+    probability_validation = (
+        snapshot.get("probability_validation")
+        or load_probability_validation_summary()
+    )
     payload = {
         "_meta": schema_meta(
             "stock-radar-static-export",
@@ -984,6 +1478,54 @@ def export_static(
             ),
         },
         "sweet_spot_reason_catalog": sweet_spot_reason_catalog,
+        "probability_contract": {
+            "schema_version": FORECAST_SCHEMA_VERSION,
+            "status_codes": list(_PROBABILITY_STATUS_CODES),
+            "class_order": list(_PROBABILITY_CLASS_ORDER),
+            "publish_transform": PUBLISH_TRANSFORM,
+            "row_fields": ["status_ref", "reason_refs", "forecast_bytes_b64"],
+            "row_storage_key": "pf",
+            "probability_precision": (
+                "whole-percent presentation quantization of exact raw probabilities "
+                "retained in data/output/latest.json"
+            ),
+            "forecast_fields": [
+                "down_pct",
+                "up_pct",
+                "down_interval_low",
+                "down_interval_high",
+                "middle_interval_low",
+                "middle_interval_high",
+                "up_interval_low",
+                "up_interval_high",
+            ],
+            "forecast_header_fields": [
+                "model_mask_low",
+                "model_mask_high",
+                "ood_outside_count",
+                "ood_distance_ratio_pct",
+                "independent_threshold_tolerance_horizon_mask",
+            ],
+            "forecast_encoding": (
+                "base64 bytes: 16-bit model mask, shared conservative OOD summary, "
+                "four-bit tolerated-inversion horizon mask, "
+                "then seven-bit packed down/up plus six directly quantized validated "
+                "interval bounds in model-catalog order; middle=100-down-up"
+            ),
+            "row_defaults": _PROBABILITY_ROW_DEFAULTS,
+            "model_interval_scope": (
+                "95% aggregate calibration-error interval approximation from "
+                "fixed OOS predictions; not an individual stock outcome interval"
+            ),
+            "ranking_separation": (
+                "probability fields are excluded from radar scores, insight "
+                "rankings, Sweet Spot, and colors"
+            ),
+        },
+        "probability_reason_catalog": probability_reason_catalog,
+        "probability_model_catalog": probability_model_catalog,
+        "probability_baseline_catalog": probability_baseline_catalog,
+        "probability_validation": probability_validation,
         "market_data_contract": snapshot.get("market_data_contract") or {},
         "rankings": rankings,
         "insight_rankings": snapshot["insight_rankings"],

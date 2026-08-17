@@ -9,8 +9,11 @@ separately presents company equities, funds/ETFs, crypto, and other instruments.
 The deployed composite is **UNVALIDATED** and its output is always marked
 `actionable: false`.
 
-- No profitability, alpha, probability, confidence, expected-return, or
-  intraday claim is made.
+- No profitability, alpha, expected-return, or intraday claim is made. The
+  separate probability engine publishes a stock-specific number only for an
+  individually accepted horizon/threshold model; otherwise it says
+  `No validated stock-specific probability edge` and displays baseline rates
+  only when a fitted baseline exists.
 - Scenario ranges are uncalibrated log-return/volatility illustrations. They are
   excluded from ranking and cannot produce negative prices.
 - The available backtest can validate only the technical score because reliable
@@ -18,6 +21,237 @@ The deployed composite is **UNVALIDATED** and its output is always marked
   available. It cannot validate the deployed composite.
 - Optional news, analyst, macro, social/expert, and deep-fundamental context does
   not change the comparable core ranking.
+
+## Calibrated material-move probability engine
+
+`src/probability_*.py` is a separate, fail-closed model family. It never reads or
+changes radar scores, insight ranks, Sweet-Spot evidence/colors, fundamentals,
+analysts, news, earnings, identity, jurisdiction, or ranking inputs. Its MVP
+partition is one primary **USD company-equity listing** per available issuer key.
+ETFs, funds, crypto, non-USD listings, duplicate issuer listings, and histories
+without at least 252 completed prior bars are withheld.
+
+The current checked-in `data/probability_models.json` and
+`data/probability_validation.json` intentionally remain withheld until the
+ordered challenger's expensive full-universe release run completes. The
+independent-threshold v1 result (0/12 accepted) is preserved at
+`data/probability_experiments/independent-threshold-v1_summary.json`.
+
+### Target and timing convention
+
+For a completed adjusted daily close at session `t`:
+
+1. features use data available at or before `t`;
+2. hypothetical entry is the first adjusted/raw-equivalent open strictly after
+   `t`;
+3. exit is adjusted close at `t + H` sessions, for `H = 21, 63, 126, 252`;
+4. gross total return is `adjusted_close[t+H] / adjusted_open[t+1] - 1`;
+5. a direction-symmetric 30 bp friction dead-band defines material moves:
+   `DOWN` when gross `<= -(X + 0.003)`, `UP` when gross `>= X + 0.003`, and
+   `MIDDLE` otherwise.
+
+Threshold grids are 21 sessions `[3,5,10]%`, 63 `[5,10,20]%`, 126
+`[10,15,25]%`, and 252 `[10,20,30]%`. Classes are mutually exclusive and sum
+to one. The dataset also stores long-only `gross - 0.003`, but **P(positive net
+return) is not published**: that target needs its own model and calibration and
+must not be inferred from a material-threshold class.
+
+### Dataset and point-in-time boundary
+
+The restartable builder uses the **current universe membership observed at
+retrieval time** and downloads Yahoo history from `2008-01-01` by default,
+with actions and `auto_adjust=False`, then reconstructs adjusted OHLC from
+`Adj Close / Close`. It stores checksummed, atomic, per-symbol files plus a
+manifest under ignored `data/probability_cache/panel_v1/`. The manifest records
+retrieval time, source range, symbols, failures, checksums, feature version,
+schema hash, and code hash. Failed batches retry, split recursively, and retry
+individual symbols. The 2008 boundary leaves sufficient calendar depth, where a
+symbol actually traded, for 252-bar warm-up, exact 252-session labels/purging,
+five usable training years, calibration, embargo, and at least five full annual
+tests through the current date.
+
+The assembled dataframe checkpoint is
+`weekly_dataset_v3.pkl.gz`: an atomic gzip-compressed pandas pickle plus file
+SHA-256 and semantic dataset hash. Dates, dtypes, floating-point values, and
+nullable labels round-trip exactly across processes. **Trust boundary:** pickle
+may execute code; only repository-generated files under ignored
+`data/probability_cache/` may be loaded. Never place downloaded/untrusted pickle
+there. Legacy `weekly_dataset_v2.pkl.gz` is ignored and must be rebuilt,
+not migrated.
+
+One anchor is retained per ISO week: the final completed session in that week.
+Features include adjusted-return horizons; SMA/EMA distances and slopes; RSI;
+MACD-histogram/ATR; ATR%; 20/60/252 volatility; upside/downside semivolatility;
+drawdown and 52-week high/low distance; Bollinger %B/bandwidth; Wilder ADX/DMI;
+relative volume; raw contemporaneous dollar liquidity; prior pivot/S1/20-day-low
+ATR distances; and point-in-time-aligned SPY return, volatility, drawdown, and
+trend fields.
+The ordered challenger adds only five frozen PIT interactions: SPY-above-SMA200
+times stock 60-day return, SPY-above-SMA200 times stock SMA200 distance, SPY
+vol60 times stock vol60, SPY vol60 times trailing drawdown, and
+SPY-above-SMA200 times downside semivolatility. SPY inputs use an explicit
+backward as-of join (`SPY timestamp <= stock timestamp`), including non-US and
+weekend stock dates.
+
+Yahoo exposes a current adjusted history, not a historical snapshot of its
+action tape. A later split/dividend can uniformly rescale pre-event adjusted
+OHLC. All price features are dimensionless and invariant to that uniform
+scaling; liquidity uses contemporaneous `RawClose * Volume`. Tests enforce
+future-row/action and scale invariance. Full explicit point-in-time action
+reconstruction is not claimed.
+
+### Model, calibration, and validation
+
+Independent-threshold v1 uses one three-class model per threshold. The
+preregistered `ordered-vector-v1` challenger instead fits one L2 multinomial
+seven-bin distribution per horizon and derives all three threshold outputs by
+disjoint tail sums. Exact negative/positive boundary equalities follow the
+documented seven-bin contract, so simplex and threshold monotonicity hold by
+construction without caps or projection. In every outer fold, 0.5/99.5%
+winsorization, medians,
+needed missing indicators, scaling, coefficients, and SPY trend/volatility
+regime buckets are fit on training rows only. The challenger selects regularized
+vector scaling from the frozen penalty grid `[0.01,0.1,1,10,100]`: candidates
+fit on calibration months 1–9, months 10–12 select by seven-class log loss with
+Brier tie-break, then the winner refits on the full calibration year. Biases are
+zero-mean and L2 shrinkage targets unit scales/zero biases. Production JSON
+stores every numeric transform, coefficient, intercept, calibrator, OOD
+reference, and hash, so artifact inference is deterministic NumPy only.
+
+Outer validation is purged expanding walk-forward: at least five actual usable
+feature-date years after the 252-bar warm-up and exact-label purging, 12 months
+calibration, the latest exact calibration-label exit plus a one-week embargo,
+then 12 full untouched
+test months, rolling annually. Exact per-row `max_exit_date` must precede the
+next segment by the one-week embargo; no feature-date approximation substitutes
+for a known label interval. Training label intervals may not enter calibration;
+calibration label intervals may not enter test. Climatology is the required comparator. A
+training-only SPY trend × training-volatility-tercile baseline, shrunk by 100
+observations toward climatology, is reported separately.
+
+Reported OOS metrics include multiclass Brier and skill, log loss and
+improvement, adaptive equal-count classwise reliability/ECE and maximum gap,
+one-vs-rest calibration slope/intercept, prevalence, class/issuer/date counts,
+coverage, every fold, and regime ECE. Challenger reliability starts with ten
+equal-count bins and merges adjacent bins until supported (500 rows, 50
+positives, 50 negatives), requiring five supported bins; unsupported extreme
+tails retain Wilson intervals and do not enter ECE/gap. Regimes are available
+only with 26 dates, 8 quarter blocks, 100 outcomes/class, and 100 issuers.
+Release uses 1,000 fixed-seed two-way bootstrap repetitions over issuer clusters
+and calendar-quarter blocks. Reports record requested, attempted, completed, and
+skipped draws. Invalid draws retry deterministically up to three times the
+requested count; release requires all requested draws (at least 1,000) to
+complete, otherwise the horizon is withheld. Models are not refit inside that metric bootstrap; metric
+intervals and per-class aggregate calibration-residual offsets are therefore
+explicit approximations from fixed OOS predictions, not individual-return
+intervals. A separate configurable full model+calibrator bootstrap must complete
+at least 200 refits for release; smoke may record an explicit smaller
+development-only override, which can never create a production artifact.
+
+Every horizon/threshold must independently satisfy all gates:
+
+- at least 8 usable years, 5 test folds, 200 issuers, 100 forecast dates;
+- every counted fold has at least 5.0 actual usable training years and a full
+  untouched 12-month test window;
+- minimum per fold/class: 1,000 train, 300 calibration, 200 untouched test;
+- at least 80% inference coverage;
+- at least 80% successful requested eligible-issuer provider coverage and at
+  least 200 successful issuers, with unavailable symbols/reasons reported;
+- aggregate Brier skill at least 2% versus climatology and its 95% block
+  bootstrap lower bound strictly above zero;
+- log-loss improvement at least 1%;
+- every class ECE at most 3%, maximum reliability gap at most 8%;
+- every meaningful class slope 0.8–1.2 and intercept -0.1–0.1;
+- no two consecutive folds below -2% Brier skill;
+- supported regime ECE at most 5%; unsupported regimes are unavailable rather
+  than passing or failing.
+
+No gate is relaxed automatically. The MVP production transform is serialized
+as `raw-temperature-scaled-identity-v1`: the exact temperature-scaled softmax
+probabilities used by OOS metrics, bootstrap, calibration diagnostics, and
+acceptance are published without caps or projection. A complete horizon grid
+records temporal OOS inversion rate and violating-magnitude mean/p50/p95/max
+separately for UP and DOWN. Each direction must have at most 1% violating
+adjacent-threshold comparisons, p95 magnitude at most 1 percentage point, and
+maximum magnitude at most 3 points (magnitude quantiles use violating
+comparisons only). At current-row inference, raw values are
+never changed: an inversion above 0.5 point, or any smaller inversion that would
+make whole-percent display non-monotonic, withholds that horizon with
+`current_threshold_non_monotonic`. A smaller inversion may be displayed
+unchanged only when whole-percent values remain monotonic/equal, with an
+independent-threshold tolerance disclosure. Display rounding preserves a
+three-class sum of 100. The labeled interval is a **95% aggregate calibration-error interval
+approximation from fixed OOS predictions; not an individual stock outcome
+interval**. A row is withheld for acceptance failure, missing/invalid hashes,
+model age over 45 days, stale/incomplete bars, missing features, unsupported
+partition, fewer than 252 prior bars, more than two features outside training
+0.5/99.5% bounds, robust distance beyond training p99.5, or interval width over
+20 percentage points.
+
+For `ordered-vector-v1`, `ordered-vector-tail-sum-identity-v1` publishes the
+validated vector-scaled seven-class tail sums unchanged. Its monotonicity
+assertion uses float64 machine epsilon; any horizon-level inference or interval
+failure withholds all three stock-specific thresholds for that horizon while
+retaining baseline rows.
+
+The ordered family and tail-sum identity are also mandatory at the artifact
+root; model/root family or transform disagreement invalidates the complete
+artifact. Completed challenger runs first archive versioned validation/model
+copies under `data/probability_experiments/`, then atomically replace the
+canonical model followed by canonical `data/probability_validation.json`.
+Failed completed releases publish canonical `no_model_passed` / `withheld`,
+never a stale `not_run`.
+
+### Commands, checkpointing, and cost
+
+Run from PowerShell:
+
+```powershell
+Set-Location "C:\Users\ththomas\OneDrive\09_Software_Tools_Projekte\01_Aktive_Software_Projekte\Stock-Radar"
+python -m pip install -r requirements-ci.txt
+
+# Bounded in-memory learnable/random check; writes no production artifact
+python -m src.probability_train smoke
+python -m src.probability_train smoke --model-family ordered-vector-v1 --dev-refit-override
+
+# Restartable ignored Yahoo panel + weekly dataset
+python -m src.probability_train build --start 2008-01-01
+
+# Development reports only (200 bootstrap repetitions)
+python -m src.probability_train validation-only --model-family ordered-vector-v1 --bootstrap 200
+
+# Ordered release from an existing cache (1,000 fixed OOS resamples, 200 refits)
+python -m src.probability_train train --model-family ordered-vector-v1 --bootstrap 1000 --refit-bootstrap 200
+
+# Build, validate, and release in one restartable run
+python -m src.probability_train full --model-family ordered-vector-v1 --start 2008-01-01 --bootstrap 1000 --refit-bootstrap 200
+```
+
+`--no-resume` discards compatible checkpoints; `--horizon` and `--threshold`
+bound a diagnostic run. Resume keys bind the full dataframe content hash, panel
+source/manifest hash, requested/success/failure coverage, symbol/date/count
+summary, model family, feature schema/version, portable code/dependency hash, C,
+calibrator/grid, fixed and refit bootstrap counts, seed, fold settings,
+acceptance gates, and publish-transform version; any
+change forces recomputation. On a typical 8-core workstation, smoke is roughly
+2–8 minutes and under 1 GiB; Yahoo panel build is roughly 30–120 minutes and
+1–4 GiB; a four-horizon ordered release with 200 full refits is roughly
+8–24 hours with 4–12 GiB peak working space. These are planning
+estimates—provider throttling,
+eligible-universe size, CPU, and memory dominate.
+
+Limitations remain material: the training membership is today's observable
+universe (survivorship bias); probabilities are for listing-currency USD total
+returns, not an investor's home-currency return; Yahoo adjustment history is not
+a true vintage action tape; bootstrap probability bands are aggregate
+calibration-error approximations; and no causal/structural return claim is made.
+True point-in-time fundamentals, estimates, news, and earnings are a future
+model phase and may not be backfilled into this price/SPY MVP.
+
+Daily SPY inference uses the same backward as-of rule as dataset features: the
+selected completed SPY session must be at or before the stock signal session.
+Weekend/non-US-holiday gaps are allowed through 4 calendar and 2 business days;
+future-only or older SPY history is withheld.
 
 ## Daily data contract
 
@@ -73,7 +307,12 @@ provenance/actionability fields and non-rendered compatibility/context duplicate
 are represented once by the top-level `instrument_contract` and
 `insight_metadata.provenance_catalog`; the exact zone formula, thresholds, and
 provenance are additionally represented once by `sweet_spot_contract`. It
-serializes one deterministic compact UTF-8 byte sequence and measures that exact
+interns probability reasons/model/baseline metadata and packs row-varying whole
+percentages, directly quantized validated interval bounds, and conservative OOD
+summaries into a bounded base64 byte stream.
+The browser hydrates and revalidates sums, directly stored interval bounds, OOD
+status, and threshold monotonicity before rendering. It serializes one deterministic compact UTF-8
+byte sequence and measures that exact
 sequence. The hard ceiling remains 10 MiB, while publication is refused above
 the stricter 8.5 MiB operational target.
 
@@ -270,8 +509,8 @@ choose decimals by price magnitude and increase precision until internally
 distinct lower/IDEAL/upper values remain visibly distinct.
 
 This geometry has not been backtested as an optimal entry edge. Its evidence
-quality score measures only input confluence and proximity; it is not confidence,
-probability, expected return, a recommendation, or a guarantee.
+quality score measures only input confluence and proximity; it does not measure
+likelihood, probability, expected return, or recommendation strength.
 
 The static cockpit applies the same fail-closed contract before rendering any
 tips: status must be `ok`, `data_actionable` true, blocking reasons empty, model
@@ -298,7 +537,7 @@ The paper module is an **UNVALIDATED, non-actionable simulation**:
   explicit user decision (`STOCK_RADAR_START_NEW_PAPER=1`). Legacy data remains
   under `legacy_archive` / `legacy_frozen_positions`.
 
-Corporate-action coverage cannot be guaranteed across missed runs. Consequently,
+Corporate-action coverage may remain incomplete across missed runs. Consequently,
 paper performance remains explicitly non-actionable.
 
 Portfolio benchmarks use the same completed-session ingestion contract. Values

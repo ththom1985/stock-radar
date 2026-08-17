@@ -21,6 +21,8 @@ class WorkflowContractTests(unittest.TestCase):
             self.assertIn("data/deep_fundamentals.json", text)
             self.assertIn("data/news_cache.json", text)
             self.assertIn("data/failed_symbols.json", text)
+            self.assertIn("data/probability_models.json", text)
+            self.assertIn("data/probability_validation.json", text)
             self.assertIn("persist-credentials: false", text)
             self.assertNotIn("|| true", text)
             self.assertNotIn("push ||", text)

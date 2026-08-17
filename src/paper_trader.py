@@ -65,7 +65,7 @@ def _initial(today: str) -> dict[str, Any]:
             "diversification": "issuer uniqueness plus sector/country caps; no correlation claim",
             "order_not_before": "UTC creation date + two calendar dates",
             "corporate_actions": (
-                "best effort from Yahoo daily action columns; missed-run gaps are not guaranteed"
+                "best effort from Yahoo daily action columns; missed-run gaps may remain incomplete"
             ),
         },
         "_meta": schema_meta("stock-radar-paper-portfolio"),

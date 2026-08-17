@@ -113,6 +113,9 @@
     .sweet-zone.amber { border-left-color: var(--cp-warning); }
     .sweet-zone.red { border-left-color: var(--cp-danger); }
     .sweet-zone.neutral { border-left-color: var(--cp-border-strong); }
+    .probability-panel { border: 1px solid var(--cp-border-strong); border-radius: 12px; padding: 13px; margin: 14px 0; background: var(--cp-surface-soft); }
+    .probability-row { border-top: 1px solid var(--cp-border); padding: 9px 0; line-height: 1.45; }
+    .probability-row:first-of-type { border-top: 0; }
     .sweet-zone-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
     .sweet-values { font-size: 18px; font-weight: 800; margin: 10px 0 4px; }
     .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
@@ -165,7 +168,7 @@
           <h1>Stock Radar</h1>
           <div class="subtitle">Transparente tägliche Research-Hinweise zu Timing, Bewertung, Analysten, Chancen und Risiken.</div>
         </div>
-        <div class="status-chip">UNVALIDATED · Research only</div>
+        <div class="status-chip">Radar UNVALIDATED · probability fail-closed</div>
       </header>
       <section class="metrics">
         <div class="metric"><div class="metric-label">Datenstand</div><div id="generated" class="metric-value"></div></div>
@@ -174,7 +177,7 @@
         <div class="metric"><div class="metric-label">Frische Bars</div><div id="freshness" class="metric-value"></div></div>
         <div class="metric"><div class="metric-label">Fehlende Symbole</div><div id="failed-count" class="metric-value"></div></div>
       </section>
-      <div class="notice">Keine Anlageberatung. Alle Insights sind <strong>heuristic_unvalidated</strong>, nicht handlungsleitend und keine Prognosen, Wahrscheinlichkeiten oder Kauf-/Verkaufsempfehlungen. Szenarien fließen nicht in das Core-Ranking ein.</div>
+      <div class="notice">Keine Anlageberatung. Radar-Insights bleiben <strong>heuristic_unvalidated</strong>. Kalibrierte Materialbewegungs-Wahrscheinlichkeiten erscheinen ausschließlich nach bestandenen strikten Freigabekriterien und fließen nie in Ranking, Sweet Spot oder Farbe ein.</div>
       <nav id="nav" class="nav">
         <button class="nav-button active" data-view="sweet_spot">Sweet Spot</button>
         <button class="nav-button" data-view="daily_setups">Tages-Setups</button>
@@ -206,7 +209,7 @@
         <div class="panel"><h2>Datenqualität</h2><div id="health-content" class="section"></div></div>
         <div class="panel"><h2>Fehlende Symbole</h2><div id="failures" class="section"></div></div>
       </section>
-      <footer class="footer">Yahoo Finance über die fail-closed Stock-Radar-Pipeline · abgeschlossene Tagesbars · öffentlich ohne Login · Modellstatus UNVALIDATED.</footer>
+      <footer class="footer">Yahoo Finance über die fail-closed Stock-Radar-Pipeline · abgeschlossene Tagesbars · Radar UNVALIDATED · Probability-Modelle separat und strikt freigabepflichtig.</footer>
     </div>
   </main>
   <script>
@@ -337,6 +340,128 @@
       }
     }
 
+    function hydrateProbabilityForecasts(data) {
+      const contract = data.probability_contract || {};
+      const defaults = contract.row_defaults || {};
+      const statuses = contract.status_codes || ["withheld", "partial", "accepted"];
+      const reasons = data.probability_reason_catalog || [];
+      const models = data.probability_model_catalog || [];
+      const baselines = data.probability_baseline_catalog || [];
+      for (const row of data.instruments || []) {
+        const compact = row.pf;
+        if (!Array.isArray(compact) || compact.length !== 3) {
+          row.probability_forecast = {
+            ...defaults,
+            status: "withheld",
+            message: "No validated stock-specific probability edge",
+            listing_currency: row.currency,
+            signal_timestamp: row.bar_date,
+            reasons: ["Probability output contract is unavailable."],
+            ood: [],
+            baselines,
+            forecasts: []
+          };
+          continue;
+        }
+        const status = statuses[compact[0]] || "withheld";
+        const packed = atob(compact[2] || "");
+        const forecasts = [];
+        const modelMask = packed.length >= 5
+          ? packed.charCodeAt(0) | (packed.charCodeAt(1) << 8)
+          : 0;
+        const toleranceHorizonMask = packed.length >= 5
+          ? packed.charCodeAt(4)
+          : 0;
+        const selectedModelRefs = models
+          .map((_model, index) => index)
+          .filter((index) => modelMask & (1 << index));
+        selectedModelRefs.forEach((modelRef, position) => {
+          const offset = 5 + position * 7;
+          const values = [];
+          let bitBuffer = 0;
+          let bitCount = 0;
+          let cursor = offset;
+          while (values.length < 8) {
+            while (bitCount < 7) {
+              bitBuffer |= packed.charCodeAt(cursor) << bitCount;
+              cursor += 1;
+              bitCount += 8;
+            }
+            values.push(bitBuffer & 0x7f);
+            bitBuffer >>= 7;
+            bitCount -= 7;
+          }
+          const [down, up, downLow, downHigh, middleLow, middleHigh, upLow, upHigh] = values;
+          const metadata = { ...(models[modelRef] || {}) };
+          const horizonIndex = [21, 63, 126, 252].indexOf(Number(metadata.horizon_sessions));
+          const toleratedThresholdInversion = horizonIndex >= 0 && Boolean(toleranceHorizonMask & (1 << horizonIndex));
+          const probabilities = { down, middle: 100 - down - up, up };
+          const intervals = {
+            down: [downLow, downHigh],
+            middle: [middleLow, middleHigh],
+            up: [upLow, upHigh]
+          };
+          forecasts.push({
+            ...metadata,
+            definition: `gross UP >= +${(Number(metadata.threshold_pct) + 0.30).toFixed(2)}%; gross DOWN <= -${(Number(metadata.threshold_pct) + 0.30).toFixed(2)}%; otherwise MIDDLE`,
+            publish_transform: metadata.publish_transform || contract.publish_transform,
+            model_interval_method: contract.model_interval_scope,
+            threshold_monotonicity: {
+              permitted: true,
+              reason_code: null,
+              tolerated_independent_threshold_inversion: toleratedThresholdInversion,
+              disclosure: toleratedThresholdInversion
+                ? "Independent-threshold tolerance applied: raw inversion is at most 0.5 percentage point, whole-percent display is monotonic, and raw probabilities are unchanged."
+                : metadata.model_family === "ordered-vector-v1"
+                  ? "Exact ordered-distribution tail sums; monotonic by construction within float64 machine epsilon."
+                  : "Raw independent-threshold probabilities are monotonic.",
+              action: "never project; withhold horizon when not permitted"
+            },
+            probabilities: {
+              down: probabilities.down / 100,
+              middle: probabilities.middle / 100,
+              up: probabilities.up / 100
+            },
+            probabilities_pct: probabilities,
+            sum_pct: 100,
+            model_interval_95_pct: intervals,
+            listing_currency: row.currency,
+            signal_timestamp: row.bar_date,
+            entry_assumption: defaults.entry_assumption,
+            exit_assumption: `adjusted close ${metadata.horizon_sessions} sessions after t`,
+            cost_assumption_bps_round_trip: 30,
+            survivorship_warning: defaults.survivorship_warning,
+            acceptance_passed: true,
+            withholding_reasons: [],
+            ood: {
+              withhold: false,
+              reasons: [],
+              missing_features: [],
+              outside_features: [],
+              outside_count: packed.charCodeAt(2),
+              robust_distance_ratio: packed.charCodeAt(3) / 100
+            }
+          });
+        });
+        delete row.pf;
+        row.probability_forecast = {
+          ...defaults,
+          status,
+          message: status === "withheld"
+            ? "No validated stock-specific probability edge"
+            : status === "accepted"
+              ? "Strictly validated calibrated material-move probabilities"
+              : "Only listed horizon/threshold models passed all current gates",
+          listing_currency: row.currency,
+          signal_timestamp: row.bar_date,
+          reasons: (compact[1] || []).map((index) => reasons[index]),
+          ood: [],
+          baselines,
+          forecasts
+        };
+      }
+    }
+
     function staticGateFailures(data, nowMs = Date.now()) {
       const failures = [];
       const status = data?.data_status || {};
@@ -355,11 +480,34 @@
       if (insights.model_status !== "heuristic_unvalidated" || insights.actionable !== false || insights.enabled !== true) failures.push("Insight-Gate ist nicht freigegeben.");
       if (hasActionableTrue(insights)) failures.push("Verschachteltes actionable=true erkannt.");
       if (instrumentContract.model_status !== "heuristic_unvalidated" || instrumentContract.actionable !== false) failures.push("Kompakter Instrumentvertrag ist nicht sicher.");
-      const identityFields = ["display_name_full", "short_name", "headquarters_country", "legal_domicile", "listing_country", "listing_market", "economic_exposure_country", "sector_display", "industry_display", "jurisdiction_risk", "valuation_context", "valuation_thesis", "entry_thesis", "sweet_spot", "analyst_context"];
+      const identityFields = ["display_name_full", "short_name", "headquarters_country", "legal_domicile", "listing_country", "listing_market", "economic_exposure_country", "sector_display", "industry_display", "jurisdiction_risk", "valuation_context", "valuation_thesis", "entry_thesis", "sweet_spot", "probability_forecast", "analyst_context"];
       for (const row of data?.instruments || []) {
         if (!identityFields.every((field) => Object.prototype.hasOwnProperty.call(row, field))) failures.push(`Identitäts-/Thesenfelder fehlen bei ${row.symbol || "unbekannt"}.`);
         for (const group of [row.jurisdiction_risk, row.valuation_thesis, row.entry_thesis]) {
           if (!group || typeof group !== "object") failures.push(`Kompakter Kontext fehlt bei ${row.symbol || "unbekannt"}.`);
+        }
+        const probability = row.probability_forecast || {};
+        if (!["withheld", "partial", "accepted"].includes(probability.status) || probability.actionable !== false) failures.push(`Probability-Vertrag ist ungültig bei ${row.symbol || "unbekannt"}.`);
+        if (probability.status === "withheld" && (probability.forecasts || []).length) failures.push(`Withheld Probability enthält Modellwerte bei ${row.symbol || "unbekannt"}.`);
+        const grids = new Map();
+        for (const item of probability.forecasts || []) {
+          const p = item.probabilities_pct || {};
+          if (![p.down, p.middle, p.up].every((value) => Number.isInteger(value) && value >= 0 && value <= 100) || p.down + p.middle + p.up !== 100) failures.push(`Probability-Summe ist ungültig bei ${row.symbol || "unbekannt"}.`);
+          if (!item.ood || item.ood.withhold !== false || item.acceptance_passed !== true || (item.withholding_reasons || []).length) failures.push(`Probability-OOD/Freigabe ist ungültig bei ${row.symbol || "unbekannt"}.`);
+          if (!["raw-temperature-scaled-identity-v1", "ordered-vector-tail-sum-identity-v1"].includes(item.publish_transform?.version) || item.publish_transform?.operation !== "identity") failures.push(`Probability-Publish-Transform ist ungültig bei ${row.symbol || "unbekannt"}.`);
+          if (item.threshold_monotonicity?.permitted !== true) failures.push(`Probability-Schwellentoleranz ist ungültig bei ${row.symbol || "unbekannt"}.`);
+          for (const name of ["down", "middle", "up"]) {
+            const interval = item.model_interval_95_pct?.[name];
+            if (!Array.isArray(interval) || interval.length !== 2 || !interval.every((value) => Number.isInteger(value) && value >= 0 && value <= 100) || interval[0] > p[name] || interval[1] < p[name] || interval[1] - interval[0] > 20) failures.push(`Probability-Intervall ist ungültig bei ${row.symbol || "unbekannt"}.`);
+          }
+          if (!grids.has(item.horizon_sessions)) grids.set(item.horizon_sessions, []);
+          grids.get(item.horizon_sessions).push(item);
+        }
+        for (const items of grids.values()) {
+          items.sort((a, b) => a.threshold_pct - b.threshold_pct);
+          for (let index = 1; index < items.length; index += 1) {
+            if (items[index].probabilities.up > items[index - 1].probabilities.up || items[index].probabilities.down > items[index - 1].probabilities.down) failures.push(`Probability-Schwellen sind nicht monoton bei ${row.symbol || "unbekannt"}.`);
+          }
         }
       }
       if (hasActionableTrue(data?.instruments || [])) failures.push("Verschachteltes actionable=true in Instrumentdaten erkannt.");
@@ -442,6 +590,38 @@
       return `<div class="section"><h3>${escapeHtml(title)}</h3>${items.map((item) => callout(item, tone)).join("")}</div>`;
     }
 
+    function renderProbabilityPanel(row) {
+      const value = row.probability_forecast || {};
+      const forecasts = value.forecasts || [];
+      const reasons = (value.reasons || []).map((reason) => `<li>${escapeHtml(reason)}</li>`).join("");
+      const modelRows = forecasts.map((item) => {
+        const p = item.probabilities_pct || {};
+        const interval = item.model_interval_95_pct || {};
+        const base = item.baseline_rates_pct || {};
+        const ece = item.classwise_ece || {};
+        const bootstrap = item.fixed_oos_bootstrap || {};
+        const grossBoundary = Number(item.threshold_pct) + 0.30;
+        return `<div class="probability-row">
+          <strong>${escapeHtml(item.horizon_label || "")} / ${escapeHtml(item.threshold_pct)}% Materialschwelle:</strong>
+          Anstieg (Brutto) ≥ +${grossBoundary.toFixed(2)}% ${escapeHtml(p.up)}%, Mitte ${escapeHtml(p.middle)}%, Rückgang (Brutto) ≤ -${grossBoundary.toFixed(2)}% ${escapeHtml(p.down)}%
+          <div class="muted">Modellfamilie ${escapeHtml(item.model_family || "independent-threshold-v1")} · 95% aggregate calibration-error interval approximation from fixed OOS predictions; not an individual stock outcome interval. Down/Mitte/Up: ${escapeHtml((interval.down || []).join("–"))}% / ${escapeHtml((interval.middle || []).join("–"))}% / ${escapeHtml((interval.up || []).join("–"))}% · Baseline ${escapeHtml(base.down)}/${escapeHtml(base.middle)}/${escapeHtml(base.up)}% · Brier skill ${$number(item.brier_skill, 3)} · ECE ${$number(Math.max(...Object.values(ece).filter(Number.isFinite)), 3)} · ${escapeHtml(item.full_test_fold_count ?? item.fold_count)} volle Test-Folds · ${$number(item.history_years, 1)} nutzbare Jahre · min. Train ${$number(item.min_usable_train_years, 1)} Jahre · n=${escapeHtml(item.sample_size)} · OOS-Bootstrap ${escapeHtml(bootstrap.completed)}/${escapeHtml(bootstrap.requested)} abgeschlossen (${escapeHtml(bootstrap.skipped)} übersprungen) · ${escapeHtml(item.threshold_monotonicity?.disclosure || "")}</div>
+        </div>`;
+      }).join("");
+      const baselineRows = !forecasts.length && (value.baselines || []).length
+        ? `<table class="data-table"><tr><th>Horizont</th><th>Schwelle</th><th>Down/Mitte/Up</th><th>Folds</th></tr>${value.baselines.map((item) => `<tr><td>${escapeHtml(item.horizon_label)}</td><td>${escapeHtml(item.threshold_pct)}%</td><td>${escapeHtml(item.rates_pct?.down)}/${escapeHtml(item.rates_pct?.middle)}/${escapeHtml(item.rates_pct?.up)}%</td><td>${escapeHtml(item.fold_count ?? "–")}</td></tr>`).join("")}</table>`
+        : "";
+      const statusText = value.status === "withheld"
+        ? `<div class="callout warning"><strong>${escapeHtml(value.message || "No validated stock-specific probability edge")}</strong><div>Status: Forward Validation erforderlich. Historische Basisraten sind deskriptive Häufigkeiten des heutigen Survivor-Universums, keine Aktienprognose und kein Konfidenzintervall.</div>${reasons ? `<ul>${reasons}</ul>` : ""}</div>`
+        : value.status === "partial"
+          ? `<div class="callout">Nur die gelisteten Horizont-/Schwellenmodelle haben alle aktuellen Freigabekriterien erfüllt.</div>`
+          : `<div class="callout">Die gelisteten Modelle haben alle strikten Freigabekriterien erfüllt.</div>`;
+      return `<div class="probability-panel">
+        <div class="sweet-zone-head"><div><strong>Kalibrierte Wahrscheinlichkeiten</strong><div class="muted">Separat von Radar-Score, Insight-Rang, Sweet Spot und Farbe</div></div><span class="badge neutral">${escapeHtml(value.status || "withheld")}</span></div>
+        ${statusText}${modelRows}${baselineRows}${baselineRows ? `<div class="muted">Nur historische Basisraten; keine aktienspezifische Modellfreigabe. Die Werte sind keine Prognose für dieses Unternehmen.</div>` : ""}
+        <div class="muted">Signal ${escapeHtml(value.signal_timestamp || row.bar_date || "–")} · Listing-Währung ${escapeHtml(value.listing_currency || row.currency || "–")} · erster adjustierter/raw-äquivalenter Open strikt nach t · 30 bp Round Trip. ${escapeHtml(value.survivorship_warning || "")}</div>
+      </div>`;
+    }
+
     function renderDetail(row) {
       if (!row) { $("detail").innerHTML = `<div class="muted">Keine Instrumente erfüllen diese Auswahl.</div>`; return; }
       const analyst = row.analyst_context || {};
@@ -450,6 +630,7 @@
       const valuationThesis = row.valuation_thesis || {};
       const entryThesis = row.entry_thesis || {};
       const sweet = row.sweet_spot || {};
+      const probabilityPanel = renderProbabilityPanel(row);
       const jurisdiction = row.jurisdiction_risk || {};
       const phase = row.trend_phase || {};
       const scenarios = (row.scenario_long || []).map((item) => `<div class="scenario">
@@ -504,6 +685,7 @@
         <div class="muted">Börsenland/Markt: ${escapeHtml(row.listing_country || "nicht verfügbar")} / ${escapeHtml(row.listing_market || "nicht verfügbar")}</div>
         <div class="muted">${escapeHtml(assetLabels[row.asset_type] || row.asset_type)} · ${escapeHtml(row.currency || "")} · Bar ${escapeHtml(row.bar_date || "–")}</div></div>
         <span class="badge">${$number(row.entry_timing_score, 0)}/100 Timing</span></div>
+        ${probabilityPanel}
         ${sweetPanel}
         ${thesisList("Warum diese Zone", sweet.why_zone_here)}
         ${thesisList("Warum Grün oder nicht", sweet.why_green_or_not, sweet.tone === "green" ? "success" : sweet.tone === "red" ? "danger" : "warning")}
@@ -565,12 +747,24 @@
     function renderHealthView() {
       $("cockpit").hidden = true; $("controls").hidden = true; $("health").hidden = false;
       const status = state.data.data_status || {}; const age = status.bar_age_distribution || {};
+      const probability = state.data.probability_validation || {};
+      const providerCoverage = probability.provider_coverage || {};
+      const probabilityModels = Object.entries(probability.models || {});
+      const probabilityModelTable = probabilityModels.length
+        ? `<table class="data-table"><tr><th>Modell</th><th>Freigabe</th><th>Brier skill</th><th>Max ECE</th><th>volle Folds</th><th>Jahre/min. Train</th></tr>${probabilityModels.map(([key, model]) => `<tr><td>${escapeHtml(key)}</td><td>${model.accepted ? "ja" : "nein"}</td><td>${$number(model.brier_skill, 3)}</td><td>${$number(Math.max(...Object.values(model.classwise_ece || {}).filter(Number.isFinite)), 3)}</td><td>${escapeHtml(model.full_test_fold_count ?? model.fold_count ?? "–")}</td><td>${$number(model.history_years, 1)} / ${$number(model.min_usable_train_years, 1)}</td></tr>`).join("")}</table>`
+        : `<div class="muted">Noch keine Release-Validierung ausgeführt.</div>`;
       $("health-content").innerHTML = `${state.gateFailures.map((reason) => callout(reason, "danger")).join("")}<div class="detail-grid">
         <div class="stat"><span>Status</span><strong>${escapeHtml(status.status || "–")}</strong></div>
         <div class="stat"><span>Coverage</span><strong>${percent(status.coverage_pct)}</strong></div>
         <div class="stat"><span>Frische Bars</span><strong>${percent(status.fresh_bar_coverage_pct)}</strong></div>
         <div class="stat"><span>Median / Max Alter</span><strong>${$number(age.median_days, 0)} / ${$number(age.max_days, 0)} Tage</strong></div>
-      </div><div class="section"><h3>Blocking Reasons</h3>${(status.blocking_reasons || []).map((reason) => callout(reason, "danger")).join("") || `<div class="muted">Keine.</div>`}</div>`;
+      </div><div class="section"><h3>Blocking Reasons</h3>${(status.blocking_reasons || []).map((reason) => callout(reason, "danger")).join("") || `<div class="muted">Keine.</div>`}</div>
+      <div class="section"><h3>Probability-Validierung</h3><div class="detail-grid">
+        <div class="stat"><span>Status</span><strong>${escapeHtml(probability.status || "unavailable")}</strong></div>
+        <div class="stat"><span>Getestet</span><strong>${escapeHtml(probability.tested_model_count ?? 0)}</strong></div>
+        <div class="stat"><span>Freigegeben</span><strong>${escapeHtml(probability.accepted_model_count ?? 0)}</strong></div>
+        <div class="stat"><span>Provider-Coverage</span><strong>${Number.isFinite(providerCoverage.success_coverage) ? percent(providerCoverage.success_coverage * 100) : "–"}</strong></div>
+      </div>${(probability.reasons || []).map((reason) => callout(reason, "warning")).join("")}${probabilityModelTable}</div>`;
       const failed = Object.entries(status.failed_symbols || {});
       $("failures").innerHTML = failed.length ? failed.map(([symbol, reason]) => `<div class="failure"><span class="symbol">${escapeHtml(symbol)}</span><span>${escapeHtml(reason)}</span></div>`).join("") : `<div class="muted">Keine fehlenden Symbole.</div>`;
     }
@@ -595,6 +789,7 @@
         state.data = await response.json();
         if (state.data.schema !== "stock-radar-static" || state.data.schema_version !== 3) throw new Error("Nicht unterstützter Datenvertrag");
         hydrateSweetSpotReasons(state.data);
+        hydrateProbabilityForecasts(state.data);
         state.bySymbol = new Map(state.data.instruments.map((row) => [row.symbol, row]));
         const currencies = new Set(Object.keys(state.data.rankings || {}));
         Object.values(state.data.insight_rankings?.categories || {}).forEach((cat) => Object.keys(cat.items_by_currency || {}).forEach((currency) => currencies.add(currency)));

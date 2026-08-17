@@ -9,6 +9,7 @@ from statistics import median
 from typing import Any
 
 from .persistence import SCHEMA_VERSION
+from .probability_inference import validate_probability_forecast
 from .sweet_spot import confirmed_status_violations, green_invariant_blockers
 
 
@@ -831,6 +832,56 @@ def validate_output_contract(data: Any) -> dict[str, Any]:
         raise DataContractError(
             "Deployed output must remain explicitly unvalidated and non-actionable"
         )
+    probability_validation = data.get("probability_validation")
+    if probability_validation is not None:
+        if (
+            not isinstance(probability_validation, dict)
+            or probability_validation.get("status") not in {
+                "not_run",
+                "running",
+                "no_model_passed",
+                "accepted_models_available",
+                "accepted_full_grid",
+                "accepted_partial_grid",
+                "unavailable",
+            }
+            or not isinstance(
+                probability_validation.get("accepted_model_count"), int
+            )
+            or not isinstance(
+                probability_validation.get("tested_model_count"), int
+            )
+            or not isinstance(probability_validation.get("reasons"), list)
+        ):
+            raise DataContractError("Probability validation summary is invalid")
+        provider = probability_validation.get("provider_coverage")
+        if provider is not None and (
+            not isinstance(provider, dict)
+            or not isinstance(provider.get("requested_issuer_count"), int)
+            or not isinstance(provider.get("successful_issuer_count"), int)
+            or not isinstance(provider.get("success_coverage"), (int, float))
+            or not 0 <= provider["success_coverage"] <= 1
+            or not isinstance(provider.get("unavailable_symbols"), dict)
+        ):
+            raise DataContractError("Probability provider coverage summary is invalid")
+        missing_forecasts = [
+            row.get("symbol")
+            for row in data["all"]
+            if not isinstance(row, dict) or "probability_forecast" not in row
+        ]
+        if missing_forecasts:
+            raise DataContractError(
+                "Probability-enabled output has rows without a forecast contract: "
+                f"{missing_forecasts[:10]}"
+            )
+    for row in data["all"]:
+        if isinstance(row, dict) and "probability_forecast" in row:
+            try:
+                validate_probability_forecast(row["probability_forecast"])
+            except (TypeError, ValueError) as exc:
+                raise DataContractError(
+                    f"Probability forecast for {row.get('symbol')!r} is invalid: {exc}"
+                ) from exc
     validate_insight_contract(data["insight_rankings"], data["all"])
     for key in ("aschenbrenner_holdings",):
         for row in data.get(key) or []:

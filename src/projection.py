@@ -1,7 +1,7 @@
 """Unvalidated heuristic scenario ranges with strictly positive prices.
 
 These are volatility-scaled research scenarios, not probabilities, forecasts,
-expected returns, confidence intervals or ranking inputs.
+expected returns, calibrated intervals or ranking inputs.
 """
 from __future__ import annotations
 
