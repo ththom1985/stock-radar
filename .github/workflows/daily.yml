@@ -98,6 +98,7 @@ jobs:
             data/job_postings.json \
             data/filing_diffs.json \
             data/earnings_tone.json \
+            data/earnings_text_sources.json
           do
             if [ -e "$optional" ]; then git add "$optional"; fi
           done
