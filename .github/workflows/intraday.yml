@@ -37,6 +37,7 @@ jobs:
           FINRA_CLIENT_ID: ${{ secrets.FINRA_CLIENT_ID }}
           FINRA_CLIENT_SECRET: ${{ secrets.FINRA_CLIENT_SECRET }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          EARNINGSCALL_API_KEY: ${{ secrets.EARNINGSCALL_API_KEY }}
       - name: Check published data health
         continue-on-error: true
         run: python -m src.published_health

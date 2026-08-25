@@ -43,6 +43,16 @@ def fetch_earnings_tone_signals(rows,max_new=None,force=False,verbose=True):
     cache=load_json(CACHE_PATH,expected_type=dict,default={})
     if not os.environ.get("ANTHROPIC_API_KEY"):
         return {},{"status":"disabled","reason":"ANTHROPIC_API_KEY unavailable","refreshed":0}
+    if not (
+        os.environ.get("EARNINGSCALL_API_KEY")
+        or os.environ.get("ECALL_API_KEY")
+    ):
+        return {},{
+            "status":"disabled",
+            "reason":"EARNINGSCALL_API_KEY unavailable",
+            "registration":"https://earningscall.biz/api-pricing",
+            "refreshed":0,
+        }
     eligible=[row for row in rows if row.get("asset_type")=="company_equity" and row.get("currency")=="USD"]
     eligible.sort(key=lambda row:(-(row.get("longterm_score") or 0),row["symbol"]))
     max_new=max_new if max_new is not None else int(os.environ.get("STOCK_RADAR_EARNINGS_TONE_MAX","3"))
