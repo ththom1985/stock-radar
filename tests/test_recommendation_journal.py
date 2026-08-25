@@ -9,6 +9,39 @@ from src import recommendation_journal as journal
 
 
 class RecommendationJournalTests(unittest.TestCase):
+    def test_records_every_active_confluence_with_groups(self):
+        with tempfile.TemporaryDirectory() as directory:
+            log_path = Path(directory) / "recommendations.jsonl"
+            outcome_path = Path(directory) / "outcomes.jsonl"
+            rows = [{
+                "symbol": "AAA",
+                "bar_date": "2026-08-25",
+                "price_local": 10,
+                "alternative_signals": {
+                    "activation_status": "active",
+                    "confluence_score": 70,
+                    "confluence_tier": "three_group",
+                    "contributing_groups": [
+                        {"group": "insider", "score": 80},
+                        {"group": "congress", "score": 70},
+                        {"group": "attention", "score": 60},
+                    ],
+                },
+            }]
+            with patch.object(journal, "LOG_PATH", log_path), patch.object(
+                journal, "OUTCOME_PATH", outcome_path
+            ):
+                added = journal.record_confluence_observations(
+                    rows, "2026-08-25T18:00:00+00:00"
+                )
+                duplicate = journal.record_confluence_observations(
+                    rows, "2026-08-25T18:00:00+00:00"
+                )
+            self.assertEqual(len(added), 1)
+            self.assertEqual(added[0]["confluence_tier"], "three_group")
+            self.assertEqual(len(added[0]["contributing_groups"]), 3)
+            self.assertEqual(duplicate, [])
+
     def test_records_once_and_appends_mature_outcome(self):
         with tempfile.TemporaryDirectory() as directory:
             log_path = Path(directory) / "recommendations.jsonl"

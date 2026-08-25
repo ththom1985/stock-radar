@@ -104,6 +104,46 @@ def record_top_observations(rows, rankings, generated_at):
     return additions
 
 
+def record_confluence_observations(rows, generated_at):
+    observed_at = datetime.fromisoformat(str(generated_at).replace("Z", "+00:00"))
+    if observed_at.tzinfo is None:
+        observed_at = observed_at.replace(tzinfo=timezone.utc)
+    observed_date = observed_at.date().isoformat()
+    existing = _read_jsonl(LOG_PATH)
+    existing_ids = {row.get("id") for row in existing}
+    additions = []
+    for row in rows:
+        alternative = row.get("alternative_signals") or {}
+        if alternative.get("activation_status") != "active":
+            continue
+        observation_id = _observation_id(
+            observed_date, row.get("symbol"), "confluence"
+        )
+        if observation_id in existing_ids:
+            continue
+        additions.append(
+            {
+                "id": observation_id,
+                "observed_at": observed_at.astimezone(timezone.utc).isoformat(),
+                "bar_date": row.get("bar_date"),
+                "symbol": row.get("symbol"),
+                "name": row.get("display_name_full") or row.get("name"),
+                "currency": row.get("currency"),
+                "price_local": row.get("price_local"),
+                "horizon": "confluence",
+                "score": alternative.get("confluence_score"),
+                "signal": "confluence_active",
+                "confluence_tier": alternative.get("confluence_tier"),
+                "contributing_groups": alternative.get("contributing_groups") or [],
+                "alternative_signals": alternative,
+                "actionable": False,
+            }
+        )
+    if additions:
+        _write_jsonl(LOG_PATH, [*existing, *additions])
+    return additions
+
+
 def evaluate_mature_observations(price_histories):
     observations = _read_jsonl(LOG_PATH)
     outcomes = _read_jsonl(OUTCOME_PATH)

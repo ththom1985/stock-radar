@@ -87,6 +87,7 @@ from .recommendation_journal import (
     evaluate_mature_observations,
     journal_summary,
     record_top_observations,
+    record_confluence_observations,
 )
 from .rating import radar_elo, radar_score, stars
 from .score import score_daily_signal, score_longterm
@@ -962,6 +963,7 @@ def run(with_news=True, with_fundamentals=True):
     if not market_data_only:
         evaluate_mature_observations(fetched.prices)
         record_top_observations(rows, expert_rankings, now.isoformat())
+        record_confluence_observations(rows, now.isoformat())
     recommendation_journal = journal_summary()
     rankings_by_currency_asset = rehydrate_rankings(
         rankings_by_currency_asset,
