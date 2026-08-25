@@ -1,6 +1,38 @@
 {
- "_refresh_failure": {
-  "at": "2026-08-25T10:55:57+00:00",
-  "error": "HTTP Error 400: Bad Request"
+ "score": 70.0,
+ "regime": "risk_on",
+ "yield_curve_10y_2y": 0.5,
+ "reasons": [
+  "10Y–2Y Zinskurve 0.50 Prozentpunkte",
+  "US High-Yield-Spread 2.70%",
+  "NFCI -0.56"
+ ],
+ "observations": {
+  "dgs10": {
+   "value": 4.74,
+   "observation_date": "2026-08-21"
+  },
+  "dgs2": {
+   "value": 4.24,
+   "observation_date": "2026-08-21"
+  },
+  "high_yield_spread": {
+   "value": 2.7,
+   "observation_date": "2026-08-21"
+  },
+  "financial_conditions": {
+   "value": -0.559,
+   "observation_date": "2026-08-14"
+  }
+ },
+ "model_status": "heuristic_context_only",
+ "actionable": false,
+ "source": "FRED",
+ "fetched_at": "2026-08-25T11:14:58+00:00",
+ "last_success_at": "2026-08-25T11:14:58+00:00",
+ "_meta": {
+  "schema": "stock-radar-fred-regime-cache",
+  "schema_version": 1,
+  "written_at": "2026-08-25T11:14:58+00:00"
  }
 }
