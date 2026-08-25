@@ -1,6 +1,6 @@
 import unittest
 
-from src.wikipedia_attention import summarize_pageviews
+from src.wikipedia_attention import select_article, summarize_pageviews
 
 
 class WikipediaAttentionTests(unittest.TestCase):
@@ -19,6 +19,18 @@ class WikipediaAttentionTests(unittest.TestCase):
     def test_insufficient_history_is_unavailable(self):
         self.assertIsNone(
             summarize_pageviews([{"timestamp": "20260101", "views": 100}])
+        )
+
+    def test_article_resolution_rejects_zero_overlap(self):
+        self.assertIsNone(
+            select_article(
+                "Krystal Biotech Inc.",
+                [{"title": "Beremagene geperpavec"}],
+            )
+        )
+        self.assertEqual(
+            select_article("Apple Inc.", [{"title": "Apple Inc."}]),
+            "Apple Inc.",
         )
 
 

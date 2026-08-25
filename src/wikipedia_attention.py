@@ -4,8 +4,10 @@ from __future__ import annotations
 import json
 import math
 import os
+import time
 import urllib.parse
 import urllib.request
+import urllib.error
 from datetime import datetime, timedelta, timezone
 
 from .config import DATA
@@ -25,18 +27,35 @@ PAGEVIEWS_URL = (
     "en.wikipedia/all-access/user/{article}/daily/{start}/{end}"
 )
 MAX_AGE_HOURS = 24
+REQUEST_PAUSE_SECONDS = 1.0
 
 
-def _request_json(url):
-    request = urllib.request.Request(
-        url,
-        headers={
-            "User-Agent": "Stock-Radar research bot contact via repository",
-            "Accept": "application/json",
-        },
-    )
-    with urllib.request.urlopen(request, timeout=45) as response:
-        return json.loads(response.read().decode("utf-8"))
+def _request_json(url, retries=3):
+    for attempt in range(retries + 1):
+        request = urllib.request.Request(
+            url,
+            headers={
+                "User-Agent": (
+                    "Stock-Radar/1.0 "
+                    "(https://github.com/ththom1985/stock-radar)"
+                ),
+                "Accept": "application/json",
+            },
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=45) as response:
+                return json.loads(response.read().decode("utf-8"))
+        except urllib.error.HTTPError as exc:
+            if exc.code != 429 or attempt >= retries:
+                raise
+            retry_after = exc.headers.get("Retry-After")
+            delay = (
+                float(retry_after)
+                if retry_after and retry_after.replace(".", "", 1).isdigit()
+                else 2**attempt
+            )
+            time.sleep(max(1.0, min(delay, 30.0)))
+    raise RuntimeError("unreachable Wikimedia retry state")
 
 
 def resolve_article(company_name):
@@ -52,17 +71,25 @@ def resolve_article(company_name):
         }
     )
     results = ((_request_json(f"{SEARCH_URL}?{query}").get("query") or {}).get("search") or [])
+    return select_article(company_name, results)
+
+
+def select_article(company_name, results):
     if not results:
         return None
     normalized = _normalize(company_name)
+    company_tokens = set(normalized.split())
     ranked = []
     for result in results:
         title = result.get("title")
         if not title:
             continue
         title_normalized = _normalize(title)
-        overlap = len(set(normalized.split()) & set(title_normalized.split()))
+        overlap = len(company_tokens & set(title_normalized.split()))
         exact = normalized == title_normalized
+        minimum_overlap = max(1, math.ceil(len(company_tokens) / 2))
+        if not exact and overlap < minimum_overlap:
+            continue
         ranked.append(((exact, overlap, -len(title)), title))
     return max(ranked)[1] if ranked else None
 
@@ -185,6 +212,8 @@ def fetch_wikipedia_signals(rows, max_new=None, force=False, verbose=True):
             failures[symbol] = str(exc)[:200]
         if verbose:
             print(f"  Wikipedia attention {index}/{len(candidates)}")
+        if index < len(candidates):
+            time.sleep(REQUEST_PAUSE_SECONDS)
     if candidates:
         cache["_meta"] = schema_meta(
             "stock-radar-wikipedia-attention-cache",
