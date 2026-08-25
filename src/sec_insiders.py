@@ -19,6 +19,7 @@ from .persistence import (
 from .sec_companyfacts import (
     REQUEST_PAUSE_SECONDS,
     load_sec_ticker_map,
+    normalize_sec_user_agent,
     request_sec_json,
 )
 
@@ -43,6 +44,9 @@ def _fresh(entry):
 
 
 def _request_text(url, user_agent, timeout=30):
+    user_agent = normalize_sec_user_agent(user_agent)
+    if not user_agent:
+        raise ValueError("SEC_USER_AGENT is required by SEC fair-access policy")
     request = urllib.request.Request(
         url,
         headers={
@@ -204,7 +208,7 @@ def _recent_form4_filings(submissions, today=None):
 
 
 def fetch_insider_signals(symbols, max_new=None, force=False, verbose=True):
-    user_agent = os.environ.get("SEC_USER_AGENT", "").strip()
+    user_agent = normalize_sec_user_agent()
     cache = load_json(CACHE_PATH, expected_type=dict, default={})
     if not user_agent:
         return {

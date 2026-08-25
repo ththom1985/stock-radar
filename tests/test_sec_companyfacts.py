@@ -1,6 +1,10 @@
 import unittest
 
-from src.sec_companyfacts import merge_official_fundamentals, parse_companyfacts
+from src.sec_companyfacts import (
+    merge_official_fundamentals,
+    normalize_sec_user_agent,
+    parse_companyfacts,
+)
 
 
 def fact(tag, values):
@@ -26,6 +30,20 @@ def fact(tag, values):
 
 
 class SecCompanyfactsTests(unittest.TestCase):
+    def test_sec_user_agent_strips_bom_and_edge_noise(self):
+        self.assertEqual(
+            normalize_sec_user_agent(
+                "\ufeff Stock-Radar research test@example.com\r\n"
+            ),
+            "Stock-Radar research test@example.com",
+        )
+
+    def test_sec_user_agent_rejects_control_and_non_ascii_characters(self):
+        with self.assertRaisesRegex(ValueError, "control"):
+            normalize_sec_user_agent("Stock-Radar\nInjected: value")
+        with self.assertRaisesRegex(ValueError, "printable ASCII"):
+            normalize_sec_user_agent("Stock-Radar tést@example.com")
+
     def test_reduces_annual_facts_and_derives_fcf(self):
         facts = {}
         facts.update(

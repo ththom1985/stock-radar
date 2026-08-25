@@ -24,6 +24,7 @@ COMPANYFACTS_URL = "https://data.sec.gov/api/xbrl/companyfacts/CIK{cik:010d}.jso
 MAX_AGE_DAYS = 30
 TICKER_MAP_MAX_AGE_DAYS = 7
 REQUEST_PAUSE_SECONDS = 0.12
+_EDGE_NOISE = "\ufeff\u200b\u2060 \t\r\n"
 
 TAG_CANDIDATES = {
     "revenue": (
@@ -68,7 +69,26 @@ def _is_fresh(entry, max_age_days):
     return parsed >= datetime.now(timezone.utc) - timedelta(days=max_age_days)
 
 
+def normalize_sec_user_agent(value=None):
+    raw = os.environ.get("SEC_USER_AGENT", "") if value is None else str(value)
+    user_agent = raw.strip(_EDGE_NOISE)
+    if not user_agent:
+        return ""
+    if any(ord(character) < 32 or ord(character) == 127 for character in user_agent):
+        raise ValueError("SEC_USER_AGENT contains an HTTP control character")
+    try:
+        user_agent.encode("ascii")
+    except UnicodeEncodeError as exc:
+        raise ValueError(
+            "SEC_USER_AGENT must contain printable ASCII only; use a plain name and email"
+        ) from exc
+    return user_agent
+
+
 def request_sec_json(url, user_agent, timeout=30):
+    user_agent = normalize_sec_user_agent(user_agent)
+    if not user_agent:
+        raise ValueError("SEC_USER_AGENT is required by SEC fair-access policy")
     request = urllib.request.Request(
         url,
         headers={
@@ -217,7 +237,7 @@ def parse_companyfacts(payload):
 
 def fetch_sec_companyfacts(symbols, max_new=None, force=False, verbose=True):
     """Refresh a bounded number of SEC-mapped symbols and retain stale-good data."""
-    user_agent = os.environ.get("SEC_USER_AGENT", "").strip()
+    user_agent = normalize_sec_user_agent()
     cache = load_json(CACHE_PATH, expected_type=dict, default={})
     if not user_agent:
         return {
