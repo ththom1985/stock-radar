@@ -660,7 +660,8 @@ investment advice.
 | FRED | 10Y–2Y curve, high-yield spread, NFCI risk regime | Daily cache; source-series delay | Active when free `FRED_API_KEY` is set |
 | ECB / Bundesbank | EU macro regime | Series dependent | Not yet wired; explicit gap |
 | FINRA | Consolidated short interest, days-to-cover and multi-period trend | 10-day cache; 15 prioritized USD equities per run; source publishes twice monthly | Adapter active when free Public API credentials are set |
-| House / Senate disclosures | Congressional transactions | Up to 45-day reporting lag | Not yet wired; explicit gap |
+| House Clerk PTR | Official yearly index ZIP plus official PTR PDFs | 24-hour cache; 20 new documents per run; up to 45-day reporting lag | Active and incrementally cached |
+| Senate EFDS PTR | Official CSRF/session portal | Up to 45-day reporting lag | Adapter boundary requires explicit statutory-use acknowledgement before activation |
 | CFTC / CBOE | Positioning and put/call regime | Publication dependent | Not yet wired; explicit gap |
 | Yahoo options | Self-computed Black-Scholes GEX from IV/open interest | 18-hour cache; five symbols per run by default | Active, bounded, US USD company equities only |
 | Wikimedia / Reddit / careers pages | Attention and hiring trends | Daily/periodic | Not yet wired; explicit gap |

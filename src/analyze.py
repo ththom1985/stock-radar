@@ -22,6 +22,7 @@ from .assets import (
     is_company,
 )
 from .config import DATA, OUTPUT, TOP_N
+from .congress_trades import fetch_congress_signals
 from .data_quality import OUTPUT_SCHEMA, OUTPUT_SCHEMA_VERSION, build_data_status
 from .deep_fundamentals import fetch_deep
 from .earnings import days_until, fetch_earnings
@@ -850,17 +851,23 @@ def run(with_news=True, with_fundamentals=True):
         gex_by_symbol, gex_source_status = fetch_gex_signals(rows)
         short_interest_by_symbol, finra_source_status = fetch_finra_signals(rows)
         institutional_by_symbol, sec_13f_status = fetch_13f_signals(rows)
+        congress_by_symbol, congress_source_status = fetch_congress_signals(rows)
         fred_regime, fred_source_status = fetch_fred_regime()
     else:
         gex_by_symbol = {}
         short_interest_by_symbol = {}
         institutional_by_symbol = {}
+        congress_by_symbol = {}
         gex_source_status = {"status": "skipped", "reason": "market-data-only pipeline"}
         finra_source_status = {
             "status": "skipped",
             "reason": "market-data-only pipeline",
         }
         sec_13f_status = {"status": "skipped", "reason": "market-data-only pipeline"}
+        congress_source_status = {
+            "status": "skipped",
+            "reason": "market-data-only pipeline",
+        }
         fred_regime = {}
         fred_source_status = {"status": "skipped", "reason": "market-data-only pipeline"}
     for row in rows:
@@ -891,6 +898,7 @@ def run(with_news=True, with_fundamentals=True):
         gex_by_symbol,
         short_interest_by_symbol,
         institutional_by_symbol,
+        congress_by_symbol,
         now=now,
     )
     expert_weights = load_score_weights()
@@ -1058,6 +1066,7 @@ def run(with_news=True, with_fundamentals=True):
         "options_gex_status": gex_source_status,
         "finra_short_interest_status": finra_source_status,
         "sec_13f_status": sec_13f_status,
+        "congress_trades_status": congress_source_status,
         "fred_status": fred_source_status,
         "fx_status": fx_result.status,
         "macro": macro,

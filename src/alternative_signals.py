@@ -41,6 +41,7 @@ def build_alternative_signals(
     gex=None,
     short_interest=None,
     institutional=None,
+    congress=None,
     now=None,
 ):
     now = now or datetime.now(timezone.utc)
@@ -105,6 +106,21 @@ def build_alternative_signals(
                 "limitations": institutional.get("limitations"),
             },
         }
+    if isinstance(congress, dict) and _number(congress.get("score")) is not None:
+        raw["congress"] = {
+            "score": congress["score"],
+            "observed_at": congress.get("latest_transaction_date"),
+            "source": congress.get("source"),
+            "expected_delay": congress.get("expected_delay"),
+            "evidence": {
+                "trade_count": congress.get("trade_count"),
+                "purchase_count": congress.get("purchase_count"),
+                "sale_count": congress.get("sale_count"),
+                "trades": congress.get("trades"),
+                "fetched_at": congress.get("fetched_at"),
+                "limitations": congress.get("limitations"),
+            },
+        }
     for name in SIGNAL_SPECS:
         supplied = (row.get("raw_alternative_signals") or {}).get(name)
         if name not in raw and isinstance(supplied, dict):
@@ -162,12 +178,14 @@ def attach_alternative_signals(
     gex_by_symbol=None,
     short_interest_by_symbol=None,
     institutional_by_symbol=None,
+    congress_by_symbol=None,
     now=None,
 ):
     insider_by_symbol = insider_by_symbol or {}
     gex_by_symbol = gex_by_symbol or {}
     short_interest_by_symbol = short_interest_by_symbol or {}
     institutional_by_symbol = institutional_by_symbol or {}
+    congress_by_symbol = congress_by_symbol or {}
     for row in rows:
         row["alternative_signals"] = build_alternative_signals(
             row,
@@ -175,6 +193,7 @@ def attach_alternative_signals(
             gex=gex_by_symbol.get(row.get("symbol")),
             short_interest=short_interest_by_symbol.get(row.get("symbol")),
             institutional=institutional_by_symbol.get(row.get("symbol")),
+            congress=congress_by_symbol.get(row.get("symbol")),
             now=now,
         )
     return rows
