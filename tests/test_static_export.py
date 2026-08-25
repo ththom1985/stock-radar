@@ -361,6 +361,8 @@ class StaticExportTests(ProjectTempMixin, unittest.TestCase):
         self.assertIn("state.data.schema_version !== 3", html)
         self.assertIn("state.selected !== row.symbol", html)
         self.assertIn("localValue(sweet.lower)", html)
+        self.assertIn("localValue(analyst.target_price)", html)
+        self.assertIn("localizeTechnicalPoints", html)
         self.assertIn("Für Titel außerhalb USD", html)
         self.assertIn("Wahrscheinlichkeits-Selbstprüfung", html)
         self.assertIn("hydrateProbabilityForecasts", html)

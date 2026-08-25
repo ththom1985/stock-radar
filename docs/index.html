@@ -746,6 +746,16 @@
       const currency = row.currency || "USD";
       const localValue = (value) => Number.isFinite(value) ? value / rate : null;
       const currentLocal = localValue(row.price);
+      const localizeTechnicalPoints = (items) => {
+        if (currency === "USD") return items || [];
+        const clean = (items || []).filter((item) => !String(item).includes("USD"));
+        if ((items || []).length !== clean.length) {
+          clean.push("Maßgeblich sind die oben in Handelswährung gezeigten Marken.");
+        }
+        return [...new Set(clean)];
+      };
+      const sweetInvalidation = localizeTechnicalPoints(sweet.invalidation_signals);
+      const entryInvalidation = localizeTechnicalPoints(entryThesis.what_invalidates);
       const todayCard = (state.data.today?.candidates || []).find((item) => item.symbol === row.symbol);
       const plain = todayCard?.plain || {};
       const scenarios = (row.scenario_long || []).map((item) => `<div class="scenario">
@@ -852,7 +862,7 @@
         ${thesisList("Warum diese Zone", sweet.why_zone_here)}
         ${thesisList("Warum Grün oder nicht", sweet.why_green_or_not, sweet.tone === "green" ? "success" : sweet.tone === "red" ? "danger" : "warning")}
         ${thesisList("Was bestätigt", sweet.confirmation_needed)}
-        ${thesisList("Was invalidiert", sweet.invalidation_signals, "danger")}
+        ${thesisList("Was invalidiert", sweetInvalidation, "danger")}
         ${thesisList("Investor-Overlay", sweet.investor_overlay_reasons, "warning")}
         ${row.economic_exposure_country === "China" ? `<div class="section"><h3>China-Risikokontext</h3>${(jurisdiction.reasons || []).map((reason) => callout(reason, "danger")).join("")}<div class="muted">${escapeHtml(jurisdiction.heuristic_note || "")}</div></div>` : ""}
         <div class="summary"><strong>Research-Fazit:</strong> ${escapeHtml(row.research_summary || row.heuristic_summary || "–")}</div>
@@ -870,14 +880,14 @@
             <div class="stat"><span>Regime</span><strong>${escapeHtml(entryThesis.regime || "–")}</strong></div>
             <div class="stat"><span>Knife/Boden</span><strong>${escapeHtml(entryThesis.falling_knife_bottoming_status || "–")}</strong></div>
           </div>
-          ${entryThesis.available ? `${thesisList("Warum das Timing konstruktiv wirken kann", entryThesis.why_timing_may_be_good, "success")}${thesisList("Benötigte Bestätigung", entryThesis.what_confirms)}${thesisList("Invalidation", entryThesis.what_invalidates, "danger")}${thesisList("Stärkste Timing-Evidenz", entryThesis.strongest_supporting_evidence, "success")}${thesisList("Stärkste Gegenargumente", entryThesis.strongest_counterarguments, "warning")}` : `<div class="muted">Keine vollständigen technischen Tagesdaten; keine Entry-These.</div>`}
+          ${entryThesis.available ? `${thesisList("Warum das Timing konstruktiv wirken kann", localizeTechnicalPoints(entryThesis.why_timing_may_be_good), "success")}${thesisList("Benötigte Bestätigung", localizeTechnicalPoints(entryThesis.what_confirms))}${thesisList("Invalidation", entryInvalidation, "danger")}${thesisList("Stärkste Timing-Evidenz", localizeTechnicalPoints(entryThesis.strongest_supporting_evidence), "success")}${thesisList("Stärkste Gegenargumente", localizeTechnicalPoints(entryThesis.strongest_counterarguments), "warning")}` : `<div class="muted">Keine vollständigen technischen Tagesdaten; keine Entry-These.</div>`}
         </div>
         ${row.falling_knife ? callout(row.falling_knife.warning, "danger") : ""}
         ${row.bottoming ? callout(`Spekulative Bodenbildung: ${(row.bottoming.signals || []).join(" · ")}`, "warning") : ""}
         ${callout(row.bull_thesis, "success")}${callout(row.priced_in_note, "warning")}
         ${(row.risk_warnings || []).map((warning) => callout(warning, "danger")).join("")}
         <div class="section"><h3>Upside und Analysten getrennt</h3>
-          ${analyst.available ? `<div class="callout success">${analyst.analyst_count} Analysten · Konsens ${escapeHtml(analyst.consensus || "–")} · Ziel ${$number(analyst.target_price)} USD · Abstand ${percent(analyst.upside_pct)}. Keine Modellprognose.</div>` : `<div class="muted">Keine ausreichende Analystenabdeckung (mindestens 5 erforderlich).</div>`}
+          ${analyst.available ? `<div class="callout success">${analyst.analyst_count} Analysten · Konsens ${escapeHtml(analyst.consensus || "–")} · Ziel ${$number(localValue(analyst.target_price))} ${escapeHtml(currency)} · Abstand ${percent(analyst.upside_pct)}. Keine Modellprognose.</div>` : `<div class="muted">Keine ausreichende Analystenabdeckung (mindestens 5 erforderlich).</div>`}
           ${scenarios ? `<div class="scenario-grid">${scenarios}</div>` : `<div class="muted">Keine Szenariospannen verfügbar.</div>`}
         </div>
         <div class="section"><h3>Abwärtsstruktur und Beobachtungszone</h3>

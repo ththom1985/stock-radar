@@ -134,14 +134,17 @@ def _number(value, digits=2, suffix=""):
 
 
 def _scenario_table(row):
+    rate = row.get("fx_usd") if isinstance(row.get("fx_usd"), (int, float)) else 1
+    currency = row.get("currency") or "USD"
+    local = lambda value: value / rate if isinstance(value, (int, float)) and rate else None
     records = []
     for item in row.get("scenario_long") or []:
         records.append(
             {
                 "Horizont": item.get("label"),
                 "Referenzpfad (heuristisch)": _number(item.get("reference_change_pct"), 1, "%"),
-                "Spanne unten USD": _number(item.get("range_low_price"), 2),
-                "Spanne oben USD": _number(item.get("range_high_price"), 2),
+                f"Spanne unten {currency}": _number(local(item.get("range_low_price")), 2),
+                f"Spanne oben {currency}": _number(local(item.get("range_high_price")), 2),
                 "Status": "Noch nicht statistisch bestätigt",
             }
         )
@@ -244,7 +247,15 @@ def _render_sweet_spot(row):
         kind="success" if tone == "green" else "error" if tone == "red" else "warning",
     )
     _render_points("Was bestätigt", sweet.get("confirmation_needed"))
-    _render_points("Was invalidiert", sweet.get("invalidation_signals"), kind="error")
+    invalidation_points = sweet.get("invalidation_signals")
+    if currency != "USD" and any(
+        "USD" in str(point) for point in (invalidation_points or [])
+    ):
+        invalidation_points = [
+            "Ein abgeschlossener Kurs unter der oben gezeigten lokalen "
+            "Zonen-Untergrenze schwächt das Setup."
+        ]
+    _render_points("Was invalidiert", invalidation_points, kind="error")
     _render_points(
         "Investor-Overlay",
         sweet.get("investor_overlay_reasons"),
@@ -373,6 +384,9 @@ def _research_card(row, rank=None):
         valuation_thesis = row.get("valuation_thesis") or {}
         entry_thesis = row.get("entry_thesis") or {}
         jurisdiction = row.get("jurisdiction_risk") or {}
+        rate = row.get("fx_usd") if isinstance(row.get("fx_usd"), (int, float)) else 1
+        currency = row.get("currency") or "USD"
+        local = lambda value: value / rate if isinstance(value, (int, float)) and rate else None
         st.caption("Vollständiger Name")
         st.subheader(
             f"{prefix}{row.get('display_name_full') or row.get('short_name') or row.get('symbol')}"
@@ -491,7 +505,10 @@ def _research_card(row, rank=None):
         )
         _render_sweet_spot(row)
         header = st.columns(6)
-        header[0].metric("Completed-bar close (USD)", _number(row.get("price"), 2))
+        header[0].metric(
+            f"Schlusskurs ({currency})",
+            _number(row.get("price_local") or local(row.get("price")), 2),
+        )
         header[1].metric("Completed bar", row.get("bar_date") or "—")
         header[2].metric("Timing", _number(row.get("entry_timing_score"), 0, "/100"))
         header[3].metric("Trend", _number(row.get("longterm_score"), 0, "/100"))
@@ -521,11 +538,15 @@ def _research_card(row, rank=None):
                 "Benötigte Bestätigung",
                 entry_thesis.get("what_confirms"),
             )
-            _render_points(
-                "Invalidation",
-                entry_thesis.get("what_invalidates"),
-                kind="error",
-            )
+            invalidation = entry_thesis.get("what_invalidates")
+            if currency != "USD" and any(
+                "USD" in str(point) for point in (invalidation or [])
+            ):
+                invalidation = [
+                    "Maßgeblich ist die oben in Handelswährung gezeigte "
+                    "Zonen-Untergrenze."
+                ]
+            _render_points("Invalidation", invalidation, kind="error")
             _render_points(
                 "Stärkste Timing-Evidenz",
                 entry_thesis.get("strongest_supporting_evidence"),
@@ -550,9 +571,11 @@ def _research_card(row, rank=None):
 
         analyst = row.get("analyst_context") or {}
         if analyst.get("available"):
+            analyst_target = local(analyst.get("target_price"))
             st.info(
                 f"Analystenkonsens ({analyst.get('analyst_count')} Stimmen): "
-                f"{analyst.get('consensus') or '—'} · Ziel {_number(analyst.get('target_price'), 2)} USD · "
+                f"{analyst.get('consensus') or '—'} · Ziel "
+                f"{_number(analyst_target, 2)} {currency} · "
                 f"Abstand {_number(analyst.get('upside_pct'), 1, '%')}. "
                 "Separater Analystenkontext, keine Modellprognose."
             )
@@ -576,7 +599,7 @@ def _research_card(row, rank=None):
             st.write(
                 f"**Abwärtsstruktur:** Risiko {downside.get('risk') or '—'} · "
                 f"{downside.get('verdict') or ''} · Unterstützung 1 "
-                f"{_number(downside.get('support1'), 2)} USD "
+                f"{_number(local(downside.get('support1')), 2)} {currency} "
                 f"({_number(downside.get('support1_pct'), 1, '%')})"
             )
         scores = pd.DataFrame(
