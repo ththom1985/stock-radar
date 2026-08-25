@@ -90,6 +90,12 @@ def record_top_observations(rows, rankings, generated_at):
                     "evidence_quality": analysis.get("evidence_quality"),
                     "components": detail.get("components"),
                     "alternative_signals": source.get("alternative_signals") or {},
+                    "confluence_tier": (
+                        source.get("alternative_signals") or {}
+                    ).get("confluence_tier"),
+                    "contributing_groups": (
+                        source.get("alternative_signals") or {}
+                    ).get("contributing_groups") or [],
                     "actionable": False,
                 }
             )

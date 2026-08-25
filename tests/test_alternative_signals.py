@@ -90,6 +90,27 @@ class AlternativeSignalTests(unittest.TestCase):
         )
         self.assertEqual(result["activation_status"], "active")
         self.assertGreater(result["confluence_score"], 50)
+        self.assertEqual(result["confluence_tier"], "four_group")
+        self.assertEqual(result["contributing_group_count"], 4)
+
+    def test_three_groups_activate_without_tone_penalty(self):
+        result = build_alternative_signals(
+            {
+                "raw_alternative_signals": {
+                    "congress": {"score": 70, "observed_at": "2026-08-20"},
+                    "wikipedia": {"score": 60, "observed_at": "2026-08-24"},
+                }
+            },
+            insider={"score": 80, "fetched_at": "2026-08-24"},
+            now=datetime(2026, 8, 25, tzinfo=timezone.utc),
+        )
+        self.assertEqual(result["activation_status"], "active")
+        self.assertEqual(result["confluence_tier"], "three_group")
+        self.assertEqual(
+            [item["group"] for item in result["contributing_groups"]],
+            ["insider", "congress", "attention"],
+        )
+        self.assertEqual(result["tone_confirmation_bonus"], 0.0)
 
     def test_short_interest_recency_uses_settlement_not_fetch_time(self):
         result = build_alternative_signals(

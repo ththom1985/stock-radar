@@ -400,6 +400,17 @@ def _research_card(row, rank=None):
             st.error("China-Risikokontext (heuristic_unvalidated; kein bewiesener Abschlag)")
             for reason in jurisdiction.get("reasons") or []:
                 st.warning(reason)
+        alternative = row.get("alternative_signals") or {}
+        if alternative.get("activation_status") == "active":
+            groups = alternative.get("contributing_groups") or []
+            st.success(
+                f"Konfluenz {alternative.get('confluence_tier')} · "
+                f"{_number(alternative.get('confluence_score'), 1)}/100 · "
+                + ", ".join(
+                    f"{item.get('group')} {item.get('score')}"
+                    for item in groups
+                )
+            )
         jobs_signal = row.get("jobs_signal") or {}
         if jobs_signal.get("status") == "without_jobs_signal":
             st.caption("Jobs-Signal: ohne Jobs-Signal (keine zuverlässig konfigurierte direkte Karriereseite)")

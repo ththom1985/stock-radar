@@ -157,13 +157,13 @@ def build_alternative_signals(
     if isinstance(filing_diff, dict) and _number(filing_diff.get("score")) is not None:
         raw["filing_diff"] = {"score": filing_diff["score"], "observed_at": filing_diff.get("current_filing_date"), "source": filing_diff.get("source"), "expected_delay": filing_diff.get("expected_delay"), "evidence": {"current_form": filing_diff.get("current_form"), "current_filing_date": filing_diff.get("current_filing_date"), "previous_form": filing_diff.get("previous_form"), "new_paragraph_count": filing_diff.get("new_paragraph_count"), "intensified_count": filing_diff.get("intensified_count"), "new_risk_excerpts": filing_diff.get("new_risk_excerpts"), "source_url": filing_diff.get("source_url")}}
     if isinstance(earnings_tone, dict) and _number(earnings_tone.get("score")) is not None:
-        raw["earnings_tone"]={"score":earnings_tone["score"],"observed_at":(earnings_tone.get("current_period") or {}).get("conference_date"),"source":earnings_tone.get("source"),"expected_delay":earnings_tone.get("expected_delay"),"evidence":{k:earnings_tone.get(k) for k in ["current_tone","previous_tone","tone_shift","hedging_shift","qa_evasiveness_shift","cfo_tone_shift","reason","cfo_weight"]}}
+        period = earnings_tone.get("current_period") or {}
+        raw["earnings_tone"]={"score":earnings_tone["score"],"observed_at":period.get("conference_date") or period.get("filing_date") or period.get("period"),"source":earnings_tone.get("source"),"expected_delay":earnings_tone.get("expected_delay"),"evidence":{k:earnings_tone.get(k) for k in ["transcript_status","analysis_method","current_tone","previous_tone","tone_shift","hedging_shift","qa_evasiveness_shift","qa_status","cfo_tone_shift","reason","cfo_weight"]}}
     for name in SIGNAL_SPECS:
         supplied = (row.get("raw_alternative_signals") or {}).get(name)
         if name not in raw and isinstance(supplied, dict):
             raw[name] = supplied
 
-    weighted = []
     rendered = {}
     source_groups = set()
     for name, signal in raw.items():
@@ -177,8 +177,6 @@ def build_alternative_signals(
             if age is not None
             else 0.25
         )
-        centered = (max(0.0, min(100.0, score)) - 50.0) / 50.0
-        weighted.append((centered, recency))
         source_groups.add(spec["source_group"])
         rendered[name] = {
             **signal,
@@ -186,29 +184,67 @@ def build_alternative_signals(
             "recency_weight": round(recency, 4),
             "source_group": spec["source_group"],
         }
-    activation_groups = {
-        "insider": "insider" in rendered,
-        "congress": "congress" in rendered,
-        "attention": any(name in rendered for name in ("wikipedia", "jobs")),
-        "earnings_tone": "earnings_tone" in rendered,
+    group_members = {
+        "insider": ["insider"],
+        "congress": ["congress"],
+        "attention": ["wikipedia", "jobs"],
+        "earnings_tone": ["earnings_tone"],
     }
-    activated = all(activation_groups.values())
-    if weighted and activated:
-        denominator = sum(weight for _, weight in weighted)
-        centered = sum(value * weight for value, weight in weighted) / denominator
-        independence_bonus = min(10.0, max(0, len(source_groups) - 1) * 2.5)
-        confluence = 50.0 + centered * 40.0
-        if centered > 0:
-            confluence += independence_bonus
-        elif centered < 0:
-            confluence -= independence_bonus
-        confluence = round(max(0.0, min(100.0, confluence)), 1)
+    contributing_groups = []
+    for group, names in group_members.items():
+        members = [rendered[name] for name in names if name in rendered]
+        if not members:
+            continue
+        denominator = sum(item["recency_weight"] for item in members)
+        group_score = sum(
+            item["score"] * item["recency_weight"] for item in members
+        ) / denominator
+        contributing_groups.append(
+            {
+                "group": group,
+                "score": round(group_score, 1),
+                "signals": [name for name in names if name in rendered],
+            }
+        )
+    activated = len(contributing_groups) >= 3
+    confluence_tier = (
+        "four_group" if len(contributing_groups) == 4
+        else "three_group" if activated
+        else None
+    )
+    tone_bonus = 0.0
+    if activated:
+        base = sum(item["score"] for item in contributing_groups) / len(
+            contributing_groups
+        )
+        if len(contributing_groups) == 4:
+            tone = next(
+                item["score"]
+                for item in contributing_groups
+                if item["group"] == "earnings_tone"
+            )
+            other = sum(
+                item["score"]
+                for item in contributing_groups
+                if item["group"] != "earnings_tone"
+            ) / 3
+            if (tone > 55 and other > 55) or (tone < 45 and other < 45):
+                tone_bonus = 7.5 if base > 50 else -7.5
+        confluence = round(max(0.0, min(100.0, base + tone_bonus)), 1)
     else:
         confluence = None
+    activation_groups = {
+        name: any(item["group"] == name for item in contributing_groups)
+        for name in group_members
+    }
     return {
         "model_status": "heuristic_unvalidated",
         "actionable": False,
         "confluence_score": confluence,
+        "confluence_tier": confluence_tier,
+        "contributing_group_count": len(contributing_groups),
+        "contributing_groups": contributing_groups,
+        "tone_confirmation_bonus": tone_bonus,
         "activation_status": "active" if activated else "building",
         "activation_requirements": activation_groups,
         "missing_activation_groups": [
