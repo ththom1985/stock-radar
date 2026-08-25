@@ -26,6 +26,19 @@ SERIES = {
     "financial_conditions": "NFCI",
 }
 MAX_AGE_HOURS = 24
+_EDGE_NOISE = "\ufeff\u200b\u2060 \t\r\n"
+
+
+def normalize_fred_api_key(value=None):
+    raw = os.environ.get("FRED_API_KEY", "") if value is None else str(value)
+    api_key = raw.strip(_EDGE_NOISE)
+    if not api_key:
+        return ""
+    if any(ord(character) < 33 or ord(character) > 126 for character in api_key):
+        raise ValueError(
+            "FRED_API_KEY must contain printable non-whitespace ASCII only"
+        )
+    return api_key
 
 
 def _fresh(payload):
@@ -40,6 +53,9 @@ def _fresh(payload):
 
 
 def _latest_observation(series_id, api_key):
+    api_key = normalize_fred_api_key(api_key)
+    if not api_key:
+        raise ValueError("FRED_API_KEY is not configured")
     query = urllib.parse.urlencode(
         {
             "series_id": series_id,
@@ -105,7 +121,7 @@ def fetch_fred_regime(force=False):
     cache = load_json(CACHE_PATH, expected_type=dict, default={})
     if not force and _fresh(cache):
         return cache, {"status": "cached", "max_age_hours": MAX_AGE_HOURS}
-    api_key = os.environ.get("FRED_API_KEY", "").strip()
+    api_key = normalize_fred_api_key()
     if not api_key:
         return cache, {
             "status": "disabled",

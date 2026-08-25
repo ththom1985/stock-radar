@@ -6,6 +6,7 @@ import time
 import urllib.request
 import xml.etree.ElementTree as ET
 from datetime import date, datetime, timedelta, timezone
+from pathlib import PurePosixPath
 
 from .config import DATA
 from .persistence import (
@@ -57,6 +58,17 @@ def _request_text(url, user_agent, timeout=30):
     )
     with urllib.request.urlopen(request, timeout=timeout) as response:
         return response.read().decode("utf-8", errors="replace")
+
+
+def filing_document_url(cik, accession, primary_document):
+    raw_document = PurePosixPath(str(primary_document)).name
+    if not raw_document.lower().endswith(".xml"):
+        raise ValueError("SEC Form 4 primary document is not XML")
+    return ARCHIVES_URL.format(
+        cik=int(cik),
+        accession=str(accession).replace("-", ""),
+        document=raw_document,
+    )
 
 
 def _text(node, path):
@@ -239,10 +251,10 @@ def fetch_insider_signals(symbols, max_new=None, force=False, verbose=True):
             )
             transactions = []
             for filing in _recent_form4_filings(submissions):
-                url = ARCHIVES_URL.format(
-                    cik=cik,
-                    accession=filing["accession"].replace("-", ""),
-                    document=filing["document"],
+                url = filing_document_url(
+                    cik,
+                    filing["accession"],
+                    filing["document"],
                 )
                 transactions.extend(parse_form4(_request_text(url, user_agent)))
                 time.sleep(REQUEST_PAUSE_SECONDS)

@@ -2,7 +2,11 @@ import unittest
 from datetime import datetime, timezone
 
 from src.alternative_signals import build_alternative_signals
-from src.sec_insiders import parse_form4, summarize_transactions
+from src.sec_insiders import (
+    filing_document_url,
+    parse_form4,
+    summarize_transactions,
+)
 
 
 FORM4 = """<?xml version="1.0"?>
@@ -29,6 +33,17 @@ FORM4 = """<?xml version="1.0"?>
 
 
 class AlternativeSignalTests(unittest.TestCase):
+    def test_form4_url_strips_sec_xsl_rendering_path(self):
+        self.assertEqual(
+            filing_document_url(
+                320193,
+                "0001140361-26-033928",
+                "xslF345X06/form4.xml",
+            ),
+            "https://www.sec.gov/Archives/edgar/data/320193/"
+            "000114036126033928/form4.xml",
+        )
+
     def test_parses_open_market_form4_purchase(self):
         transactions = parse_form4(FORM4)
         self.assertEqual(len(transactions), 1)

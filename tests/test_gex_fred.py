@@ -1,11 +1,16 @@
 import unittest
 from datetime import datetime, timezone
 
-from src.fred_regime import build_regime
+from src.fred_regime import build_regime, normalize_fred_api_key
 from src.options_gex import black_scholes_gamma, calculate_gex
 
 
 class GexFredTests(unittest.TestCase):
+    def test_fred_key_strips_bom_and_rejects_internal_whitespace(self):
+        self.assertEqual(normalize_fred_api_key("\ufeff abc123\r\n"), "abc123")
+        with self.assertRaisesRegex(ValueError, "printable"):
+            normalize_fred_api_key("abc 123")
+
     def test_black_scholes_gamma_is_positive(self):
         gamma = black_scholes_gamma(100, 100, 30 / 365.25, 0.25)
         self.assertGreater(gamma, 0)
