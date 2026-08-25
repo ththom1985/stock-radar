@@ -26,6 +26,7 @@ from .congress_trades import fetch_congress_signals
 from .data_quality import OUTPUT_SCHEMA, OUTPUT_SCHEMA_VERSION, build_data_status
 from .deep_fundamentals import fetch_deep
 from .earnings import days_until, fetch_earnings
+from .earnings_tone import fetch_earnings_tone_signals
 from .expert_layer import (
     SOURCE_CATALOG as EXPERT_SOURCE_CATALOG,
     attach_expert_analysis,
@@ -50,6 +51,7 @@ from .fundamental_score import (
 from .fundamentals import fetch_fundamentals
 from .fx import currency_for, get_fx_rates_with_status
 from .fred_regime import fetch_fred_regime
+from .filing_diffs import fetch_filing_diff_signals
 from .finra_short_interest import fetch_finra_signals
 from .geo import country_flag
 from .indicators import compute_features
@@ -866,6 +868,8 @@ def run(with_news=True, with_fundamentals=True):
         congress_by_symbol, congress_source_status = fetch_congress_signals(rows)
         wikipedia_by_symbol, wikipedia_source_status = fetch_wikipedia_signals(rows)
         jobs_by_symbol, jobs_coverage, jobs_source_status = fetch_job_signals(rows)
+        filing_diff_by_symbol, filing_diff_status = fetch_filing_diff_signals(rows)
+        earnings_tone_by_symbol, earnings_tone_status = fetch_earnings_tone_signals(rows)
         fred_regime, fred_source_status = fetch_fred_regime()
     else:
         gex_by_symbol = {}
@@ -874,6 +878,8 @@ def run(with_news=True, with_fundamentals=True):
         congress_by_symbol = {}
         wikipedia_by_symbol = {}
         jobs_by_symbol = {}
+        filing_diff_by_symbol = {}
+        earnings_tone_by_symbol = {}
         jobs_coverage = {
             row["symbol"]: {"status": "skipped_market_data_only"} for row in rows
         }
@@ -895,6 +901,8 @@ def run(with_news=True, with_fundamentals=True):
             "status": "skipped",
             "reason": "market-data-only pipeline",
         }
+        filing_diff_status = {"status":"skipped","reason":"market-data-only pipeline"}
+        earnings_tone_status = {"status":"skipped","reason":"market-data-only pipeline"}
         fred_regime = {}
         fred_source_status = {"status": "skipped", "reason": "market-data-only pipeline"}
     for row in rows:
@@ -935,6 +943,8 @@ def run(with_news=True, with_fundamentals=True):
         congress_by_symbol,
         wikipedia_by_symbol,
         jobs_by_symbol,
+        filing_diff_by_symbol,
+        earnings_tone_by_symbol,
         now=now,
     )
     expert_weights = load_score_weights()
@@ -1105,6 +1115,8 @@ def run(with_news=True, with_fundamentals=True):
         "congress_trades_status": congress_source_status,
         "wikipedia_attention_status": wikipedia_source_status,
         "job_postings_status": jobs_source_status,
+        "filing_diff_status": filing_diff_status,
+        "earnings_tone_status": earnings_tone_status,
         "fred_status": fred_source_status,
         "market_positioning_status": positioning_source_status,
         "fx_status": fx_result.status,

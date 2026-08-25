@@ -44,6 +44,8 @@ def build_alternative_signals(
     congress=None,
     wikipedia=None,
     jobs=None,
+    filing_diff=None,
+    earnings_tone=None,
     now=None,
 ):
     now = now or datetime.now(timezone.utc)
@@ -152,6 +154,10 @@ def build_alternative_signals(
                 "source_url": jobs.get("source_url"),
             },
         }
+    if isinstance(filing_diff, dict) and _number(filing_diff.get("score")) is not None:
+        raw["filing_diff"] = {"score": filing_diff["score"], "observed_at": filing_diff.get("current_filing_date"), "source": filing_diff.get("source"), "expected_delay": filing_diff.get("expected_delay"), "evidence": {"current_form": filing_diff.get("current_form"), "current_filing_date": filing_diff.get("current_filing_date"), "previous_form": filing_diff.get("previous_form"), "new_paragraph_count": filing_diff.get("new_paragraph_count"), "intensified_count": filing_diff.get("intensified_count"), "new_risk_excerpts": filing_diff.get("new_risk_excerpts"), "source_url": filing_diff.get("source_url")}}
+    if isinstance(earnings_tone, dict) and _number(earnings_tone.get("score")) is not None:
+        raw["earnings_tone"]={"score":earnings_tone["score"],"observed_at":(earnings_tone.get("current_period") or {}).get("conference_date"),"source":earnings_tone.get("source"),"expected_delay":earnings_tone.get("expected_delay"),"evidence":{k:earnings_tone.get(k) for k in ["current_tone","previous_tone","tone_shift","hedging_shift","qa_evasiveness_shift","cfo_tone_shift","reason","cfo_weight"]}}
     for name in SIGNAL_SPECS:
         supplied = (row.get("raw_alternative_signals") or {}).get(name)
         if name not in raw and isinstance(supplied, dict):
@@ -212,6 +218,8 @@ def attach_alternative_signals(
     congress_by_symbol=None,
     wikipedia_by_symbol=None,
     jobs_by_symbol=None,
+    filing_diff_by_symbol=None,
+    earnings_tone_by_symbol=None,
     now=None,
 ):
     insider_by_symbol = insider_by_symbol or {}
@@ -221,6 +229,8 @@ def attach_alternative_signals(
     congress_by_symbol = congress_by_symbol or {}
     wikipedia_by_symbol = wikipedia_by_symbol or {}
     jobs_by_symbol = jobs_by_symbol or {}
+    filing_diff_by_symbol = filing_diff_by_symbol or {}
+    earnings_tone_by_symbol = earnings_tone_by_symbol or {}
     for row in rows:
         row["alternative_signals"] = build_alternative_signals(
             row,
@@ -231,6 +241,8 @@ def attach_alternative_signals(
             congress=congress_by_symbol.get(row.get("symbol")),
             wikipedia=wikipedia_by_symbol.get(row.get("symbol")),
             jobs=jobs_by_symbol.get(row.get("symbol")),
+            filing_diff=filing_diff_by_symbol.get(row.get("symbol")),
+            earnings_tone=earnings_tone_by_symbol.get(row.get("symbol")),
             now=now,
         )
     return rows

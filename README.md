@@ -667,6 +667,8 @@ investment advice.
 | Yahoo options | Self-computed Black-Scholes GEX from IV/open interest | 18-hour cache; five symbols per run by default | Active, bounded, US USD company equities only |
 | Wikimedia Pageviews | 7-day average versus prior 28-day attention trend | 24-hour cache; 20 new title resolutions per run | Active official API; unresolved titles are explicit |
 | Direct career ATS | Open-job count trend for configured Greenhouse/Lever companies | Daily snapshot; score only after at least 7 days | Five verified companies active; all others explicitly `without_jobs_signal` |
+| SEC filing diffs | Consecutive 10-K/10-Q Risk Factors paragraph changes | 14-day cache; filing-time availability | Active, bounded; missing sections are explicit failures |
+| EarningsCall + Claude | Genuine call transcript tone, hedging, Q&A evasiveness and CFO-weighted quarter shift | 30-day cache; three USD companies per run | Active only with genuine two-quarter transcripts and existing Anthropic key |
 | Reddit API | Mention-volume trend | — | Not activated; new Reddit API registration required |
 
 SEC requests require a descriptive Fair Access user agent containing a contact

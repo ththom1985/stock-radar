@@ -36,6 +36,7 @@ jobs:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           FINRA_CLIENT_ID: ${{ secrets.FINRA_CLIENT_ID }}
           FINRA_CLIENT_SECRET: ${{ secrets.FINRA_CLIENT_SECRET }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       - name: Check published data health
         continue-on-error: true
         run: python -m src.published_health
@@ -80,7 +81,9 @@ jobs:
             data/congress_trades.json \
             data/market_positioning.json \
             data/wikipedia_attention.json \
-            data/job_postings.json
+            data/job_postings.json \
+            data/filing_diffs.json \
+            data/earnings_tone.json
           do
             if [ -e "$optional" ]; then git add "$optional"; fi
           done
