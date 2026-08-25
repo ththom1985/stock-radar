@@ -40,6 +40,7 @@ def build_alternative_signals(
     insider=None,
     gex=None,
     short_interest=None,
+    institutional=None,
     now=None,
 ):
     now = now or datetime.now(timezone.utc)
@@ -88,6 +89,20 @@ def build_alternative_signals(
                 "change_percent": short_interest.get("change_percent"),
                 "period_trend_pct": short_interest.get("period_trend_pct"),
                 "limitations": short_interest.get("limitations"),
+            },
+        }
+    if isinstance(institutional, dict) and _number(institutional.get("score")) is not None:
+        raw["institutional"] = {
+            "score": institutional["score"],
+            "observed_at": institutional.get("report_period"),
+            "source": institutional.get("source"),
+            "expected_delay": institutional.get("expected_delay"),
+            "evidence": {
+                "report_period": institutional.get("report_period"),
+                "manager_count": institutional.get("manager_count"),
+                "changes": institutional.get("changes"),
+                "fetched_at": institutional.get("fetched_at"),
+                "limitations": institutional.get("limitations"),
             },
         }
     for name in SIGNAL_SPECS:
@@ -146,17 +161,20 @@ def attach_alternative_signals(
     insider_by_symbol=None,
     gex_by_symbol=None,
     short_interest_by_symbol=None,
+    institutional_by_symbol=None,
     now=None,
 ):
     insider_by_symbol = insider_by_symbol or {}
     gex_by_symbol = gex_by_symbol or {}
     short_interest_by_symbol = short_interest_by_symbol or {}
+    institutional_by_symbol = institutional_by_symbol or {}
     for row in rows:
         row["alternative_signals"] = build_alternative_signals(
             row,
             insider=insider_by_symbol.get(row.get("symbol")),
             gex=gex_by_symbol.get(row.get("symbol")),
             short_interest=short_interest_by_symbol.get(row.get("symbol")),
+            institutional=institutional_by_symbol.get(row.get("symbol")),
             now=now,
         )
     return rows

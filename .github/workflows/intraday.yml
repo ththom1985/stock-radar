@@ -75,7 +75,8 @@ jobs:
             data/valuation_history.json \
             data/options_gex.json \
             data/fred_regime.json \
-            data/finra_short_interest.json
+            data/finra_short_interest.json \
+            data/sec_13f_changes.json
           do
             if [ -e "$optional" ]; then git add "$optional"; fi
           done

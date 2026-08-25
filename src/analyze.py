@@ -86,6 +86,7 @@ from .recommendation_journal import (
 from .rating import radar_elo, radar_score, stars
 from .score import score_daily_signal, score_longterm
 from .sec_companyfacts import fetch_sec_companyfacts, merge_official_fundamentals
+from .sec_13f import fetch_13f_signals
 from .sec_insiders import fetch_insider_signals
 from .universe import load_universe
 from .valuation_history import update_valuation_history
@@ -848,15 +849,18 @@ def run(with_news=True, with_fundamentals=True):
     if not market_data_only:
         gex_by_symbol, gex_source_status = fetch_gex_signals(rows)
         short_interest_by_symbol, finra_source_status = fetch_finra_signals(rows)
+        institutional_by_symbol, sec_13f_status = fetch_13f_signals(rows)
         fred_regime, fred_source_status = fetch_fred_regime()
     else:
         gex_by_symbol = {}
         short_interest_by_symbol = {}
+        institutional_by_symbol = {}
         gex_source_status = {"status": "skipped", "reason": "market-data-only pipeline"}
         finra_source_status = {
             "status": "skipped",
             "reason": "market-data-only pipeline",
         }
+        sec_13f_status = {"status": "skipped", "reason": "market-data-only pipeline"}
         fred_regime = {}
         fred_source_status = {"status": "skipped", "reason": "market-data-only pipeline"}
     for row in rows:
@@ -886,6 +890,7 @@ def run(with_news=True, with_fundamentals=True):
         insider_by_symbol,
         gex_by_symbol,
         short_interest_by_symbol,
+        institutional_by_symbol,
         now=now,
     )
     expert_weights = load_score_weights()
@@ -1052,6 +1057,7 @@ def run(with_news=True, with_fundamentals=True):
         "sec_insider_status": insider_source_status,
         "options_gex_status": gex_source_status,
         "finra_short_interest_status": finra_source_status,
+        "sec_13f_status": sec_13f_status,
         "fred_status": fred_source_status,
         "fx_status": fx_result.status,
         "macro": macro,

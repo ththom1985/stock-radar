@@ -655,6 +655,7 @@ investment advice.
 | Yahoo Finance via yfinance | Completed daily OHLCV, global fundamentals, analyst context | Daily bars; fundamentals weekly | Active primary source |
 | SEC EDGAR Companyfacts | Official US annual accounting facts and five-period history | 30-day cache; filing-time data | Active when `SEC_USER_AGENT` is set |
 | SEC EDGAR Form 4 | Open-market insider purchases/sales and 21-day cluster purchases | 2-day cache; normally filed within two business days | Active when `SEC_USER_AGENT` is set |
+| SEC EDGAR 13F-HR | Quarter-over-quarter changes for five configured large managers | 7-day cache; up to 45-day filing delay | Active; stale-manager quarters are excluded from the current aggregate |
 | Stooq | Secondary EOD price source | Daily | Active only after Yahoo failure for conservatively mapped ordinary US tickers |
 | FRED | 10Y–2Y curve, high-yield spread, NFCI risk regime | Daily cache; source-series delay | Active when free `FRED_API_KEY` is set |
 | ECB / Bundesbank | EU macro regime | Series dependent | Not yet wired; explicit gap |
