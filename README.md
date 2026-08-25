@@ -665,7 +665,9 @@ investment advice.
 | CFTC TFF | S&P 500, Nasdaq-100 and VIX asset-manager/leveraged-money positioning | 7-day cache; Tuesday positions published Friday | Active official market-positioning context |
 | CBOE Put/Call | Put/call ratios | Legacy CSV 404; current CDN 403; DataShop commercial | Explicitly unavailable as a free machine feed; CFTC VIX is labelled as substitute context, not the same series |
 | Yahoo options | Self-computed Black-Scholes GEX from IV/open interest | 18-hour cache; five symbols per run by default | Active, bounded, US USD company equities only |
-| Wikimedia / Reddit / careers pages | Attention and hiring trends | Daily/periodic | Not yet wired; explicit gap |
+| Wikimedia Pageviews | 7-day average versus prior 28-day attention trend | 24-hour cache; 20 new title resolutions per run | Active official API; unresolved titles are explicit |
+| Direct career ATS | Open-job count trend for configured Greenhouse/Lever companies | Daily snapshot; score only after at least 7 days | Five verified companies active; all others explicitly `without_jobs_signal` |
+| Reddit API | Mention-volume trend | — | Not activated; new Reddit API registration required |
 
 SEC requests require a descriptive Fair Access user agent containing a contact
 email:

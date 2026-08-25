@@ -400,6 +400,20 @@ def _research_card(row, rank=None):
             st.error("China-Risikokontext (heuristic_unvalidated; kein bewiesener Abschlag)")
             for reason in jurisdiction.get("reasons") or []:
                 st.warning(reason)
+        jobs_signal = row.get("jobs_signal") or {}
+        if jobs_signal.get("status") == "without_jobs_signal":
+            st.caption("Jobs-Signal: ohne Jobs-Signal (keine zuverlässig konfigurierte direkte Karriereseite)")
+        elif jobs_signal.get("status") == "collecting_history":
+            st.caption(
+                f"Jobs-Signal: {jobs_signal.get('open_jobs')} offene Stellen · "
+                "Baseline wird gesammelt (mindestens 7 Tage)"
+            )
+        elif jobs_signal.get("status") == "ok":
+            st.caption(
+                f"Jobs-Signal: {jobs_signal.get('open_jobs')} offen · "
+                f"Trend {jobs_signal.get('change_pct')}% seit "
+                f"{jobs_signal.get('baseline_date')}"
+            )
         expert = row.get("expert_analysis") or {}
         if expert:
             st.markdown("#### Experten-Composite")

@@ -53,6 +53,7 @@ from .fred_regime import fetch_fred_regime
 from .finra_short_interest import fetch_finra_signals
 from .geo import country_flag
 from .indicators import compute_features
+from .job_postings import fetch_job_signals
 from .insights import (
     INSIGHT_CONTRACT_VERSION,
     INSIGHT_STATUS,
@@ -92,6 +93,7 @@ from .sec_13f import fetch_13f_signals
 from .sec_insiders import fetch_insider_signals
 from .universe import load_universe
 from .valuation_history import update_valuation_history
+from .wikipedia_attention import fetch_wikipedia_signals
 
 FAILED_MANIFEST = DATA / "failed_symbols.json"
 COMPARABLE_FUNDAMENTAL_FIELDS = (
@@ -862,12 +864,19 @@ def run(with_news=True, with_fundamentals=True):
         short_interest_by_symbol, finra_source_status = fetch_finra_signals(rows)
         institutional_by_symbol, sec_13f_status = fetch_13f_signals(rows)
         congress_by_symbol, congress_source_status = fetch_congress_signals(rows)
+        wikipedia_by_symbol, wikipedia_source_status = fetch_wikipedia_signals(rows)
+        jobs_by_symbol, jobs_coverage, jobs_source_status = fetch_job_signals(rows)
         fred_regime, fred_source_status = fetch_fred_regime()
     else:
         gex_by_symbol = {}
         short_interest_by_symbol = {}
         institutional_by_symbol = {}
         congress_by_symbol = {}
+        wikipedia_by_symbol = {}
+        jobs_by_symbol = {}
+        jobs_coverage = {
+            row["symbol"]: {"status": "skipped_market_data_only"} for row in rows
+        }
         gex_source_status = {"status": "skipped", "reason": "market-data-only pipeline"}
         finra_source_status = {
             "status": "skipped",
@@ -878,9 +887,18 @@ def run(with_news=True, with_fundamentals=True):
             "status": "skipped",
             "reason": "market-data-only pipeline",
         }
+        wikipedia_source_status = {
+            "status": "skipped",
+            "reason": "market-data-only pipeline",
+        }
+        jobs_source_status = {
+            "status": "skipped",
+            "reason": "market-data-only pipeline",
+        }
         fred_regime = {}
         fred_source_status = {"status": "skipped", "reason": "market-data-only pipeline"}
     for row in rows:
+        row["jobs_signal"] = jobs_coverage.get(row["symbol"])
         catalyst_values = [
             value
             for value in (
@@ -915,6 +933,8 @@ def run(with_news=True, with_fundamentals=True):
         short_interest_by_symbol,
         institutional_by_symbol,
         congress_by_symbol,
+        wikipedia_by_symbol,
+        jobs_by_symbol,
         now=now,
     )
     expert_weights = load_score_weights()
@@ -1083,6 +1103,8 @@ def run(with_news=True, with_fundamentals=True):
         "finra_short_interest_status": finra_source_status,
         "sec_13f_status": sec_13f_status,
         "congress_trades_status": congress_source_status,
+        "wikipedia_attention_status": wikipedia_source_status,
+        "job_postings_status": jobs_source_status,
         "fred_status": fred_source_status,
         "market_positioning_status": positioning_source_status,
         "fx_status": fx_result.status,

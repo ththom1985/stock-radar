@@ -92,7 +92,9 @@ jobs:
             data/finra_short_interest.json \
             data/sec_13f_changes.json \
             data/congress_trades.json \
-            data/market_positioning.json
+            data/market_positioning.json \
+            data/wikipedia_attention.json \
+            data/job_postings.json
           do
             if [ -e "$optional" ]; then git add "$optional"; fi
           done

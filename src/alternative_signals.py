@@ -42,6 +42,8 @@ def build_alternative_signals(
     short_interest=None,
     institutional=None,
     congress=None,
+    wikipedia=None,
+    jobs=None,
     now=None,
 ):
     now = now or datetime.now(timezone.utc)
@@ -121,6 +123,35 @@ def build_alternative_signals(
                 "limitations": congress.get("limitations"),
             },
         }
+    if isinstance(wikipedia, dict) and _number(wikipedia.get("score")) is not None:
+        raw["wikipedia"] = {
+            "score": wikipedia["score"],
+            "observed_at": wikipedia.get("last_success_at"),
+            "source": wikipedia.get("source"),
+            "expected_delay": wikipedia.get("expected_delay"),
+            "evidence": {
+                "article": wikipedia.get("article"),
+                "trend_change_pct": wikipedia.get("trend_change_pct"),
+                "recent_7d_average": wikipedia.get("recent_7d_average"),
+                "prior_28d_average": wikipedia.get("prior_28d_average"),
+                "source_url": wikipedia.get("source_url"),
+            },
+        }
+    if isinstance(jobs, dict) and _number(jobs.get("score")) is not None:
+        raw["jobs"] = {
+            "score": jobs["score"],
+            "observed_at": jobs.get("last_success_at"),
+            "source": jobs.get("source"),
+            "expected_delay": jobs.get("expected_delay"),
+            "evidence": {
+                "open_jobs": jobs.get("open_jobs"),
+                "baseline_jobs": jobs.get("baseline_jobs"),
+                "baseline_date": jobs.get("baseline_date"),
+                "change_count": jobs.get("change_count"),
+                "change_pct": jobs.get("change_pct"),
+                "source_url": jobs.get("source_url"),
+            },
+        }
     for name in SIGNAL_SPECS:
         supplied = (row.get("raw_alternative_signals") or {}).get(name)
         if name not in raw and isinstance(supplied, dict):
@@ -179,6 +210,8 @@ def attach_alternative_signals(
     short_interest_by_symbol=None,
     institutional_by_symbol=None,
     congress_by_symbol=None,
+    wikipedia_by_symbol=None,
+    jobs_by_symbol=None,
     now=None,
 ):
     insider_by_symbol = insider_by_symbol or {}
@@ -186,6 +219,8 @@ def attach_alternative_signals(
     short_interest_by_symbol = short_interest_by_symbol or {}
     institutional_by_symbol = institutional_by_symbol or {}
     congress_by_symbol = congress_by_symbol or {}
+    wikipedia_by_symbol = wikipedia_by_symbol or {}
+    jobs_by_symbol = jobs_by_symbol or {}
     for row in rows:
         row["alternative_signals"] = build_alternative_signals(
             row,
@@ -194,6 +229,8 @@ def attach_alternative_signals(
             short_interest=short_interest_by_symbol.get(row.get("symbol")),
             institutional=institutional_by_symbol.get(row.get("symbol")),
             congress=congress_by_symbol.get(row.get("symbol")),
+            wikipedia=wikipedia_by_symbol.get(row.get("symbol")),
+            jobs=jobs_by_symbol.get(row.get("symbol")),
             now=now,
         )
     return rows
