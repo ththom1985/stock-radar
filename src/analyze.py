@@ -96,6 +96,7 @@ from .sec_13f import fetch_13f_signals
 from .sec_insiders import fetch_insider_signals
 from .universe import load_universe
 from .valuation_history import update_valuation_history
+from .today_view import build_today_view
 from .wikipedia_attention import fetch_wikipedia_signals
 
 FAILED_MANIFEST = DATA / "failed_symbols.json"
@@ -442,6 +443,7 @@ def run(with_news=True, with_fundamentals=True):
         raise RuntimeError("Intraday mode was removed: this pipeline uses completed daily bars only")
 
     now = datetime.now(timezone.utc)
+    previous_snapshot = load_json(OUTPUT / "latest.json", expected_type=dict, default={})
     market_data_only = os.environ.get("STOCK_RADAR_MARKET_DATA_ONLY") == "1"
     if market_data_only:
         with_news = False
@@ -1142,6 +1144,11 @@ def run(with_news=True, with_fundamentals=True):
             insight_contract=INSIGHT_CONTRACT_VERSION,
         ),
     }
+    result["today"] = build_today_view(
+        rows,
+        previous_snapshot=previous_snapshot,
+        price_histories=fetched.prices,
+    )
     atomic_write_json(
         FAILED_MANIFEST,
         {

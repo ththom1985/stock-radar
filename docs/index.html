@@ -97,6 +97,11 @@
     .list { max-height: 720px; overflow: auto; }
     .list-row { width: 100%; display: grid; grid-template-columns: 36px 82px minmax(0, 1fr) 70px; gap: 8px; align-items: center; padding: 10px 12px; border: 0; border-bottom: 1px solid var(--cp-border); border-radius: 0; background: var(--cp-surface); text-align: left; cursor: pointer; }
     .list-row:hover, .list-row.selected { background: var(--cp-accent-soft); }
+    .today-card { width: 100%; display: block; padding: 14px; border: 0; border-bottom: 1px solid var(--cp-border); background: var(--cp-surface); text-align: left; cursor: pointer; }
+    .today-card:hover, .today-card.selected { background: var(--cp-accent-soft); }
+    .today-card-head { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
+    .traffic { font-weight:800; margin:8px 0 5px; }
+    .traffic.green { color:var(--cp-success); } .traffic.yellow { color:var(--cp-warning); } .traffic.red { color:var(--cp-danger); }
     .symbol { font-family: Consolas, "Courier New", monospace; font-weight: 800; }
     .score { color: var(--cp-accent); font-weight: 800; text-align: right; }
     .row-name { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -179,7 +184,8 @@
       </section>
       <div class="notice">Keine Anlageberatung. Radar-Insights bleiben <strong>heuristic_unvalidated</strong>. Kalibrierte Materialbewegungs-Wahrscheinlichkeiten erscheinen ausschließlich nach bestandenen strikten Freigabekriterien und fließen nie in Ranking, Sweet Spot oder Farbe ein.</div>
       <nav id="nav" class="nav">
-        <button class="nav-button active" data-view="sweet_spot">Sweet Spot</button>
+        <button class="nav-button active" data-view="today">Heute</button>
+        <button class="nav-button" data-view="sweet_spot">Sweet Spot</button>
         <button class="nav-button" data-view="daily_setups">Tages-Setups</button>
         <button class="nav-button" data-view="undervalued_quality">Unterbewertet</button>
         <button class="nav-button" data-view="analyst_potential">Potenzial</button>
@@ -216,9 +222,10 @@
   </main>
   <script>
     const MAX_OUTPUT_AGE_HOURS = 36;
-    const state = { data: null, bySymbol: new Map(), view: "sweet_spot", selected: null, gateFailures: [] };
+    const state = { data: null, bySymbol: new Map(), view: "today", selected: null, gateFailures: [] };
     const $ = (id) => document.getElementById(id);
     const categoryTitles = {
+      today: "Beste Einstiegs-Kandidaten heute",
       sweet_spot: "Sweet-Spot-Beobachtungszone",
       daily_setups: "Tages-Setups",
       undervalued_quality: "Unterbewertet",
@@ -254,7 +261,9 @@
       return new Intl.NumberFormat("de-DE", { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(value);
     };
     const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[char]));
-    const category = () => state.view === "sweet_spot"
+    const category = () => state.view === "today"
+      ? { formula: state.data?.today?.summary || "Timing und Bewertung gemeinsam" }
+      : state.view === "sweet_spot"
       ? { formula: "Bestätigtes Grün zuerst, danach Amber-Beobachtungen; Score = heuristische Evidenzqualität, keine Wahrscheinlichkeit" }
       : state.data.insight_rankings?.categories?.[state.view] || null;
 
@@ -521,6 +530,15 @@
     function categoryItems() {
       const currency = $("currency").value;
       const query = $("search").value.trim().toLowerCase();
+      if (state.view === "today") {
+        return (state.data.today?.candidates || []).map((item) => ({
+          symbol: item.symbol,
+          score: item.evidence_score,
+          today: item,
+          reasons: [item.why],
+          components: {}
+        }));
+      }
       if (state.view === "expert_long" || state.view === "expert_short") {
         const horizon = state.view === "expert_long" ? "long_term" : "short_term";
         let items = state.data.expert_layer?.rankings?.[horizon] || [];
@@ -576,15 +594,41 @@
       $("health").hidden = true;
       $("cockpit").hidden = false;
       $("controls").hidden = false;
+      $("currency").hidden = state.view === "today";
       const items = categoryItems();
       const cat = category();
       $("list-title").textContent = categoryTitles[state.view];
       $("list-subtitle").textContent = state.view === "all"
         ? "Alphabetische Suche, kein globales Cross-Currency-Ranking"
+        : state.view === "today"
+        ? (state.data.today?.summary || "Timing und Bewertung gemeinsam")
         : state.view === "expert_long" || state.view === "expert_short"
         ? "Konfigurierter Composite · fehlende Faktoren werden nicht erfunden · keine Anlageberatung"
         : `${$("currency").value} · ${cat?.formula || ""}`;
       $("result-count").textContent = `${items.length} sichtbar`;
+      if (state.view === "today") {
+        const headline = state.data.today?.headline || "Heute keine belastbare Aussage";
+        $("list-title").textContent = headline;
+        $("rows").innerHTML = items.map((item) => {
+          const row = state.bySymbol.get(item.symbol) || {};
+          const value = item.today || {};
+          const lamp = value.light === "green" ? "🟢" : value.light === "yellow" ? "🟡" : "🔴";
+          const zone = value.zone ? `${$number(value.zone.lower)}–${$number(value.zone.upper)} ${escapeHtml(value.zone.currency || "")}` : "keine belastbare Zone";
+          return `<button class="today-card ${item.symbol === state.selected ? "selected" : ""}" data-symbol="${escapeHtml(item.symbol)}">
+            <div class="today-card-head"><div><strong>${escapeHtml(row.display_name_full || row.short_name || item.symbol)}</strong><div class="symbol">${escapeHtml(item.symbol)}</div></div><strong>${$number(value.price)} ${escapeHtml(value.currency || "")}</strong></div>
+            <div class="traffic ${escapeHtml(value.light || "red")}">${lamp} ${escapeHtml(value.status_label || "")}</div>
+            <div>${escapeHtml(value.why || "")}</div><small class="row-meta">Einstiegszone: ${zone}</small>
+            ${value.confluence_tier ? `<span class="badge green">${(value.contributing_groups || []).length} Signale ✓</span>` : ""}
+            ${todayChart(value)}
+          </button>`;
+        }).join("");
+        $("rows").querySelectorAll(".today-card").forEach((button) => button.addEventListener("click", () => {
+          state.selected = button.dataset.symbol; renderList(); renderDetail(state.bySymbol.get(state.selected));
+        }));
+        if (!items.length) { state.selected = null; renderDetail(null); }
+        else if (!items.some((item) => item.symbol === state.selected)) { state.selected = items[0].symbol; renderList(); renderDetail(state.bySymbol.get(state.selected)); }
+        return;
+      }
       $("rows").innerHTML = items.map((item, index) => {
         const row = state.bySymbol.get(item.symbol) || {};
         return `<button class="list-row ${item.symbol === state.selected ? "selected" : ""}" data-symbol="${escapeHtml(item.symbol)}">
@@ -605,6 +649,18 @@
 
     function callout(text, tone = "warning") {
       return text ? `<div class="callout ${tone}">${escapeHtml(text)}</div>` : "";
+    }
+
+    function todayChart(value) {
+      const prices = (value.sparkline || []).filter(Number.isFinite);
+      const zone = value.zone || {};
+      if (prices.length < 2 || !Number.isFinite(zone.lower) || !Number.isFinite(zone.upper)) return "";
+      const all = [...prices, zone.lower, zone.upper];
+      const min = Math.min(...all), max = Math.max(...all), range = max - min || 1;
+      const y = (number) => 52 - ((number - min) / range) * 46;
+      const points = prices.map((number, index) => `${(index/(prices.length-1)*100).toFixed(2)},${y(number).toFixed(2)}`).join(" ");
+      const top = Math.min(y(zone.lower), y(zone.upper)), height = Math.abs(y(zone.lower)-y(zone.upper));
+      return `<svg viewBox="0 0 100 56" style="width:100%;height:68px;margin-top:8px" aria-label="Kursverlauf mit Einstiegszone"><rect x="0" y="${top}" width="100" height="${Math.max(2,height)}" fill="var(--cp-accent-soft)"></rect><polyline points="${points}" fill="none" stroke="var(--cp-text-muted)" stroke-width="1.6"></polyline><line x1="100" x2="100" y1="4" y2="53" stroke="var(--cp-accent)" stroke-width="2"></line></svg>`;
     }
 
     function thesisList(title, items, tone = "") {
@@ -655,6 +711,8 @@
       const probabilityPanel = renderProbabilityPanel(row);
       const jurisdiction = row.jurisdiction_risk || {};
       const phase = row.trend_phase || {};
+      const todayCard = (state.data.today?.candidates || []).find((item) => item.symbol === row.symbol);
+      const plain = todayCard?.plain || {};
       const scenarios = (row.scenario_long || []).map((item) => `<div class="scenario">
         <strong>${escapeHtml(item.label || "")}</strong>
         <span>Referenzpfad: ${percent(item.reference_change_pct)}</span>
@@ -744,6 +802,10 @@
         <div class="muted">Börsenland/Markt: ${escapeHtml(row.listing_country || "nicht verfügbar")} / ${escapeHtml(row.listing_market || "nicht verfügbar")}</div>
         <div class="muted">${escapeHtml(assetLabels[row.asset_type] || row.asset_type)} · ${escapeHtml(row.currency || "")} · Bar ${escapeHtml(row.bar_date || "–")}</div></div>
         <span class="badge">${$number(row.entry_timing_score, 0)}/100 Timing</span></div>
+        <div class="summary"><strong>1. Bewertung:</strong> ${escapeHtml(plain.valuation || "Bewertung ist derzeit nicht belastbar.")}</div>
+        <div class="summary"><strong>2. Timing:</strong> ${escapeHtml(plain.timing || row.entry_timing_reason || "Timingdaten fehlen.")}</div>
+        <div class="summary"><strong>3. Signale:</strong> ${escapeHtml(plain.signals || row.research_summary || "Signaldaten fehlen.")}</div>
+        <div class="summary"><strong>4. Risiko:</strong> ${escapeHtml(plain.risk || (row.risk_warnings || [])[0] || "Kein dominantes Einzelrisiko verfügbar.")}</div>
         ${probabilityPanel}
         ${expertPanel}
         ${sweetPanel}

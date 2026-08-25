@@ -1596,6 +1596,13 @@ def export_static(
         "market_data_contract": snapshot.get("market_data_contract") or {},
         "rankings": rankings,
         "insight_rankings": snapshot["insight_rankings"],
+        "today": snapshot.get("today") or {
+            "headline": "Heute keine belastbare Aussage",
+            "summary": "Der Heute-Presenter ist im Snapshot nicht verfügbar.",
+            "candidate_count": 0,
+            "candidates": [],
+            "changes": [],
+        },
         "expert_layer": snapshot.get("expert_layer") or {
             "model_status": "heuristic_unvalidated",
             "actionable": False,

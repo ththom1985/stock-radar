@@ -670,6 +670,127 @@ def _research_card(row, rank=None):
             )
 
 
+def _today_money(value, currency):
+    if not isinstance(value, (int, float)):
+        return "–"
+    symbol = {"USD": "$", "EUR": "€", "GBP": "£", "JPY": "¥"}.get(
+        currency, currency or ""
+    )
+    rendered = f"{value:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    return f"{rendered} {symbol}".strip()
+
+
+def _today_chart_svg(candidate):
+    prices = [
+        float(value)
+        for value in (candidate.get("sparkline") or [])
+        if isinstance(value, (int, float))
+    ]
+    zone = candidate.get("zone") or {}
+    lower, upper = zone.get("lower"), zone.get("upper")
+    if len(prices) < 2 or not all(
+        isinstance(value, (int, float)) for value in (lower, upper)
+    ):
+        return ""
+    values = [*prices, lower, upper]
+    minimum, maximum = min(values), max(values)
+    span = maximum - minimum or 1
+    y = lambda value: 52 - ((value - minimum) / span) * 46
+    points = " ".join(
+        f"{index / (len(prices) - 1) * 100:.2f},{y(value):.2f}"
+        for index, value in enumerate(prices)
+    )
+    top, bottom = sorted((y(lower), y(upper)))
+    return (
+        '<svg viewBox="0 0 100 56" style="width:100%;height:68px" '
+        'aria-label="Kursverlauf mit Einstiegszone">'
+        f'<rect x="0" y="{top:.2f}" width="100" height="{max(2, bottom-top):.2f}" '
+        'fill="currentColor" opacity=".12"></rect>'
+        f'<polyline points="{points}" fill="none" '
+        'stroke="currentColor" stroke-width="1.6"></polyline>'
+        '<line x1="100" x2="100" y1="4" y2="53" '
+        'stroke="currentColor" stroke-width="2"></line></svg>'
+    )
+
+
+def _render_today():
+    today = data.get("today") or {}
+    st.header("Heute")
+    color = "🟢" if today.get("candidate_count", 0) else "🟡"
+    st.subheader(f"{color} {today.get('headline') or 'Keine belastbare Aussage'}")
+    st.caption(today.get("summary") or "")
+    candidates = today.get("candidates") or []
+    if not candidates:
+        st.info("Keine belastbaren Kandidaten im aktuellen Snapshot.")
+        return
+    columns = st.columns(min(len(candidates), 3))
+    for index, candidate in enumerate(candidates):
+        with columns[index % len(columns)]:
+            with st.container(border=True):
+                lamp = {"green": "🟢", "yellow": "🟡", "red": "🔴"}.get(
+                    candidate.get("light"), "⚪"
+                )
+                st.markdown(
+                    f"### {lamp} {candidate.get('name')}\n"
+                    f"**{candidate.get('symbol')} · "
+                    f"{_today_money(candidate.get('price'), candidate.get('currency'))}**"
+                )
+                st.markdown(f"**{candidate.get('status_label')}**")
+                st.write(candidate.get("why") or "")
+                zone = candidate.get("zone") or {}
+                if zone:
+                    st.caption(
+                        "Zone "
+                        f"{_today_money(zone.get('lower'), zone.get('currency'))} – "
+                        f"{_today_money(zone.get('upper'), zone.get('currency'))}"
+                    )
+                chart = _today_chart_svg(candidate)
+                if chart:
+                    st.markdown(chart, unsafe_allow_html=True)
+                if candidate.get("confluence_tier"):
+                    st.success(
+                        f"{len(candidate.get('contributing_groups') or [])} Signale ✓"
+                    )
+                if st.button(
+                    "Klartext anzeigen",
+                    key=f"today_{candidate.get('symbol')}",
+                    use_container_width=True,
+                ):
+                    st.session_state["today_symbol"] = candidate.get("symbol")
+    selected = st.session_state.get("today_symbol") or candidates[0].get("symbol")
+    row = next(
+        (item for item in data.get("all", []) if item.get("symbol") == selected),
+        None,
+    )
+    if row:
+        plain = next(
+            (
+                item.get("plain")
+                for item in candidates
+                if item.get("symbol") == selected
+            ),
+            None,
+        ) or {}
+        with st.container(border=True):
+            st.subheader(f"{row.get('display_name_full') or row.get('name')} in Klartext")
+            st.write(f"**1. Bewertung:** {plain.get('valuation') or 'Daten fehlen.'}")
+            st.write(f"**2. Timing:** {plain.get('timing') or 'Daten fehlen.'}")
+            st.write(f"**3. Signale:** {plain.get('signals') or 'Daten fehlen.'}")
+            st.write(f"**4. Risiko:** {plain.get('risk') or 'Daten fehlen.'}")
+            with st.expander("Detailzahlen und Expertenansicht"):
+                _research_card(row)
+    with st.container(border=True):
+        st.markdown("#### Was hat sich seit gestern geändert?")
+        changes = today.get("changes") or []
+        if changes:
+            for change in changes:
+                st.write(f"• {change}")
+        else:
+            st.caption("Keine belastbare Statusänderung im gespeicherten Vortagesvergleich.")
+
+
+_render_today()
+
 tabs = st.tabs(
     [
         "Sweet Spot",
