@@ -73,6 +73,22 @@ class AlternativeSignalTests(unittest.TestCase):
         )
         self.assertEqual(result["coverage_count"], 1)
         self.assertIn("congress", result["missing_signals"])
+        self.assertIsNone(result["confluence_score"])
+        self.assertEqual(result["activation_status"], "building")
+
+    def test_confluence_activates_only_with_all_required_groups(self):
+        result = build_alternative_signals(
+            {
+                "raw_alternative_signals": {
+                    "congress": {"score": 70, "observed_at": "2026-08-20"},
+                    "wikipedia": {"score": 60, "observed_at": "2026-08-24"},
+                    "earnings_tone": {"score": 65, "observed_at": "2026-08-01"},
+                }
+            },
+            insider={"score": 80, "fetched_at": "2026-08-24"},
+            now=datetime(2026, 8, 25, tzinfo=timezone.utc),
+        )
+        self.assertEqual(result["activation_status"], "active")
         self.assertGreater(result["confluence_score"], 50)
 
     def test_short_interest_recency_uses_settlement_not_fetch_time(self):

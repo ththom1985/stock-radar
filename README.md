@@ -668,7 +668,7 @@ investment advice.
 | Wikimedia Pageviews | 7-day average versus prior 28-day attention trend | 24-hour cache; 20 new title resolutions per run | Active official API; unresolved titles are explicit |
 | Direct career ATS | Open-job count trend for configured Greenhouse/Lever companies | Daily snapshot; score only after at least 7 days | Five verified companies active; all others explicitly `without_jobs_signal` |
 | SEC filing diffs | Consecutive 10-K/10-Q Risk Factors paragraph changes | 14-day cache; filing-time availability | Active, bounded; missing sections are explicit failures |
-| EarningsCall + Claude | Genuine call transcript tone, hedging, Q&A evasiveness and CFO-weighted quarter shift | 30-day cache; three USD companies per run | Credential-gated: requires both existing Anthropic key and separate `EARNINGSCALL_API_KEY`; no score without genuine transcripts |
+| Free earnings text tone | EDGAR 8-K/IR text tone and hedging quarter shift | 30-day cache; three USD companies per run | Transparent financial lexicon; Q&A/CFO withheld unless source identifies them; current coverage is explicitly reported |
 | Reddit API | Mention-volume trend | — | Not activated; new Reddit API registration required |
 
 SEC requests require a descriptive Fair Access user agent containing a contact

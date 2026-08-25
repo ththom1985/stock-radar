@@ -73,6 +73,22 @@ class ExpertLayerTests(unittest.TestCase):
         self.assertEqual([item["symbol"] for item in rankings["long_term"]], ["AAA"])
         self.assertEqual([item["symbol"] for item in rankings["short_term"]], ["AAA"])
 
+    def test_non_us_basis_is_narrower_and_renormalized(self):
+        result = build_expert_analysis(
+            {
+                "listing_country": "Germany",
+                "value_score": 70,
+                "quality_score": 70,
+                "growth_score": 70,
+                "longterm_score": 70,
+            },
+            DEFAULT_WEIGHTS,
+        )
+        basis = result["coverage_basis"]
+        self.assertEqual(basis["status"], "narrower_non_us")
+        self.assertTrue(basis["weights_renormalized"])
+        self.assertIn("SEC 13F", basis["structurally_unavailable"])
+
 
 if __name__ == "__main__":
     unittest.main()

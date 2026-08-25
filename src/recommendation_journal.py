@@ -13,6 +13,7 @@ from .persistence import effective_path
 LOG_PATH = DATA / "recommendation_log.jsonl"
 OUTCOME_PATH = DATA / "recommendation_outcomes.jsonl"
 HORIZONS = {"1m": 21, "3m": 63, "6m": 126, "12m": 252}
+MIN_CALIBRATION_WINDOWS = 100
 
 
 def _read_jsonl(path):
@@ -161,6 +162,29 @@ def journal_summary():
                     1,
                 )
                 if subset
+                else None
+            ),
+            "calibration_status": (
+                "calibrated"
+                if len(subset) >= MIN_CALIBRATION_WINDOWS * 3
+                else "coarse"
+                if len(subset) >= MIN_CALIBRATION_WINDOWS
+                else "uncalibrated"
+            ),
+            "minimum_windows": MIN_CALIBRATION_WINDOWS,
+            "windows_remaining": max(0, MIN_CALIBRATION_WINDOWS - len(subset)),
+            "probability_band": (
+                [
+                    max(0, round(
+                        sum(bool(row.get("positive")) for row in subset)
+                        / len(subset) * 100 - 10
+                    )),
+                    min(100, round(
+                        sum(bool(row.get("positive")) for row in subset)
+                        / len(subset) * 100 + 10
+                    )),
+                ]
+                if len(subset) >= MIN_CALIBRATION_WINDOWS
                 else None
             ),
         }

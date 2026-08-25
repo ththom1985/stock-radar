@@ -58,6 +58,11 @@ class RecommendationJournalTests(unittest.TestCase):
             self.assertTrue(outcomes[0]["positive"])
             self.assertEqual(summary["observation_count"], 1)
             self.assertEqual(summary["by_horizon"]["1m"]["hit_rate_pct"], 100.0)
+            self.assertEqual(
+                summary["by_horizon"]["1m"]["calibration_status"],
+                "uncalibrated",
+            )
+            self.assertEqual(summary["by_horizon"]["1m"]["windows_remaining"], 99)
 
 
 if __name__ == "__main__":

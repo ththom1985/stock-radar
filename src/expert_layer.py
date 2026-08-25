@@ -440,6 +440,9 @@ def build_expert_analysis(
         "medium" if evidence_coverage >= 65 else
         "low"
     )
+    non_us = row.get("listing_country") not in {
+        None, "United States", "USA", "US"
+    }
     return {
         "model_status": EXPERT_MODEL_STATUS,
         "actionable": False,
@@ -448,6 +451,19 @@ def build_expert_analysis(
         "short_term": short_term,
         "signal": signal,
         "evidence_quality": evidence_quality,
+        "coverage_basis": {
+            "status": "narrower_non_us" if non_us else "standard_us",
+            "weights_renormalized": True,
+            "structurally_unavailable": (
+                ["SEC Form 4", "SEC 13F", "FINRA short interest", "U.S. Congress trades"]
+                if non_us else []
+            ),
+            "eu_source_status": (
+                "EQS/DGAP and Bundesanzeiger expose no stable documented free API; "
+                "missing fields are omitted, never scored neutral."
+                if non_us else None
+            ),
+        },
         "valuation": build_valuation_assessment(
             row, sector_medians=sector_medians, five_year=five_year
         ),

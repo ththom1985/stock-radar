@@ -452,6 +452,13 @@ def _research_card(row, rank=None):
                 "Szenario-Wahrscheinlichkeiten: "
                 f"{(expert.get('outlook') or {}).get('probabilities_status') or 'withheld'}"
             )
+            basis = expert.get("coverage_basis") or {}
+            if basis.get("status") == "narrower_non_us":
+                st.info(
+                    "Schmalere Nicht-US-Datenbasis; Gewichte renormalisiert. "
+                    "Strukturell nicht verfügbar: "
+                    + ", ".join(basis.get("structurally_unavailable") or [])
+                )
         _render_probability_forecast(
             row, data.get("probability_baselines") or []
         )
@@ -1186,6 +1193,10 @@ with tabs[13]:
                 else "noch offen"
             ),
             f"{outcome.get('evaluated', 0)} ausgewertet",
+        )
+        column.caption(
+            f"{outcome.get('calibration_status', 'uncalibrated')} · "
+            f"noch {outcome.get('windows_remaining', 100)} Fenster bis grob"
         )
     st.json(journal)
     st.subheader("Probability data health")

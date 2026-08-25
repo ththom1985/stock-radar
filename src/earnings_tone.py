@@ -14,8 +14,10 @@ SUBMISSIONS_URL="https://data.sec.gov/submissions/CIK{cik:010d}.json"
 INDEX_URL="https://www.sec.gov/Archives/edgar/data/{cik}/{accession}/index.json"
 ARCHIVE_URL="https://www.sec.gov/Archives/edgar/data/{cik}/{accession}/{document}"
 MAX_AGE_DAYS=30
-MODEL=os.environ.get("STOCK_RADAR_LLM_MODEL","claude-haiku-4-5")
-SCHEMA={"type":"object","properties":{"current_tone":{"type":"integer"},"previous_tone":{"type":"integer"},"hedging_shift":{"type":"integer"},"qa_evasiveness_shift":{"type":["integer","null"]},"cfo_tone_shift":{"type":["integer","null"]},"reason":{"type":"string"}},"required":["current_tone","previous_tone","hedging_shift","qa_evasiveness_shift","cfo_tone_shift","reason"],"additionalProperties":False}
+MODEL="free_financial_lexicon_v1"
+POSITIVE={"strong","growth","record","improved","increase","opportunity","resilient","momentum","profit","confident","demand"}
+NEGATIVE={"decline","weak","loss","adverse","constraint","shortage","litigation","impairment","risk","pressure","decrease"}
+HEDGING={"may","might","could","uncertain","approximately","expect","believe","anticipate","subject","potentially","challenging","headwind"}
 KEYWORDS=("quarter","revenue","earnings","results","net income","guidance","outlook")
 
 def _plain(value):
@@ -62,16 +64,15 @@ def fetch_edgar_prepared_texts(symbol,ua):
 def _excerpt(text):
     text=" ".join(text.split()); return text[:11000]+("\n[...]\n"+text[-11000:] if len(text)>22000 else "")
 
+def _lexicon_metrics(text):
+    words=re.findall(r"[a-z]+",text.casefold()); total=max(1,len(words))
+    positive=sum(word in POSITIVE for word in words); negative=sum(word in NEGATIVE for word in words); hedging=sum(word in HEDGING for word in words)
+    tone=round(max(0,min(100,50+(positive-negative)/total*2500)))
+    return {"tone":tone,"hedging_rate":hedging/total*1000,"positive":positive,"negative":negative,"words":total}
+
 def _compare(current,previous):
-    import anthropic
-    qa_available=current["status"]=="full" and previous["status"]=="full"
-    system=("Compare two quarterly earnings texts. Score tone 0-100 and hedging-language change. "
-            f"Q&A is {'available' if qa_available else 'unavailable: return null for qa_evasiveness_shift'}. "
-            "If speakers/titles identify CFO, weight CFO language 1.5x CEO; otherwise return null for cfo_tone_shift. "
-            "Do not invent Q&A or speakers. Return requested JSON only.")
-    user=f"CURRENT ({current['status']}):\n{_excerpt(current['text'])}\n\nPREVIOUS ({previous['status']}):\n{_excerpt(previous['text'])}"
-    response=anthropic.Anthropic().messages.create(model=MODEL,max_tokens=900,system=system,messages=[{"role":"user","content":user}],output_config={"format":{"type":"json_schema","schema":SCHEMA}})
-    return json.loads(next((block.text for block in response.content if block.type=="text"),"{}"))
+    now=_lexicon_metrics(current["text"]); before=_lexicon_metrics(previous["text"])
+    return {"current_tone":now["tone"],"previous_tone":before["tone"],"hedging_shift":round(now["hedging_rate"]-before["hedging_rate"]),"qa_evasiveness_shift":None,"cfo_tone_shift":None,"reason":f"Free lexicon: positive/negative {now['positive']}/{now['negative']} vs {before['positive']}/{before['negative']}; Q&A/CFO unavailable."}
 
 def build_tone_signal(result,current,previous):
     now=max(0,min(100,int(result["current_tone"]))); before=max(0,min(100,int(result["previous_tone"]))); shift=now-before
@@ -80,7 +81,7 @@ def build_tone_signal(result,current,previous):
     if qa is not None: parts.append(-int(qa)); weights.append(1.0)
     if cfo is not None: parts.append(1.5*int(cfo)); weights.append(1.5)
     composite=sum(parts)/sum(weights); score=round(max(0,min(100,50+composite)),1)
-    return {"score":score,"direction":"positive" if score>55 else "negative" if score<45 else "neutral","transcript_status":"full" if current["status"]=="full" and previous["status"]=="full" else "prepared-only","current_tone":now,"previous_tone":before,"tone_shift":shift,"hedging_shift":int(result["hedging_shift"]),"qa_evasiveness_shift":qa,"qa_status":"available" if qa is not None else "not_available","cfo_tone_shift":cfo,"cfo_weight":1.5 if cfo is not None else None,"reason":result["reason"],"current_period":{k:current[k] for k in ("period","filing_date","source","source_url")},"previous_period":{k:previous[k] for k in ("period","filing_date","source","source_url")},"source":"free earnings text + Claude comparison","expected_delay":"source publication time"}
+    return {"score":score,"direction":"positive" if score>55 else "negative" if score<45 else "neutral","transcript_status":"full" if current["status"]=="full" and previous["status"]=="full" else "prepared-only","analysis_method":MODEL,"current_tone":now,"previous_tone":before,"tone_shift":shift,"hedging_shift":int(result["hedging_shift"]),"qa_evasiveness_shift":qa,"qa_status":"available" if qa is not None else "not_available","cfo_tone_shift":cfo,"cfo_weight":1.5 if cfo is not None else None,"reason":result["reason"],"current_period":{k:current[k] for k in ("period","filing_date","source","source_url")},"previous_period":{k:previous[k] for k in ("period","filing_date","source","source_url")},"source":"free earnings text + transparent financial lexicon","expected_delay":"source publication time"}
 
 def _fresh(entry):
     try:
@@ -90,7 +91,6 @@ def _fresh(entry):
 
 def fetch_earnings_tone_signals(rows,max_new=None,force=False,verbose=True):
     cache=load_json(CACHE_PATH,expected_type=dict,default={}); sources=load_json(SOURCE_CACHE_PATH,expected_type=dict,default={})
-    if not os.environ.get("ANTHROPIC_API_KEY"): return {},{**coverage_status(rows,sources,cache),"status":"disabled","reason":"ANTHROPIC_API_KEY unavailable"}
     ua=normalize_sec_user_agent()
     if not ua: return {},{**coverage_status(rows,sources,cache),"status":"disabled","reason":"SEC_USER_AGENT unavailable"}
     eligible=[row for row in rows if row.get("asset_type")=="company_equity" and row.get("currency")=="USD"]; eligible.sort(key=lambda row:(-(row.get("longterm_score") or 0),row["symbol"]))

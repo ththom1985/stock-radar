@@ -186,7 +186,14 @@ def build_alternative_signals(
             "recency_weight": round(recency, 4),
             "source_group": spec["source_group"],
         }
-    if weighted:
+    activation_groups = {
+        "insider": "insider" in rendered,
+        "congress": "congress" in rendered,
+        "attention": any(name in rendered for name in ("wikipedia", "jobs")),
+        "earnings_tone": "earnings_tone" in rendered,
+    }
+    activated = all(activation_groups.values())
+    if weighted and activated:
         denominator = sum(weight for _, weight in weighted)
         centered = sum(value * weight for value, weight in weighted) / denominator
         independence_bonus = min(10.0, max(0, len(source_groups) - 1) * 2.5)
@@ -202,6 +209,11 @@ def build_alternative_signals(
         "model_status": "heuristic_unvalidated",
         "actionable": False,
         "confluence_score": confluence,
+        "activation_status": "active" if activated else "building",
+        "activation_requirements": activation_groups,
+        "missing_activation_groups": [
+            name for name, available in activation_groups.items() if not available
+        ],
         "independent_source_count": len(source_groups),
         "coverage_count": len(rendered),
         "missing_signals": [name for name in SIGNAL_SPECS if name not in rendered],
