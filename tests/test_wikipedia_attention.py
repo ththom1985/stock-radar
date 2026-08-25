@@ -1,6 +1,10 @@
 import unittest
 
-from src.wikipedia_attention import select_article, summarize_pageviews
+from src.wikipedia_attention import (
+    _cached_article_valid,
+    select_article,
+    summarize_pageviews,
+)
 
 
 class WikipediaAttentionTests(unittest.TestCase):
@@ -31,6 +35,14 @@ class WikipediaAttentionTests(unittest.TestCase):
         self.assertEqual(
             select_article("Apple Inc.", [{"title": "Apple Inc."}]),
             "Apple Inc.",
+        )
+
+    def test_invalid_cached_article_is_reprocessed(self):
+        self.assertFalse(
+            _cached_article_valid(
+                {"display_name_full": "Krystal Biotech Inc."},
+                {"status": "ok", "article": "Beremagene geperpavec"},
+            )
         )
 
 

@@ -156,6 +156,18 @@ def _fresh(entry):
     return parsed >= datetime.now(timezone.utc) - timedelta(hours=MAX_AGE_HOURS)
 
 
+def _cached_article_valid(row, entry):
+    article = (entry or {}).get("article")
+    if not article:
+        return (entry or {}).get("status") == "without_wikipedia_signal"
+    name = (
+        row.get("display_name_full")
+        or row.get("provider_long_name")
+        or row.get("name")
+    )
+    return select_article(name, [{"title": article}]) == article
+
+
 def fetch_wikipedia_signals(rows, max_new=None, force=False, verbose=True):
     cache = load_json(CACHE_PATH, expected_type=dict, default={})
     eligible = [
@@ -170,7 +182,11 @@ def fetch_wikipedia_signals(rows, max_new=None, force=False, verbose=True):
     if max_new is None:
         max_new = int(os.environ.get("STOCK_RADAR_WIKIPEDIA_MAX", "20"))
     candidates = [
-        row for row in eligible if force or not _fresh(cache.get(row["symbol"]))
+        row
+        for row in eligible
+        if force
+        or not _fresh(cache.get(row["symbol"]))
+        or not _cached_article_valid(row, cache.get(row["symbol"]))
     ][: max(0, max_new)]
     failures = {}
     unsupported = []
@@ -182,7 +198,12 @@ def fetch_wikipedia_signals(rows, max_new=None, force=False, verbose=True):
                 or row.get("provider_long_name")
                 or row.get("name")
             )
-            article = (cache.get(symbol) or {}).get("article") or resolve_article(name)
+            cached = cache.get(symbol) or {}
+            article = (
+                cached.get("article")
+                if _cached_article_valid(row, cached)
+                else None
+            ) or resolve_article(name)
             if not article:
                 unsupported.append(symbol)
                 cache[symbol] = {
