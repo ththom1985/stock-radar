@@ -25,6 +25,7 @@ from src.probability_forward_public import (
     validate_forward_validation_status,
 )
 from src.sweet_spot import format_price
+from src.today_view import STATUS_LABELS
 
 LATEST = ROOT / "data" / "output" / "latest.json"
 PORTFOLIO = ROOT / "data" / "portfolio.json"
@@ -845,7 +846,70 @@ def _render_today():
             st.caption("Keine belastbare Statusänderung im gespeicherten Vortagesvergleich.")
 
 
-_render_today()
+def _render_question_view(key):
+    question_views = data.get("question_views") or {}
+    items = question_views.get(key) or []
+    if key == "cheap_with_potential":
+        st.header("Billig mit Potenzial")
+        st.caption(
+            "Nur Titel mit bestandener Bewertungsprüfung, echtem Langfristpotenzial "
+            "und ohne Messer-, Boden- oder akute Risikowarnung."
+        )
+    else:
+        st.header("Teuer gerade")
+        st.caption(
+            "Was das System aktuell nicht kaufen würde. Eine hohe Überbewertung ist "
+            "kein Alarm, sondern ein nüchterner Abstand zum fairen Bereich."
+        )
+    if not items:
+        st.info("Aktuell erfüllt kein Titel alle strengen Kriterien dieser Liste.")
+        return
+    for item in items:
+        badge = item.get("badge") or {}
+        with st.container(border=True):
+            left, right = st.columns([3, 1])
+            with left:
+                st.subheader(item.get("name") or item.get("symbol"))
+                st.caption(
+                    f"{item.get('symbol')} · "
+                    f"{_today_money(item.get('price'), item.get('currency'))}"
+                )
+            with right:
+                st.markdown(f"**{badge.get('label') or 'Kein Setup'}**")
+                if key == "cheap_with_potential":
+                    st.metric(
+                        "Attraktivität",
+                        _number(item.get("attractiveness_score"), 0),
+                    )
+            if key == "cheap_with_potential":
+                for sentence in item.get("sentences") or []:
+                    st.write(sentence)
+            else:
+                st.write(item.get("sentence") or "")
+            st.caption(f"Bewertungsbasis: {item.get('basis') or 'schmal'}")
+
+
+primary_view = st.radio(
+    "Hauptansicht",
+    ["WO EINSTEIGEN?", "BILLIG MIT POTENZIAL", "TEUER GERADE", "EXPERTEN"],
+    horizontal=True,
+    label_visibility="collapsed",
+)
+if primary_view == "WO EINSTEIGEN?":
+    _render_today()
+    st.stop()
+if primary_view == "BILLIG MIT POTENZIAL":
+    _render_question_view("cheap_with_potential")
+    st.stop()
+if primary_view == "TEUER GERADE":
+    _render_question_view("expensive_now")
+    st.stop()
+
+st.header("Experten")
+st.caption(
+    "Technische Nachschlageansichten und Systemdiagnostik. Warnlisten zeigen "
+    "bewusst keine Zahlenscores."
+)
 
 tabs = st.tabs(
     [
@@ -876,9 +940,17 @@ rows_by_symbol = {
 def _render_insight_category(category_key, *, key):
     category = insight_categories.get(category_key) or {}
     partitions = category.get("items_by_currency") or {}
+    descriptions = {
+        "falling_knives": "Diese Titel meidet das System derzeit: Der Kurs fällt stark und eine Stabilisierung fehlt.",
+        "bottoming_watch": "Spekulative Bodenbildung: noch kein Einstiegssignal, sondern eine Beobachtungsliste.",
+        "risk_watch": "Diese Titel tragen erhöhte sichtbare Risiken und werden deshalb derzeit gemieden.",
+    }
     st.caption(
-        f"{category.get('label') or category_key} · Formel: {category.get('formula') or '—'} · "
-        "heuristic_unvalidated · keine Empfehlung"
+        descriptions.get(
+            category_key,
+            f"{category.get('label') or category_key} · Formel: {category.get('formula') or '—'}",
+        )
+        + " · System lernt noch · keine Anlageberatung"
     )
     currencies = [
         currency
@@ -897,43 +969,29 @@ def _render_insight_category(category_key, *, key):
         help="Listen werden nicht währungsübergreifend gemischt.",
     )
     items = partitions[currency]
-    overview = pd.DataFrame(
-        [
-            {
-                "Rang": index,
-                "Symbol": item.get("symbol"),
-                "Vollständiger Name": (
-                    rows_by_symbol.get(item.get("symbol")) or {}
-                ).get("display_name_full"),
-                "Hauptsitz (Provider) / Exposure": " / ".join(
-                    filter(
-                        None,
-                        [
-                            (rows_by_symbol.get(item.get("symbol")) or {}).get(
-                                "headquarters_country"
-                            ),
-                            (rows_by_symbol.get(item.get("symbol")) or {}).get(
-                                "economic_exposure_country"
-                            ),
-                        ],
-                    )
-                ),
-                "Branche": (
-                    rows_by_symbol.get(item.get("symbol")) or {}
-                ).get("industry_display"),
-                "Insight-Score": item.get("score"),
-                "Raw": item.get("raw_score"),
-                "Risikoabschlag": item.get("risk_penalty"),
-                "Risiko": item.get("risk_level"),
-                "Komponenten": " · ".join(
-                    f"{name}: {_number(value, 1)}"
-                    for name, value in (item.get("components") or {}).items()
-                ),
-                "Gründe": " · ".join(item.get("reasons") or []),
-            }
-            for index, item in enumerate(items, 1)
-        ]
-    )
+    warning_view = category_key in {"falling_knives", "bottoming_watch", "risk_watch"}
+    overview = pd.DataFrame([
+        {
+            "Name": (
+                rows_by_symbol.get(item.get("symbol")) or {}
+            ).get("display_name_full"),
+            "Ticker": item.get("symbol"),
+            "Kurs": _today_money(
+                (rows_by_symbol.get(item.get("symbol")) or {}).get("price_local"),
+                currency,
+            ),
+            "Urteil": (
+                "⚫ Meiden"
+                if warning_view
+                else STATUS_LABELS.get(
+                    ((rows_by_symbol.get(item.get("symbol")) or {}).get("sweet_spot") or {}).get("combined_status"),
+                    "⚪ Kein Setup",
+                )
+            ),
+            "Kernfakt": " · ".join(item.get("reasons") or [])[:240],
+        }
+        for item in items
+    ])
     st.dataframe(overview, hide_index=True, width="stretch")
     symbols = [item.get("symbol") for item in items if item.get("symbol") in rows_by_symbol]
     if symbols:

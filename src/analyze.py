@@ -97,6 +97,7 @@ from .sec_insiders import fetch_insider_signals
 from .universe import load_universe
 from .valuation_history import update_valuation_history
 from .today_view import build_today_view
+from .question_views import build_question_views
 from .wikipedia_attention import fetch_wikipedia_signals
 
 FAILED_MANIFEST = DATA / "failed_symbols.json"
@@ -1150,6 +1151,7 @@ def run(with_news=True, with_fundamentals=True):
         previous_snapshot=previous_snapshot,
         price_histories=fetched.prices,
     )
+    result["question_views"] = build_question_views(rows)
     valuation_anomalies = [
         {
             "symbol": row.get("symbol"),

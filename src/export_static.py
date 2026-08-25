@@ -1607,6 +1607,13 @@ def export_static(
             "candidates": [],
             "changes": [],
         },
+        "question_views": snapshot.get("question_views") or {
+            "model_status": "heuristic_unvalidated",
+            "actionable": False,
+            "cheap_with_potential": [],
+            "expensive_now": [],
+            "rules": {},
+        },
         "expert_layer": snapshot.get("expert_layer") or {
             "model_status": "heuristic_unvalidated",
             "actionable": False,

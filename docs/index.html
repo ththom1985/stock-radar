@@ -89,6 +89,13 @@
     .nav { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px; background: var(--cp-bg-elevated); border: 1px solid var(--cp-border); border-radius: 14px; position: sticky; top: 0; z-index: 3; }
     .nav-button, .button { border: 1px solid var(--cp-border); border-radius: 9px; background: var(--cp-surface); padding: 9px 12px; cursor: pointer; font-weight: 700; }
     .nav-button:hover, .nav-button.active, .button:hover { border-color: var(--cp-accent); background: var(--cp-accent-soft); color: var(--cp-accent); }
+    .expert-nav { position: relative; }
+    .expert-nav summary { list-style: none; }
+    .expert-nav summary::-webkit-details-marker { display: none; }
+    .expert-menu { position: absolute; right: 0; top: calc(100% + 8px); width: min(620px, 88vw); display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; padding: 10px; border: 1px solid var(--cp-border); border-radius: 12px; background: var(--cp-surface); box-shadow: var(--cp-shadow); }
+    .question-copy { line-height: 1.5; margin-top: 8px; }
+    .expert-details { margin-top: 14px; border-top: 1px solid var(--cp-border); padding-top: 12px; }
+    .expert-details > summary { cursor: pointer; font-weight: 800; color: var(--cp-link); }
     .controls { display: grid; grid-template-columns: minmax(160px, .7fr) minmax(240px, 1.5fr) auto; gap: 10px; margin: 14px 0; }
     select, input { min-height: 42px; border: 1px solid var(--cp-border); border-radius: 9px; background: var(--cp-surface); padding: 8px 11px; width: 100%; }
     .layout { display: grid; grid-template-columns: minmax(0, .8fr) minmax(420px, 1.2fr); gap: 16px; }
@@ -160,6 +167,7 @@
       .status-chip { display: inline-block; margin-top: 10px; }
       .metrics, .controls, .detail-grid, .scenario-grid { grid-template-columns: 1fr; }
       .list-row { grid-template-columns: 32px 82px 1fr 55px; }
+      .expert-menu { position: fixed; left: 10px; right: 10px; top: 130px; width: auto; grid-template-columns: 1fr 1fr; }
     }
   </style>
 </head>
@@ -184,19 +192,26 @@
       </section>
       <div class="notice">Keine Anlageberatung. Das System sammelt noch Erfahrungswerte; Wahrscheinlichkeiten erscheinen erst nach bestandener Selbstprüfung.</div>
       <nav id="nav" class="nav">
-        <button class="nav-button active" data-view="today">Heute</button>
-        <button class="nav-button" data-view="sweet_spot">Sweet Spot</button>
-        <button class="nav-button" data-view="daily_setups">Tages-Setups</button>
-        <button class="nav-button" data-view="undervalued_quality">Unterbewertet</button>
-        <button class="nav-button" data-view="analyst_potential">Potenzial</button>
-        <button class="nav-button" data-view="entry_watchlist">Einstiegs-Timing</button>
-        <button class="nav-button" data-view="falling_knives">Fallende Messer</button>
-        <button class="nav-button" data-view="bottoming_watch">Bodenbildung</button>
-        <button class="nav-button" data-view="risk_watch">Risiken</button>
-        <button class="nav-button" data-view="expert_long">Long-Term Score</button>
-        <button class="nav-button" data-view="expert_short">Short-Term Score</button>
-        <button class="nav-button" data-view="all">Alle suchen</button>
-        <button class="nav-button" data-view="health">Datenqualität</button>
+        <button class="nav-button active" data-view="today">WO EINSTEIGEN?</button>
+        <button class="nav-button" data-view="cheap_with_potential">BILLIG MIT POTENZIAL</button>
+        <button class="nav-button" data-view="expensive_now">TEUER GERADE</button>
+        <details class="expert-nav">
+          <summary class="nav-button">EXPERTEN ▾</summary>
+          <div class="expert-menu">
+            <button class="nav-button" data-view="sweet_spot">Sweet Spot</button>
+            <button class="nav-button" data-view="daily_setups">Tages-Setups</button>
+            <button class="nav-button" data-view="undervalued_quality">Unterbewertet</button>
+            <button class="nav-button" data-view="analyst_potential">Potenzial</button>
+            <button class="nav-button" data-view="entry_watchlist">Einstiegs-Timing</button>
+            <button class="nav-button" data-view="falling_knives">Fallende Messer</button>
+            <button class="nav-button" data-view="bottoming_watch">Bodenbildung</button>
+            <button class="nav-button" data-view="risk_watch">Risiken</button>
+            <button class="nav-button" data-view="expert_long">Langfrist-Score</button>
+            <button class="nav-button" data-view="expert_short">Kurzfrist-Score</button>
+            <button class="nav-button" data-view="all">Alle suchen</button>
+            <button class="nav-button" data-view="health">Datenqualität</button>
+          </div>
+        </details>
       </nav>
       <section id="controls" class="controls">
         <select id="currency" aria-label="Handelswährung"></select>
@@ -226,6 +241,8 @@
     const $ = (id) => document.getElementById(id);
     const categoryTitles = {
       today: "Beste Einstiegs-Kandidaten heute",
+      cheap_with_potential: "Billig mit Potenzial",
+      expensive_now: "Teuer gerade",
       sweet_spot: "Sweet-Spot-Beobachtungszone",
       daily_setups: "Tages-Setups",
       undervalued_quality: "Unterbewertet",
@@ -292,6 +309,10 @@
     const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[char]));
     const category = () => state.view === "today"
       ? { formula: state.data?.today?.summary || "Timing und Bewertung gemeinsam" }
+      : state.view === "cheap_with_potential"
+      ? { formula: state.data?.question_views?.rules?.cheap || "Unterbewertung, Potenzial und begrenztes Risiko" }
+      : state.view === "expensive_now"
+      ? { formula: state.data?.question_views?.rules?.expensive || "Abstand zum plausiblen fairen Bereich" }
       : state.view === "sweet_spot"
       ? { formula: "Bestätigtes Grün zuerst, danach Amber-Beobachtungen; Score = heuristische Evidenzqualität, keine Wahrscheinlichkeit" }
       : state.data.insight_rankings?.categories?.[state.view] || null;
@@ -568,6 +589,16 @@
           components: {}
         }));
       }
+      if (state.view === "cheap_with_potential" || state.view === "expensive_now") {
+        const key = state.view === "cheap_with_potential" ? "cheap_with_potential" : "expensive_now";
+        return (state.data.question_views?.[key] || []).map((value) => ({
+          symbol: value.symbol,
+          score: value.attractiveness_score,
+          question: value,
+          reasons: value.sentences || [value.sentence],
+          components: {}
+        }));
+      }
       if (state.view === "expert_long" || state.view === "expert_short") {
         const horizon = state.view === "expert_long" ? "long_term" : "short_term";
         let items = state.data.expert_layer?.rankings?.[horizon] || [];
@@ -622,8 +653,9 @@
       if (state.view === "health") return renderHealthView();
       $("health").hidden = true;
       $("cockpit").hidden = false;
-      $("controls").hidden = false;
-      $("currency").hidden = state.view === "today";
+      const primaryView = ["today", "cheap_with_potential", "expensive_now"].includes(state.view);
+      $("controls").hidden = primaryView;
+      $("currency").hidden = primaryView;
       const items = categoryItems();
       const cat = category();
       $("list-title").textContent = categoryTitles[state.view];
@@ -631,8 +663,16 @@
         ? "Alphabetische Suche, kein globales Cross-Currency-Ranking"
         : state.view === "today"
         ? (state.data.today?.summary || "Timing und Bewertung gemeinsam")
+        : state.view === "cheap_with_potential" || state.view === "expensive_now"
+        ? (cat?.formula || "")
         : state.view === "expert_long" || state.view === "expert_short"
         ? "Konfigurierter Composite · fehlende Faktoren werden nicht erfunden · keine Anlageberatung"
+        : state.view === "falling_knives"
+        ? "Diese Titel meidet das System derzeit: Der Kurs fällt stark und eine Stabilisierung fehlt."
+        : state.view === "bottoming_watch"
+        ? "Spekulative Bodenbildung: noch kein Einstiegssignal, sondern eine Beobachtungsliste."
+        : state.view === "risk_watch"
+        ? "Diese Titel tragen erhöhte sichtbare Risiken und werden deshalb derzeit gemieden."
         : `${$("currency").value} · ${cat?.formula || ""}`;
       $("result-count").textContent = `${items.length} sichtbar`;
       if (state.view === "today") {
@@ -658,12 +698,36 @@
         else if (!items.some((item) => item.symbol === state.selected)) { state.selected = items[0].symbol; renderList(); renderDetail(state.bySymbol.get(state.selected)); }
         return;
       }
+      if (state.view === "cheap_with_potential" || state.view === "expensive_now") {
+        $("rows").innerHTML = items.map((item) => {
+          const value = item.question || {};
+          const badge = value.badge || {};
+          const metric = state.view === "cheap_with_potential"
+            ? `<strong>Attraktivität ${$number(value.attractiveness_score, 0)}</strong>`
+            : `<strong>${percent(value.premium_pct)} über fair</strong>`;
+          const copy = (value.sentences || [value.sentence]).filter(Boolean).map((text) => `<div class="question-copy">${escapeHtml(text)}</div>`).join("");
+          return `<button class="today-card ${item.symbol === state.selected ? "selected" : ""}" data-symbol="${escapeHtml(item.symbol)}">
+            <div class="today-card-head"><div><strong>${escapeHtml(value.name || item.symbol)}</strong><div class="symbol">${escapeHtml(item.symbol)}</div></div><div style="text-align:right"><strong>${$number(value.price)} ${escapeHtml(value.currency || "")}</strong><div class="badge ${badge.tone === "green" ? "green" : badge.tone === "yellow" ? "amber" : "neutral"}">${escapeHtml(badge.label || "Kein Setup")}</div></div></div>
+            <div class="question-copy">${metric}</div>${copy}<small class="row-meta">Bewertungsbasis: ${escapeHtml(value.basis || "schmal")}</small>
+          </button>`;
+        }).join("");
+        $("rows").querySelectorAll(".today-card").forEach((button) => button.addEventListener("click", () => {
+          state.selected = button.dataset.symbol; renderList(); renderDetail(state.bySymbol.get(state.selected));
+        }));
+        if (!items.length) { state.selected = null; $("rows").innerHTML = `<div class="muted" style="padding:18px">Aktuell erfüllt kein Titel alle strengen Kriterien.</div>`; renderDetail(null); }
+        else if (!items.some((item) => item.symbol === state.selected)) { state.selected = items[0].symbol; renderList(); renderDetail(state.bySymbol.get(state.selected)); }
+        return;
+      }
       $("rows").innerHTML = items.map((item, index) => {
         const row = state.bySymbol.get(item.symbol) || {};
+        const warningView = ["falling_knives", "bottoming_watch", "risk_watch"].includes(state.view);
+        const localPrice = Number.isFinite(row.price) && Number.isFinite(row.x) && row.x ? row.price / row.x : null;
+        const verdict = warningView ? "⚫ Meiden" : (sweetLabels[row.sweet_spot?.combined_status] || "⚪ Kein Setup");
+        const core = (item.reasons || []).filter(Boolean)[0] || "";
         return `<button class="list-row ${item.symbol === state.selected ? "selected" : ""}" data-symbol="${escapeHtml(item.symbol)}">
           <span>${index + 1}</span><span class="symbol">${escapeHtml(item.symbol)}</span>
-          <span title="${escapeHtml(row.display_name_full || row.short_name || row.symbol || "")}"><strong class="row-name">${escapeHtml(row.display_name_full || row.short_name || "")}</strong><small class="row-meta">${escapeHtml(row.economic_exposure_country || row.headquarters_country || "Exposure n. v.")} · ${escapeHtml(row.industry_display || "Branche n. v.")}</small>${row.sweet_spot?.combined_status ? `<small class="row-meta sweet-${escapeHtml(row.sweet_spot?.tone || "neutral")}">${escapeHtml(sweetLabels[row.sweet_spot.combined_status] || "Beobachten")}</small>` : ""}</span>
-          <span class="score">${$number(item.score, 0)}${state.view === "undervalued_quality" ? `<small class="row-meta">adjustiert</small>` : ""}</span>
+          <span title="${escapeHtml(row.display_name_full || row.short_name || row.symbol || "")}"><strong class="row-name">${escapeHtml(row.display_name_full || row.short_name || "")}</strong><small class="row-meta">${$number(localPrice)} ${escapeHtml(row.currency || "")} · ${escapeHtml(verdict)}</small>${core ? `<small class="row-meta">${escapeHtml(core)}</small>` : ""}</span>
+          <span class="${warningView ? "muted" : "score"}">${warningView ? "" : $number(item.score, 0)}</span>
         </button>`;
       }).join("");
       $("rows").querySelectorAll(".list-row").forEach((button) => button.addEventListener("click", () => {
@@ -757,6 +821,10 @@
       const sweetInvalidation = localizeTechnicalPoints(sweet.invalidation_signals);
       const entryInvalidation = localizeTechnicalPoints(entryThesis.what_invalidates);
       const todayCard = (state.data.today?.candidates || []).find((item) => item.symbol === row.symbol);
+      const questionItem = [
+        ...(state.data.question_views?.cheap_with_potential || []),
+        ...(state.data.question_views?.expensive_now || [])
+      ].find((item) => item.symbol === row.symbol);
       const plain = todayCard?.plain || {};
       const scenarios = (row.scenario_long || []).map((item) => `<div class="scenario">
         <strong>${escapeHtml(item.label || "")}</strong>
@@ -826,9 +894,11 @@
       const availableText = (value) => value && value !== "Nicht verfügbar";
       const exposure = [row.economic_exposure_country, row.economic_exposure_region].filter(availableText);
       const listing = [row.listing_country, row.listing_market].filter(availableText);
-      const valuationPlain = plain.valuation || (
+      const valuationPlain = plain.valuation || (questionItem?.sentences || [questionItem?.sentence]).filter(Boolean)[0] || (
         expert.valuation?.verdict === "data_review_required"
           ? `${row.display_name_full || row.short_name || row.symbol}: Bewertung auffällig — der extreme faire Bereich wird bis zur Datenprüfung nicht angezeigt.`
+          : Number.isFinite(expertFair.lower) && Number.isFinite(expertFair.upper)
+          ? `${row.display_name_full || row.short_name || row.symbol} ist aktuell ${verdictLabels[expert.valuation?.verdict] || "bewertet"} — der faire Bereich liegt bei ${$number(expertFair.lower)} bis ${$number(expertFair.upper)} ${expertFair.currency || currency}, der Kurs bei ${$number(currentLocal)} ${currency}.`
           : "Bewertung ist derzeit nicht belastbar."
       );
       const expertPanel = expert.model_status ? `<div class="section"><h3>Experten-Gesamtbild (System lernt noch)</h3>
@@ -858,8 +928,9 @@
         <span class="badge">${$number(row.entry_timing_score, 0)}/100 Timing</span></div>
         <div class="summary"><strong>1. Bewertung:</strong> ${escapeHtml(valuationPlain)}</div>
         <div class="summary"><strong>2. Timing:</strong> ${escapeHtml(plain.timing || row.entry_timing_reason || "Timingdaten fehlen.")}</div>
-        <div class="summary"><strong>3. Signale:</strong> ${escapeHtml(plain.signals || row.research_summary || "Signaldaten fehlen.")}</div>
-        <div class="summary"><strong>4. Risiko:</strong> ${escapeHtml(plain.risk || (row.risk_warnings || [])[0] || "Kein dominantes Einzelrisiko verfügbar.")}</div>
+        <div class="summary"><strong>3. Signale:</strong> ${escapeHtml(plain.signals || (questionItem?.potential_driver ? `Dafür spricht vor allem ${questionItem.potential_driver}.` : null) || row.research_summary || "Signaldaten fehlen.")}</div>
+        <div class="summary"><strong>4. Risiko:</strong> ${escapeHtml(plain.risk || questionItem?.residual_risk || (row.risk_warnings || [])[0] || "Kein dominantes Einzelrisiko verfügbar.")}</div>
+        <details class="expert-details"><summary>Detailzahlen und Expertenansicht</summary>
         ${probabilityPanel}
         ${expertPanel}
         ${sweetPanel}
@@ -916,7 +987,7 @@
         <div class="section"><h3>News und Termine</h3>
           ${row.next_earnings ? `<div class="callout warning">Nächste Zahlen: ${escapeHtml(row.next_earnings)} (${escapeHtml(row.earnings_in_days)} Tage)</div>` : ""}
           ${news || `<div class="muted">Keine aktuellen altersgefilterten Headlines.</div>`}
-        </div>`;
+        </div></details>`;
     }
 
     function renderHealthView() {
@@ -961,6 +1032,7 @@
     function setView(view) {
       state.view = view; state.selected = null; $("search").value = "";
       document.querySelectorAll(".nav-button").forEach((button) => button.classList.toggle("active", button.dataset.view === view));
+      document.querySelectorAll(".expert-nav").forEach((details) => details.open = false);
       renderList();
     }
 
