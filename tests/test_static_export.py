@@ -398,9 +398,10 @@ class StaticExportTests(ProjectTempMixin, unittest.TestCase):
         self.assertIn("var(--cp-warning)", html)
         self.assertIn("var(--cp-danger)", html)
         self.assertIn("Vollständiger Name", html)
-        self.assertIn("Hauptsitz (Provider)", html)
+        self.assertIn("availableText(row.headquarters_country)", html)
+        self.assertIn("Hauptsitz:", html)
         self.assertIn("Juristischer Sitz (verifiziert)", html)
-        self.assertIn("Börsenland/Markt", html)
+        self.assertIn("Börse:", html)
         self.assertIn('button.disabled = button.dataset.view !== "health"', html)
 
 

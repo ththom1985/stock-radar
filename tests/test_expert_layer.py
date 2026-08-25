@@ -8,6 +8,7 @@ from src.expert_layer import (
     build_expert_analysis,
     build_expert_rankings,
     load_score_weights,
+    build_risk_assessment,
 )
 
 
@@ -88,6 +89,26 @@ class ExpertLayerTests(unittest.TestCase):
         self.assertEqual(basis["status"], "narrower_non_us")
         self.assertTrue(basis["weights_renormalized"])
         self.assertIn("SEC 13F", basis["structurally_unavailable"])
+
+    def test_low_debt_and_beta_are_not_presented_as_top_risks(self):
+        result = build_risk_assessment(
+            {
+                "debt_to_equity_pct": 11.9,
+                "beta": 0.38,
+                "next_earnings": "2026-10-22",
+                "earnings_in_days": 58,
+            }
+        )
+        self.assertEqual(len(result["top_risks"]), 1)
+        self.assertIn("kein einzelnes dominantes Risiko", result["top_risks"][0])
+        self.assertNotIn("Debt/Equity", result["top_risks"][0])
+
+    def test_material_debt_is_translated_to_plain_german(self):
+        result = build_risk_assessment(
+            {"debt_to_equity_pct": 180, "beta": 1.0}
+        )
+        self.assertIn("Verschuldung", result["top_risks"][0])
+        self.assertNotIn("Debt/Equity", result["top_risks"][0])
 
 
 if __name__ == "__main__":

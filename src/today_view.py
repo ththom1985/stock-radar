@@ -59,7 +59,10 @@ def plain_language(row):
     signal=("Dafür spricht: "+", ".join(positive)+"." if positive else "Derzeit gibt es keine klar positiven unabhängigen Signalgruppen.")
     if verdict in {"expensive","overpriced"}:signal+=" Dagegen spricht die hohe Bewertung."
     risks=(expert.get("risks") or {}).get("top_risks") or row.get("risk_warnings") or []
-    risk=f"Größtes sichtbares Risiko: {risks[0]}" if risks else "Größtes Risiko: Die Datenlage liefert aktuell keinen einzelnen dominanten Risikofaktor."
+    if risks and str(risks[0]).startswith("Das Modell erkennt aktuell kein"):
+        risk=risks[0]
+    else:
+        risk=f"Größtes sichtbares Risiko: {risks[0]}" if risks else "Das Modell erkennt aktuell kein einzelnes dominantes Risiko."
     return {"valuation":valuation_text,"timing":timing,"signals":signal,"risk":risk}
 
 def _reason(row,light):

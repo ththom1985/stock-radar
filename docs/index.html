@@ -823,6 +823,9 @@
         disclaimer: "Analyse-Unterstützung, keine Anlageberatung."
       } : {};
       const expertFair = expert.valuation?.fair_value_range || {};
+      const availableText = (value) => value && value !== "Nicht verfügbar";
+      const exposure = [row.economic_exposure_country, row.economic_exposure_region].filter(availableText);
+      const listing = [row.listing_country, row.listing_market].filter(availableText);
       const valuationPlain = plain.valuation || (
         expert.valuation?.verdict === "data_review_required"
           ? `${row.display_name_full || row.short_name || row.symbol}: Bewertung auffällig — der extreme faire Bereich wird bis zur Datenprüfung nicht angezeigt.`
@@ -846,10 +849,11 @@
       </div>` : "";
       $("detail").innerHTML = `
         <div class="detail-head"><div><div class="eyebrow">Vollständiger Name</div><h2>${escapeHtml(row.display_name_full || row.short_name || row.symbol || "")}</h2><div class="symbol">${escapeHtml(row.symbol)}</div>
-        <div class="muted">Branche: ${escapeHtml(row.industry_display || "nicht verfügbar")} · Sektor: ${escapeHtml(row.sector_display || "nicht verfügbar")}</div>
-        <div class="muted">Hauptsitz (Provider): ${escapeHtml(row.headquarters_country || "nicht verfügbar")} · Wirtschaftliches Exposure: ${escapeHtml(row.economic_exposure_country || "nicht verfügbar")} / ${escapeHtml(row.economic_exposure_region || "nicht verfügbar")}</div>
+        ${(row.industry_display || row.sector_display) ? `<div class="muted">${row.industry_display ? `Branche: ${escapeHtml(row.industry_display)}` : ""}${row.industry_display && row.sector_display ? " · " : ""}${row.sector_display ? `Sektor: ${escapeHtml(row.sector_display)}` : ""}</div>` : ""}
+        ${availableText(row.headquarters_country) ? `<div class="muted">Hauptsitz: ${escapeHtml(row.headquarters_country)}</div>` : ""}
+        ${exposure.length ? `<div class="muted">Wirtschaftliches Exposure: ${exposure.map(escapeHtml).join(" / ")}</div>` : ""}
         ${row.legal_domicile_verified ? `<div class="muted">Juristischer Sitz (verifiziert): ${escapeHtml(row.legal_domicile)} · ${escapeHtml(row.legal_domicile_source || "")}</div>` : ""}
-        <div class="muted">Börsenland/Markt: ${escapeHtml(row.listing_country || "nicht verfügbar")} / ${escapeHtml(row.listing_market || "nicht verfügbar")}</div>
+        ${listing.length ? `<div class="muted">Börse: ${listing.map(escapeHtml).join(" / ")}</div>` : ""}
         <div class="muted">${escapeHtml(assetLabels[row.asset_type] || row.asset_type)} · ${escapeHtml(row.currency || "")} · Bar ${escapeHtml(row.bar_date || "–")}</div></div>
         <span class="badge">${$number(row.entry_timing_score, 0)}/100 Timing</span></div>
         <div class="summary"><strong>1. Bewertung:</strong> ${escapeHtml(valuationPlain)}</div>

@@ -379,14 +379,41 @@ def build_entry_assessment(row):
 
 def build_risk_assessment(row):
     risks = list(row.get("risk_warnings") or [])
-    if _number(row.get("debt_to_equity_pct")) is not None:
-        risks.append(f"Debt/Equity: {row['debt_to_equity_pct']:.1f}%")
-    if _number(row.get("beta")) is not None:
-        risks.append(f"Beta: {row['beta']:.2f}")
-    if row.get("next_earnings"):
+    debt = _number(row.get("debt_to_equity_pct"))
+    beta = _number(row.get("beta"))
+    if debt is not None and debt >= 150:
         risks.append(
-            f"Nächster Ergebnistermin: {row['next_earnings']} "
-            f"({row.get('earnings_in_days')} Tage)"
+            f"Die Verschuldung ist mit {debt:.0f}% des Eigenkapitals sehr hoch."
+        )
+    elif debt is not None and debt >= 100:
+        risks.append(
+            f"Die Verschuldung ist mit {debt:.0f}% des Eigenkapitals erhöht."
+        )
+    if beta is not None and beta >= 1.5:
+        risks.append(
+            f"Der Kurs schwankt mit einem Beta von {beta:.2f} deutlich stärker als der Markt."
+        )
+    short_interest = (
+        (row.get("alternative_signals") or {}).get("signals") or {}
+    ).get("short_interest") or {}
+    days_to_cover = _number((short_interest.get("evidence") or {}).get("days_to_cover"))
+    if days_to_cover is not None and days_to_cover >= 7:
+        risks.append(
+            f"Die gemeldeten Leerverkäufe entsprechen etwa {days_to_cover:.1f} Handelstagen."
+        )
+    earnings_days = row.get("earnings_in_days")
+    if (
+        row.get("next_earnings")
+        and isinstance(earnings_days, int)
+        and 0 <= earnings_days <= 14
+    ):
+        risks.append(
+            f"Der nächste Ergebnistermin ist bereits in {earnings_days} Tagen."
+        )
+    if not risks:
+        risks.append(
+            "Das Modell erkennt aktuell kein einzelnes dominantes Risiko; "
+            "Verschuldung und Kursschwankung sind unauffällig."
         )
     return {
         "model_status": EXPERT_MODEL_STATUS,
@@ -394,9 +421,7 @@ def build_risk_assessment(row):
         "top_risks": risks[:3],
         "debt_to_equity_pct": row.get("debt_to_equity_pct"),
         "beta": row.get("beta"),
-        "short_interest": (
-            (row.get("alternative_signals") or {}).get("signals") or {}
-        ).get("short_interest"),
+        "short_interest": short_interest or None,
         "next_earnings": row.get("next_earnings"),
     }
 

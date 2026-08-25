@@ -392,15 +392,32 @@ def _research_card(row, rank=None):
             f"{prefix}{row.get('display_name_full') or row.get('short_name') or row.get('symbol')}"
         )
         st.markdown(f"**{row.get('symbol')}**")
-        st.caption(
-            f"Branche: {row.get('industry_display') or 'nicht verfügbar'} · "
-            f"Sektor: {row.get('sector_display') or 'nicht verfügbar'} · "
-            f"Hauptsitz (Provider): {row.get('headquarters_country') or 'nicht verfügbar'} · "
-            f"Wirtschaftliches Exposure: {row.get('economic_exposure_country') or 'nicht verfügbar'}"
-            f"/{row.get('economic_exposure_region') or 'nicht verfügbar'} · "
-            f"Börsenland/Markt: {row.get('listing_country') or 'nicht verfügbar'} / "
-            f"{row.get('listing_market') or 'nicht verfügbar'}"
-        )
+        context = []
+        if row.get("industry_display"):
+            context.append(f"Branche: {row['industry_display']}")
+        if row.get("sector_display"):
+            context.append(f"Sektor: {row['sector_display']}")
+        if row.get("headquarters_country") not in {None, "Nicht verfügbar"}:
+            context.append(f"Hauptsitz: {row['headquarters_country']}")
+        exposure = [
+            value
+            for value in (
+                row.get("economic_exposure_country"),
+                row.get("economic_exposure_region"),
+            )
+            if value not in {None, "Nicht verfügbar"}
+        ]
+        if exposure:
+            context.append("Wirtschaftliches Exposure: " + " / ".join(exposure))
+        listing = [
+            value
+            for value in (row.get("listing_country"), row.get("listing_market"))
+            if value not in {None, "Nicht verfügbar"}
+        ]
+        if listing:
+            context.append("Börse: " + " / ".join(listing))
+        if context:
+            st.caption(" · ".join(context))
         if row.get("legal_domicile_verified"):
             st.caption(
                 f"Juristischer Sitz (verifiziert): {row.get('legal_domicile')} · "
