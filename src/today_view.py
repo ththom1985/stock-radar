@@ -13,7 +13,8 @@ STATUS_LABELS={
     "reference_only_far":"Nur beobachten",
     "unavailable":"Keine belastbare Zone",
 }
-VERDICTS={"clearly_undervalued":"deutlich unterbewertet","fair":"fair bewertet","expensive":"eher teuer","overpriced":"deutlich überteuert","unavailable":"nicht belastbar bewertbar"}
+VERDICTS={"clearly_undervalued":"deutlich unterbewertet","fair":"fair bewertet","expensive":"eher teuer","overpriced":"deutlich überteuert","unavailable":"nicht belastbar bewertbar","data_review_required":"auffällig bewertet — Datenprüfung ausstehend"}
+GROUP_LABELS={"insider":"Insider-Aktivität","congress":"Congress-Transaktionen","attention":"steigende Aufmerksamkeit (Wikipedia-Aufrufe oder Jobs)","earnings_tone":"positiver Tonwechsel in den Quartalsunterlagen"}
 
 def _num(value):
     return float(value) if isinstance(value,(int,float)) and math.isfinite(value) else None
@@ -34,6 +35,7 @@ def local_zone(row):
 def traffic_light(row):
     status=(row.get("sweet_spot") or {}).get("combined_status")
     verdict=((row.get("expert_analysis") or {}).get("valuation") or {}).get("verdict")
+    if verdict=="data_review_required":return "yellow"
     if status=="in_zone_confirmed" and verdict in {"fair","clearly_undervalued"}:return "green"
     if status in {"in_zone_confirmed","approaching","setup_waiting_confirmation","in_zone_risk_filtered"}:return "yellow"
     return "red"
@@ -42,7 +44,10 @@ def plain_language(row):
     expert=row.get("expert_analysis") or {}; valuation=expert.get("valuation") or {}; fair=valuation.get("fair_value_range") or {}
     currency=row.get("currency"); price=_num(row.get("price_local")); verdict=valuation.get("verdict","unavailable")
     fair_text=(f"der faire Bereich liegt bei {_money(fair.get('lower'),currency)} bis {_money(fair.get('upper'),currency)}" if fair else "ein fairer Bereich ist noch nicht belastbar")
-    valuation_text=f"{row.get('display_name_full') or row.get('name') or row.get('symbol')} ist aktuell {VERDICTS.get(verdict,verdict)} — {fair_text}, der Kurs bei {_money(price,currency)}."
+    if verdict=="data_review_required":
+        valuation_text=f"Die Bewertung von {row.get('display_name_full') or row.get('name') or row.get('symbol')} ist auffällig — der extreme faire Bereich wird bis zur Datenprüfung nicht angezeigt; Kurs {_money(price,currency)}."
+    else:
+        valuation_text=f"{row.get('display_name_full') or row.get('name') or row.get('symbol')} ist aktuell {VERDICTS.get(verdict,verdict)} — {fair_text}, der Kurs bei {_money(price,currency)}."
     zone=local_zone(row); status=(row.get("sweet_spot") or {}).get("combined_status")
     if zone and status=="in_zone_confirmed":
         timing=f"Der Kurs liegt in der technischen Einstiegszone von {_money(zone['lower'],currency)} bis {_money(zone['upper'],currency)}."
@@ -50,7 +55,7 @@ def plain_language(row):
         timing=f"Interessanter wird der Kurs in der Zone von {_money(zone['lower'],currency)} bis {_money(zone['upper'],currency)}."
     else: timing="Eine belastbare Einstiegszone fehlt derzeit."
     alt=row.get("alternative_signals") or {}; groups=alt.get("contributing_groups") or []
-    positive=[item["group"] for item in groups if _num(item.get("score")) is not None and item["score"]>55]
+    positive=[GROUP_LABELS.get(item["group"],item["group"]) for item in groups if _num(item.get("score")) is not None and item["score"]>55]
     signal=("Dafür spricht: "+", ".join(positive)+"." if positive else "Derzeit gibt es keine klar positiven unabhängigen Signalgruppen.")
     if verdict in {"expensive","overpriced"}:signal+=" Dagegen spricht die hohe Bewertung."
     risks=(expert.get("risks") or {}).get("top_risks") or row.get("risk_warnings") or []
@@ -60,8 +65,11 @@ def plain_language(row):
 def _reason(row,light):
     verdict=((row.get("expert_analysis") or {}).get("valuation") or {}).get("verdict")
     alt=row.get("alternative_signals") or {}; groups=alt.get("contributing_groups") or []
+    if verdict=="data_review_required":
+        return "Technische Zone erreicht, aber die extreme Bewertung ist zur Datenprüfung zurückgehalten."
     if light=="green":
-        return f"{VERDICTS.get(verdict,'Fair bewertet').capitalize()}, Kurs in der Unterstützungszone"+(f", {len(groups)} unabhängige Signalgruppen vorhanden." if groups else ".")
+        count=len(groups); group_text=f"{count} unabhängige Signalgruppe" if count==1 else f"{count} unabhängige Signalgruppen"
+        return f"{VERDICTS.get(verdict,'Fair bewertet').capitalize()}, Kurs in der Unterstützungszone"+(f", {group_text} vorhanden." if groups else ".")
     if light=="yellow" and verdict in {"expensive","overpriced"}:return "Technische Zone erreicht, aber die Bewertung ist hoch."
     if light=="yellow":return "Der Kurs nähert sich einer interessanten Zone; Bestätigung abwarten."
     return "Timing, Bewertung oder Sicherheitsfilter sprechen derzeit gegen einen Einstieg."

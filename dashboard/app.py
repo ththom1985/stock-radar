@@ -31,10 +31,10 @@ PORTFOLIO = ROOT / "data" / "portfolio.json"
 BACKTEST = ROOT / "data" / "backtest.json"
 
 st.set_page_config(page_title="Stock Radar Research", page_icon="📊", layout="wide")
-st.title("📊 Stock Radar — completed-daily-bar research")
+st.title("📊 Stock Radar")
 st.caption(
-    "Heuristic radar sections remain unvalidated. Calibrated material-move "
-    "probabilities appear only after every strict release gate passes."
+    "Hinweise aus abgeschlossenen Tageskursen. Wahrscheinlichkeiten erscheinen "
+    "erst nach bestandener Selbstprüfung."
 )
 
 
@@ -48,9 +48,8 @@ try:
     validate_output_contract(data)
 except (PersistenceError, DataContractError) as exc:
     _stop_with_error(
-        f"Output is missing, corrupt, or from the unsupported legacy schema: {exc}. "
-        "Run `python -m src.analyze` or provider-free `python -m src.enrich_snapshot "
-        "--in-place` to create a validated v3 snapshot."
+        "Die Datendatei fehlt, ist beschädigt oder hat ein nicht unterstütztes Format. "
+        f"Technisches Detail: {exc}"
     )
 
 status = data["data_status"]
@@ -61,11 +60,11 @@ try:
         or load_forward_validation_status()
     )
 except ValueError as exc:
-    _stop_with_error(f"Forward-validation aggregate is invalid: {exc}")
+    _stop_with_error(f"Der Stand der Selbstprüfung ist ungültig. Technisches Detail: {exc}")
 allowed, blockers = dashboard_gate(data)
 
 if not allowed:
-    st.error("Research cards are blocked because the freshness/completeness contract failed.")
+    st.error("Die Karten sind gesperrt, weil Daten fehlen oder zu alt sind.")
     for reason in blockers:
         st.write(f"- {reason}")
     st.json(
@@ -89,23 +88,21 @@ if not allowed:
 
 metrics = st.columns(5)
 metrics[0].metric("Snapshot", data["generated_at"].replace("T", " ")[:19] + " UTC")
-metrics[1].metric("Price coverage", f"{status.get('coverage_pct', 0):.2f}%")
-metrics[2].metric("Fresh bars", f"{status.get('fresh_bar_coverage_pct', 0):.2f}%")
-metrics[3].metric("Failed symbols", status.get("failed_symbol_count", 0))
-metrics[4].metric("Model", str(model.get("validation", "unknown")).upper())
+metrics[1].metric("Preisabdeckung", f"{status.get('coverage_pct', 0):.2f}%")
+metrics[2].metric("Aktuelle Kurse", f"{status.get('fresh_bar_coverage_pct', 0):.2f}%")
+metrics[3].metric("Fehlende Titel", status.get("failed_symbol_count", 0))
+metrics[4].metric("Selbstprüfung", "läuft")
 
 st.warning(
-    "The deployed composite is UNVALIDATED and non-actionable. Scenario ranges are "
-    "heuristic volatility illustrations, not expected returns, medians, calibrated "
-    "intervals, probabilities, targets, or recommendations."
+    "Das System sammelt noch Erfahrungswerte. Szenariospannen sind Beobachtungen, "
+    "keine Wahrscheinlichkeiten, Kursziele oder Empfehlungen."
 )
 st.info(
-    "Technical research lists are partitioned by trading currency and asset class. "
-    "There is no global cross-currency ordering because point-in-time historical FX "
-    "is unavailable."
+    "Listen werden nach Handelswährung und Anlageart getrennt. Es gibt bewusst "
+    "kein gemeinsames Ranking über unterschiedliche Währungen."
 )
 
-with st.expander("Data and model contract", expanded=not allowed):
+with st.expander("Technischer Daten- und Modellstatus", expanded=not allowed):
     st.json(
         {
             "schema": data.get("schema"),
@@ -145,7 +142,7 @@ def _scenario_table(row):
                 "Referenzpfad (heuristisch)": _number(item.get("reference_change_pct"), 1, "%"),
                 "Spanne unten USD": _number(item.get("range_low_price"), 2),
                 "Spanne oben USD": _number(item.get("range_high_price"), 2),
-                "Status": item.get("model_status"),
+                "Status": "Noch nicht statistisch bestätigt",
             }
         )
     return pd.DataFrame(records)
@@ -180,10 +177,7 @@ def _render_sweet_spot(row):
         sweet.get("combined_status") or "Zone nicht verfügbar",
     )
     tone = sweet.get("tone")
-    message = (
-        f"{label} · combined_status={sweet.get('combined_status') or 'unavailable'} · "
-        "heuristic_unvalidated / actionable false"
-    )
+    message = f"{label} · Das System sammelt noch Erfahrungswerte."
     if tone == "green":
         st.success(message)
     elif tone == "amber":
@@ -197,37 +191,35 @@ def _render_sweet_spot(row):
         return
     if sweet.get("zone_tier") == "reference_only":
         st.info(
-            "Nur Einzelanker, keine Confluence · "
-            f"{sweet.get('anchor_scope') or 'reference'} / "
-            f"{sweet.get('anchor_distance_class') or 'unclassified'} · "
-            "mathematische Referenzzone, Bestätigung fehlt."
+            "Nur eine technische Unterstützung, noch keine Bestätigung durch "
+            "mehrere unabhängige Quellen."
         )
-    zone_values = [
-        sweet.get("lower"),
-        sweet.get("ideal"),
-        sweet.get("upper"),
-    ]
+    rate = row.get("fx_usd") if isinstance(row.get("fx_usd"), (int, float)) else 1
+    currency = row.get("currency") or "USD"
+    local = lambda value: value / rate if isinstance(value, (int, float)) and rate else None
+    zone_values = [local(sweet.get(key)) for key in ("lower", "ideal", "upper")]
+    current_local = row.get("price_local")
     zone_metrics = st.columns(4)
     zone_metrics[0].metric(
-        "Untergrenze USD",
-        format_price(sweet.get("lower"), zone_values),
+        f"Untergrenze {currency}",
+        format_price(zone_values[0], zone_values),
     )
     zone_metrics[1].metric(
-        "IDEAL USD",
-        format_price(sweet.get("ideal"), zone_values),
+        f"IDEAL {currency}",
+        format_price(zone_values[1], zone_values),
     )
     zone_metrics[2].metric(
-        "Obergrenze USD",
-        format_price(sweet.get("upper"), zone_values),
+        f"Obergrenze {currency}",
+        format_price(zone_values[2], zone_values),
     )
     zone_metrics[3].metric(
-        "Aktueller Kurs USD",
-        format_price(sweet.get("current_price"), [*zone_values, sweet.get("current_price")]),
+        f"Aktueller Kurs {currency}",
+        format_price(current_local, [*zone_values, current_local]),
     )
     st.caption(
-        f"{format_price(sweet.get('lower'), zone_values)} – IDEAL "
-        f"{format_price(sweet.get('ideal'), zone_values)} – "
-        f"{format_price(sweet.get('upper'), zone_values)} USD · Abstand zu IDEAL "
+        f"{format_price(zone_values[0], zone_values)} – IDEAL "
+        f"{format_price(zone_values[1], zone_values)} – "
+        f"{format_price(zone_values[2], zone_values)} {currency} · Abstand zu IDEAL "
         f"{_number(sweet.get('current_distance_pct'), 2, '%')} · Abstand zur Zone "
         f"{_number(sweet.get('distance_to_zone_pct'), 2, '%')} · Reliabilität "
         f"{_number(sweet.get('reliability_score'), 0, '/100')} "
@@ -241,7 +233,7 @@ def _render_sweet_spot(row):
             "**Konfluenzquellen:** "
             + " ".join(
                 f"`{item.get('label')} "
-                f"{format_price(item.get('value'), [*zone_values, item.get('value')])} USD`"
+                f"{format_price(local(item.get('value')), [*zone_values, local(item.get('value'))])} {currency}`"
                 for item in components
             )
         )
@@ -260,7 +252,7 @@ def _render_sweet_spot(row):
     )
     alignment = sweet.get("valuation_alignment") or {}
     st.caption(
-        f"Bewertungsabgleich: {alignment.get('status') or 'unavailable'} · "
+        f"Bewertungsabgleich: {'verfügbar' if alignment.get('status') else 'nicht verfügbar'} · "
         f"{alignment.get('note') or ''}"
     )
 
@@ -281,16 +273,20 @@ def _render_probability_forecast(row, shared_baselines=None):
         "Sweet Spot oder Farbe · keine Anlageempfehlung"
     )
     if forecast.get("status") == "withheld":
-        st.warning(
-            f"{forecast.get('message') or 'No validated stock-specific probability edge'}."
-        )
+        st.warning("Noch keine Wahrscheinlichkeiten — das System prüft sich erst selbst.")
         st.caption(
             "Status: Forward Validation erforderlich. Historische Basisraten sind "
             "deskriptive Häufigkeiten des heutigen Survivor-Universums, keine "
             "Aktienprognose und kein Konfidenzintervall."
         )
-        for reason in forecast.get("reasons") or []:
-            st.write(f"- {reason}")
+        reasons = forecast.get("reasons") or []
+        if reasons:
+            non_us = row.get("currency") != "USD"
+            st.caption(
+                "Für Titel außerhalb USD gibt es noch keine Wahrscheinlichkeits-Prüfung."
+                if non_us
+                else "Die technische Modellprüfung ist noch nicht abgeschlossen."
+            )
     elif forecast.get("status") == "partial":
         st.info(
             "Nur die unten aufgeführten Horizont-/Schwellenmodelle haben alle "
@@ -299,7 +295,7 @@ def _render_probability_forecast(row, shared_baselines=None):
     elif forecast.get("status") == "accepted":
         st.info("Alle unten aufgeführten Modelle haben die strikten Freigabekriterien erfüllt.")
     else:
-        st.warning("No validated stock-specific probability edge. Output contract unavailable.")
+        st.warning("Noch keine Wahrscheinlichkeiten — die Selbstprüfung ist nicht abgeschlossen.")
 
     for item in forecast.get("forecasts") or []:
         probabilities = item.get("probabilities_pct") or {}
@@ -397,17 +393,17 @@ def _research_card(row, rank=None):
                 f"{row.get('legal_domicile_source') or ''}"
             )
         if row.get("economic_exposure_country") == "China":
-            st.error("China-Risikokontext (heuristic_unvalidated; kein bewiesener Abschlag)")
+            st.error("China-Risikokontext (noch nicht statistisch bestätigt)")
             for reason in jurisdiction.get("reasons") or []:
                 st.warning(reason)
         alternative = row.get("alternative_signals") or {}
         if alternative.get("activation_status") == "active":
             groups = alternative.get("contributing_groups") or []
             st.success(
-                f"Konfluenz {alternative.get('confluence_tier')} · "
+                f"Mehrfachsignal {'4 Gruppen' if alternative.get('confluence_tier') == 'four_group' else '3 Gruppen'} · "
                 f"{_number(alternative.get('confluence_score'), 1)}/100 · "
                 + ", ".join(
-                    f"{item.get('group')} {item.get('score')}"
+                    f"{ {'insider':'Insider','congress':'Congress','attention':'Aufmerksamkeit','earnings_tone':'Quartalston'}.get(item.get('group'), item.get('group'))} {item.get('score')}"
                     for item in groups
                 )
             )
@@ -430,23 +426,43 @@ def _research_card(row, rank=None):
             st.markdown("#### Experten-Composite")
             expert_metrics = st.columns(4)
             expert_metrics[0].metric(
-                "Long Term",
+                "Langfristig",
                 _number((expert.get("long_term") or {}).get("score"), 1, "/100"),
                 f"{_number((expert.get('long_term') or {}).get('coverage_pct'), 1, '%')} Abdeckung",
             )
             expert_metrics[1].metric(
-                "Short Term",
+                "Kurzfristig",
                 _number((expert.get("short_term") or {}).get("score"), 1, "/100"),
                 f"{_number((expert.get('short_term') or {}).get('coverage_pct'), 1, '%')} Abdeckung",
             )
-            expert_metrics[2].metric("Signal", expert.get("signal") or "insufficient_data")
+            signal_labels = {
+                "positive_setup": "Positives Setup",
+                "wait_for_pullback": "Auf Rücksetzer warten",
+                "risk_too_high": "Risiko zu hoch",
+                "insufficient_data": "Daten reichen nicht",
+            }
+            expert_metrics[2].metric(
+                "Signal",
+                signal_labels.get(expert.get("signal"), "Daten reichen nicht"),
+            )
             expert_metrics[3].metric(
-                "Konfidenz", expert.get("evidence_quality") or "low"
+                "Datenbasis",
+                {"high": "breit", "medium": "mittel", "low": "schmal"}.get(
+                    expert.get("evidence_quality"), "schmal"
+                ),
             )
             expert_valuation = expert.get("valuation") or {}
             fair_range = expert_valuation.get("fair_value_range") or {}
+            verdict_labels = {
+                "clearly_undervalued": "deutlich unterbewertet",
+                "fair": "fair bewertet",
+                "expensive": "eher teuer",
+                "overpriced": "deutlich überteuert",
+                "data_review_required": "auffällig — Datenprüfung ausstehend",
+                "unavailable": "nicht belastbar",
+            }
             st.caption(
-                f"Bewertung: {expert_valuation.get('verdict') or 'unavailable'} · "
+                f"Bewertung: {verdict_labels.get(expert_valuation.get('verdict'), 'nicht belastbar')} · "
                 + (
                     f"fairer Heuristik-Bereich {_number(fair_range.get('lower'), 2)}–"
                     f"{_number(fair_range.get('upper'), 2)} {fair_range.get('currency') or ''}"

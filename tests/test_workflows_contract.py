@@ -25,6 +25,7 @@ class WorkflowContractTests(unittest.TestCase):
             self.assertIn("data/probability_validation.json", text)
             self.assertIn("data/probability_forward_status.json", text)
             self.assertIn("data/finra_short_interest.json", text)
+            self.assertIn("data/valuation_anomalies.json", text)
             self.assertIn("FINRA_CLIENT_ID", text)
             self.assertIn("FINRA_CLIENT_SECRET", text)
             self.assertIn(

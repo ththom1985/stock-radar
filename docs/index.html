@@ -173,7 +173,7 @@
           <h1>Stock Radar</h1>
           <div class="subtitle">Transparente tägliche Research-Hinweise zu Timing, Bewertung, Analysten, Chancen und Risiken.</div>
         </div>
-        <div class="status-chip">Radar UNVALIDATED · probability fail-closed</div>
+        <div class="status-chip">System lernt noch · 0/100 Testfenster</div>
       </header>
       <section class="metrics">
         <div class="metric"><div class="metric-label">Datenstand</div><div id="generated" class="metric-value"></div></div>
@@ -182,7 +182,7 @@
         <div class="metric"><div class="metric-label">Frische Bars</div><div id="freshness" class="metric-value"></div></div>
         <div class="metric"><div class="metric-label">Fehlende Symbole</div><div id="failed-count" class="metric-value"></div></div>
       </section>
-      <div class="notice">Keine Anlageberatung. Radar-Insights bleiben <strong>heuristic_unvalidated</strong>. Kalibrierte Materialbewegungs-Wahrscheinlichkeiten erscheinen ausschließlich nach bestandenen strikten Freigabekriterien und fließen nie in Ranking, Sweet Spot oder Farbe ein.</div>
+      <div class="notice">Keine Anlageberatung. Das System sammelt noch Erfahrungswerte; Wahrscheinlichkeiten erscheinen erst nach bestandener Selbstprüfung.</div>
       <nav id="nav" class="nav">
         <button class="nav-button active" data-view="today">Heute</button>
         <button class="nav-button" data-view="sweet_spot">Sweet Spot</button>
@@ -217,7 +217,7 @@
         <div class="panel"><h2>Datenqualität</h2><div id="health-content" class="section"></div></div>
         <div class="panel"><h2>Fehlende Symbole</h2><div id="failures" class="section"></div></div>
       </section>
-      <footer class="footer">Yahoo Finance über die fail-closed Stock-Radar-Pipeline · abgeschlossene Tagesbars · Radar UNVALIDATED · Probability-Modelle separat und strikt freigabepflichtig.</footer>
+      <footer class="footer">Abgeschlossene Tageskurse · fehlende oder auffällige Daten werden zurückgehalten · keine Anlageberatung.</footer>
     </div>
   </main>
   <script>
@@ -239,6 +239,35 @@
       all: "Alle suchen",
       health: "Datenqualität"
     };
+    const sweetLabels = {
+      in_zone_confirmed: "In der Kaufzone ✓",
+      in_zone_risk_filtered: "Zone erreicht, Risiko bremst",
+      approaching: "Fast in der Kaufzone",
+      setup_waiting_confirmation: "Bestätigung abwarten",
+      safety_blocked: "Kein Einstieg",
+      broken_below: "Technisches Bild gebrochen",
+      far_above: "Zu weit über der Zone",
+      reference_only_far: "Nur beobachten",
+      unavailable: "Keine belastbare Zone"
+    };
+    const signalLabels = {
+      positive_setup: "Positives Setup",
+      wait_for_pullback: "Auf Rücksetzer warten",
+      risk_too_high: "Risiko zu hoch",
+      insufficient_data: "Daten reichen nicht"
+    };
+    const verdictLabels = {
+      clearly_undervalued: "deutlich unterbewertet",
+      fair: "fair bewertet",
+      expensive: "eher teuer",
+      overpriced: "deutlich überteuert",
+      data_review_required: "Bewertung auffällig — Datenprüfung ausstehend",
+      unavailable: "nicht belastbar bewertbar"
+    };
+    function probabilityReason(row) {
+      if (row.currency !== "USD") return "Für Titel außerhalb USD gibt es noch keine Wahrscheinlichkeits-Prüfung.";
+      return "Noch keine Wahrscheinlichkeiten — das System prüft sich erst selbst (Stand: 0 von 100 Testfenstern).";
+    }
     const assetLabels = { company_equity: "Aktie", etf_fund: "ETF/Fonds", crypto: "Krypto", index_other: "Index/Sonstige", unknown: "Unbekannt" };
     const $number = (value, digits = 2) => Number.isFinite(value) ? new Intl.NumberFormat("de-DE", { maximumFractionDigits: digits }).format(value) : "–";
     const percent = (value, digits = 1) => Number.isFinite(value) ? `${$number(value, digits)} %` : "–";
@@ -633,7 +662,7 @@
         const row = state.bySymbol.get(item.symbol) || {};
         return `<button class="list-row ${item.symbol === state.selected ? "selected" : ""}" data-symbol="${escapeHtml(item.symbol)}">
           <span>${index + 1}</span><span class="symbol">${escapeHtml(item.symbol)}</span>
-          <span title="${escapeHtml(row.display_name_full || row.short_name || row.symbol || "")}"><strong class="row-name">${escapeHtml(row.display_name_full || row.short_name || "")}</strong><small class="row-meta">${escapeHtml(row.economic_exposure_country || row.headquarters_country || "Exposure n. v.")} · ${escapeHtml(row.industry_display || "Branche n. v.")}</small><small class="row-meta sweet-${escapeHtml(row.sweet_spot?.tone || "neutral")}">${escapeHtml(row.sweet_spot?.combined_status || "unavailable")}</small></span>
+          <span title="${escapeHtml(row.display_name_full || row.short_name || row.symbol || "")}"><strong class="row-name">${escapeHtml(row.display_name_full || row.short_name || "")}</strong><small class="row-meta">${escapeHtml(row.economic_exposure_country || row.headquarters_country || "Exposure n. v.")} · ${escapeHtml(row.industry_display || "Branche n. v.")}</small>${row.sweet_spot?.combined_status ? `<small class="row-meta sweet-${escapeHtml(row.sweet_spot?.tone || "neutral")}">${escapeHtml(sweetLabels[row.sweet_spot.combined_status] || "Beobachten")}</small>` : ""}</span>
           <span class="score">${$number(item.score, 0)}${state.view === "undervalued_quality" ? `<small class="row-meta">adjustiert</small>` : ""}</span>
         </button>`;
       }).join("");
@@ -671,7 +700,7 @@
     function renderProbabilityPanel(row) {
       const value = row.probability_forecast || {};
       const forecasts = value.forecasts || [];
-      const reasons = (value.reasons || []).map((reason) => `<li>${escapeHtml(reason)}</li>`).join("");
+      const reasons = value.reasons?.length ? `<li>${escapeHtml(probabilityReason(row))}</li>` : "";
       const modelRows = forecasts.map((item) => {
         const p = item.probabilities_pct || {};
         const interval = item.model_interval_95_pct || {};
@@ -689,12 +718,12 @@
         ? `<table class="data-table"><tr><th>Horizont</th><th>Schwelle</th><th>Down/Mitte/Up</th><th>Folds</th></tr>${value.baselines.map((item) => `<tr><td>${escapeHtml(item.horizon_label)}</td><td>${escapeHtml(item.threshold_pct)}%</td><td>${escapeHtml(item.rates_pct?.down)}/${escapeHtml(item.rates_pct?.middle)}/${escapeHtml(item.rates_pct?.up)}%</td><td>${escapeHtml(item.fold_count ?? "–")}</td></tr>`).join("")}</table>`
         : "";
       const statusText = value.status === "withheld"
-        ? `<div class="callout warning"><strong>${escapeHtml(value.message || "No validated stock-specific probability edge")}</strong><div>Status: Forward Validation erforderlich. Historische Basisraten sind deskriptive Häufigkeiten des heutigen Survivor-Universums, keine Aktienprognose und kein Konfidenzintervall.</div>${reasons ? `<ul>${reasons}</ul>` : ""}</div>`
+        ? `<div class="callout warning"><strong>${escapeHtml(probabilityReason(row))}</strong><div>Historische Basisraten sind nur Hintergrund, keine Aktienprognose.</div></div>`
         : value.status === "partial"
           ? `<div class="callout">Nur die gelisteten Horizont-/Schwellenmodelle haben alle aktuellen Freigabekriterien erfüllt.</div>`
           : `<div class="callout">Die gelisteten Modelle haben alle strikten Freigabekriterien erfüllt.</div>`;
       return `<div class="probability-panel">
-        <div class="sweet-zone-head"><div><strong>Kalibrierte Wahrscheinlichkeiten</strong><div class="muted">Separat von Radar-Score, Insight-Rang, Sweet Spot und Farbe</div></div><span class="badge neutral">${escapeHtml(value.status || "withheld")}</span></div>
+        <div class="sweet-zone-head"><div><strong>Wahrscheinlichkeits-Selbstprüfung</strong><div class="muted">Separat von Bewertung und Einstiegszone</div></div><span class="badge neutral">${value.status === "accepted" ? "Freigegeben" : value.status === "partial" ? "Teilweise freigegeben" : "Noch nicht freigegeben"}</span></div>
         ${statusText}${modelRows}${baselineRows}${baselineRows ? `<div class="muted">Nur historische Basisraten; keine aktienspezifische Modellfreigabe. Die Werte sind keine Prognose für dieses Unternehmen.</div>` : ""}
         <div class="muted">Signal ${escapeHtml(value.signal_timestamp || row.bar_date || "–")} · Listing-Währung ${escapeHtml(value.listing_currency || row.currency || "–")} · erster adjustierter/raw-äquivalenter Open strikt nach t · 30 bp Round Trip. ${escapeHtml(value.survivorship_warning || "")}</div>
       </div>`;
@@ -702,6 +731,8 @@
 
     function renderDetail(row) {
       if (!row) { $("detail").innerHTML = `<div class="muted">Keine Instrumente erfüllen diese Auswahl.</div>`; return; }
+      if (state.selected && state.selected !== row.symbol) return;
+      $("detail").dataset.symbol = row.symbol;
       const analyst = row.analyst_context || {};
       const downside = row.downside_structure || {};
       const valuation = row.valuation_context || {};
@@ -711,12 +742,16 @@
       const probabilityPanel = renderProbabilityPanel(row);
       const jurisdiction = row.jurisdiction_risk || {};
       const phase = row.trend_phase || {};
+      const rate = Number.isFinite(row.x) && row.x > 0 ? row.x : 1;
+      const currency = row.currency || "USD";
+      const localValue = (value) => Number.isFinite(value) ? value / rate : null;
+      const currentLocal = localValue(row.price);
       const todayCard = (state.data.today?.candidates || []).find((item) => item.symbol === row.symbol);
       const plain = todayCard?.plain || {};
       const scenarios = (row.scenario_long || []).map((item) => `<div class="scenario">
         <strong>${escapeHtml(item.label || "")}</strong>
         <span>Referenzpfad: ${percent(item.reference_change_pct)}</span>
-        <span>Spanne: ${$number(item.range_low_price)}–${$number(item.range_high_price)} USD</span>
+        <span>Spanne: ${$number(localValue(item.range_low_price))}–${$number(localValue(item.range_high_price))} ${escapeHtml(currency)}</span>
       </div>`).join("");
       const technicalRows = [
         ["RSI", $number(row.rsi, 1)], ["MACD / Signal", `${$number(row.macd, 2)} / ${$number(row.macd_signal, 2)}`],
@@ -732,7 +767,7 @@
         item.link ? `<a href="${escapeHtml(item.link)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.title || "")}</a>` : escapeHtml(item.title || "")
       }</div>`).join("");
       const sweetStatus = {
-        in_zone_confirmed: "Im Sweet Spot",
+        in_zone_confirmed: "In der Kaufzone ✓",
         in_zone_risk_filtered: "In Zone, Investor-Risiko gefiltert",
         approaching: "Nähert sich der Zone",
         setup_waiting_confirmation: "Bestätigung ausstehend",
@@ -740,19 +775,19 @@
         broken_below: "Unter Invalidation Reference",
         far_above: "Weit oberhalb der Zone",
         reference_only_far: "Nur Referenzzone",
-        unavailable: "Zone nicht verfügbar"
+        unavailable: "Keine belastbare Zone"
       }[sweet.combined_status] || sweet.combined_status || "Zone nicht verfügbar";
-      const zoneValues = [sweet.lower, sweet.ideal, sweet.upper];
+      const zoneValues = [localValue(sweet.lower), localValue(sweet.ideal), localValue(sweet.upper)];
       const sweetChips = (sweet.components || []).map((item) =>
-        `<span class="chip">${escapeHtml(item.label)} · ${escapeHtml(item.source_family)} · ${$price(item.value, [...zoneValues, item.value])} USD · ${$number(item.distance_atr, 2)} ATR</span>`
+        `<span class="chip">${escapeHtml(item.label)} · ${$price(localValue(item.value), [...zoneValues, localValue(item.value)])} ${escapeHtml(currency)} · ${$number(item.distance_atr, 2)} ATR</span>`
       ).join("");
       const tierNotice = sweet.zone_tier === "reference_only"
         ? `<div class="callout">Nur Einzelanker, keine Confluence · ${escapeHtml(sweet.anchor_scope || "reference")} / ${escapeHtml(sweet.anchor_distance_class || "unclassified")} · mathematische Referenzzone, Bestätigung fehlt.</div>`
         : "";
       const sweetPanel = sweet.available ? `<div class="sweet-zone ${escapeHtml(sweet.tone || "neutral")}">
         <div class="sweet-zone-head"><div><strong>Sweet-Spot-Beobachtungszone</strong><div class="muted">technische Einstiegsbeobachtung</div></div><span class="badge ${escapeHtml(sweet.tone || "neutral")}">${escapeHtml(sweetStatus)}</span></div>
-        <div class="sweet-values">${$price(sweet.lower, zoneValues)} – IDEAL ${$price(sweet.ideal, zoneValues)} – ${$price(sweet.upper, zoneValues)} USD</div>
-        <div>Kurs ${$price(row.price, [...zoneValues, row.price])} USD · Abstand zu IDEAL ${percent(sweet.current_distance_pct)} · Abstand zur Zone ${percent(sweet.distance_to_zone_pct)} · Reliabilität ${$number(sweet.reliability_score, 0)}/100 · ${sweet.independent_family_count} ${sweet.independent_family_count === 1 ? "Quellenfamilie" : "Quellenfamilien"}</div>
+        <div class="sweet-values">${$price(zoneValues[0], zoneValues)} – IDEAL ${$price(zoneValues[1], zoneValues)} – ${$price(zoneValues[2], zoneValues)} ${escapeHtml(currency)}</div>
+        <div>Kurs ${$price(currentLocal, [...zoneValues, currentLocal])} ${escapeHtml(currency)} · Abstand zu IDEAL ${percent(sweet.current_distance_pct)} · Abstand zur Zone ${percent(sweet.distance_to_zone_pct)} · Evidenz ${$number(sweet.reliability_score, 0)}/100 · ${sweet.independent_family_count} ${sweet.independent_family_count === 1 ? "Quellenfamilie" : "Quellenfamilien"}</div>
         <div class="chips">${sweetChips}</div>
         ${tierNotice}
         <div class="muted">Beobachtungszone, keine Ordermarke · ${escapeHtml(sweet.valuation_alignment?.note || "")}</div>
@@ -782,16 +817,16 @@
         <div class="detail-grid">
           <div class="stat"><span>Long Term</span><strong>${$number(expert.long_term?.score, 1)}/100</strong><small>${$number(expert.long_term?.coverage_pct, 1)} % Abdeckung</small></div>
           <div class="stat"><span>Short Term</span><strong>${$number(expert.short_term?.score, 1)}/100</strong><small>${$number(expert.short_term?.coverage_pct, 1)} % Abdeckung</small></div>
-          <div class="stat"><span>Signal</span><strong>${escapeHtml(expert.signal || "insufficient_data")}</strong></div>
-          <div class="stat"><span>Konfidenz</span><strong>${escapeHtml(expert.evidence_quality || "low")}</strong></div>
+          <div class="stat"><span>Signal</span><strong>${escapeHtml(signalLabels[expert.signal] || "Daten reichen nicht")}</strong></div>
+          <div class="stat"><span>Datenbasis</span><strong>${escapeHtml({high:"breit",medium:"mittel",low:"schmal"}[expert.evidence_quality] || "schmal")}</strong></div>
         </div>
-        <div class="callout">${escapeHtml(expert.valuation?.verdict || "unavailable")} · ${
+        <div class="callout">${escapeHtml(verdictLabels[expert.valuation?.verdict] || "nicht belastbar bewertbar")} · ${
           Number.isFinite(expertFair.lower) && Number.isFinite(expertFair.upper)
             ? `fairer Heuristik-Bereich ${$number(expertFair.lower)}–${$number(expertFair.upper)} ${escapeHtml(expertFair.currency || "")}`
             : "kein belastbarer fairer Bereich"
         }</div>
         ${expert.valuation?.missing_note ? `<div class="muted">${escapeHtml(expert.valuation.missing_note)}</div>` : ""}
-        <div class="muted">Szenario-Wahrscheinlichkeiten: ${escapeHtml(expert.outlook?.probabilities_status || "withheld")}</div>
+        <div class="muted">${probabilityReason(row)}</div>
         <div class="muted">${escapeHtml(expert.disclaimer || "Analyse-Unterstützung, keine Anlageberatung.")}</div>
       </div>` : "";
       $("detail").innerHTML = `
@@ -820,7 +855,7 @@
           <div class="stat"><span>Trendphase</span><strong>${escapeHtml(phase.phase || "–")}</strong></div>
           <div class="stat"><span>Timing</span><strong>${escapeHtml(row.entry_timing_label || "–")}</strong></div>
           <div class="stat"><span>Tageskontext</span><strong>${escapeHtml(row.daily_signal_direction || "–")}</strong></div>
-          <div class="stat"><span>Kurs USD</span><strong>${$number(row.price)}</strong></div>
+          <div class="stat"><span>Kurs ${escapeHtml(currency)}</span><strong>${$number(currentLocal)}</strong></div>
         </div>
         ${callout(row.entry_timing_reason, "success")}
         <div class="section"><h3>Entry-These (technischer Tageskontext)</h3>
@@ -841,7 +876,7 @@
           ${scenarios ? `<div class="scenario-grid">${scenarios}</div>` : `<div class="muted">Keine Szenariospannen verfügbar.</div>`}
         </div>
         <div class="section"><h3>Abwärtsstruktur und Beobachtungszone</h3>
-          <div class="callout ${downside.risk === "hoch" ? "danger" : "warning"}">Risiko ${escapeHtml(downside.risk || "–")} · ${escapeHtml(downside.verdict || "–")} · Support ${$number(downside.support1)} USD (${percent(downside.support1_pct)})</div>
+          <div class="callout ${downside.risk === "hoch" ? "danger" : "warning"}">Risiko ${escapeHtml(downside.risk || "–")} · ${escapeHtml(downside.verdict || "–")} · Unterstützung ${$number(localValue(downside.support1))} ${escapeHtml(currency)} (${percent(downside.support1_pct)})</div>
         </div>
         <div class="section"><h3>Fundamentaldaten (deskriptiv)</h3><div class="detail-grid">${fundRows}</div>
           <div class="muted">${escapeHtml((valuation.reasons || []).join(" · ") || valuation.comparison_note || valuation.unavailable_reason || "Keine vollständigen aktuellen Fundamentaldaten.")}</div>

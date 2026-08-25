@@ -10,6 +10,7 @@ from .persistence import load_json
 
 WEIGHTS_PATH = DATA / "expert_score_weights.json"
 EXPERT_MODEL_STATUS = "heuristic_unvalidated"
+MAX_FAIR_VALUE_DEVIATION_PCT = 80.0
 
 DEFAULT_WEIGHTS = {
     "long_term": {
@@ -254,7 +255,14 @@ def build_valuation_assessment(row, sector_medians=None, five_year=None):
         value for value in implied_prices if math.isfinite(value) and value > 0
     )
     fair_range = None
+    raw_fair_range = None
     verdict = "unavailable"
+    plausibility_gate = {
+        "status": "pass",
+        "max_deviation_pct": MAX_FAIR_VALUE_DEVIATION_PCT,
+        "observed_deviation_pct": None,
+        "reason": None,
+    }
     if len(implied_prices) >= 2 and current_price:
         low_index = max(0, round((len(implied_prices) - 1) * 0.25))
         high_index = min(
@@ -273,6 +281,7 @@ def build_valuation_assessment(row, sector_medians=None, five_year=None):
             ),
             "input_count": len(implied_prices),
         }
+        raw_fair_range = dict(fair_range)
         if current_price < lower * 0.85:
             verdict = "clearly_undervalued"
         elif current_price <= upper:
@@ -281,11 +290,38 @@ def build_valuation_assessment(row, sector_medians=None, five_year=None):
             verdict = "expensive"
         else:
             verdict = "overpriced"
+        deviation_pct = (
+            (lower / current_price - 1.0) * 100.0
+            if current_price < lower
+            else (current_price / upper - 1.0) * 100.0
+            if current_price > upper
+            else 0.0
+        )
+        plausibility_gate["observed_deviation_pct"] = round(deviation_pct, 2)
+        if deviation_pct > MAX_FAIR_VALUE_DEVIATION_PCT:
+            plausibility_gate.update(
+                {
+                    "status": "withheld_extreme_deviation",
+                    "reason": (
+                        "Fair-value range is more than "
+                        f"{MAX_FAIR_VALUE_DEVIATION_PCT:.0f}% from the current price; "
+                        "peer comparability or corporate-action data requires review."
+                    ),
+                }
+            )
+            fair_range = None
+            verdict = "data_review_required"
     return {
         "model_status": EXPERT_MODEL_STATUS,
         "actionable": False,
         "verdict": verdict,
         "fair_value_range": fair_range,
+        "raw_fair_value_range": (
+            raw_fair_range
+            if plausibility_gate["status"] != "pass"
+            else None
+        ),
+        "plausibility_gate": plausibility_gate,
         "metrics": metrics,
         "own_history_months": five_year.get("months_available", 0),
         "own_5y_complete": bool(five_year.get("complete")),
@@ -413,7 +449,15 @@ def build_expert_analysis(
     five_year=None,
 ):
     weights = weights or load_score_weights()
+    valuation_assessment = build_valuation_assessment(
+        row, sector_medians=sector_medians, five_year=five_year
+    )
     values = _component_values(row)
+    if (
+        valuation_assessment.get("plausibility_gate") or {}
+    ).get("status") != "pass":
+        values["long_term"]["value"] = None
+        values["short_term"]["valuation"] = None
     long_term = _score_group(values["long_term"], weights["long_term"])
     short_term = _score_group(values["short_term"], weights["short_term"])
 
@@ -464,9 +508,7 @@ def build_expert_analysis(
                 if non_us else None
             ),
         },
-        "valuation": build_valuation_assessment(
-            row, sector_medians=sector_medians, five_year=five_year
-        ),
+        "valuation": valuation_assessment,
         "entry": build_entry_assessment(row),
         "outlook": build_scenario_assessment(row),
         "risks": build_risk_assessment(row),

@@ -112,6 +112,7 @@ _EXPERT_VALUATION_VERDICTS = (
     "fair",
     "expensive",
     "overpriced",
+    "data_review_required",
 )
 _PROBABILITY_ROW_DEFAULTS = {
     "schema_version": FORECAST_SCHEMA_VERSION,
@@ -158,6 +159,7 @@ ROW_FIELDS = (
     "industry_display",
     "jurisdiction_risk",
     "price",
+    "x",
     "bar_date",
     "radar_score",
     "longterm_score",
@@ -228,6 +230,8 @@ def _compact_group(
 
 def _compact_row(row: dict[str, Any]) -> dict[str, Any]:
     compact = {key: row.get(key) for key in ROW_FIELDS}
+    fx = row.get("fx_usd")
+    compact["x"] = round(fx, 8) if isinstance(fx, (int, float)) else None
     compact["probability_forecast"] = row.get("probability_forecast")
     expert = row.get("expert_analysis")
     if isinstance(expert, dict):

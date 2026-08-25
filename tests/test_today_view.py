@@ -8,6 +8,7 @@ class TodayViewTests(unittest.TestCase):
     def test_green_requires_zone_and_fair_value(self):
         self.assertEqual(traffic_light(row()),"green")
         self.assertEqual(traffic_light(row(verdict="overpriced")),"yellow")
+        self.assertEqual(traffic_light(row(verdict="data_review_required")),"yellow")
     def test_zone_is_converted_to_listing_currency(self):
         self.assertAlmostEqual(local_zone(row())["lower"],98.333333,places=5)
     def test_no_forced_pick_when_no_green(self):

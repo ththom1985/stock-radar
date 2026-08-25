@@ -100,6 +100,7 @@ from .today_view import build_today_view
 from .wikipedia_attention import fetch_wikipedia_signals
 
 FAILED_MANIFEST = DATA / "failed_symbols.json"
+VALUATION_ANOMALIES = DATA / "valuation_anomalies.json"
 COMPARABLE_FUNDAMENTAL_FIELDS = (
     "pe",
     "pb",
@@ -1149,6 +1150,35 @@ def run(with_news=True, with_fundamentals=True):
         previous_snapshot=previous_snapshot,
         price_histories=fetched.prices,
     )
+    valuation_anomalies = [
+        {
+            "symbol": row.get("symbol"),
+            "name": row.get("display_name_full") or row.get("name"),
+            "price_local": row.get("price_local"),
+            "currency": row.get("currency"),
+            "gate": ((row.get("expert_analysis") or {}).get("valuation") or {}).get(
+                "plausibility_gate"
+            ),
+            "raw_fair_value_range": (
+                (row.get("expert_analysis") or {}).get("valuation") or {}
+            ).get("raw_fair_value_range"),
+            "metrics": ((row.get("expert_analysis") or {}).get("valuation") or {}).get(
+                "metrics"
+            ),
+        }
+        for row in rows
+        if (
+            (((row.get("expert_analysis") or {}).get("valuation") or {}).get(
+                "plausibility_gate"
+            ) or {}).get("status")
+            != "pass"
+        )
+    ]
+    result["valuation_anomaly_status"] = {
+        "status": "warning" if valuation_anomalies else "ok",
+        "count": len(valuation_anomalies),
+        "threshold_pct": 80,
+    }
     atomic_write_json(
         FAILED_MANIFEST,
         {
@@ -1159,6 +1189,16 @@ def run(with_news=True, with_fundamentals=True):
         },
     )
     atomic_write_json(OUTPUT / "latest.json", result)
+    atomic_write_json(
+        VALUATION_ANOMALIES,
+        {
+            "schema": "stock-radar-valuation-anomalies",
+            "schema_version": 1,
+            "generated_at": result["generated_at"],
+            "anomalies": valuation_anomalies,
+        },
+        indent=1,
+    )
     print(
         f"Saved: {len(rows)}/{len(symbols)} ({data_status['coverage_pct']:.2f}%) | "
         f"data gate {data_status['status']} | model UNVALIDATED | "

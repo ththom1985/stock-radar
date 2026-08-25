@@ -51,6 +51,36 @@ class ValuationHistoryTests(unittest.TestCase):
         self.assertIsNotNone(result["fair_value_range"])
         self.assertFalse(result["own_5y_complete"])
 
+    def test_extreme_fair_value_is_withheld_fail_closed(self):
+        row = {
+            "sector": "Industrials",
+            "currency": "EUR",
+            "price_local": 176,
+            "pe": 7.7,
+            "ev_ebitda": 5.5,
+            "price_to_sales": 0.35,
+        }
+        peers = {
+            "Industrials": {
+                "pe": 29.8,
+                "ev_ebitda": 16.8,
+                "price_to_sales": 2.75,
+                "peer_counts": {"pe": 100, "ev_ebitda": 100, "price_to_sales": 100},
+            }
+        }
+        result = build_valuation_assessment(
+            row,
+            peers,
+            {"metrics": {}, "months_available": 1, "complete": False},
+        )
+        self.assertEqual(result["verdict"], "data_review_required")
+        self.assertIsNone(result["fair_value_range"])
+        self.assertIsNotNone(result["raw_fair_value_range"])
+        self.assertEqual(
+            result["plausibility_gate"]["status"],
+            "withheld_extreme_deviation",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
