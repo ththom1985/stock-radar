@@ -6,6 +6,7 @@ from datetime import date
 from src.congress_trades import (
     parse_house_index,
     parse_house_ptr_text,
+    parse_senate_report_html,
     senate_source_status,
     summarize_congress_trades,
 )
@@ -69,14 +70,38 @@ class CongressTradesTests(unittest.TestCase):
         self.assertEqual(trades[0]["amount_low"], 1001)
 
     def test_senate_requires_explicit_acknowledgement(self):
+        status = senate_source_status()
+        self.assertTrue(status["acknowledged"])
+        self.assertTrue(status["local_only"])
+        self.assertFalse(status["public_detail"])
+
+    def test_github_actions_never_fetches_local_only_senate_details(self):
         import os
         from unittest.mock import patch
 
-        with patch.dict(os.environ, {}, clear=True):
+        with patch.dict(os.environ, {"GITHUB_ACTIONS": "true"}):
             status = senate_source_status()
-        self.assertEqual(status["status"], "pending_legal_acknowledgement")
-        self.assertEqual(status["required_setting"], "SENATE_EFDS_AGREEMENT=1")
+        self.assertEqual(status["status"], "local_only_not_run")
+
+    def test_parses_senate_transaction_table(self):
+        report_html = """
+        <table><tbody><tr><td>1</td><td>08/01/2026</td><td>Self</td>
+        <td><a>AAPL</a></td><td>Apple Inc</td><td>Stock</td>
+        <td>Purchase</td><td>$1,001 - $15,000</td><td>--</td></tr></tbody></table>
+        """
+        trades = parse_senate_report_html(
+            report_html,
+            {
+                "member": "Test Senator",
+                "report_path": "/search/view/ptr/abc/",
+                "filing_date": "2026-08-20",
+            },
+        )
+        self.assertEqual(len(trades), 1)
+        self.assertEqual(trades[0]["ticker"], "AAPL")
+        self.assertEqual(trades[0]["transaction_type"], "P")
 
 
 if __name__ == "__main__":
     unittest.main()
+    parse_senate_report_html,

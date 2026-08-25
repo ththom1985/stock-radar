@@ -2,10 +2,12 @@
 from __future__ import annotations
 
 import io
+import html
 import json
 import math
 import os
 import re
+import time
 import urllib.request
 import zipfile
 from datetime import date, datetime, timedelta, timezone
@@ -23,6 +25,8 @@ from .persistence import (
 )
 
 CACHE_PATH = DATA / "congress_trades.json"
+SENATE_PRIVATE_CACHE_PATH = DATA / "senate_efds_private.json"
+SOURCE_POLICIES_PATH = DATA / "source_policies.json"
 HOUSE_INDEX_URL = (
     "https://disclosures-clerk.house.gov/public_disc/financial-pdfs/{year}FD.zip"
 )
@@ -30,6 +34,7 @@ HOUSE_PDF_URL = (
     "https://disclosures-clerk.house.gov/public_disc/ptr-pdfs/{year}/{doc_id}.pdf"
 )
 SENATE_HOME_URL = "https://efdsearch.senate.gov/search/home/"
+SENATE_REPORTS_URL = "https://efdsearch.senate.gov/search/report/data/"
 MAX_AGE_HOURS = 24
 LOOKBACK_DAYS = 180
 EXPECTED_DELAY = "STOCK Act filing can lag transaction date by up to 45 days"
@@ -147,16 +152,223 @@ def parse_house_ptr_text(text, filing):
 
 
 def senate_source_status():
-    acknowledged = os.environ.get("SENATE_EFDS_AGREEMENT") == "1"
+    policy = load_json(
+        SOURCE_POLICIES_PATH, required=True, expected_type=dict
+    ).get("senate_efds") or {}
+    acknowledged = bool(policy.get("statutory_use_acknowledged"))
+    local_only = not bool(policy.get("public_detail"))
+    cloud_blocked = os.environ.get("GITHUB_ACTIONS") == "true" and local_only
     return {
-        "status": "pending_legal_acknowledgement" if not acknowledged else "enabled",
+        "status": (
+            "pending_legal_acknowledgement"
+            if not acknowledged
+            else "local_only_not_run"
+            if cloud_blocked
+            else "enabled_local_only"
+            if local_only
+            else "enabled"
+        ),
         "acknowledged": acknowledged,
-        "required_setting": "SENATE_EFDS_AGREEMENT=1",
+        "local_only": local_only,
+        "public_detail": bool(policy.get("public_detail")),
+        "public_aggregate_score": bool(policy.get("public_aggregate_score")),
         "terms_url": SENATE_HOME_URL,
         "reason": (
             "The official Senate portal requires explicit acceptance of statutory "
             "use prohibitions before report access."
         ),
+    }
+
+
+def _csrf(text):
+    match = re.search(
+        r'name=["\']csrfmiddlewaretoken["\'][^>]*value=["\']([^"\']+)',
+        text,
+    )
+    if not match:
+        raise ValueError("Senate EFDS page did not contain a CSRF token")
+    return match.group(1)
+
+
+def _strip_html(value):
+    value = re.sub(r"<[^>]+>", " ", str(value))
+    return " ".join(html.unescape(value).split())
+
+
+def parse_senate_report_html(report_html, report):
+    tbody_match = re.search(r"<tbody[^>]*>(.*?)</tbody>", report_html, re.S | re.I)
+    if not tbody_match:
+        return []
+    trades = []
+    for row_html in re.findall(r"<tr[^>]*>(.*?)</tr>", tbody_match.group(1), re.S | re.I):
+        columns = [
+            _strip_html(value)
+            for value in re.findall(r"<td[^>]*>(.*?)</td>", row_html, re.S | re.I)
+        ]
+        if len(columns) < 8:
+            continue
+        ticker = columns[3].replace(".", "-")
+        if not re.fullmatch(r"[A-Z][A-Z0-9\-]{0,9}", ticker):
+            continue
+        order = columns[6].casefold()
+        transaction_type = (
+            "P" if order.startswith("purchase")
+            else "S" if order.startswith("sale")
+            else "E" if order.startswith("exchange")
+            else None
+        )
+        amount_match = _AMOUNT_RE.search(columns[7])
+        transaction_date = _iso_date(columns[1])
+        if not transaction_type or not amount_match or not transaction_date:
+            continue
+        trades.append(
+            {
+                "chamber": "Senate",
+                "member": report["member"],
+                "ticker": ticker,
+                "asset": columns[4],
+                "transaction_type": transaction_type,
+                "transaction_date": transaction_date,
+                "notification_date": None,
+                "filing_date": report.get("filing_date"),
+                "amount_range": columns[7],
+                "amount_low": float(amount_match.group(1).replace(",", "")),
+                "amount_high": float(amount_match.group(2).replace(",", "")),
+                "doc_id": report["report_path"].rstrip("/").split("/")[-1],
+                "source_url": f"https://efdsearch.senate.gov{report['report_path']}",
+            }
+        )
+    return trades
+
+
+def fetch_senate_trades(force=False, verbose=True):
+    status = senate_source_status()
+    if status["status"] not in {"enabled_local_only", "enabled"}:
+        return [], status
+    private_cache = load_json(
+        SENATE_PRIVATE_CACHE_PATH, expected_type=dict, default={}
+    )
+    if not force and _fresh(private_cache):
+        trades = [
+            trade
+            for document in (private_cache.get("documents") or {}).values()
+            for trade in document.get("trades") or []
+        ]
+        return trades, {
+            **status,
+            "status": "cached_local_only",
+            "cached_document_count": len(private_cache.get("documents") or {}),
+            "trade_count": len(trades),
+        }
+    from curl_cffi import requests
+
+    session = requests.Session(impersonate="chrome")
+    home = session.get(SENATE_HOME_URL, timeout=45)
+    home.raise_for_status()
+    agreement = session.post(
+        SENATE_HOME_URL,
+        data={
+            "csrfmiddlewaretoken": _csrf(home.text),
+            "prohibition_agreement": "1",
+        },
+        headers={"Referer": SENATE_HOME_URL},
+        timeout=45,
+    )
+    agreement.raise_for_status()
+    search_csrf = _csrf(agreement.text)
+    start_date = (date.today() - timedelta(days=LOOKBACK_DAYS + 60)).strftime(
+        "%m/%d/%Y 00:00:00"
+    )
+    response = session.post(
+        SENATE_REPORTS_URL,
+        data={
+            "start": "0",
+            "length": "100",
+            "report_types": "[11]",
+            "filer_types": "[]",
+            "submitted_start_date": start_date,
+            "submitted_end_date": "",
+            "candidate_state": "",
+            "senator_state": "",
+            "office_id": "",
+            "first_name": "",
+            "last_name": "",
+            "csrfmiddlewaretoken": search_csrf,
+        },
+        headers={
+            "Referer": "https://efdsearch.senate.gov/search/",
+            "X-Requested-With": "XMLHttpRequest",
+        },
+        timeout=45,
+    )
+    response.raise_for_status()
+    reports = []
+    for item in response.json().get("data") or []:
+        link_match = re.search(r'href="([^"]+)"', item[3])
+        if not link_match or link_match.group(1).startswith("/search/view/paper/"):
+            continue
+        reports.append(
+            {
+                "member": " ".join(filter(None, [item[0], item[1]])),
+                "report_path": link_match.group(1),
+                "filing_date": _iso_date(item[4]),
+            }
+        )
+    documents = dict(private_cache.get("documents") or {})
+    max_new = int(os.environ.get("STOCK_RADAR_SENATE_MAX", "20"))
+    unseen = [
+        report
+        for report in reports
+        if report["report_path"] not in documents
+    ][:max_new]
+    failures = {}
+    for index, report in enumerate(unseen, 1):
+        try:
+            page = session.get(
+                f"https://efdsearch.senate.gov{report['report_path']}",
+                headers={"Referer": "https://efdsearch.senate.gov/search/"},
+                timeout=45,
+            )
+            page.raise_for_status()
+            documents[report["report_path"]] = {
+                "report": report,
+                "trades": parse_senate_report_html(page.text, report),
+                "fetched_at": utc_now(),
+            }
+        except Exception as exc:
+            failures[report["report_path"]] = str(exc)[:200]
+        if verbose:
+            print(f"  Senate PTR reports {index}/{len(unseen)}")
+        time.sleep(2.0)
+    now = utc_now()
+    private_payload = clear_cache_failure(
+        {
+            "documents": documents,
+            "last_success_at": now,
+            "_meta": {
+                **schema_meta(
+                    "stock-radar-senate-efds-private-cache",
+                    schema_version=1,
+                    policy="local_only",
+                ),
+                "last_success_at": now,
+            },
+        }
+    )
+    atomic_write_json(SENATE_PRIVATE_CACHE_PATH, private_payload, indent=1)
+    trades = [
+        trade
+        for document in documents.values()
+        for trade in document.get("trades") or []
+    ]
+    return trades, {
+        **status,
+        "status": "ok_local_only" if not failures else "partial_local_only",
+        "report_count": len(reports),
+        "cached_document_count": len(documents),
+        "refreshed_document_count": len(unseen),
+        "trade_count": len(trades),
+        "failures": failures,
     }
 
 
@@ -182,6 +394,7 @@ def summarize_congress_trades(trades, today=None):
         average = sum(directional) / max(1, len(directional))
         score = round(max(0.0, min(100.0, 50.0 + average * 12.0)), 1)
         most_recent = max(item["transaction_date"] for item in items)
+        chambers = sorted({item.get("chamber") for item in items if item.get("chamber")})
         signals[ticker] = {
             "score": score,
             "direction": "positive" if score > 55 else "negative" if score < 45 else "neutral",
@@ -192,11 +405,14 @@ def summarize_congress_trades(trades, today=None):
             "trades": sorted(
                 items, key=lambda item: item["transaction_date"], reverse=True
             )[:20],
-            "source": "U.S. House Clerk official PTR disclosures",
+            "source": (
+                "Official U.S. congressional PTR disclosures: "
+                + " + ".join(chambers)
+            ),
             "expected_delay": EXPECTED_DELAY,
             "limitations": (
-                "Reported amount ranges are not exact values. House coverage is "
-                "incrementally bounded; Senate is separate and consent-gated."
+                "Reported amount ranges are not exact values. House and Senate "
+                "coverage are incrementally bounded; Senate details remain local-only."
             ),
         }
     return signals
@@ -216,11 +432,27 @@ def _fresh(cache):
 def fetch_congress_signals(rows, force=False, verbose=True):
     cache = load_json(CACHE_PATH, expected_type=dict, default={})
     if not force and _fresh(cache):
-        return cache.get("signals") or {}, {
+        house_trades = [
+            trade
+            for document in (cache.get("house_documents") or {}).values()
+            for trade in document.get("trades") or []
+        ]
+        senate_trades, senate_status = fetch_senate_trades(
+            force=False, verbose=verbose
+        )
+        watchlist_symbols = {str(row.get("symbol") or "") for row in rows}
+        signals = summarize_congress_trades(
+            [
+                trade
+                for trade in (*house_trades, *senate_trades)
+                if trade.get("ticker") in watchlist_symbols
+            ]
+        )
+        return signals, {
             "status": "cached",
             "house": cache.get("house_status"),
-            "senate": senate_source_status(),
-            "signal_count": len(cache.get("signals") or {}),
+            "senate": senate_status,
+            "signal_count": len(signals),
         }
     current_year = datetime.now(timezone.utc).year
     docs = dict(cache.get("house_documents") or {})
@@ -255,13 +487,14 @@ def fetch_congress_signals(rows, force=False, verbose=True):
         if verbose:
             print(f"  House PTR documents {index}/{len(unseen)}")
     watchlist_symbols = {str(row.get("symbol") or "") for row in rows}
-    trades = [
+    house_trades = [
         trade
         for document in docs.values()
         for trade in document.get("trades") or []
         if trade.get("ticker") in watchlist_symbols
     ]
-    signals = summarize_congress_trades(trades)
+    senate_trades, senate_status = fetch_senate_trades(force=force, verbose=verbose)
+    signals = summarize_congress_trades([*house_trades, *senate_trades])
     now = utc_now()
     for signal in signals.values():
         signal["fetched_at"] = now
@@ -282,7 +515,7 @@ def fetch_congress_signals(rows, force=False, verbose=True):
             "signals": signals,
             "house_documents": docs,
             "house_status": house_status,
-            "senate_status": senate_source_status(),
+            "senate_status": senate_status,
             "fetched_at": now,
             "last_success_at": now,
             "_meta": {
@@ -299,6 +532,6 @@ def fetch_congress_signals(rows, force=False, verbose=True):
     return signals, {
         "status": "ok" if not failures else "partial",
         "house": house_status,
-        "senate": senate_source_status(),
+        "senate": senate_status,
         "signal_count": len(signals),
     }
