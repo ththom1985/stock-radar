@@ -725,7 +725,7 @@
       return `<div class="probability-panel">
         <div class="sweet-zone-head"><div><strong>Wahrscheinlichkeits-Selbstprüfung</strong><div class="muted">Separat von Bewertung und Einstiegszone</div></div><span class="badge neutral">${value.status === "accepted" ? "Freigegeben" : value.status === "partial" ? "Teilweise freigegeben" : "Noch nicht freigegeben"}</span></div>
         ${statusText}${modelRows}${baselineRows}${baselineRows ? `<div class="muted">Nur historische Basisraten; keine aktienspezifische Modellfreigabe. Die Werte sind keine Prognose für dieses Unternehmen.</div>` : ""}
-        <div class="muted">Signal ${escapeHtml(value.signal_timestamp || row.bar_date || "–")} · Listing-Währung ${escapeHtml(value.listing_currency || row.currency || "–")} · erster adjustierter/raw-äquivalenter Open strikt nach t · 30 bp Round Trip. ${escapeHtml(value.survivorship_warning || "")}</div>
+        <div class="muted">Stand ${escapeHtml(value.signal_timestamp || row.bar_date || "–")} · Handelswährung ${escapeHtml(row.currency || "–")} · technische Selbstprüfung, keine Prognose.</div>
       </div>`;
     }
 
@@ -894,20 +894,19 @@
           <div class="callout ${downside.risk === "hoch" ? "danger" : "warning"}">Risiko ${escapeHtml(downside.risk || "–")} · ${escapeHtml(downside.verdict || "–")} · Unterstützung ${$number(localValue(downside.support1))} ${escapeHtml(currency)} (${percent(downside.support1_pct)})</div>
         </div>
         <div class="section"><h3>Fundamentaldaten (deskriptiv)</h3><div class="detail-grid">${fundRows}</div>
-          <div class="muted">${escapeHtml((valuation.reasons || []).join(" · ") || valuation.comparison_note || valuation.unavailable_reason || "Keine vollständigen aktuellen Fundamentaldaten.")}</div>
+          <div class="muted">${escapeHtml(localizeTechnicalPoints(valuation.reasons).join(" · ") || valuation.comparison_note || valuation.unavailable_reason || "Keine vollständigen aktuellen Fundamentaldaten.")}</div>
         </div>
         <div class="section"><h3>Bewertungsthese (risikoadjustierte Heuristik)</h3>
           ${valuationThesis.available ? `<div class="detail-grid">
-            <div class="stat"><span>Raw Value/Quality</span><strong>${$number(valuationThesis.raw_score, 1)}/100</strong></div>
-            <div class="stat"><span>Sichtbarer Risikoabschlag</span><strong>−${$number(valuationThesis.risk_penalty, 1)}</strong></div>
-            <div class="stat"><span>Risikoadjustiert</span><strong>${$number(valuationThesis.risk_adjusted_score, 1)}/100</strong></div>
-            <div class="stat"><span>Jurisdiktion / Value Trap</span><strong>${escapeHtml(jurisdiction.level || "low")} / ${escapeHtml(valuationThesis.value_trap_risk || "–")}</strong></div>
+            <div class="stat"><span>Bewertung vor Risiko</span><strong>${$number(valuationThesis.raw_score, 1)}/100</strong></div>
+            <div class="stat"><span>Risikoabschlag</span><strong>−${$number(valuationThesis.risk_penalty, 1)}</strong></div>
+            <div class="stat"><span>Bewertung nach Risiko</span><strong>${$number(valuationThesis.risk_adjusted_score, 1)}/100</strong></div>
+            <div class="stat"><span>Region / Risiko einer günstigen Falle</span><strong>${escapeHtml(jurisdiction.level || "niedrig")} / ${escapeHtml(valuationThesis.value_trap_risk || "–")}</strong></div>
           </div>
-          <div class="muted">${escapeHtml(valuationThesis.formula || "")}</div>
-          ${thesisList("Warum es günstig aussieht", valuationThesis.why_it_looks_cheap, "success")}
-          ${thesisList("Warum der Abschlag gerechtfertigt sein kann", valuationThesis.why_discount_may_be_justified, "warning")}
-          ${thesisList("Stärkste positive Evidenz", valuationThesis.strongest_positive_evidence, "success")}
-          ${thesisList("Gegenargumente / Value-Trap-Risiken", valuationThesis.strongest_counterarguments, "danger")}` : `<div class="callout warning">${escapeHtml(valuation.unavailable_reason || "Keine aktuellen vollständigen Fundamentaldaten; keine Bewertungsthese oder Rangbildung.")}</div>`}
+          ${thesisList("Warum es günstig aussieht", localizeTechnicalPoints(valuationThesis.why_it_looks_cheap), "success")}
+          ${thesisList("Warum der Abschlag gerechtfertigt sein kann", localizeTechnicalPoints(valuationThesis.why_discount_may_be_justified), "warning")}
+          ${thesisList("Stärkste positive Evidenz", localizeTechnicalPoints(valuationThesis.strongest_positive_evidence), "success")}
+          ${thesisList("Gegenargumente / Risiken einer günstigen Falle", localizeTechnicalPoints(valuationThesis.strongest_counterarguments), "danger")}` : `<div class="callout warning">${escapeHtml(valuation.unavailable_reason || "Keine aktuellen vollständigen Fundamentaldaten; keine Bewertungsthese oder Rangbildung.")}</div>`}
         </div>
         <div class="section"><h3>Technisches Tagesbild</h3><table class="data-table">${technicalRows}</table></div>
         <div class="section"><h3>News und Termine</h3>
