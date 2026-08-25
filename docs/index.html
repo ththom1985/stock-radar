@@ -794,7 +794,7 @@
       </div>` : `<div class="sweet-zone neutral"><div class="sweet-zone-head"><strong>Sweet-Spot-Beobachtungszone</strong><span class="badge neutral">Nicht verfügbar</span></div><div class="muted">Keine belastbare Referenzzone; es werden keine Marken erzeugt. Beobachtungszone, keine Ordermarke.</div></div>`;
       const expertSignals = ["positive_setup", "wait_for_pullback", "risk_too_high", "insufficient_data"];
       const expertEvidence = ["low", "medium", "high"];
-      const expertVerdicts = ["unavailable", "clearly_undervalued", "fair", "expensive", "overpriced"];
+      const expertVerdicts = ["unavailable", "clearly_undervalued", "fair", "expensive", "overpriced", "data_review_required"];
       const expertRaw = row.ea;
       const expert = Array.isArray(expertRaw) ? {
         model_status: "heuristic_unvalidated",
@@ -813,10 +813,15 @@
         disclaimer: "Analyse-Unterstützung, keine Anlageberatung."
       } : {};
       const expertFair = expert.valuation?.fair_value_range || {};
-      const expertPanel = expert.model_status ? `<div class="section"><h3>Experten-Composite (unvalidiert)</h3>
+      const valuationPlain = plain.valuation || (
+        expert.valuation?.verdict === "data_review_required"
+          ? `${row.display_name_full || row.short_name || row.symbol}: Bewertung auffällig — der extreme faire Bereich wird bis zur Datenprüfung nicht angezeigt.`
+          : "Bewertung ist derzeit nicht belastbar."
+      );
+      const expertPanel = expert.model_status ? `<div class="section"><h3>Experten-Gesamtbild (System lernt noch)</h3>
         <div class="detail-grid">
-          <div class="stat"><span>Long Term</span><strong>${$number(expert.long_term?.score, 1)}/100</strong><small>${$number(expert.long_term?.coverage_pct, 1)} % Abdeckung</small></div>
-          <div class="stat"><span>Short Term</span><strong>${$number(expert.short_term?.score, 1)}/100</strong><small>${$number(expert.short_term?.coverage_pct, 1)} % Abdeckung</small></div>
+          <div class="stat"><span>Langfristig</span><strong>${$number(expert.long_term?.score, 1)}/100</strong><small>${$number(expert.long_term?.coverage_pct, 1)} % Abdeckung</small></div>
+          <div class="stat"><span>Kurzfristig</span><strong>${$number(expert.short_term?.score, 1)}/100</strong><small>${$number(expert.short_term?.coverage_pct, 1)} % Abdeckung</small></div>
           <div class="stat"><span>Signal</span><strong>${escapeHtml(signalLabels[expert.signal] || "Daten reichen nicht")}</strong></div>
           <div class="stat"><span>Datenbasis</span><strong>${escapeHtml({high:"breit",medium:"mittel",low:"schmal"}[expert.evidence_quality] || "schmal")}</strong></div>
         </div>
@@ -837,7 +842,7 @@
         <div class="muted">Börsenland/Markt: ${escapeHtml(row.listing_country || "nicht verfügbar")} / ${escapeHtml(row.listing_market || "nicht verfügbar")}</div>
         <div class="muted">${escapeHtml(assetLabels[row.asset_type] || row.asset_type)} · ${escapeHtml(row.currency || "")} · Bar ${escapeHtml(row.bar_date || "–")}</div></div>
         <span class="badge">${$number(row.entry_timing_score, 0)}/100 Timing</span></div>
-        <div class="summary"><strong>1. Bewertung:</strong> ${escapeHtml(plain.valuation || "Bewertung ist derzeit nicht belastbar.")}</div>
+        <div class="summary"><strong>1. Bewertung:</strong> ${escapeHtml(valuationPlain)}</div>
         <div class="summary"><strong>2. Timing:</strong> ${escapeHtml(plain.timing || row.entry_timing_reason || "Timingdaten fehlen.")}</div>
         <div class="summary"><strong>3. Signale:</strong> ${escapeHtml(plain.signals || row.research_summary || "Signaldaten fehlen.")}</div>
         <div class="summary"><strong>4. Risiko:</strong> ${escapeHtml(plain.risk || (row.risk_warnings || [])[0] || "Kein dominantes Einzelrisiko verfügbar.")}</div>
