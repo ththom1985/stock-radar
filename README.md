@@ -662,7 +662,8 @@ investment advice.
 | FINRA | Consolidated short interest, days-to-cover and multi-period trend | 10-day cache; 15 prioritized USD equities per run; source publishes twice monthly | Adapter active when free Public API credentials are set |
 | House Clerk PTR | Official yearly index ZIP plus official PTR PDFs | 24-hour cache; 20 new documents per run; up to 45-day reporting lag | Active and incrementally cached |
 | Senate EFDS PTR | Official CSRF/session portal | Local private cache; 20 new reports per run; up to 45-day reporting lag | Active locally under acknowledged policy B; details are blocked on GitHub Actions/public export |
-| CFTC / CBOE | Positioning and put/call regime | Publication dependent | Not yet wired; explicit gap |
+| CFTC TFF | S&P 500, Nasdaq-100 and VIX asset-manager/leveraged-money positioning | 7-day cache; Tuesday positions published Friday | Active official market-positioning context |
+| CBOE Put/Call | Put/call ratios | Legacy CSV 404; current CDN 403; DataShop commercial | Explicitly unavailable as a free machine feed; CFTC VIX is labelled as substitute context, not the same series |
 | Yahoo options | Self-computed Black-Scholes GEX from IV/open interest | 18-hour cache; five symbols per run by default | Active, bounded, US USD company equities only |
 | Wikimedia / Reddit / careers pages | Attention and hiring trends | Daily/periodic | Not yet wired; explicit gap |
 

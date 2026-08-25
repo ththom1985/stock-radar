@@ -62,6 +62,7 @@ from .insights import (
     rehydrate_rankings,
 )
 from .macro import fetch_macro, macro_adjust
+from .market_positioning import fetch_market_positioning
 from .news_engine import fetch_all_ticker_news, fetch_market_news, news_signal
 from .options_gex import fetch_gex_signals
 from .paper_trader import update_portfolio
@@ -661,6 +662,14 @@ def run(with_news=True, with_fundamentals=True):
         if not market_data_only
         else {"status": "skipped", "context_only": True}
     )
+    positioning, positioning_source_status = (
+        fetch_market_positioning()
+        if not market_data_only
+        else (
+            {"status": "skipped", "model_status": "heuristic_context_only"},
+            {"status": "skipped", "reason": "market-data-only pipeline"},
+        )
+    )
     aschenbrenner = (
         load_aschenbrenner()
         if not market_data_only
@@ -688,6 +697,7 @@ def run(with_news=True, with_fundamentals=True):
         _macro_points, macro_notes = macro_adjust(row, macro)
         row["macro_notes"] = macro_notes
         row["macro_model_status"] = "heuristic_context_only"
+        row["positioning_context"] = positioning
         fundamental_complete = all(
             row.get(key) is not None
             for key in ("value_score", "quality_score", "growth_score")
@@ -873,7 +883,11 @@ def run(with_news=True, with_fundamentals=True):
     for row in rows:
         catalyst_values = [
             value
-            for value in (row.get("news_score"), fred_regime.get("score"))
+            for value in (
+                row.get("news_score"),
+                fred_regime.get("score"),
+                positioning.get("score"),
+            )
             if isinstance(value, (int, float)) and math.isfinite(value)
         ]
         row["market_regime"] = fred_regime or None
@@ -886,6 +900,8 @@ def run(with_news=True, with_fundamentals=True):
             "news_score": row.get("news_score"),
             "macro_regime_score": fred_regime.get("score"),
             "macro_regime": fred_regime.get("regime"),
+            "positioning_score": positioning.get("score"),
+            "positioning_regime": positioning.get("regime"),
             "earnings_event": row.get("next_earnings"),
             "earnings_in_days": row.get("earnings_in_days"),
             "note": (
@@ -1068,6 +1084,7 @@ def run(with_news=True, with_fundamentals=True):
         "sec_13f_status": sec_13f_status,
         "congress_trades_status": congress_source_status,
         "fred_status": fred_source_status,
+        "market_positioning_status": positioning_source_status,
         "fx_status": fx_result.status,
         "macro": macro,
         "benchmarks": benchmarks,
