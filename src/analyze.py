@@ -49,6 +49,7 @@ from .fundamental_score import (
 from .fundamentals import fetch_fundamentals
 from .fx import currency_for, get_fx_rates_with_status
 from .fred_regime import fetch_fred_regime
+from .finra_short_interest import fetch_finra_signals
 from .geo import country_flag
 from .indicators import compute_features
 from .insights import (
@@ -846,10 +847,16 @@ def run(with_news=True, with_fundamentals=True):
     )
     if not market_data_only:
         gex_by_symbol, gex_source_status = fetch_gex_signals(rows)
+        short_interest_by_symbol, finra_source_status = fetch_finra_signals(rows)
         fred_regime, fred_source_status = fetch_fred_regime()
     else:
         gex_by_symbol = {}
+        short_interest_by_symbol = {}
         gex_source_status = {"status": "skipped", "reason": "market-data-only pipeline"}
+        finra_source_status = {
+            "status": "skipped",
+            "reason": "market-data-only pipeline",
+        }
         fred_regime = {}
         fred_source_status = {"status": "skipped", "reason": "market-data-only pipeline"}
     for row in rows:
@@ -878,6 +885,7 @@ def run(with_news=True, with_fundamentals=True):
         rows,
         insider_by_symbol,
         gex_by_symbol,
+        short_interest_by_symbol,
         now=now,
     )
     expert_weights = load_score_weights()
@@ -1043,6 +1051,7 @@ def run(with_news=True, with_fundamentals=True):
         "sec_companyfacts_status": sec_source_status,
         "sec_insider_status": insider_source_status,
         "options_gex_status": gex_source_status,
+        "finra_short_interest_status": finra_source_status,
         "fred_status": fred_source_status,
         "fx_status": fx_result.status,
         "macro": macro,

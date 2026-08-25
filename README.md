@@ -658,7 +658,7 @@ investment advice.
 | Stooq | Secondary EOD price source | Daily | Active only after Yahoo failure for conservatively mapped ordinary US tickers |
 | FRED | 10Y–2Y curve, high-yield spread, NFCI risk regime | Daily cache; source-series delay | Active when free `FRED_API_KEY` is set |
 | ECB / Bundesbank | EU macro regime | Series dependent | Not yet wired; explicit gap |
-| FINRA | Short interest / days to cover | Twice monthly | Not yet wired; free credentials required |
+| FINRA | Consolidated short interest, days-to-cover and multi-period trend | 10-day cache; 15 prioritized USD equities per run; source publishes twice monthly | Adapter active when free Public API credentials are set |
 | House / Senate disclosures | Congressional transactions | Up to 45-day reporting lag | Not yet wired; explicit gap |
 | CFTC / CBOE | Positioning and put/call regime | Publication dependent | Not yet wired; explicit gap |
 | Yahoo options | Self-computed Black-Scholes GEX from IV/open interest | 18-hour cache; five symbols per run by default | Active, bounded, US USD company equities only |
@@ -673,11 +673,20 @@ STOCK_RADAR_SEC_MAX=25
 STOCK_RADAR_INSIDER_MAX=15
 FRED_API_KEY=your_free_fred_key
 STOCK_RADAR_OPTIONS_MAX=5
+FINRA_CLIENT_ID=your_public_api_client_id
+FINRA_CLIENT_SECRET=your_public_api_client_secret
+STOCK_RADAR_FINRA_MAX=15
 ```
 
 The GitHub workflows read `SEC_USER_AGENT` from a repository secret. Without it,
 both SEC modules report `disabled` and retain stale-good cached data; they do not
 send anonymous requests.
+
+FINRA requires a free Individual/Public API credential from
+`https://gateway.finra.org/app/dfo-console`. The client secret expires annually.
+Without both `FINRA_CLIENT_ID` and `FINRA_CLIENT_SECRET`, the FINRA source reports
+`disabled` with the missing names and registration URL. Missing short-interest
+coverage is omitted and score weights renormalize; it is never scored as neutral.
 
 Equibles is not a mandatory runtime dependency. Its free self-hosted core is
 technically useful for SEC/FINRA/Congress enrichment, but its persistent

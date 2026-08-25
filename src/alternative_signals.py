@@ -34,7 +34,14 @@ def _age_days(timestamp, now):
     return max(0.0, (now - parsed.astimezone(timezone.utc)).total_seconds() / 86400)
 
 
-def build_alternative_signals(row, *, insider=None, gex=None, now=None):
+def build_alternative_signals(
+    row,
+    *,
+    insider=None,
+    gex=None,
+    short_interest=None,
+    now=None,
+):
     now = now or datetime.now(timezone.utc)
     raw = {}
     if isinstance(insider, dict) and _number(insider.get("score")) is not None:
@@ -62,6 +69,27 @@ def build_alternative_signals(row, *, insider=None, gex=None, now=None):
                 "gex_to_market_cap": gex.get("gex_to_market_cap"),
                 "gamma_walls": gex.get("gamma_walls"),
                 "limitations": gex.get("limitations"),
+            },
+        }
+    if (
+        isinstance(short_interest, dict)
+        and _number(short_interest.get("score")) is not None
+    ):
+        raw["short_interest"] = {
+            "score": short_interest["score"],
+            "observed_at": (
+                short_interest.get("last_success_at")
+                or short_interest.get("fetched_at")
+            ),
+            "source": short_interest.get("source"),
+            "expected_delay": short_interest.get("expected_delay"),
+            "evidence": {
+                "settlement_date": short_interest.get("settlement_date"),
+                "short_position": short_interest.get("short_position"),
+                "days_to_cover": short_interest.get("days_to_cover"),
+                "change_percent": short_interest.get("change_percent"),
+                "period_trend_pct": short_interest.get("period_trend_pct"),
+                "limitations": short_interest.get("limitations"),
             },
         }
     for name in SIGNAL_SPECS:
@@ -119,15 +147,18 @@ def attach_alternative_signals(
     rows,
     insider_by_symbol=None,
     gex_by_symbol=None,
+    short_interest_by_symbol=None,
     now=None,
 ):
     insider_by_symbol = insider_by_symbol or {}
     gex_by_symbol = gex_by_symbol or {}
+    short_interest_by_symbol = short_interest_by_symbol or {}
     for row in rows:
         row["alternative_signals"] = build_alternative_signals(
             row,
             insider=insider_by_symbol.get(row.get("symbol")),
             gex=gex_by_symbol.get(row.get("symbol")),
+            short_interest=short_interest_by_symbol.get(row.get("symbol")),
             now=now,
         )
     return rows
