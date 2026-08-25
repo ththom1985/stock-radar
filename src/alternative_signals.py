@@ -77,14 +77,12 @@ def build_alternative_signals(
     ):
         raw["short_interest"] = {
             "score": short_interest["score"],
-            "observed_at": (
-                short_interest.get("last_success_at")
-                or short_interest.get("fetched_at")
-            ),
+            "observed_at": short_interest.get("settlement_date"),
             "source": short_interest.get("source"),
             "expected_delay": short_interest.get("expected_delay"),
             "evidence": {
                 "settlement_date": short_interest.get("settlement_date"),
+                "fetched_at": short_interest.get("fetched_at"),
                 "short_position": short_interest.get("short_position"),
                 "days_to_cover": short_interest.get("days_to_cover"),
                 "change_percent": short_interest.get("change_percent"),

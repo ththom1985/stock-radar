@@ -75,6 +75,23 @@ class AlternativeSignalTests(unittest.TestCase):
         self.assertIn("congress", result["missing_signals"])
         self.assertGreater(result["confluence_score"], 50)
 
+    def test_short_interest_recency_uses_settlement_not_fetch_time(self):
+        result = build_alternative_signals(
+            {},
+            short_interest={
+                "score": 40,
+                "settlement_date": "2026-07-31",
+                "fetched_at": "2026-08-25T11:51:30+00:00",
+                "source": "FINRA consolidatedShortInterest",
+                "expected_delay": "twice monthly",
+            },
+            now=datetime(2026, 8, 25, tzinfo=timezone.utc),
+        )
+        signal = result["signals"]["short_interest"]
+        self.assertEqual(signal["observed_at"], "2026-07-31")
+        self.assertEqual(signal["age_days"], 25.0)
+        self.assertLess(signal["recency_weight"], 1.0)
+
 
 if __name__ == "__main__":
     unittest.main()
