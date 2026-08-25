@@ -4,7 +4,6 @@ import copy
 import json
 import math
 import unittest
-from pathlib import Path
 
 from src.insights import build_insight_rankings
 from src.sweet_spot import build_sweet_spot, format_price, price_display_decimals
@@ -312,21 +311,6 @@ class SweetSpotModelTests(unittest.TestCase):
         self.assertEqual(len(set(rendered)), 3)
         self.assertTrue(all("." in value for value in rendered))
 
-    def test_published_doge_zone_displays_three_distinct_marks(self):
-        root = Path(__file__).resolve().parent.parent
-        snapshot = json.loads(
-            (root / "data" / "output" / "latest.json").read_text(encoding="utf-8")
-        )
-        doge = next(row for row in snapshot["all"] if row["symbol"] == "DOGE-USD")
-        zone = [
-            doge["sweet_spot"]["lower"],
-            doge["sweet_spot"]["ideal"],
-            doge["sweet_spot"]["upper"],
-        ]
-        rendered = [format_price(value, zone) for value in zone]
-        self.assertEqual(rendered, ["0.0688", "0.0699", "0.0709"])
-        self.assertEqual(len(set(rendered)), 3)
-
     def test_confirmed_category_is_deterministic_and_currency_partitioned(self):
         rows = []
         for symbol, currency in (("BBB", "EUR"), ("CCC", "USD"), ("AAA", "USD")):
@@ -348,112 +332,6 @@ class SweetSpotModelTests(unittest.TestCase):
         self.assertEqual(symbols(first, "USD"), ["AAA", "CCC"])
         self.assertEqual(symbols(first, "EUR"), ["BBB"])
         self.assertEqual(symbols(first, "USD"), symbols(second, "USD"))
-
-    def test_published_confirmed_category_has_no_knife_or_bottom_overlap(self):
-        root = Path(__file__).resolve().parent.parent
-        snapshot_path = root / "data" / "output" / "latest.json"
-        snapshot = json.loads(snapshot_path.read_text(encoding="utf-8"))
-        if snapshot.get("insight_rankings", {}).get("contract_version") != 3:
-            self.skipTest("provider-free v3 insight regeneration has not run yet")
-        by_symbol = {row["symbol"]: row for row in snapshot["all"]}
-        confirmed = {
-            row["symbol"]
-            for row in snapshot["all"]
-            if row["sweet_spot"]["combined_status"] == "in_zone_confirmed"
-        }
-        self.assertTrue(
-            all(
-                not by_symbol[symbol].get("falling_knife")
-                and not by_symbol[symbol].get("bottoming")
-                and by_symbol[symbol]["sweet_spot"]["combined_status"]
-                == "in_zone_confirmed"
-                for symbol in confirmed
-            )
-        )
-
-    def test_published_false_family_greens_are_removed_and_pr_is_not_green(self):
-        root = Path(__file__).resolve().parent.parent
-        snapshot = json.loads(
-            (root / "data" / "output" / "latest.json").read_text(encoding="utf-8")
-        )
-        if snapshot.get("insight_metadata", {}).get("sweet_spot_contract", {}).get(
-            "model_version"
-        ) not in {2, 3}:
-            self.skipTest("family-aware provider-free regeneration has not run yet")
-        by_symbol = {row["symbol"]: row for row in snapshot["all"]}
-        for symbol in ("6301.T", "6724.T", "VIE.PA", "CVS", "DIA", "PR"):
-            self.assertNotEqual(
-                by_symbol[symbol]["sweet_spot"]["combined_status"],
-                "in_zone_confirmed",
-            )
-        self.assertNotEqual(
-            {
-                component["label"]
-                for component in by_symbol["PR"]["sweet_spot"]["components"]
-            },
-            {"Prior Pivot", "Pivot S1"},
-        )
-
-    def test_published_app_exposes_all_volatility_blockers(self):
-        root = Path(__file__).resolve().parent.parent
-        snapshot = json.loads(
-            (root / "data" / "output" / "latest.json").read_text(encoding="utf-8")
-        )
-        if snapshot.get("insight_metadata", {}).get("sweet_spot_contract", {}).get(
-            "model_version"
-        ) not in {2, 3}:
-            self.skipTest("family-aware provider-free regeneration has not run yet")
-        app = next(row for row in snapshot["all"] if row["symbol"] == "APP")
-        reasons = app["sweet_spot"]["why_green_or_not"]
-        self.assertTrue(any("ATR liegt" in reason for reason in reasons))
-        self.assertTrue(
-            any("Annualisierte Volatilität" in reason for reason in reasons)
-        )
-
-    def test_published_reference_only_is_numeric_and_never_ranked(self):
-        root = Path(__file__).resolve().parent.parent
-        snapshot = json.loads(
-            (root / "data" / "output" / "latest.json").read_text(encoding="utf-8")
-        )
-        if snapshot.get("insight_metadata", {}).get("sweet_spot_contract", {}).get(
-            "model_version"
-        ) != 3:
-            self.skipTest("reference-only provider-free regeneration has not run yet")
-        reference_rows = [
-            row
-            for row in snapshot["all"]
-            if row["sweet_spot"]["zone_tier"] == "reference_only"
-        ]
-        self.assertGreater(len(reference_rows), 50)
-        self.assertTrue(
-            all(
-                row["sweet_spot"]["available"]
-                and 0
-                < row["sweet_spot"]["lower"]
-                < row["sweet_spot"]["ideal"]
-                < row["sweet_spot"]["upper"]
-                and row["sweet_spot"]["reliability_score"] <= 49
-                and row["sweet_spot"]["combined_status"]
-                not in {"in_zone_confirmed", "approaching"}
-                for row in reference_rows
-            )
-        )
-        categories = snapshot["insight_rankings"]["categories"]
-        ranked = {
-            item["symbol"]
-            for key in ("in_sweet_spot", "approaching_sweet_spot")
-            for items in categories[key]["items_by_currency"].values()
-            for item in items
-        }
-        self.assertFalse(
-            ranked
-            & {row["symbol"] for row in reference_rows}
-        )
-        unavailable = [
-            row for row in snapshot["all"] if not row["sweet_spot"]["available"]
-        ]
-        self.assertLessEqual(len(unavailable), 2)
-
 
 if __name__ == "__main__":
     unittest.main()

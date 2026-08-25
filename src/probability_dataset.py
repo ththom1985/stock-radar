@@ -591,6 +591,15 @@ def build_symbol_dataset(
                     record[label_column(horizon, threshold_pct)] = np.nan
                 continue
             exit_close = float(frame["Close"].iloc[exit_position])
+            if not math.isfinite(exit_close) or exit_close <= 0:
+                record[f"exit_timestamp_h{horizon}"] = pd.NaT
+                record[f"gross_return_h{horizon}"] = np.nan
+                record[f"long_net_return_h{horizon}"] = np.nan
+                record[f"material_net_return_h{horizon}"] = np.nan
+                record[ordered_label_column(horizon)] = np.nan
+                for threshold_pct in THRESHOLD_GRIDS[horizon]:
+                    record[label_column(horizon, threshold_pct)] = np.nan
+                continue
             gross = exit_close / entry_open - 1.0
             record[f"exit_timestamp_h{horizon}"] = frame.index[exit_position]
             record[f"gross_return_h{horizon}"] = gross

@@ -13,6 +13,7 @@ from numbers import Integral, Real
 
 import numpy as np
 
+from .alternative_signals import attach_alternative_signals
 from .aschenbrenner import load_aschenbrenner, stance_for
 from .assets import (
     COMPANY_EQUITY,
@@ -24,6 +25,12 @@ from .config import DATA, OUTPUT, TOP_N
 from .data_quality import OUTPUT_SCHEMA, OUTPUT_SCHEMA_VERSION, build_data_status
 from .deep_fundamentals import fetch_deep
 from .earnings import days_until, fetch_earnings
+from .expert_layer import (
+    SOURCE_CATALOG as EXPERT_SOURCE_CATALOG,
+    attach_expert_analysis,
+    build_expert_rankings,
+    load_score_weights,
+)
 from .expert_signals import (
     minervini,
     tech_momentum_score,
@@ -41,6 +48,7 @@ from .fundamental_score import (
 )
 from .fundamentals import fetch_fundamentals
 from .fx import currency_for, get_fx_rates_with_status
+from .fred_regime import fetch_fred_regime
 from .geo import country_flag
 from .indicators import compute_features
 from .insights import (
@@ -53,6 +61,7 @@ from .insights import (
 )
 from .macro import fetch_macro, macro_adjust
 from .news_engine import fetch_all_ticker_news, fetch_market_news, news_signal
+from .options_gex import fetch_gex_signals
 from .paper_trader import update_portfolio
 from .persistence import (
     SCHEMA_VERSION,
@@ -68,9 +77,17 @@ from .probability_inference import (
     load_probability_baselines,
     load_probability_validation_summary,
 )
+from .recommendation_journal import (
+    evaluate_mature_observations,
+    journal_summary,
+    record_top_observations,
+)
 from .rating import radar_elo, radar_score, stars
 from .score import score_daily_signal, score_longterm
+from .sec_companyfacts import fetch_sec_companyfacts, merge_official_fundamentals
+from .sec_insiders import fetch_insider_signals
 from .universe import load_universe
+from .valuation_history import update_valuation_history
 
 FAILED_MANIFEST = DATA / "failed_symbols.json"
 COMPARABLE_FUNDAMENTAL_FIELDS = (
@@ -157,6 +174,14 @@ def _copy_fundamental_context(row: dict, fundamental: dict) -> None:
     row["pe"] = _json_value(fundamental.get("pe"))
     row["forward_pe"] = _json_value(fundamental.get("forward_pe"))
     row["pb"] = _json_value(fundamental.get("pb"))
+    row["peg"] = _json_value(fundamental.get("peg"))
+    row["ev_ebitda"] = _json_value(fundamental.get("ev_ebitda"))
+    row["price_to_sales"] = _json_value(fundamental.get("ps"))
+    row["price_to_fcf"] = _json_value(fundamental.get("price_to_fcf"))
+    row["profit_margin_pct"] = _percent(fundamental.get("profit_margin"))
+    row["debt_to_equity_pct"] = _json_value(fundamental.get("debt_to_equity"))
+    row["current_ratio"] = _json_value(fundamental.get("current_ratio"))
+    row["free_cashflow"] = _json_value(fundamental.get("free_cashflow"))
     row["earnings_growth"] = _json_value(fundamental.get("earnings_growth"))
     row["roe_pct"] = _percent(fundamental.get("roe"))
     row["revenue_growth_pct"] = _percent(fundamental.get("revenue_growth"))
@@ -165,6 +190,8 @@ def _copy_fundamental_context(row: dict, fundamental: dict) -> None:
     row["reported_currency"] = fundamental.get("reported_currency")
     row["market_cap_local"] = _json_value(fundamental.get("market_cap"))
     row["issuer_uuid"] = fundamental.get("issuer_uuid")
+    row["fundamental_field_sources"] = fundamental.get("field_sources") or {}
+    row["sec_companyfacts"] = fundamental.get("sec_companyfacts")
     fetched_at = fundamental.get("last_success_at") or fundamental.get("fetched_at")
     age_days = None
     try:
@@ -497,6 +524,34 @@ def run(with_news=True, with_fundamentals=True):
         if with_fundamentals
         else {}
     )
+    if with_fundamentals:
+        sec_by_symbol, sec_source_status = fetch_sec_companyfacts(
+            [row["symbol"] for row in rows]
+        )
+        fundamental_by_symbol = {
+            symbol: merge_official_fundamentals(
+                fundamental_by_symbol.get(symbol, {}),
+                sec_by_symbol.get(symbol, {}),
+            )
+            for symbol in [row["symbol"] for row in rows]
+        }
+    else:
+        sec_source_status = {
+            "status": "skipped",
+            "reason": "fundamental enrichment disabled",
+            "refreshed": 0,
+        }
+    if not market_data_only:
+        insider_by_symbol, insider_source_status = fetch_insider_signals(
+            [row["symbol"] for row in rows]
+        )
+    else:
+        insider_by_symbol = {}
+        insider_source_status = {
+            "status": "skipped",
+            "reason": "market-data-only pipeline",
+            "refreshed": 0,
+        }
     magic = magic_formula_ranks(fundamental_by_symbol)
     for row in rows:
         fundamental = fundamental_by_symbol.get(row["symbol"], {})
@@ -789,6 +844,58 @@ def run(with_news=True, with_fundamentals=True):
         rankings_enabled=data_status["data_actionable"],
         blockers=data_status["blocking_reasons"],
     )
+    if not market_data_only:
+        gex_by_symbol, gex_source_status = fetch_gex_signals(rows)
+        fred_regime, fred_source_status = fetch_fred_regime()
+    else:
+        gex_by_symbol = {}
+        gex_source_status = {"status": "skipped", "reason": "market-data-only pipeline"}
+        fred_regime = {}
+        fred_source_status = {"status": "skipped", "reason": "market-data-only pipeline"}
+    for row in rows:
+        catalyst_values = [
+            value
+            for value in (row.get("news_score"), fred_regime.get("score"))
+            if isinstance(value, (int, float)) and math.isfinite(value)
+        ]
+        row["market_regime"] = fred_regime or None
+        row["catalyst_context"] = {
+            "score": (
+                round(sum(catalyst_values) / len(catalyst_values), 1)
+                if catalyst_values
+                else None
+            ),
+            "news_score": row.get("news_score"),
+            "macro_regime_score": fred_regime.get("score"),
+            "macro_regime": fred_regime.get("regime"),
+            "earnings_event": row.get("next_earnings"),
+            "earnings_in_days": row.get("earnings_in_days"),
+            "note": (
+                "Earnings proximity is event context only and receives no directional score."
+            ),
+        }
+    attach_alternative_signals(
+        rows,
+        insider_by_symbol,
+        gex_by_symbol,
+        now=now,
+    )
+    expert_weights = load_score_weights()
+    valuation_history = (
+        update_valuation_history(rows, observed_at=now)
+        if not market_data_only
+        else {"symbols": {}, "status": {"skipped": True}}
+    )
+    attach_expert_analysis(
+        rows,
+        expert_weights,
+        valuation_history=valuation_history,
+    )
+    expert_rankings = build_expert_rankings(rows, top_n=TOP_N)
+    if not market_data_only:
+        evaluate_mature_observations(fetched.prices)
+        record_top_observations(rows, expert_rankings, now.isoformat())
+    recommendation_journal = journal_summary()
     rankings_by_currency_asset = rehydrate_rankings(
         rankings_by_currency_asset,
         rows,
@@ -853,6 +960,8 @@ def run(with_news=True, with_fundamentals=True):
             "macro context",
             "generic company fundamental bands",
             "calibrated probability forecasts",
+            "expert long-term and short-term composites",
+            "alternative-data confluence",
         ],
         "scenario_status": "unvalidated heuristic range; not a probability or expected return",
         "validation_gate": {
@@ -914,6 +1023,14 @@ def run(with_news=True, with_fundamentals=True):
             "provenance_catalog": PROVENANCE_CATALOG,
             "sweet_spot_contract": SWEET_SPOT_CONTRACT,
         },
+        "expert_layer": {
+            "model_status": "heuristic_unvalidated",
+            "actionable": False,
+            "core_ranking_unchanged": True,
+            "source_catalog": EXPERT_SOURCE_CATALOG,
+            "rankings": expert_rankings,
+            "recommendation_journal": recommendation_journal,
+        },
         "probability_validation": probability_validation,
         "probability_baselines": probability_baselines,
         "universe_size": len(symbols),
@@ -923,6 +1040,10 @@ def run(with_news=True, with_fundamentals=True):
         "analyzed": len(rows),
         "market_news": market_news,
         "news_source_status": news_status,
+        "sec_companyfacts_status": sec_source_status,
+        "sec_insider_status": insider_source_status,
+        "options_gex_status": gex_source_status,
+        "fred_status": fred_source_status,
         "fx_status": fx_result.status,
         "macro": macro,
         "benchmarks": benchmarks,

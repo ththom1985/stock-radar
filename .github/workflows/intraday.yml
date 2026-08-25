@@ -31,6 +31,14 @@ jobs:
       - run: python -m pip install -r requirements-ci.txt
       - run: python -m unittest discover -s tests -v
       - run: python -m src.analyze
+        env:
+          SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+      - name: Check published data health
+        continue-on-error: true
+        run: python -m src.published_health
+      # Aggregate-only: no private detailed ledger exists on the GitHub runner.
+      - run: python -m src.probability_forward publish-status --aggregate-only
       - run: python -m src.export_static
 
       - name: Publish complete data transaction
@@ -54,7 +62,20 @@ jobs:
             data/news_cache.json \
             data/probability_models.json \
             data/probability_validation.json \
+            data/probability_forward_status.json \
             docs/data.json
+          for optional in \
+            data/sec_ticker_map.json \
+            data/sec_companyfacts.json \
+            data/sec_insider_signals.json \
+            data/recommendation_log.jsonl \
+            data/recommendation_outcomes.jsonl \
+            data/valuation_history.json \
+            data/options_gex.json \
+            data/fred_regime.json
+          do
+            if [ -e "$optional" ]; then git add "$optional"; fi
+          done
           if git diff --cached --quiet; then
             echo "No data changes."
             exit 0

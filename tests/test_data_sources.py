@@ -50,6 +50,44 @@ class DataSourceTests(unittest.TestCase):
         self.assertEqual(completed["RawOpen"].iloc[-1], 102)
         self.assertEqual(completed["Open"].iloc[-1], 51)
 
+    def test_completed_bars_skip_incomplete_ohlc_but_keep_actions(self):
+        index = pd.DatetimeIndex(
+            [
+                pd.Timestamp("2026-08-10"),
+                pd.Timestamp("2026-08-11"),
+            ]
+        )
+        raw = pd.DataFrame(
+            {
+                "Open": [100.0, 102.0],
+                "High": [101.0, 103.0],
+                "Low": [99.0, 101.0],
+                "Close": [100.0, np.nan],
+                "Adj Close": [100.0, np.nan],
+                "Volume": [1000.0, 0.0],
+                "Dividends": [0.0, 1.5],
+                "Stock Splits": [0.0, 0.0],
+            },
+            index=index,
+        )
+        completed, info = completed_daily_bars(
+            raw,
+            symbol="AAPL",
+            now=datetime(2026, 8, 12, 23, tzinfo=timezone.utc),
+        )
+        self.assertEqual(len(completed), 1)
+        self.assertEqual(info["bar_date"], "2026-08-10")
+        self.assertEqual(info["excluded_incomplete_price_rows"], 1)
+        self.assertEqual(
+            info["corporate_actions"][0]["bar_date"],
+            "2026-08-11",
+        )
+        self.assertEqual(
+            info["corporate_actions"][0]["dividend_local"],
+            1.5,
+        )
+        self.assertEqual(info["excluded_partial_rows"], 0)
+
     def test_failed_batch_splits_and_reports_only_failed_symbol(self):
         index = pd.date_range("2026-06-01", periods=50, freq="D")
         single = pd.DataFrame(

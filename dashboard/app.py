@@ -20,6 +20,10 @@ from src.data_quality import (
     validate_portfolio_contract,
 )
 from src.persistence import PersistenceError, load_json
+from src.probability_forward_public import (
+    load_forward_validation_status,
+    validate_forward_validation_status,
+)
 from src.sweet_spot import format_price
 
 LATEST = ROOT / "data" / "output" / "latest.json"
@@ -51,6 +55,13 @@ except (PersistenceError, DataContractError) as exc:
 
 status = data["data_status"]
 model = data["model_status"]
+try:
+    forward_validation = validate_forward_validation_status(
+        data.get("forward_validation_status")
+        or load_forward_validation_status()
+    )
+except ValueError as exc:
+    _stop_with_error(f"Forward-validation aggregate is invalid: {exc}")
 allowed, blockers = dashboard_gate(data)
 
 if not allowed:
@@ -62,6 +73,7 @@ if not allowed:
             "data_status": status,
             "model_status": model,
             "probability_validation": data.get("probability_validation"),
+            "forward_validation_status": forward_validation,
         }
     )
     failed = status.get("failed_symbols")
@@ -101,6 +113,7 @@ with st.expander("Data and model contract", expanded=not allowed):
             "data_status": status,
             "model_status": model,
             "probability_validation": data.get("probability_validation"),
+            "forward_validation_status": forward_validation,
         }
     )
     feature_gate = status.get("feature_coverage") or {}
@@ -387,6 +400,44 @@ def _research_card(row, rank=None):
             st.error("China-Risikokontext (heuristic_unvalidated; kein bewiesener Abschlag)")
             for reason in jurisdiction.get("reasons") or []:
                 st.warning(reason)
+        expert = row.get("expert_analysis") or {}
+        if expert:
+            st.markdown("#### Experten-Composite")
+            expert_metrics = st.columns(4)
+            expert_metrics[0].metric(
+                "Long Term",
+                _number((expert.get("long_term") or {}).get("score"), 1, "/100"),
+                f"{_number((expert.get('long_term') or {}).get('coverage_pct'), 1, '%')} Abdeckung",
+            )
+            expert_metrics[1].metric(
+                "Short Term",
+                _number((expert.get("short_term") or {}).get("score"), 1, "/100"),
+                f"{_number((expert.get('short_term') or {}).get('coverage_pct'), 1, '%')} Abdeckung",
+            )
+            expert_metrics[2].metric("Signal", expert.get("signal") or "insufficient_data")
+            expert_metrics[3].metric(
+                "Konfidenz", expert.get("evidence_quality") or "low"
+            )
+            expert_valuation = expert.get("valuation") or {}
+            fair_range = expert_valuation.get("fair_value_range") or {}
+            st.caption(
+                f"Bewertung: {expert_valuation.get('verdict') or 'unavailable'} · "
+                + (
+                    f"fairer Heuristik-Bereich {_number(fair_range.get('lower'), 2)}–"
+                    f"{_number(fair_range.get('upper'), 2)} {fair_range.get('currency') or ''}"
+                    if fair_range
+                    else "kein belastbarer fairer Bereich"
+                )
+            )
+            if expert_valuation.get("missing_note"):
+                st.info(expert_valuation["missing_note"])
+            expert_risks = (expert.get("risks") or {}).get("top_risks") or []
+            for risk in expert_risks:
+                st.warning(risk)
+            st.caption(
+                "Szenario-Wahrscheinlichkeiten: "
+                f"{(expert.get('outlook') or {}).get('probabilities_status') or 'withheld'}"
+            )
         _render_probability_forecast(
             row, data.get("probability_baselines") or []
         )
@@ -601,6 +652,8 @@ tabs = st.tabs(
         "Datenqualität",
         "Paper",
         "Validierung",
+        "Experten-Scores",
+        "Trefferquote",
     ]
 )
 
@@ -971,6 +1024,30 @@ with tabs[11]:
             pd.DataFrame.from_dict(probability_models, orient="index"),
             width="stretch",
         )
+    st.subheader("Forward Validation")
+    st.warning(
+        "The ordered shadow model was rejected retrospectively and is being "
+        "monitored prospectively. No shadow probabilities are shown; the current "
+        "page remains baseline-only."
+    )
+    forward_metrics = st.columns(4)
+    forward_metrics[0].metric("Status", forward_validation["status"])
+    forward_metrics[1].metric("Weekly anchors", forward_validation["weeks_captured"])
+    forward_metrics[2].metric(
+        "Matured 1M",
+        forward_validation["matured_outcomes"]["21"],
+    )
+    forward_metrics[3].metric(
+        "Matured 12M",
+        forward_validation["matured_outcomes"]["252"],
+    )
+    st.caption(
+        "Earliest meaningful 1M assessment: "
+        f"{forward_validation['schedule']['meaningful_1m_assessment_not_before']}; "
+        "final 12M schedule: "
+        f"{forward_validation['schedule']['final_12m_assessment_not_before']}. "
+        "A pass can only create a candidate for independent review."
+    )
 
 with tabs[9]:
     st.subheader("Completed-bar age distribution")
@@ -980,8 +1057,127 @@ with tabs[9]:
         pd.DataFrame.from_dict(data.get("fx_status") or {}, orient="index"),
         width="stretch",
     )
+
+with tabs[12]:
+    expert_layer = data.get("expert_layer") or {}
+    expert_rankings = expert_layer.get("rankings") or {}
+    configured_weights = expert_rankings.get("weights") or {}
+    st.warning(
+        "Beide Composite-Scores sind heuristic_unvalidated, getrennt vom konservativen "
+        "Radar-Ranking und keine Anlageberatung. Fehlende Faktoren werden nicht erfunden; "
+        "die sichtbare Abdeckung sinkt entsprechend."
+    )
+
+    horizon_options = {
+        "Long Term (6–24 Monate)": "long_term",
+        "Short Term (Tage–3 Monate)": "short_term",
+    }
+    selected_label = st.radio(
+        "Horizont",
+        list(horizon_options),
+        horizontal=True,
+        key="expert_horizon",
+    )
+    selected_horizon = horizon_options[selected_label]
+    default_weights = configured_weights.get(selected_horizon) or {}
+    labels = {
+        "value": "Bewertung",
+        "quality": "Qualität",
+        "growth": "Wachstum",
+        "momentum": "Momentum",
+        "sentiment": "Sentiment",
+        "alternative_data": "Alt-Data",
+        "technical_momentum": "Technik/Momentum",
+        "catalysts": "Katalysatoren",
+        "valuation": "Bewertung",
+    }
+    weight_columns = st.columns(min(3, max(1, len(default_weights))))
+    tuned_weights = {}
+    for index, (factor, default) in enumerate(default_weights.items()):
+        tuned_weights[factor] = weight_columns[index % len(weight_columns)].slider(
+            labels.get(factor, factor),
+            min_value=0,
+            max_value=100,
+            value=int(round(default)),
+            key=f"expert_weight_{selected_horizon}_{factor}",
+        )
+
+    def tuned_score(row):
+        analysis = row.get("expert_analysis") or {}
+        detail = analysis.get(selected_horizon) or {}
+        components = detail.get("components") or {}
+        available = [
+            (components.get(factor, {}).get("value"), weight)
+            for factor, weight in tuned_weights.items()
+            if isinstance(components.get(factor, {}).get("value"), (int, float))
+            and weight > 0
+        ]
+        denominator = sum(weight for _, weight in available)
+        return (
+            round(sum(value * weight for value, weight in available) / denominator, 1)
+            if denominator
+            else None
+        )
+
+    expert_rows = []
+    for row in rows_by_symbol.values():
+        analysis = row.get("expert_analysis") or {}
+        detail = analysis.get(selected_horizon) or {}
+        score = tuned_score(row)
+        if score is None:
+            continue
+        expert_rows.append(
+            {
+                "Symbol": row.get("symbol"),
+                "Name": row.get("display_name_full") or row.get("name"),
+                "Score (getunt)": score,
+                "Basis-Score": detail.get("score"),
+                "Abdeckung %": detail.get("coverage_pct"),
+                "Signal": analysis.get("signal"),
+                "Konfidenz": analysis.get("evidence_quality"),
+                "Fehlend": ", ".join(detail.get("missing_components") or []),
+            }
+        )
+    expert_rows.sort(
+        key=lambda item: (
+            -(item["Score (getunt)"] or -1),
+            item["Symbol"] or "",
+        )
+    )
+    st.caption(
+        "Slider ändern nur diese Ansicht. Dauerhafte Tagesgewichte stehen in "
+        "`data/expert_score_weights.json` und werden beim nächsten Pipeline-Lauf angewendet."
+    )
+    st.dataframe(pd.DataFrame(expert_rows[:100]), hide_index=True, width="stretch")
+    symbols = [item["Symbol"] for item in expert_rows[:100]]
+    if symbols:
+        selected = st.selectbox("Detail", symbols, key="expert_detail")
+        _research_card(rows_by_symbol[selected], symbols.index(selected) + 1)
+
+with tabs[13]:
+    journal = ((data.get("expert_layer") or {}).get("recommendation_journal") or {})
+    st.warning(
+        "Trefferquote bedeutet hier ausschließlich positiver lokaler Kursreturn nach "
+        "21/63/126/252 Handelssitzungen. Sie ist noch kein Alpha-, Benchmark- oder "
+        "Kausalitätsnachweis."
+    )
+    summary_columns = st.columns(4)
+    for column, horizon in zip(summary_columns, ("1m", "3m", "6m", "12m")):
+        outcome = (journal.get("by_horizon") or {}).get(horizon) or {}
+        column.metric(
+            horizon.upper(),
+            (
+                f"{outcome.get('hit_rate_pct'):.1f}%"
+                if isinstance(outcome.get("hit_rate_pct"), (int, float))
+                else "noch offen"
+            ),
+            f"{outcome.get('evaluated', 0)} ausgewertet",
+        )
+    st.json(journal)
     st.subheader("Probability data health")
     st.json(data.get("probability_validation") or {"status": "unavailable"})
+    st.subheader("Forward Validation")
+    st.json(forward_validation)
     failed = status.get("failed_symbols") or {}
     st.subheader(f"Failed symbols ({len(failed)})")
     st.dataframe(

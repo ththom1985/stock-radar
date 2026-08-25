@@ -38,6 +38,7 @@ from src.probability_features import (
     probability_code_hash,
 )
 from src.probability_train import make_synthetic_dataset
+from src.probability_contract import ordered_label_column
 from tests.helpers import ROOT, ProjectTempMixin
 
 
@@ -195,6 +196,21 @@ class ProbabilityFeatureDatasetTests(ProjectTempMixin, unittest.TestCase):
         self.assertFalse(pd.isna(latest["ordered_label_h21"]))
         self.assertTrue(pd.isna(latest["label_h252_x10"]))
         self.assertTrue(pd.isna(latest["ordered_label_h252"]))
+
+    def test_nonfinite_exit_close_remains_unlabeled_not_sentinel(self):
+        history = history_frame()
+        baseline = build_symbol_dataset("AAA", history, history)
+        feature_date = baseline.iloc[0]["feature_date"]
+        position = history.index.get_loc(feature_date)
+        exit_date = history.index[position + 21]
+        broken = history.copy()
+        broken.loc[exit_date, "Close"] = np.nan
+
+        dataset = build_symbol_dataset("AAA", broken, history)
+        row = dataset.loc[dataset["feature_date"] == feature_date].iloc[0]
+        self.assertTrue(pd.isna(row[ordered_label_column(21)]))
+        self.assertTrue(pd.isna(row["label_h21_x3"]))
+        self.assertTrue(pd.isna(row["exit_timestamp_h21"]))
 
     def test_material_classes_are_coherent_at_cost_boundaries(self):
         threshold = 0.05

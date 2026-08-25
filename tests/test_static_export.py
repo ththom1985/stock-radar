@@ -47,6 +47,21 @@ class StaticExportTests(ProjectTempMixin, unittest.TestCase):
             "probability fields are excluded from radar scores, insight rankings, "
             "Sweet Spot, and colors",
         )
+        forward = loaded["forward_validation_status"]
+        self.assertEqual(forward["retrospective_status"], "rejected")
+        self.assertFalse(forward["actionable"])
+        self.assertFalse(forward["shadow_values_published"])
+        self.assertEqual(forward["detail_store"], "machine_local_only")
+        forward_text = json.dumps(forward, sort_keys=True).casefold()
+        for forbidden in (
+            "raw_ordered_probabilities",
+            "derived_probabilities",
+            "feature_vector",
+            "coefficient",
+            "entry_open",
+            "gross_return",
+        ):
+            self.assertNotIn(forbidden, forward_text)
         probability = _hydrate_compact_probability(
             loaded["instruments"][0]["pf"],
             reason_catalog=loaded["probability_reason_catalog"],
@@ -347,6 +362,9 @@ class StaticExportTests(ProjectTempMixin, unittest.TestCase):
         self.assertIn("Kalibrierte Wahrscheinlichkeiten", html)
         self.assertIn("hydrateProbabilityForecasts", html)
         self.assertIn("Probability-Validierung", html)
+        self.assertIn("Forward Validation", html)
+        self.assertIn("baseline-only", html)
+        self.assertIn("meaningful_1m_assessment_not_before", html)
         dashboard = (ROOT / "dashboard" / "app.py").read_text(encoding="utf-8")
         for forbidden in (
             "will rise",

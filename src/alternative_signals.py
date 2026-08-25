@@ -1,0 +1,133 @@
+"""Recency-aware confluence across independent free alternative-data signals."""
+from __future__ import annotations
+
+import math
+from datetime import datetime, timezone
+
+SIGNAL_SPECS = {
+    "insider": {"half_life_days": 30, "source_group": "sec_insiders"},
+    "congress": {"half_life_days": 60, "source_group": "congress"},
+    "institutional": {"half_life_days": 120, "source_group": "sec_13f"},
+    "short_interest": {"half_life_days": 30, "source_group": "finra"},
+    "wikipedia": {"half_life_days": 14, "source_group": "wikimedia"},
+    "jobs": {"half_life_days": 30, "source_group": "company_careers"},
+    "earnings_tone": {"half_life_days": 120, "source_group": "filings_calls"},
+    "filing_diff": {"half_life_days": 180, "source_group": "sec_filings"},
+    "gex": {"half_life_days": 3, "source_group": "options_chain"},
+}
+
+
+def _number(value):
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return None
+    value = float(value)
+    return value if math.isfinite(value) else None
+
+
+def _age_days(timestamp, now):
+    try:
+        parsed = datetime.fromisoformat(str(timestamp).replace("Z", "+00:00"))
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+    except (TypeError, ValueError):
+        return None
+    return max(0.0, (now - parsed.astimezone(timezone.utc)).total_seconds() / 86400)
+
+
+def build_alternative_signals(row, *, insider=None, gex=None, now=None):
+    now = now or datetime.now(timezone.utc)
+    raw = {}
+    if isinstance(insider, dict) and _number(insider.get("score")) is not None:
+        raw["insider"] = {
+            "score": insider["score"],
+            "observed_at": insider.get("last_success_at") or insider.get("fetched_at"),
+            "source": insider.get("source"),
+            "expected_delay": insider.get("expected_delay"),
+            "evidence": {
+                "cluster_purchase": insider.get("cluster_purchase"),
+                "cluster_owner_count": insider.get("cluster_owner_count"),
+                "purchase_count_90d": insider.get("purchase_count_90d"),
+                "sale_count_90d": insider.get("sale_count_90d"),
+            },
+        }
+    if isinstance(gex, dict) and _number(gex.get("score")) is not None:
+        raw["gex"] = {
+            "score": gex["score"],
+            "observed_at": gex.get("last_success_at") or gex.get("fetched_at"),
+            "source": gex.get("source"),
+            "expected_delay": gex.get("expected_delay"),
+            "evidence": {
+                "direction": gex.get("direction"),
+                "net_gex_usd_per_1pct": gex.get("net_gex_usd_per_1pct"),
+                "gex_to_market_cap": gex.get("gex_to_market_cap"),
+                "gamma_walls": gex.get("gamma_walls"),
+                "limitations": gex.get("limitations"),
+            },
+        }
+    for name in SIGNAL_SPECS:
+        supplied = (row.get("raw_alternative_signals") or {}).get(name)
+        if name not in raw and isinstance(supplied, dict):
+            raw[name] = supplied
+
+    weighted = []
+    rendered = {}
+    source_groups = set()
+    for name, signal in raw.items():
+        score = _number(signal.get("score"))
+        if score is None:
+            continue
+        spec = SIGNAL_SPECS[name]
+        age = _age_days(signal.get("observed_at"), now)
+        recency = (
+            0.5 ** (age / spec["half_life_days"])
+            if age is not None
+            else 0.25
+        )
+        centered = (max(0.0, min(100.0, score)) - 50.0) / 50.0
+        weighted.append((centered, recency))
+        source_groups.add(spec["source_group"])
+        rendered[name] = {
+            **signal,
+            "age_days": round(age, 2) if age is not None else None,
+            "recency_weight": round(recency, 4),
+            "source_group": spec["source_group"],
+        }
+    if weighted:
+        denominator = sum(weight for _, weight in weighted)
+        centered = sum(value * weight for value, weight in weighted) / denominator
+        independence_bonus = min(10.0, max(0, len(source_groups) - 1) * 2.5)
+        confluence = 50.0 + centered * 40.0
+        if centered > 0:
+            confluence += independence_bonus
+        elif centered < 0:
+            confluence -= independence_bonus
+        confluence = round(max(0.0, min(100.0, confluence)), 1)
+    else:
+        confluence = None
+    return {
+        "model_status": "heuristic_unvalidated",
+        "actionable": False,
+        "confluence_score": confluence,
+        "independent_source_count": len(source_groups),
+        "coverage_count": len(rendered),
+        "missing_signals": [name for name in SIGNAL_SPECS if name not in rendered],
+        "signals": rendered,
+    }
+
+
+def attach_alternative_signals(
+    rows,
+    insider_by_symbol=None,
+    gex_by_symbol=None,
+    now=None,
+):
+    insider_by_symbol = insider_by_symbol or {}
+    gex_by_symbol = gex_by_symbol or {}
+    for row in rows:
+        row["alternative_signals"] = build_alternative_signals(
+            row,
+            insider=insider_by_symbol.get(row.get("symbol")),
+            gex=gex_by_symbol.get(row.get("symbol")),
+            now=now,
+        )
+    return rows

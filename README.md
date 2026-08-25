@@ -32,10 +32,10 @@ ETFs, funds, crypto, non-USD listings, duplicate issuer listings, and histories
 without at least 252 completed prior bars are withheld.
 
 The current checked-in `data/probability_models.json` and
-`data/probability_validation.json` intentionally remain withheld until the
-ordered challenger's expensive full-universe release run completes. The
-independent-threshold v1 result (0/12 accepted) is preserved at
-`data/probability_experiments/independent-threshold-v1_summary.json`.
+`data/probability_validation.json` are intentionally withheld. Both
+independent-threshold-v1 and the completed ordered-vector-v1 retrospective
+validation accepted zero models. Their artifacts remain preserved under
+`data/probability_experiments/`; no rejected probability is promoted.
 
 ### Target and timing convention
 
@@ -202,6 +202,111 @@ canonical model followed by canonical `data/probability_validation.json`.
 Failed completed releases publish canonical `no_model_passed` / `withheld`,
 never a stale `not_run`.
 
+### Prospective forward validation (shadow only)
+
+`src.probability_forward` freezes and monitors the rejected ordered-vector-v1
+without retuning it. `freeze` writes an immutable preregistration **before**
+fitting all four final horizons from the exact cached dataset bounded at
+`2026-07-10`. It records feature/specification, gate, source, dependency,
+dataset, validation, and production-artifact hashes. The resulting artifact has
+the distinct `stock-radar-probability-shadow-artifact` schema, is marked
+`REJECTED_SHADOW_NOT_FORECAST`, `shadow_only: true`, and `actionable: false`,
+contains no accepted-model index, and is rejected by the normal production
+loader. It never overwrites `data/probability_models.json`.
+
+Detailed coefficients, weekly predictions, OOD diagnostics, and matured outcomes
+live only under ignored `data/probability_forward/cohorts/<cohort>/`. The
+authoritative SQLite ledger uses WAL, full synchronous transactions, immutable
+prediction/outcome triggers, HMAC-SHA256 records, a canonical append-only event
+chain covering metadata, anchors, predictions, exclusions, outcomes, resolution
+attempts, and candidate reports, plus a monotonic separately stored signed
+snapshot root. Event transactions atomically stage a pending seal; manifest
+publication then finalizes that exact head in a short transaction. Startup and
+`recover` deterministically finish either crash window (DB commit before
+manifest, or manifest before finalization) only after full reconciliation.
+Deterministic immutable gzip snapshots and verified SQLite
+backups include the corresponding sealed manifest. Back up both the cohort directory and its
+`manifest-signing.key`; losing the local directory loses the prospective
+history. The HMAC protects integrity while the key remains separate from an
+attacker, but it is not encryption.
+Do not open the same SQLite cohort concurrently on multiple synced machines;
+WAL protects local processes, not cross-device OneDrive synchronization.
+There is no external cryptographic timestamp or transparency log: rollback
+detection is only as strong as an independently retained newer sealed manifest
+(including the manifest sidecar written with every backup). An attacker able to
+replace the database, seal, and local key together can rewrite local history.
+
+Only `data/probability_forward_status.json` may be committed. It contains counts,
+dates, schedules, and state—never coefficients, feature vectors, prices,
+returns, labels, or shadow probability values. GitHub Actions can inject this
+already-committed aggregate into `latest.json` and `docs/data.json`; a public
+runner has no private durable ledger and therefore **cannot** capture, mature, or
+evaluate unseen history. GitHub cache/artifact retention is deliberately not
+misrepresented as durable storage. There is no external cloud dependency.
+
+Run the local commands from PowerShell:
+
+```powershell
+Set-Location "C:\Users\ththomas\OneDrive\09_Software_Tools_Projekte\01_Aktive_Software_Projekte\Stock-Radar"
+
+# One time, after reviewing the preregistration inputs. Restartable checkpoints
+# are reused only when every frozen binding is identical.
+.\.venv\Scripts\python.exe -m src.probability_forward freeze
+
+# Once per ISO week, preferably Saturday 01:30 Europe/Berlin. Capture enforces
+# Friday 23:00 UTC or later, the current ISO week, and feature_date > freeze date.
+.\.venv\Scripts\python.exe -m src.probability_forward capture
+
+# Run after capture and at least weekly; labels are inserted only at exact t+H.
+.\.venv\Scripts\python.exe -m src.probability_forward evaluate
+
+# Local integrity/backup and, only after all minimums, a 1,000-draw candidate report.
+.\.venv\Scripts\python.exe -m src.probability_forward verify
+.\.venv\Scripts\python.exe -m src.probability_forward recover
+.\.venv\Scripts\python.exe -m src.probability_forward backup
+.\.venv\Scripts\python.exe -m src.probability_forward report
+```
+
+Production CLI commands accept no clock, historical-date, test-mode, or reduced
+bootstrap override. They use timezone-aware system UTC; injected clocks exist
+only in internal development tests and produce artifacts permanently marked
+`development_test_mode`. Capture requires the selected stock and SPY session to
+equal the latest completed US session inferred from the current US-equity/SPY
+histories (so stale Thursday data is rejected when a Friday session exists, while
+a genuine Friday holiday can retain Thursday). Each anchor records requested,
+successful, and failed provider issuers. Candidate metrics use a stable SQLite
+read snapshot; the report event is rejected/retried if the event head changes
+before sealing, and aggregate publication rechecks the same bound head under a
+write lock. Candidate review additionally requires
+at least 80% provider coverage and at least 200 successful issuers. `report`
+always uses exactly 1,000 fixed-prediction bootstrap repetitions, recomputes all
+gates from immutable ledger rows, and republishes aggregate status; a stale
+candidate JSON is never trusted.
+
+The freeze performs four multinomial fits and four vector-calibrator fits but no
+retrospective search/bootstrap; plan roughly **10–45 minutes and 2–6 GiB** on a
+typical workstation. Actual time depends on BLAS, CPU, and the 203 MiB cached
+dataframe.
+
+No Windows task is created by this repository. If the operator later chooses to
+schedule it, use two Task Scheduler actions whose working directory is the
+repository: weekly Saturday around 01:30 local for `capture`, followed around
+02:30 by `evaluate`. The capture command itself rejects early, stale-week, and
+backfill attempts. Keep `verify` and an off-machine backup of the ignored cohort
+and signing key in the operator's backup policy.
+
+Assuming implementation/freeze on 2026-08-18, the first permitted completed
+weekly anchor is Friday **2026-08-21**. Its 21-session outcome is expected around
+**2026-09-22**, but that is only the first outcome. Release review still requires
+at least 104 weekly anchors, 200 issuers, 200 outcomes per class, 26 dates, eight
+quarters, all unchanged metric gates, and a complete 1,000-draw bootstrap. The
+earliest meaningful 1M review is therefore approximately **2028-09-12**; the
+252-session cohort cannot complete its 104th-anchor outcomes before the frozen
+NYSE weekday/holiday schedule estimate **2029-08-14**. Exchange closures, halts,
+and missing bars can only delay these
+dates. A complete pass creates a non-actionable candidate report for independent
+review; it never promotes automatically.
+
 ### Commands, checkpointing, and cost
 
 Run from PowerShell:
@@ -286,6 +391,7 @@ Every output row contains:
 - `rankings_by_currency_asset`: conservative technical partitions;
 - `insight_rankings`: transparent, research-only category formulas and items;
 - `insight_metadata`: explicit `heuristic_unvalidated` provenance;
+- `forward_validation_status`: leak-safe prospective cohort counts and schedule;
 - `all`: the complete analyzed-row contract.
 
 The dashboard refuses to render research cards when the snapshot is corrupt,
@@ -515,6 +621,68 @@ likelihood, probability, expected return, or recommendation strength.
 The static cockpit applies the same fail-closed contract before rendering any
 tips: status must be `ok`, `data_actionable` true, blocking reasons empty, model
 and insight actionability false, and `generated_at` no older than 36 hours.
+
+## Free expert-analysis layer
+
+The additive expert layer never changes `radar_score`, core technical partitions,
+Sweet Spot, or released/withheld probability models. It remains
+`heuristic_unvalidated`, `actionable: false`, and is analysis support rather than
+investment advice.
+
+- `data/expert_score_weights.json` configures separate long-term and short-term
+  composites. Missing factors are omitted with visible weight coverage; they are
+  never guessed or filled with a neutral score.
+- The Streamlit dashboard exposes temporary weight sliders for scenario testing.
+  Persistent daily weights remain reviewable source-controlled JSON.
+- `data/recommendation_log.jsonl` records the daily top observations with the
+  exact completed-bar price, score components, evidence quality, and alternative
+  signals. `data/recommendation_outcomes.jsonl` appends matured 21/63/126/252
+  session outcomes. A positive-return hit rate is not an alpha or benchmark claim.
+- `data/valuation_history.json` stores one point-in-time multiple snapshot per
+  month. An own five-year average is withheld until at least 48 monthly
+  observations exist. Current sector medians require at least five available peers.
+- Fair-value ranges are unvalidated interquartile implied-price ranges from
+  available sector medians and complete point-in-time own-history averages. If
+  fewer than two references exist, no range or verdict is produced.
+- Existing 1M/6M/12M/24M scenario ranges remain uncalibrated. Scenario
+  probabilities are explicitly withheld while the strict probability engine has
+  no accepted model.
+
+### Free source status
+
+| Source | Role | Refresh / delay | Current integration |
+| --- | --- | --- | --- |
+| Yahoo Finance via yfinance | Completed daily OHLCV, global fundamentals, analyst context | Daily bars; fundamentals weekly | Active primary source |
+| SEC EDGAR Companyfacts | Official US annual accounting facts and five-period history | 30-day cache; filing-time data | Active when `SEC_USER_AGENT` is set |
+| SEC EDGAR Form 4 | Open-market insider purchases/sales and 21-day cluster purchases | 2-day cache; normally filed within two business days | Active when `SEC_USER_AGENT` is set |
+| Stooq | Secondary EOD price source | Daily | Active only after Yahoo failure for conservatively mapped ordinary US tickers |
+| FRED | 10Y–2Y curve, high-yield spread, NFCI risk regime | Daily cache; source-series delay | Active when free `FRED_API_KEY` is set |
+| ECB / Bundesbank | EU macro regime | Series dependent | Not yet wired; explicit gap |
+| FINRA | Short interest / days to cover | Twice monthly | Not yet wired; free credentials required |
+| House / Senate disclosures | Congressional transactions | Up to 45-day reporting lag | Not yet wired; explicit gap |
+| CFTC / CBOE | Positioning and put/call regime | Publication dependent | Not yet wired; explicit gap |
+| Yahoo options | Self-computed Black-Scholes GEX from IV/open interest | 18-hour cache; five symbols per run by default | Active, bounded, US USD company equities only |
+| Wikimedia / Reddit / careers pages | Attention and hiring trends | Daily/periodic | Not yet wired; explicit gap |
+
+SEC requests require a descriptive Fair Access user agent containing a contact
+email:
+
+```text
+SEC_USER_AGENT=Stock-Radar research your.name@example.com
+STOCK_RADAR_SEC_MAX=25
+STOCK_RADAR_INSIDER_MAX=15
+FRED_API_KEY=your_free_fred_key
+STOCK_RADAR_OPTIONS_MAX=5
+```
+
+The GitHub workflows read `SEC_USER_AGENT` from a repository secret. Without it,
+both SEC modules report `disabled` and retain stale-good cached data; they do not
+send anonymous requests.
+
+Equibles is not a mandatory runtime dependency. Its free self-hosted core is
+technically useful for SEC/FINRA/Congress enrichment, but its persistent
+ParadeDB plus .NET/Docker services are incompatible with ephemeral GitHub Actions.
+It may be added later as an optional local MCP adapter only.
 
 ## Paper simulation
 

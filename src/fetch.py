@@ -2,7 +2,10 @@
 from __future__ import annotations
 
 import math
+import os
+import re
 import time
+import urllib.parse
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Callable
@@ -57,6 +60,26 @@ def completed_daily_bars(
     if clean.empty or "Close" not in clean.columns:
         return pd.DataFrame(), {"excluded_partial_rows": excluded}
 
+    action_source = clean.copy()
+    required_ohlc = ("Open", "High", "Low", "Close")
+    if any(column not in clean.columns for column in required_ohlc):
+        return pd.DataFrame(), {
+            "excluded_partial_rows": excluded,
+            "excluded_incomplete_price_rows": len(clean),
+        }
+    complete_prices = clean.loc[:, required_ohlc].apply(
+        pd.to_numeric, errors="coerce"
+    )
+    valid_price_row = complete_prices.notna().all(axis=1)
+    valid_price_row &= (complete_prices > 0).all(axis=1)
+    excluded_incomplete = int((~valid_price_row).sum())
+    clean = clean.loc[valid_price_row].copy()
+    if clean.empty:
+        return pd.DataFrame(), {
+            "excluded_partial_rows": excluded,
+            "excluded_incomplete_price_rows": excluded_incomplete,
+        }
+
     raw_open = clean["Open"].astype(float).copy()
     raw_high = clean["High"].astype(float).copy()
     raw_low = clean["Low"].astype(float).copy()
@@ -81,7 +104,7 @@ def completed_daily_bars(
     last = clean.index[-1]
     timestamp = last.isoformat() if hasattr(last, "isoformat") else str(last)
     actions = []
-    for ts, row in clean.iterrows():
+    for ts, row in action_source.iterrows():
         dividend = float(row.get("Dividends") or 0.0)
         split = float(row.get("Stock Splits") or 0.0)
         dividend = dividend if math.isfinite(dividend) else 0.0
@@ -100,6 +123,7 @@ def completed_daily_bars(
         "bar_date": last.date().isoformat(),
         "bar_timestamp": timestamp,
         "excluded_partial_rows": excluded,
+        "excluded_incomplete_price_rows": excluded_incomplete,
         "source_interval": "1d",
         "completed_bars_only": True,
         "corporate_actions": actions,
@@ -142,6 +166,40 @@ def _default_download(symbols: list[str], period: str) -> pd.DataFrame:
     )
 
 
+def _stooq_symbol(symbol: str) -> str | None:
+    """Conservative Stooq mapping for ordinary US ticker symbols only."""
+    if not re.fullmatch(r"[A-Z]{1,5}", symbol):
+        return None
+    return f"{symbol.lower()}.us"
+
+
+def _default_stooq_download(symbol: str, period: str) -> pd.DataFrame:
+    mapped = _stooq_symbol(symbol)
+    if not mapped:
+        return pd.DataFrame()
+    years = 3 if period == "2y" else 6
+    end = datetime.now(timezone.utc).date()
+    start = end.replace(year=end.year - years)
+    query = urllib.parse.urlencode(
+        {
+            "s": mapped,
+            "d1": start.strftime("%Y%m%d"),
+            "d2": end.strftime("%Y%m%d"),
+            "i": "d",
+        }
+    )
+    frame = pd.read_csv(f"https://stooq.com/q/d/l/?{query}")
+    if frame.empty or "Date" not in frame:
+        return pd.DataFrame()
+    frame["Date"] = pd.to_datetime(frame["Date"], errors="coerce")
+    frame = frame.dropna(subset=["Date"]).set_index("Date").sort_index()
+    if "Close" in frame:
+        frame["Adj Close"] = frame["Close"]
+    frame["Dividends"] = 0.0
+    frame["Stock Splits"] = 0.0
+    return frame
+
+
 def fetch_prices_with_status(
     symbols: list[str],
     period: str = HISTORY_PERIOD,
@@ -149,6 +207,7 @@ def fetch_prices_with_status(
     retries: int = 2,
     now: datetime | None = None,
     downloader: Callable[[list[str], str], pd.DataFrame] | None = None,
+    fallback_downloader: Callable[[str, str], pd.DataFrame] | None = None,
     verbose: bool = True,
 ) -> PriceFetchResult:
     """Download with retries, recursive batch splitting and a failure manifest."""
@@ -186,7 +245,7 @@ def fetch_prices_with_status(
                     missing.append(symbol)
                     continue
                 result.prices[symbol] = frame
-                result.bar_info[symbol] = info
+                result.bar_info[symbol] = {**info, "price_provider": "yfinance"}
                 result.failed_symbols.pop(symbol, None)
             except Exception as exc:
                 result.failed_symbols[symbol] = f"invalid response: {str(exc)[:200]}"
@@ -209,6 +268,38 @@ def fetch_prices_with_status(
             print(f"  Batch {index}: {done}/{total} | successful {len(result.prices)}")
         if index * FETCH_CHUNK < total:
             time.sleep(FETCH_PAUSE)
+
+    fallback_enabled = (
+        os.environ.get("STOCK_RADAR_STOOQ_FALLBACK", "1") == "1"
+        and (fallback_downloader is not None or downloader is None)
+    )
+    if fallback_enabled:
+        fallback = fallback_downloader or _default_stooq_download
+        for symbol in list(result.failed_symbols):
+            if _stooq_symbol(symbol) is None:
+                continue
+            try:
+                frame = fallback(symbol, period)
+                frame, info = completed_daily_bars(frame, now=now, symbol=symbol)
+                if frame.empty or len(frame) < 30:
+                    continue
+                result.prices[symbol] = frame
+                result.bar_info[symbol] = {
+                    **info,
+                    "price_provider": "stooq",
+                    "fallback_reason": result.failed_symbols[symbol],
+                    "adjustment_status": (
+                        "Stooq EOD fallback; adjusted-close/corporate-action parity "
+                        "with Yahoo is not claimed"
+                    ),
+                }
+                result.failed_symbols.pop(symbol, None)
+            except Exception as exc:
+                result.failed_symbols[symbol] = (
+                    f"{result.failed_symbols[symbol]}; Stooq fallback failed: "
+                    f"{str(exc)[:120]}"
+                )
+            time.sleep(0.15)
     return result
 
 

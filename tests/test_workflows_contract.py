@@ -23,6 +23,13 @@ class WorkflowContractTests(unittest.TestCase):
             self.assertIn("data/failed_symbols.json", text)
             self.assertIn("data/probability_models.json", text)
             self.assertIn("data/probability_validation.json", text)
+            self.assertIn("data/probability_forward_status.json", text)
+            self.assertIn(
+                "python -m src.probability_forward publish-status --aggregate-only",
+                text,
+            )
+            self.assertNotIn("src.probability_forward capture", text)
+            self.assertNotIn("src.probability_forward evaluate", text)
             self.assertIn("persist-credentials: false", text)
             self.assertNotIn("|| true", text)
             self.assertNotIn("push ||", text)
@@ -34,6 +41,15 @@ class WorkflowContractTests(unittest.TestCase):
         command = "python -m unittest discover -s tests -v"
         self.assertIn(command, daily)
         self.assertLess(daily.index(command), daily.index("python -m src.analyze"))
+
+    def test_live_data_health_runs_after_analysis_and_is_non_blocking(self):
+        for name in ("daily.yml", "intraday.yml"):
+            text = (ROOT / ".github/workflows" / name).read_text(encoding="utf-8")
+            analysis = text.index("python -m src.analyze")
+            health = text.index("python -m src.published_health")
+            self.assertLess(analysis, health)
+            health_step = text[text.rfind("- name:", 0, health) : health]
+            self.assertIn("continue-on-error: true", health_step)
 
     def test_publication_jobs_are_main_branch_only(self):
         for name in ("daily.yml", "intraday.yml"):

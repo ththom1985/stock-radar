@@ -18,6 +18,10 @@ from .probability_inference import (
     validate_probability_forecast,
 )
 from .probability_contract import HORIZONS
+from .probability_forward_public import (
+    load_forward_validation_status,
+    validate_forward_validation_status,
+)
 from .probability_model import PUBLISH_TRANSFORM
 from .sweet_spot import FORMULA as SWEET_SPOT_FORMULA
 from .sweet_spot import MODEL_STATUS as SWEET_SPOT_MODEL_STATUS
@@ -95,6 +99,20 @@ _SWEET_ANCHOR_DISTANCE_CLASSES = (
 )
 _PROBABILITY_STATUS_CODES = ("withheld", "partial", "accepted")
 _PROBABILITY_CLASS_ORDER = ("down", "middle", "up")
+_EXPERT_SIGNALS = (
+    "positive_setup",
+    "wait_for_pullback",
+    "risk_too_high",
+    "insufficient_data",
+)
+_EXPERT_EVIDENCE_QUALITY = ("low", "medium", "high")
+_EXPERT_VALUATION_VERDICTS = (
+    "unavailable",
+    "clearly_undervalued",
+    "fair",
+    "expensive",
+    "overpriced",
+)
 _PROBABILITY_ROW_DEFAULTS = {
     "schema_version": FORECAST_SCHEMA_VERSION,
     "actionable": False,
@@ -175,6 +193,7 @@ ROW_FIELDS = (
     "rvol",
     "minervini_score",
     "weinstein_label",
+    "ea",
 )
 STATIC_INSTRUMENT_CONTRACT = {
     "model_status": "heuristic_unvalidated",
@@ -210,6 +229,35 @@ def _compact_group(
 def _compact_row(row: dict[str, Any]) -> dict[str, Any]:
     compact = {key: row.get(key) for key in ROW_FIELDS}
     compact["probability_forecast"] = row.get("probability_forecast")
+    expert = row.get("expert_analysis")
+    if isinstance(expert, dict):
+        long_term = expert.get("long_term") or {}
+        short_term = expert.get("short_term") or {}
+        valuation = expert.get("valuation") or {}
+        fair_range = valuation.get("fair_value_range") or {}
+        compact["ea"] = [
+            long_term.get("score"),
+            long_term.get("coverage_pct"),
+            short_term.get("score"),
+            short_term.get("coverage_pct"),
+            (
+                _EXPERT_SIGNALS.index(expert.get("signal"))
+                if expert.get("signal") in _EXPERT_SIGNALS
+                else len(_EXPERT_SIGNALS) - 1
+            ),
+            (
+                _EXPERT_EVIDENCE_QUALITY.index(expert.get("evidence_quality"))
+                if expert.get("evidence_quality") in _EXPERT_EVIDENCE_QUALITY
+                else 0
+            ),
+            (
+                _EXPERT_VALUATION_VERDICTS.index(valuation.get("verdict"))
+                if valuation.get("verdict") in _EXPERT_VALUATION_VERDICTS
+                else 0
+            ),
+            fair_range.get("lower"),
+            fair_range.get("upper"),
+        ]
     compact["news"] = (compact.get("news") or [])[:3]
     compact["scenario_long"] = [
         {
@@ -983,6 +1031,14 @@ def validate_static_payload(payload: Any) -> dict[str, Any]:
         raise ValueError("Static payload instruments must be a list")
     if not isinstance(payload.get("rankings"), dict):
         raise ValueError("Static payload core rankings must be an object")
+    expert_layer = payload.get("expert_layer")
+    if expert_layer is not None and (
+        not isinstance(expert_layer, dict)
+        or expert_layer.get("model_status") != "heuristic_unvalidated"
+        or expert_layer.get("actionable") is not False
+        or _contains_actionable_true(expert_layer)
+    ):
+        raise ValueError("Static expert layer is invalid")
     contract = payload.get("instrument_contract")
     if (
         not isinstance(contract, dict)
@@ -1030,6 +1086,7 @@ def validate_static_payload(payload: Any) -> dict[str, Any]:
     probability_model_catalog = payload.get("probability_model_catalog")
     probability_baseline_catalog = payload.get("probability_baseline_catalog")
     probability_validation = payload.get("probability_validation")
+    forward_validation_status = payload.get("forward_validation_status")
     if (
         not isinstance(probability_contract, dict)
         or probability_contract.get("schema_version") != FORECAST_SCHEMA_VERSION
@@ -1074,6 +1131,10 @@ def validate_static_payload(payload: Any) -> dict[str, Any]:
         or not isinstance(probability_validation, dict)
     ):
         raise ValueError("Static probability contract is invalid")
+    try:
+        validate_forward_validation_status(forward_validation_status)
+    except ValueError as exc:
+        raise ValueError("Static forward-validation status is invalid") from exc
 
     def require_text_lists(group: dict[str, Any], keys: tuple[str, ...]) -> None:
         for key in keys:
@@ -1419,6 +1480,11 @@ def export_static(
         snapshot.get("probability_validation")
         or load_probability_validation_summary()
     )
+    forward_validation_status = (
+        snapshot.get("forward_validation_status")
+        or load_forward_validation_status()
+    )
+    validate_forward_validation_status(forward_validation_status)
     payload = {
         "_meta": schema_meta(
             "stock-radar-static-export",
@@ -1526,9 +1592,17 @@ def export_static(
         "probability_model_catalog": probability_model_catalog,
         "probability_baseline_catalog": probability_baseline_catalog,
         "probability_validation": probability_validation,
+        "forward_validation_status": forward_validation_status,
         "market_data_contract": snapshot.get("market_data_contract") or {},
         "rankings": rankings,
         "insight_rankings": snapshot["insight_rankings"],
+        "expert_layer": snapshot.get("expert_layer") or {
+            "model_status": "heuristic_unvalidated",
+            "actionable": False,
+            "core_ranking_unchanged": True,
+            "rankings": {"long_term": [], "short_term": []},
+            "recommendation_journal": {},
+        },
         "instruments": compact_rows,
     }
     validate_static_payload(payload)

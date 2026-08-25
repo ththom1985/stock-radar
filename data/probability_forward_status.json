@@ -1,0 +1,59 @@
+{
+  "schema": "stock-radar-probability-forward-status",
+  "schema_version": 1,
+  "cohort_id": "ordered-vector-v1-forward-2026-08-18",
+  "frozen_at": null,
+  "implementation_state": "awaiting_local_freeze",
+  "training_cutoff": "2026-07-10",
+  "weeks_captured": 0,
+  "eligible_prediction_counts": {
+    "21": 0,
+    "63": 0,
+    "126": 0,
+    "252": 0
+  },
+  "matured_outcomes": {
+    "21": 0,
+    "63": 0,
+    "126": 0,
+    "252": 0
+  },
+  "unresolved_outcomes": {
+    "21": 0,
+    "63": 0,
+    "126": 0,
+    "252": 0
+  },
+  "next_maturity_dates": {
+    "21": null,
+    "63": null,
+    "126": null,
+    "252": null
+  },
+  "minimum_required_dates": {
+    "weekly_anchors": 104,
+    "distinct_forecast_dates": 26,
+    "quarter_blocks": 8,
+    "issuers": 200,
+    "outcomes_per_class": 200
+  },
+  "status": "collecting",
+  "model_family": "ordered-vector-v1",
+  "retrospective_status": "rejected",
+  "shadow_classification": "REJECTED_SHADOW_NOT_FORECAST",
+  "actionable": false,
+  "shadow_values_published": false,
+  "detail_store": "machine_local_only",
+  "integrity_status": "not_initialized",
+  "first_anchor_date": null,
+  "latest_anchor_date": null,
+  "schedule": {
+    "first_weekly_anchor_not_before": "2026-08-21",
+    "first_1m_maturity_estimate": "2026-09-22",
+    "meaningful_1m_assessment_not_before": "2028-09-12",
+    "final_12m_assessment_not_before": "2029-08-14",
+    "schedule_note": "Frozen NYSE weekday/holiday schedule v1; actual maturity still uses completed symbol sessions and cannot be labeled early."
+  },
+  "last_updated_at": null,
+  "status_hash": "e5086bf5e1f2037cd7b4e8b50becb1acb72b1a3f55c496c59632e8aafc7863c9"
+}
