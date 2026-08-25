@@ -45,7 +45,6 @@ jobs:
           FINRA_CLIENT_ID: ${{ secrets.FINRA_CLIENT_ID }}
           FINRA_CLIENT_SECRET: ${{ secrets.FINRA_CLIENT_SECRET }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          EARNINGSCALL_API_KEY: ${{ secrets.EARNINGSCALL_API_KEY }}
 
       - name: Check published data health
         continue-on-error: true
@@ -98,7 +97,7 @@ jobs:
             data/wikipedia_attention.json \
             data/job_postings.json \
             data/filing_diffs.json \
-            data/earnings_tone.json
+            data/earnings_tone.json \
           do
             if [ -e "$optional" ]; then git add "$optional"; fi
           done
