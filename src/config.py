@@ -29,7 +29,7 @@ for _d in (DATA, PRICES, OUTPUT, HISTORY):
     _d.mkdir(parents=True, exist_ok=True)
 
 # --- Data fetching ---
-HISTORY_PERIOD = "2y"   # >=252 prior bars are required by probability inference
+HISTORY_PERIOD = "5y"   # valuation backfill needs fiscal-period prices; probability uses a bounded tail
 PROBABILITY_HISTORY_START = "2008-01-01"
 FETCH_CHUNK = 100       # tickers per yfinance batch request
 FETCH_PAUSE = 1.0       # seconds between batches (be gentle to Yahoo)

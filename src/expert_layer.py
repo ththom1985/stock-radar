@@ -10,7 +10,8 @@ from .persistence import load_json
 
 WEIGHTS_PATH = DATA / "expert_score_weights.json"
 EXPERT_MODEL_STATUS = "heuristic_unvalidated"
-MAX_FAIR_VALUE_DEVIATION_PCT = 80.0
+MAX_FAIR_VALUE_DEVIATION_PCT = 50.0
+MAX_FAIR_VALUE_WIDTH_FACTOR = 1.5
 
 DEFAULT_WEIGHTS = {
     "long_term": {
@@ -225,6 +226,18 @@ def sector_valuation_medians(rows, minimum_peers=5):
     return medians
 
 
+def _requires_special_sector_model(row):
+    sector = str(row.get("sector_display") or row.get("sector") or "").casefold()
+    industry = str(row.get("industry_display") or row.get("industry") or "").casefold()
+    return (
+        "financial" in sector
+        or "real estate" in sector
+        or "insurance" in industry
+        or "bank" in industry
+        or "reit" in industry
+    )
+
+
 def build_valuation_assessment(row, sector_medians=None, five_year=None):
     sector_medians = sector_medians or {}
     five_year = five_year or {"metrics": {}, "months_available": 0, "complete": False}
@@ -257,10 +270,65 @@ def build_valuation_assessment(row, sector_medians=None, five_year=None):
     fair_range = None
     raw_fair_range = None
     verdict = "unavailable"
+    own_metrics = [
+        metric
+        for metric, values in metrics.items()
+        if values.get("own_5y_average") is not None
+    ]
+    peer_metrics = [
+        metric
+        for metric, values in metrics.items()
+        if values.get("sector_median") is not None
+        and (values.get("sector_peer_count") or 0) >= 5
+    ]
+    reference_families = []
+    if five_year.get("complete") and len(own_metrics) >= 2:
+        reference_families.append(
+            {
+                "id": "issuer_history",
+                "label": "Eigene Mehrjahresbewertung",
+                "source": "SEC EDGAR Companyfacts + historische Tageskurse",
+                "metrics": own_metrics,
+                "observation_count": five_year.get("annual_points_available")
+                or five_year.get("months_available"),
+            }
+        )
+    if len(peer_metrics) >= 2:
+        reference_families.append(
+            {
+                "id": "sector_peers",
+                "label": "Aktuelle Sektorvergleichsgruppe",
+                "source": "Yahoo Finance Fundamentaldaten anderer Unternehmen",
+                "metrics": peer_metrics,
+                "observation_count": min(
+                    (metrics[metric].get("sector_peer_count") or 0)
+                    for metric in peer_metrics
+                ),
+            }
+        )
+    family_ids = {family["id"] for family in reference_families}
+    basis_quality = {
+        "status": (
+            "broad"
+            if {"issuer_history", "sector_peers"}.issubset(family_ids)
+            else "narrow"
+        ),
+        "independent_family_count": len(reference_families),
+        "reference_families": reference_families,
+        "definition": (
+            "Breit verlangt zwei unabhängige Referenzfamilien: eine eigene "
+            "Mehrjahresbewertung aus offiziellen Filings plus historischen Kursen "
+            "und eine ausreichend besetzte aktuelle Peer-Verteilung. Mehrere "
+            "Kennzahlen derselben Familie zählen nicht mehrfach."
+        ),
+    }
     plausibility_gate = {
         "status": "pass",
         "max_deviation_pct": MAX_FAIR_VALUE_DEVIATION_PCT,
+        "max_width_factor": MAX_FAIR_VALUE_WIDTH_FACTOR,
         "observed_deviation_pct": None,
+        "observed_width_factor": None,
+        "checks": {},
         "reason": None,
     }
     if len(implied_prices) >= 2 and current_price:
@@ -277,9 +345,10 @@ def build_valuation_assessment(row, sector_medians=None, five_year=None):
             "currency": row.get("currency"),
             "method": (
                 "interquartile implied-price range from available sector medians "
-                "and complete point-in-time five-year averages"
+                "and multi-year issuer valuation history"
             ),
-            "input_count": len(implied_prices),
+            "input_count": len(reference_families),
+            "implied_price_count": len(implied_prices),
         }
         raw_fair_range = dict(fair_range)
         if current_price < lower * 0.85:
@@ -297,23 +366,65 @@ def build_valuation_assessment(row, sector_medians=None, five_year=None):
             if current_price > upper
             else 0.0
         )
+        width_factor = upper / lower
         plausibility_gate["observed_deviation_pct"] = round(deviation_pct, 2)
-        if deviation_pct > MAX_FAIR_VALUE_DEVIATION_PCT:
+        plausibility_gate["observed_width_factor"] = round(width_factor, 4)
+        checks = {
+            "sector_model_supported": not _requires_special_sector_model(row),
+            "basis_broad": basis_quality["status"] == "broad",
+            "width_within_limit": width_factor <= MAX_FAIR_VALUE_WIDTH_FACTOR,
+            "deviation_within_limit": deviation_pct <= MAX_FAIR_VALUE_DEVIATION_PCT,
+        }
+        plausibility_gate["checks"] = checks
+        failures = [key for key, passed in checks.items() if not passed]
+        if failures:
+            status = (
+                "withheld_sector_model"
+                if not checks["sector_model_supported"]
+                else "withheld_wide_range"
+                if not checks["width_within_limit"]
+                else "withheld_extreme_deviation"
+                if not checks["deviation_within_limit"]
+                else "withheld_narrow_basis"
+            )
+            reasons = {
+                "sector_model_supported": (
+                    "Für Financials oder REITs ist noch kein passendes "
+                    "sektorspezifisches Bewertungsmodell aktiv."
+                ),
+                "basis_broad": (
+                    "Die Bewertung besitzt noch nicht beide unabhängigen "
+                    "Referenzfamilien."
+                ),
+                "width_within_limit": (
+                    f"Der faire Bereich ist breiter als Faktor "
+                    f"{MAX_FAIR_VALUE_WIDTH_FACTOR:.1f}."
+                ),
+                "deviation_within_limit": (
+                    "Der faire Bereich liegt mehr als "
+                    f"{MAX_FAIR_VALUE_DEVIATION_PCT:.0f}% vom aktuellen Kurs entfernt."
+                ),
+            }
             plausibility_gate.update(
                 {
-                    "status": "withheld_extreme_deviation",
-                    "reason": (
-                        "Fair-value range is more than "
-                        f"{MAX_FAIR_VALUE_DEVIATION_PCT:.0f}% from the current price; "
-                        "peer comparability or corporate-action data requires review."
-                    ),
+                    "status": status,
+                    "reason": " ".join(reasons[key] for key in failures),
                 }
             )
             fair_range = None
             verdict = "data_review_required"
     return {
         "model_status": EXPERT_MODEL_STATUS,
-        "actionable": False,
+        "valuation_status": (
+            "evidence_qualified_unbacktested"
+            if plausibility_gate["status"] == "pass"
+            else "withheld"
+        ),
+        "valuation_status_label": (
+            "Bewertung belastbar; Modell noch nicht rückgeprüft"
+            if plausibility_gate["status"] == "pass"
+            else "Bewertung zurückgehalten"
+        ),
         "verdict": verdict,
         "fair_value_range": fair_range,
         "raw_fair_value_range": (
@@ -322,13 +433,19 @@ def build_valuation_assessment(row, sector_medians=None, five_year=None):
             else None
         ),
         "plausibility_gate": plausibility_gate,
+        "basis_quality": basis_quality,
         "metrics": metrics,
         "own_history_months": five_year.get("months_available", 0),
+        "own_history_annual_points": five_year.get("annual_points_available", 0),
+        "own_history_type": five_year.get("history_type", "insufficient"),
         "own_5y_complete": bool(five_year.get("complete")),
         "missing_note": (
             None
             if five_year.get("complete")
-            else "Eigener 5-Jahres-Schnitt noch nicht verfügbar; Monats-Snapshots werden ab jetzt gesammelt."
+            else (
+                "Keine belastbare eigene Mehrjahresbewertung aus mindestens vier "
+                "Jahresperioden und zwei Kennzahlen."
+            )
         ),
     }
 

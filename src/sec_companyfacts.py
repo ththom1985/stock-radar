@@ -24,6 +24,7 @@ COMPANYFACTS_URL = "https://data.sec.gov/api/xbrl/companyfacts/CIK{cik:010d}.jso
 MAX_AGE_DAYS = 30
 TICKER_MAP_MAX_AGE_DAYS = 7
 REQUEST_PAUSE_SECONDS = 0.12
+PARSER_VERSION = 2
 _EDGE_NOISE = "\ufeff\u200b\u2060 \t\r\n"
 
 TAG_CANDIDATES = {
@@ -53,6 +54,8 @@ TAG_CANDIDATES = {
         "LongTermDebtNoncurrent",
         "LongTermDebt",
     ),
+    "diluted_eps": ("EarningsPerShareDiluted",),
+    "diluted_shares": ("WeightedAverageNumberOfDilutedSharesOutstanding",),
 }
 
 
@@ -132,7 +135,12 @@ def _annual_points(companyfacts, candidates):
     for tag in candidates:
         fact = us_gaap.get(tag) or {}
         units = fact.get("units") or {}
-        unit_rows = units.get("USD") or units.get("shares") or []
+        unit_rows = (
+            units.get("USD")
+            or units.get("shares")
+            or units.get("USD/shares")
+            or []
+        )
         for item in unit_rows:
             if item.get("form") not in {"10-K", "20-F", "40-F"}:
                 continue
@@ -221,6 +229,7 @@ def parse_companyfacts(payload):
         "fcf_conversion": ratio(latest.get("free_cash_flow"), net_income),
     }
     return {
+        "parser_version": PARSER_VERSION,
         "entity_name": payload.get("entityName"),
         "cik": payload.get("cik"),
         "latest": latest,
@@ -255,7 +264,11 @@ def fetch_sec_companyfacts(symbols, max_new=None, force=False, verbose=True):
         symbol
         for symbol in symbols
         if symbol.upper() in ticker_map
-        and (force or not _is_fresh(cache.get(symbol), MAX_AGE_DAYS))
+        and (
+            force
+            or not _is_fresh(cache.get(symbol), MAX_AGE_DAYS)
+            or (cache.get(symbol) or {}).get("parser_version") != PARSER_VERSION
+        )
     ]
     limit = max_new
     if limit is None:

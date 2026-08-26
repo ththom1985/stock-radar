@@ -1,8 +1,10 @@
 import unittest
 from datetime import datetime, timezone
 
+import pandas as pd
+
 from src.expert_layer import build_valuation_assessment, sector_valuation_medians
-from src.valuation_history import five_year_averages
+from src.valuation_history import _sec_annual_backfill, five_year_averages
 
 
 class ValuationHistoryTests(unittest.TestCase):
@@ -27,6 +29,28 @@ class ValuationHistoryTests(unittest.TestCase):
         medians = sector_valuation_medians(rows)
         self.assertEqual(medians["Tech"]["pe"], 30)
 
+    def test_sec_backfill_creates_multi_year_valuation_history(self):
+        annual = [
+            {
+                "period_end": f"{year}-12-31",
+                "filed": f"{year + 1}-02-01",
+                "diluted_eps": 5 + index,
+                "diluted_shares": 100,
+                "revenue": 1000 + index * 100,
+                "free_cash_flow": 100 + index * 10,
+            }
+            for index, year in enumerate(range(2021, 2026))
+        ]
+        frame = pd.DataFrame(
+            {"Close": [100, 110, 120, 130, 140]},
+            index=pd.to_datetime([f"{year}-12-31" for year in range(2021, 2026)]),
+        )
+        points = _sec_annual_backfill({"annual": annual}, frame)
+        result = five_year_averages({"symbols": {"AAA": points}}, "AAA")
+        self.assertTrue(result["complete"])
+        self.assertEqual(result["history_type"], "sec_annual_backfill")
+        self.assertGreaterEqual(len(result["supported_metrics"]), 2)
+
     def test_fair_range_uses_available_sector_references(self):
         row = {
             "sector": "Tech",
@@ -47,9 +71,37 @@ class ValuationHistoryTests(unittest.TestCase):
             peers,
             {"metrics": {}, "months_available": 1, "complete": False},
         )
-        self.assertEqual(result["verdict"], "overpriced")
-        self.assertIsNotNone(result["fair_value_range"])
+        self.assertEqual(result["verdict"], "data_review_required")
+        self.assertEqual(
+            result["plausibility_gate"]["status"], "withheld_narrow_basis"
+        )
+        self.assertIsNotNone(result["raw_fair_value_range"])
+        self.assertIsNone(result["fair_value_range"])
         self.assertFalse(result["own_5y_complete"])
+
+    def test_wide_fair_range_is_withheld(self):
+        row = {
+            "sector": "Tech",
+            "currency": "USD",
+            "price_local": 100,
+            "pe": 20,
+            "price_to_sales": 4,
+        }
+        peers = {
+            "Tech": {
+                "pe": 10,
+                "price_to_sales": 8,
+                "peer_counts": {"pe": 10, "price_to_sales": 10},
+            }
+        }
+        own = {
+            "metrics": {"pe": 12, "price_to_sales": 7},
+            "complete": True,
+            "annual_points_available": 5,
+        }
+        result = build_valuation_assessment(row, peers, own)
+        self.assertEqual(result["plausibility_gate"]["status"], "withheld_wide_range")
+        self.assertIsNone(result["fair_value_range"])
 
     def test_extreme_fair_value_is_withheld_fail_closed(self):
         row = {
@@ -62,9 +114,9 @@ class ValuationHistoryTests(unittest.TestCase):
         }
         peers = {
             "Industrials": {
-                "pe": 29.8,
-                "ev_ebitda": 16.8,
-                "price_to_sales": 2.75,
+                "pe": 26.25,
+                "ev_ebitda": 18.75,
+                "price_to_sales": 1.193,
                 "peer_counts": {"pe": 100, "ev_ebitda": 100, "price_to_sales": 100},
             }
         }

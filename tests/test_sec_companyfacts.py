@@ -7,11 +7,11 @@ from src.sec_companyfacts import (
 )
 
 
-def fact(tag, values):
+def fact(tag, values, unit="USD"):
     return {
         tag: {
             "units": {
-                "USD": [
+                unit: [
                     {
                         "val": value,
                         "start": f"{year}-01-01",
@@ -54,6 +54,16 @@ class SecCompanyfactsTests(unittest.TestCase):
         )
         facts.update(fact("NetIncomeLoss", [(2024, 100), (2025, 144)]))
         facts.update(
+            fact("EarningsPerShareDiluted", [(2024, 2.0), (2025, 2.4)], "USD/shares")
+        )
+        facts.update(
+            fact(
+                "WeightedAverageNumberOfDilutedSharesOutstanding",
+                [(2024, 50), (2025, 60)],
+                "shares",
+            )
+        )
+        facts.update(
             fact(
                 "NetCashProvidedByUsedInOperatingActivities",
                 [(2024, 180), (2025, 210)],
@@ -70,6 +80,8 @@ class SecCompanyfactsTests(unittest.TestCase):
         self.assertEqual(parsed["latest"]["free_cash_flow"], 150)
         self.assertAlmostEqual(parsed["derived"]["profit_margin"], 0.12)
         self.assertAlmostEqual(parsed["derived"]["revenue_growth"], 0.2)
+        self.assertEqual(parsed["latest"]["diluted_eps"], 2.4)
+        self.assertEqual(parsed["latest"]["diluted_shares"], 60)
 
     def test_official_fields_override_accounting_but_keep_market_fields(self):
         yahoo = {"market_cap": 3000, "pe": 20, "profit_margin": 0.05}

@@ -478,9 +478,10 @@ def _research_card(row, rank=None):
                 signal_labels.get(expert.get("signal"), "Daten reichen nicht"),
             )
             expert_metrics[3].metric(
-                "Datenbasis",
-                {"high": "breit", "medium": "mittel", "low": "schmal"}.get(
-                    expert.get("evidence_quality"), "schmal"
+                "Bewertungsbasis",
+                {"broad": "breit", "narrow": "schmal"}.get(
+                    ((expert.get("valuation") or {}).get("basis_quality") or {}).get("status"),
+                    "schmal",
                 ),
             )
             expert_valuation = expert.get("valuation") or {}
@@ -490,7 +491,7 @@ def _research_card(row, rank=None):
                 "fair": "fair bewertet",
                 "expensive": "eher teuer",
                 "overpriced": "deutlich überteuert",
-                "data_review_required": "auffällig — Datenprüfung ausstehend",
+                "data_review_required": "derzeit nicht belastbar",
                 "unavailable": "nicht belastbar",
             }
             st.caption(
@@ -504,6 +505,11 @@ def _research_card(row, rank=None):
             )
             if expert_valuation.get("missing_note"):
                 st.info(expert_valuation["missing_note"])
+            st.caption(
+                "ⓘ Breit bedeutet: eigene Mehrjahresbewertung aus offiziellen "
+                "Filings und historischen Kursen plus eine aktuelle Peer-Verteilung. "
+                "Mehrere Kennzahlen derselben Quelle zählen nicht mehrfach."
+            )
             expert_risks = (expert.get("risks") or {}).get("top_risks") or []
             for risk in expert_risks:
                 st.warning(risk)
@@ -514,7 +520,8 @@ def _research_card(row, rank=None):
             basis = expert.get("coverage_basis") or {}
             if basis.get("status") == "narrower_non_us":
                 st.info(
-                    "Schmalere Nicht-US-Datenbasis; Gewichte renormalisiert. "
+                    "Herkunftshinweis: Für diesen Titel fehlen US-Behördensignale; "
+                    "das ist vom Qualitätsurteil der Bewertungsbasis getrennt. "
                     "Strukturell nicht verfügbar: "
                     + ", ".join(basis.get("structurally_unavailable") or [])
                 )
@@ -852,8 +859,9 @@ def _render_question_view(key):
     if key == "cheap_with_potential":
         st.header("Billig mit Potenzial")
         st.caption(
-            "Nur Titel mit bestandener Bewertungsprüfung, echtem Langfristpotenzial "
-            "und ohne Messer-, Boden- oder akute Risikowarnung."
+            "Nur Titel mit bestandener Bewertungsprüfung, momentumfreiem Qualitäts- "
+            "und Wachstumspotenzial sowie ohne erhöhtes Value-Trap-, Bilanz- oder "
+            "akutes Ereignisrisiko. Kurszustand und Timing werden sichtbar angezeigt."
         )
     else:
         st.header("Teuer gerade")
@@ -862,8 +870,15 @@ def _render_question_view(key):
             "kein Alarm, sondern ein nüchterner Abstand zum fairen Bereich."
         )
     if not items:
-        st.info("Aktuell erfüllt kein Titel alle strengen Kriterien dieser Liste.")
+        st.info(
+            question_views.get("empty_state")
+            if key == "cheap_with_potential"
+            else "Aktuell erfüllt kein Titel alle strengen Kriterien dieser Liste."
+        )
         return
+    concentration = question_views.get("sector_concentration") or {}
+    if key == "cheap_with_potential" and concentration.get("warning"):
+        st.warning(concentration["warning"])
     for item in items:
         badge = item.get("badge") or {}
         with st.container(border=True):
@@ -886,7 +901,14 @@ def _render_question_view(key):
                     st.write(sentence)
             else:
                 st.write(item.get("sentence") or "")
-            st.caption(f"Bewertungsbasis: {item.get('basis') or 'schmal'}")
+            st.caption(
+                f"Bewertungsbasis: {item.get('basis') or 'schmal'} · ⓘ Zwei "
+                "unabhängige Referenzfamilien sind für „breit“ erforderlich."
+            )
+            if item.get("valuation_status_label"):
+                st.caption(item["valuation_status_label"])
+            if item.get("geographic_note"):
+                st.info(item["geographic_note"])
 
 
 primary_view = st.radio(

@@ -113,11 +113,24 @@ def _forbidden_research_phrases(row: dict[str, Any]) -> list[str]:
     return [phrase for phrase in FORBIDDEN_RESEARCH_PHRASES if phrase in text]
 
 
-def _require_heuristic_group(value: Any, label: str) -> None:
+def _require_heuristic_group(
+    value: Any,
+    label: str,
+    *,
+    allow_descriptive_status: bool = False,
+) -> None:
+    status_valid = isinstance(value, dict) and (
+        value.get("actionable") is False
+        or (
+            allow_descriptive_status
+            and value.get("assessment_status") == "descriptive_only"
+            and isinstance(value.get("assessment_status_label"), str)
+        )
+    )
     if (
         not isinstance(value, dict)
         or value.get("model_status") != "heuristic_unvalidated"
-        or value.get("actionable") is not False
+        or not status_valid
         or not isinstance(value.get("inputs_used"), list)
         or not isinstance(value.get("missing_inputs"), list)
     ):
@@ -308,7 +321,11 @@ def validate_insight_contract(
                     f"Insight row {row.get('symbol')!r} is missing fields: {absent}"
                 )
             for group in required_groups:
-                _require_heuristic_group(row[group], f"{row.get('symbol')}.{group}")
+                _require_heuristic_group(
+                    row[group],
+                    f"{row.get('symbol')}.{group}",
+                    allow_descriptive_status=group == "valuation_context",
+                )
             for optional_group in (
                 "falling_knife",
                 "bottoming",
@@ -960,6 +977,7 @@ def validate_output_contract(data: Any) -> dict[str, Any]:
                     _require_heuristic_group(
                         member[group],
                         f"ranking.{member.get('symbol')}.{group}",
+                        allow_descriptive_status=group == "valuation_context",
                     )
                 if _has_actionable_true(member):
                     raise DataContractError(

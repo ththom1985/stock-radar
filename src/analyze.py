@@ -549,6 +549,7 @@ def run(with_news=True, with_fundamentals=True):
             for symbol in [row["symbol"] for row in rows]
         }
     else:
+        sec_by_symbol = {}
         sec_source_status = {
             "status": "skipped",
             "reason": "fundamental enrichment disabled",
@@ -954,7 +955,12 @@ def run(with_news=True, with_fundamentals=True):
     )
     expert_weights = load_score_weights()
     valuation_history = (
-        update_valuation_history(rows, observed_at=now)
+        update_valuation_history(
+            rows,
+            observed_at=now,
+            sec_by_symbol=sec_by_symbol,
+            price_histories=fetched.prices,
+        )
         if not market_data_only
         else {"symbols": {}, "status": {"skipped": True}}
     )

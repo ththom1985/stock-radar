@@ -261,6 +261,8 @@ def _compact_row(row: dict[str, Any]) -> dict[str, Any]:
             ),
             fair_range.get("lower"),
             fair_range.get("upper"),
+            1 if (valuation.get("basis_quality") or {}).get("status") == "broad" else 0,
+            1 if (expert.get("coverage_basis") or {}).get("status") == "narrower_non_us" else 0,
         ]
     compact["news"] = (compact.get("news") or [])[:3]
     compact["scenario_long"] = [
@@ -1608,11 +1610,20 @@ def export_static(
             "changes": [],
         },
         "question_views": snapshot.get("question_views") or {
-            "model_status": "heuristic_unvalidated",
-            "actionable": False,
+            "valuation_status": "unavailable",
+            "valuation_status_label": "Bewertung nicht verfügbar",
             "cheap_with_potential": [],
             "expensive_now": [],
             "rules": {},
+        },
+        "valuation_basis_contract": {
+            "broad_definition": (
+                "Zwei unabhängige Referenzfamilien: eigene Mehrjahresbewertung "
+                "aus offiziellen Filings plus historischen Kursen und eine "
+                "ausreichend besetzte aktuelle Peer-Verteilung. Mehrere "
+                "Kennzahlen derselben Familie zählen nicht mehrfach."
+            ),
+            "geography_separate": True,
         },
         "expert_layer": snapshot.get("expert_layer") or {
             "model_status": "heuristic_unvalidated",

@@ -225,17 +225,23 @@ def _valuation_context(row: dict[str, Any]) -> dict[str, Any]:
     if excluded:
         missing.append(excluded)
     reasons = list(row.get("fundamental_reasons") or []) if complete else []
+    provenance = _provenance(
+        [
+            "asset_type",
+            "fundamental_source_status",
+            "value_score",
+            "quality_score",
+            "growth_score",
+            "fundamental_reasons",
+        ],
+        missing,
+    )
+    provenance.pop("actionable", None)
     return {
-        **_provenance(
-            [
-                "asset_type",
-                "fundamental_source_status",
-                "value_score",
-                "quality_score",
-                "growth_score",
-                "fundamental_reasons",
-            ],
-            missing,
+        **provenance,
+        "assessment_status": "descriptive_only",
+        "assessment_status_label": (
+            "Beschreibender Fundamentalkontext; keine Fair-Value-Freigabe"
         ),
         "available": complete,
         "ranking_eligible": eligible,

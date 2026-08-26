@@ -23,6 +23,7 @@ def row(symbol="AAA", *, verdict="clearly_undervalued", price=50, lower=100, upp
                 "verdict": verdict,
                 "fair_value_range": {"lower": lower, "upper": upper, "input_count": 5},
                 "plausibility_gate": {"status": "pass"},
+                "basis_quality": {"status": "broad", "definition": "two families"},
                 "own_5y_complete": True,
             },
             "risks": {"top_risks": ["Kein einzelnes dominantes Risiko."]},
@@ -31,14 +32,62 @@ def row(symbol="AAA", *, verdict="clearly_undervalued", price=50, lower=100, upp
 
 
 class QuestionViewsTests(unittest.TestCase):
-    def test_cheap_requires_gate_and_excludes_falling_knives(self):
+    def test_cheap_requires_gate_and_keeps_falling_knives_as_watch_items(self):
         valid = row()
         withheld = row("WITHHELD")
         withheld["expert_analysis"]["valuation"]["plausibility_gate"]["status"] = "withheld_extreme_deviation"
         knife = row("KNIFE")
         knife["falling_knife"] = {"active": True}
         result = build_question_views([valid, withheld, knife])
+        self.assertEqual(
+            [item["symbol"] for item in result["cheap_with_potential"]],
+            ["AAA", "KNIFE"],
+        )
+        knife_item = result["cheap_with_potential"][1]
+        self.assertEqual(knife_item["course_state"], "falling")
+        self.assertEqual(knife_item["entry_guidance"]["code"], "watch_falling")
+        self.assertIn("nicht greifen", knife_item["badge"]["label"])
+
+    def test_high_value_trap_excludes_even_with_course_warning(self):
+        trapped = row()
+        trapped["falling_knife"] = {"active": True}
+        trapped["valuation_context"] = {"value_trap_risk": "high"}
+        self.assertEqual(build_question_views([trapped])["cheap_with_potential"], [])
+
+    def test_timing_safety_block_is_guidance_not_exclusion(self):
+        waiting = row()
+        waiting["sweet_spot"] = {
+            "combined_status": "safety_blocked",
+            "lower": 45,
+            "ideal": 47,
+            "upper": 49,
+        }
+        waiting["fx_usd"] = 1
+        item = build_question_views([waiting])["cheap_with_potential"][0]
+        self.assertEqual(item["entry_guidance"]["code"], "watch_entry")
+        self.assertEqual(item["entry_guidance"]["target_price"], 49)
+
+    def test_acute_fundamental_warning_excludes(self):
+        warned = row()
+        warned["risk_warnings"] = ["⚠️ Kritischer Altman-Z-Wert (1.2)"]
+        self.assertEqual(build_question_views([warned])["cheap_with_potential"], [])
+
+    def test_cheap_uses_momentum_free_quality_growth_potential(self):
+        valid = row()
+        valid["expert_analysis"]["long_term"] = {"score": 1, "coverage_pct": 1}
+        valid["longterm_score"] = 0
+        valid["rs_rating"] = 0
+        valid["news_score"] = 0
+        result = build_question_views([valid])
         self.assertEqual([item["symbol"] for item in result["cheap_with_potential"]], ["AAA"])
+        item = result["cheap_with_potential"][0]
+        self.assertEqual(item["potential_score"], 83.0)
+        self.assertNotIn("long_term_score", item)
+
+    def test_cheap_requires_both_quality_and_growth_inputs(self):
+        missing_growth = row()
+        missing_growth["growth_score"] = None
+        self.assertEqual(build_question_views([missing_growth])["cheap_with_potential"], [])
 
     def test_cheap_ranks_discount_potential_over_risk(self):
         first = row("FIRST", price=60)
@@ -55,10 +104,23 @@ class QuestionViewsTests(unittest.TestCase):
         self.assertNotIn("score", result["expensive_now"][0])
         self.assertEqual(result["expensive_now"][0]["badge"]["label"], "Kein Setup")
 
-    def test_non_us_basis_is_explicit(self):
+    def test_non_us_origin_does_not_reduce_quality_label(self):
         eu = row()
         eu["expert_analysis"]["coverage_basis"]["status"] = "narrower_non_us"
-        self.assertEqual(build_question_views([eu])["cheap_with_potential"][0]["basis"], "EU-renormalisiert")
+        item = build_question_views([eu])["cheap_with_potential"][0]
+        self.assertEqual(item["basis"], "breit")
+        self.assertEqual(item["geographic_coverage"], "narrower_non_us")
+
+    def test_narrow_basis_is_excluded(self):
+        narrow = row()
+        narrow["expert_analysis"]["valuation"]["basis_quality"]["status"] = "narrow"
+        self.assertEqual(build_question_views([narrow])["cheap_with_potential"], [])
+
+    def test_question_view_uses_valuation_status_not_actionable(self):
+        result = build_question_views([row()])
+        self.assertNotIn("actionable", result)
+        self.assertEqual(result["valuation_status"], "evidence_qualified_unbacktested")
+        self.assertIn("noch nicht rückgeprüft", result["valuation_status_label"])
 
 
 if __name__ == "__main__":

@@ -278,7 +278,7 @@
       fair: "fair bewertet",
       expensive: "eher teuer",
       overpriced: "deutlich überteuert",
-      data_review_required: "Bewertung auffällig — Datenprüfung ausstehend",
+      data_review_required: "Bewertung derzeit nicht belastbar",
       unavailable: "nicht belastbar bewertbar"
     };
     function probabilityReason(row) {
@@ -675,6 +675,9 @@
         ? "Diese Titel tragen erhöhte sichtbare Risiken und werden deshalb derzeit gemieden."
         : `${$("currency").value} · ${cat?.formula || ""}`;
       $("result-count").textContent = `${items.length} sichtbar`;
+      if (state.view === "cheap_with_potential" && state.data.question_views?.sector_concentration?.warning) {
+        $("list-subtitle").textContent += ` · ${state.data.question_views.sector_concentration.warning}`;
+      }
       if (state.view === "today") {
         const headline = state.data.today?.headline || "Heute keine belastbare Aussage";
         $("list-title").textContent = headline;
@@ -708,13 +711,13 @@
           const copy = (value.sentences || [value.sentence]).filter(Boolean).map((text) => `<div class="question-copy">${escapeHtml(text)}</div>`).join("");
           return `<button class="today-card ${item.symbol === state.selected ? "selected" : ""}" data-symbol="${escapeHtml(item.symbol)}">
             <div class="today-card-head"><div><strong>${escapeHtml(value.name || item.symbol)}</strong><div class="symbol">${escapeHtml(item.symbol)}</div></div><div style="text-align:right"><strong>${$number(value.price)} ${escapeHtml(value.currency || "")}</strong><div class="badge ${badge.tone === "green" ? "green" : badge.tone === "yellow" ? "amber" : "neutral"}">${escapeHtml(badge.label || "Kein Setup")}</div></div></div>
-            <div class="question-copy">${metric}</div>${copy}<small class="row-meta">Bewertungsbasis: ${escapeHtml(value.basis || "schmal")}</small>
+            <div class="question-copy">${metric}</div>${copy}<small class="row-meta" title="${escapeHtml(value.basis_definition || state.data.valuation_basis_contract?.broad_definition || "")}">Bewertungsbasis: ${escapeHtml(value.basis || "schmal")} ⓘ</small>${value.valuation_status_label ? `<small class="row-meta">${escapeHtml(value.valuation_status_label)}</small>` : ""}${value.geographic_note ? `<small class="row-meta">${escapeHtml(value.geographic_note)}</small>` : ""}
           </button>`;
         }).join("");
         $("rows").querySelectorAll(".today-card").forEach((button) => button.addEventListener("click", () => {
           state.selected = button.dataset.symbol; renderList(); renderDetail(state.bySymbol.get(state.selected));
         }));
-        if (!items.length) { state.selected = null; $("rows").innerHTML = `<div class="muted" style="padding:18px">Aktuell erfüllt kein Titel alle strengen Kriterien.</div>`; renderDetail(null); }
+        if (!items.length) { state.selected = null; $("rows").innerHTML = `<div class="muted" style="padding:18px">${escapeHtml(state.view === "cheap_with_potential" ? state.data.question_views?.empty_state || "Heute kein belastbares Schnäppchen." : "Aktuell erfüllt kein Titel alle strengen Kriterien.")}</div>`; renderDetail(null); }
         else if (!items.some((item) => item.symbol === state.selected)) { state.selected = items[0].symbol; renderList(); renderDetail(state.bySymbol.get(state.selected)); }
         return;
       }
@@ -887,6 +890,8 @@
             : null,
           missing_note: null
         },
+        basis_quality: expertRaw[9] === 1 ? "breit" : "schmal",
+        geographic_coverage: expertRaw[10] === 1 ? "narrower_non_us" : "standard_us",
         outlook: { probabilities_status: "withheld_no_validated_model" },
         disclaimer: "Analyse-Unterstützung, keine Anlageberatung."
       } : {};
@@ -906,7 +911,7 @@
           <div class="stat"><span>Langfristig</span><strong>${$number(expert.long_term?.score, 1)}/100</strong><small>${$number(expert.long_term?.coverage_pct, 1)} % Abdeckung</small></div>
           <div class="stat"><span>Kurzfristig</span><strong>${$number(expert.short_term?.score, 1)}/100</strong><small>${$number(expert.short_term?.coverage_pct, 1)} % Abdeckung</small></div>
           <div class="stat"><span>Signal</span><strong>${escapeHtml(signalLabels[expert.signal] || "Daten reichen nicht")}</strong></div>
-          <div class="stat"><span>Datenbasis</span><strong>${escapeHtml({high:"breit",medium:"mittel",low:"schmal"}[expert.evidence_quality] || "schmal")}</strong></div>
+          <div class="stat"><span>Bewertungsbasis</span><strong title="${escapeHtml(state.data.valuation_basis_contract?.broad_definition || "")}">${escapeHtml(expert.basis_quality || "schmal")} ⓘ</strong></div>
         </div>
         <div class="callout">${escapeHtml(verdictLabels[expert.valuation?.verdict] || "nicht belastbar bewertbar")} · ${
           Number.isFinite(expertFair.lower) && Number.isFinite(expertFair.upper)
@@ -915,6 +920,7 @@
         }</div>
         ${expert.valuation?.missing_note ? `<div class="muted">${escapeHtml(expert.valuation.missing_note)}</div>` : ""}
         <div class="muted">${probabilityReason(row)}</div>
+        ${expert.geographic_coverage === "narrower_non_us" ? `<div class="muted">Herkunftshinweis: Für diesen Titel fehlt ein vergleichbares kostenloses Fundamentalarchiv; die Bewertung stützt sich auf weniger Quellen.</div>` : ""}
         <div class="muted">${escapeHtml(expert.disclaimer || "Analyse-Unterstützung, keine Anlageberatung.")}</div>
       </div>` : "";
       $("detail").innerHTML = `
