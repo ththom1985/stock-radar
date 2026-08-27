@@ -702,7 +702,7 @@
         return;
       }
       if (state.view === "cheap_with_potential" || state.view === "expensive_now") {
-        $("rows").innerHTML = items.map((item) => {
+        const cards = items.map((item) => {
           const value = item.question || {};
           const badge = value.badge || {};
           const metric = state.view === "cheap_with_potential"
@@ -714,6 +714,13 @@
             <div class="question-copy">${metric}</div>${copy}<small class="row-meta" title="${escapeHtml(value.basis_definition || state.data.valuation_basis_contract?.broad_definition || "")}">Bewertungsbasis: ${escapeHtml(value.basis || "schmal")} ⓘ</small>${value.valuation_status_label ? `<small class="row-meta">${escapeHtml(value.valuation_status_label)}</small>` : ""}${value.geographic_note ? `<small class="row-meta">${escapeHtml(value.geographic_note)}</small>` : ""}
           </button>`;
         }).join("");
+        const excluded = state.view === "cheap_with_potential"
+          ? (state.data.question_views?.excluded_cheap || [])
+          : [];
+        const exclusions = excluded.length
+          ? `<details class="card" style="padding:14px"><summary>Warum ${excluded.length} günstige Kandidaten fehlen</summary>${excluded.map((candidate) => `<div class="question-copy"><strong>${escapeHtml(candidate.symbol)}</strong> · ${percent(candidate.discount_pct)} unter fair · ${escapeHtml((candidate.reasons || []).join(" "))}</div>`).join("")}</details>`
+          : "";
+        $("rows").innerHTML = cards + exclusions;
         $("rows").querySelectorAll(".today-card").forEach((button) => button.addEventListener("click", () => {
           state.selected = button.dataset.symbol; renderList(); renderDetail(state.bySymbol.get(state.selected));
         }));

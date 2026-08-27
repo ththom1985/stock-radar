@@ -52,7 +52,19 @@ class QuestionViewsTests(unittest.TestCase):
         trapped = row()
         trapped["falling_knife"] = {"active": True}
         trapped["valuation_context"] = {"value_trap_risk": "high"}
-        self.assertEqual(build_question_views([trapped])["cheap_with_potential"], [])
+        result = build_question_views([trapped])
+        self.assertEqual(result["cheap_with_potential"], [])
+        self.assertEqual(
+            result["excluded_cheap"][0]["reasons"],
+            ["Das Value-Trap-Risiko ist hoch."],
+        )
+
+    def test_medium_value_trap_is_visible_but_not_excluded(self):
+        medium = row()
+        medium["valuation_context"] = {"value_trap_risk": "medium"}
+        item = build_question_views([medium])["cheap_with_potential"][0]
+        self.assertEqual(item["value_trap_risk"], "medium")
+        self.assertIn("kleiner positionieren", item["risk_note"])
 
     def test_timing_safety_block_is_guidance_not_exclusion(self):
         waiting = row()
@@ -70,7 +82,12 @@ class QuestionViewsTests(unittest.TestCase):
     def test_acute_fundamental_warning_excludes(self):
         warned = row()
         warned["risk_warnings"] = ["⚠️ Kritischer Altman-Z-Wert (1.2)"]
-        self.assertEqual(build_question_views([warned])["cheap_with_potential"], [])
+        result = build_question_views([warned])
+        self.assertEqual(result["cheap_with_potential"], [])
+        self.assertEqual(
+            result["excluded_cheap"][0]["reasons"],
+            ["⚠️ Kritischer Altman-Z-Wert (1.2)"],
+        )
 
     def test_cheap_uses_momentum_free_quality_growth_potential(self):
         valid = row()

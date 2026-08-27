@@ -856,12 +856,26 @@ def _render_today():
 def _render_question_view(key):
     question_views = data.get("question_views") or {}
     items = question_views.get(key) or []
+    excluded = question_views.get("excluded_cheap") or []
+
+    def render_excluded():
+        if key != "cheap_with_potential" or not excluded:
+            return
+        with st.expander(f"Warum {len(excluded)} günstige Kandidaten fehlen"):
+            for candidate in excluded:
+                reasons = " ".join(candidate.get("reasons") or [])
+                st.write(
+                    f"**{candidate.get('symbol')}** · "
+                    f"{_number(candidate.get('discount_pct'), 1)} % unter fair · "
+                    f"{reasons}"
+                )
+
     if key == "cheap_with_potential":
         st.header("Billig mit Potenzial")
         st.caption(
             "Nur Titel mit bestandener Bewertungsprüfung, momentumfreiem Qualitäts- "
-            "und Wachstumspotenzial sowie ohne erhöhtes Value-Trap-, Bilanz- oder "
-            "akutes Ereignisrisiko. Kurszustand und Timing werden sichtbar angezeigt."
+            "und Wachstumspotenzial. Nur hohes Value-Trap-, Bilanz- oder akutes "
+            "Ereignisrisiko schließt aus; medium wird sichtbar markiert."
         )
     else:
         st.header("Teuer gerade")
@@ -875,6 +889,7 @@ def _render_question_view(key):
             if key == "cheap_with_potential"
             else "Aktuell erfüllt kein Titel alle strengen Kriterien dieser Liste."
         )
+        render_excluded()
         return
     concentration = question_views.get("sector_concentration") or {}
     if key == "cheap_with_potential" and concentration.get("warning"):
@@ -909,6 +924,7 @@ def _render_question_view(key):
                 st.caption(item["valuation_status_label"])
             if item.get("geographic_note"):
                 st.info(item["geographic_note"])
+    render_excluded()
 
 
 primary_view = st.radio(

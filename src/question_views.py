@@ -194,12 +194,8 @@ def _value_trap_risk(row):
 def _fundamental_risk_reasons(row):
     reasons = []
     trap = _value_trap_risk(row)
-    if trap in {"medium", "high"}:
-        reasons.append(
-            "Das Value-Trap-Risiko ist erhöht."
-            if trap == "medium"
-            else "Das Value-Trap-Risiko ist hoch."
-        )
+    if trap == "high":
+        reasons.append("Das Value-Trap-Risiko ist hoch.")
     warning_tokens = (
         "altman",
         "bilanz",
@@ -261,6 +257,7 @@ def _cheap_action(row):
 
 def build_question_views(rows, cheap_limit=5, expensive_limit=12):
     cheap = []
+    excluded_cheap = []
     expensive = []
     gate_ready_count = 0
     materially_cheap_count = 0
@@ -314,6 +311,23 @@ def build_question_views(rows, cheap_limit=5, expensive_limit=12):
                 potential_pass_count += 1
                 if fundamental_risks:
                     risk_excluded_count += 1
+                    excluded_cheap.append(
+                        {
+                            "symbol": row.get("symbol"),
+                            "name": (
+                                row.get("display_name_full")
+                                or row.get("name")
+                                or row.get("symbol")
+                            ),
+                            "discount_pct": round(discount, 1),
+                            "potential_score": round(potential["score"], 1),
+                            "value_trap_risk": _value_trap_risk(row),
+                            "risk_penalty": _number(
+                                (row.get("valuation_context") or {}).get("risk_penalty")
+                            ),
+                            "reasons": fundamental_risks,
+                        }
+                    )
                     continue
                 quality = _number(row.get("quality_score")) or 50.0
                 risk_floor = max(20.0, 100.0 - quality)
@@ -325,6 +339,12 @@ def build_question_views(rows, cheap_limit=5, expensive_limit=12):
                 driver = _potential_driver(row, analysis)
                 residual_risk = _material_risk(analysis)
                 action = _cheap_action(row)
+                trap_risk = _value_trap_risk(row)
+                risk_note = (
+                    "Erhöhtes Rückschlagrisiko — kleiner positionieren."
+                    if trap_risk == "medium"
+                    else None
+                )
                 sentences = [
                     f"Der Kurs liegt rund {discount:.0f}% unter der unteren plausiblen fairen Grenze."
                 ]
@@ -332,6 +352,8 @@ def build_question_views(rows, cheap_limit=5, expensive_limit=12):
                     sentences.append(f"Dafür spricht {driver}.")
                 if residual_risk and residual_risk not in fundamental_risks:
                     sentences.append(residual_risk)
+                if risk_note:
+                    sentences.append(risk_note)
                 sentences.append(action["sentence"])
                 cheap.append(
                     {
@@ -347,6 +369,8 @@ def build_question_views(rows, cheap_limit=5, expensive_limit=12):
                         "growth_score": round(potential["growth_score"], 1),
                         "potential_driver": driver,
                         "residual_risk": residual_risk,
+                        "value_trap_risk": trap_risk,
+                        "risk_note": risk_note,
                         "course_state": (
                             "falling"
                             if _active(row.get("falling_knife"))
@@ -382,6 +406,7 @@ def build_question_views(rows, cheap_limit=5, expensive_limit=12):
                     }
                 )
     cheap.sort(key=lambda item: (-item["_rank_value"], -item["discount_pct"], item["symbol"]))
+    excluded_cheap.sort(key=lambda item: (-item["discount_pct"], item["symbol"]))
     expensive.sort(key=lambda item: (-item["premium_pct"], item["symbol"]))
     for item in cheap:
         item.pop("_rank_value", None)
@@ -410,6 +435,7 @@ def build_question_views(rows, cheap_limit=5, expensive_limit=12):
         "valuation_status": VALUATION_STATUS,
         "valuation_status_label": VALUATION_STATUS_LABEL,
         "cheap_with_potential": cheap[:cheap_limit],
+        "excluded_cheap": excluded_cheap,
         "expensive_now": expensive[:expensive_limit],
         "selection_counts": {
             "gate_ready": gate_ready_count,
@@ -431,7 +457,7 @@ def build_question_views(rows, cheap_limit=5, expensive_limit=12):
             "die Risikoprüfung. Das Bewertungsmodell ist noch nicht rückgeprüft."
         ),
         "rules": {
-            "cheap": "Breite Bewertungsbasis aus zwei unabhängigen Referenzfamilien; Bereich höchstens Faktor 1,5; Abweichung höchstens 50%; mindestens 15% unter fair; momentumfreies Potenzial mindestens 65 aus 60% Qualität und 40% Wachstum; kein erhöhtes Value-Trap-, Bilanz- oder akutes Ereignisrisiko. Messer-, Boden- und Timingstatus werden nur angezeigt.",
+            "cheap": "Breite Bewertungsbasis aus zwei unabhängigen Referenzfamilien; Bereich höchstens Faktor 1,5; Abweichung höchstens 50%; mindestens 15% unter fair; momentumfreies Potenzial mindestens 65 aus 60% Qualität und 40% Wachstum. Nur hohes Value-Trap-, Bilanz- oder akutes Ereignisrisiko schließt aus; medium wird als erhöhtes Rückschlagrisiko markiert. Messer-, Boden- und Timingstatus werden nur angezeigt.",
             "expensive": "Breite Bewertungsbasis aus zwei unabhängigen Referenzfamilien; Bereich höchstens Faktor 1,5; Abweichung höchstens 50%; mindestens 15% über fair.",
         },
     }
