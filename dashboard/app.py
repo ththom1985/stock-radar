@@ -505,10 +505,16 @@ def _research_card(row, rank=None):
             )
             if expert_valuation.get("missing_note"):
                 st.info(expert_valuation["missing_note"])
+            basis_definition = (
+                expert_valuation.get("basis_quality") or {}
+            ).get("definition")
             st.caption(
-                "ⓘ Breit bedeutet: eigene Mehrjahresbewertung aus offiziellen "
-                "Filings und historischen Kursen plus eine aktuelle Peer-Verteilung. "
-                "Mehrere Kennzahlen derselben Quelle zählen nicht mehrfach."
+                f"ⓘ {basis_definition}"
+                if basis_definition
+                else (
+                    "ⓘ Breit bedeutet: eigene Mehrjahresbewertung plus eine "
+                    "aktuelle Peer-Verteilung."
+                )
             )
             expert_risks = (expert.get("risks") or {}).get("top_risks") or []
             for risk in expert_risks:

@@ -133,6 +133,74 @@ class ValuationHistoryTests(unittest.TestCase):
             "withheld_extreme_deviation",
         )
 
+    def test_bank_model_uses_four_year_pb_relative_to_roe(self):
+        row = {
+            "symbol": "BANK",
+            "industry": "Banks - Diversified",
+            "currency": "USD",
+            "price_local": 100,
+            "bvps": 50,
+            "pb": 2,
+            "roe_pct": 10,
+        }
+        result = build_valuation_assessment(
+            row,
+            financial_history={
+                "complete": True,
+                "annual_points_available": 4,
+                "annual_points": [{"period_end": "2025-12-31"}] * 4,
+                "pb_to_roe_median": 20,
+            },
+            financial_peer={"pb_to_roe_median": 15, "peer_count": 32},
+        )
+        self.assertEqual(result["plausibility_gate"]["status"], "pass")
+        self.assertEqual(result["sector_model"], "bank_pb_to_roe_4y")
+        self.assertEqual(
+            result["fair_value_range"],
+            {
+                "lower": 75.0,
+                "upper": 100.0,
+                "currency": "USD",
+                "method": (
+                    "P/B relativ zum ROE, abgeleitet aus eigener Vierjahreshistorie "
+                    "und aktueller Sektor-Peergroup"
+                ),
+                "input_count": 2,
+                "implied_price_count": 2,
+            },
+        )
+        self.assertIn("4-Jahres-Basis", result["history_note"])
+
+    def test_reit_remains_withheld_with_specific_reason(self):
+        result = build_valuation_assessment(
+            {
+                "symbol": "REIT",
+                "sector": "Real Estate",
+                "industry": "REIT - Retail",
+                "currency": "USD",
+                "price_local": 100,
+                "pe": 20,
+                "price_to_sales": 4,
+            },
+            {
+                "Real Estate": {
+                    "pe": 18,
+                    "price_to_sales": 3,
+                    "peer_counts": {"pe": 10, "price_to_sales": 10},
+                }
+            },
+            {
+                "metrics": {"pe": 18, "price_to_sales": 3},
+                "complete": True,
+                "annual_points_available": 5,
+            },
+        )
+        self.assertEqual(
+            result["plausibility_gate"]["status"],
+            "withheld_sector_model",
+        )
+        self.assertIn("FFO-/AFFO", result["plausibility_gate"]["reason"])
+
 
 if __name__ == "__main__":
     unittest.main()

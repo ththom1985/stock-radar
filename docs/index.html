@@ -895,7 +895,13 @@
           fair_value_range: Number.isFinite(expertRaw[7]) && Number.isFinite(expertRaw[8])
             ? { lower: expertRaw[7], upper: expertRaw[8], currency: row.currency }
             : null,
-          missing_note: null
+          missing_note: expertRaw[11] === 1
+            ? "Bewertung sektorbedingt nicht möglich: Für REITs fehlen belastbare mehrjährige FFO-/AFFO- oder direkte NAV-Daten."
+            : expertRaw[11] === 2
+            ? "Bewertung sektorbedingt nicht möglich: Für dieses Finanzgeschäft ist noch kein fachlich passendes Bewertungsmodell zugeordnet."
+            : expertRaw[11] === 3
+            ? "Bewertung auf 4-Jahres-Basis, ein Jahr kürzer als bei Industriewerten."
+            : null
         },
         basis_quality: expertRaw[9] === 1 ? "breit" : "schmal",
         geographic_coverage: expertRaw[10] === 1 ? "narrower_non_us" : "standard_us",

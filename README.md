@@ -440,11 +440,12 @@ Asset type uses provider `quoteType` when available and conservative symbol/name
 fallbacks. Company fundamental scoring is disabled for ETFs, funds, crypto,
 indices, futures, and other non-company instruments.
 
-All overall rankings now use completed-daily technical context only. Generic
-absolute fundamental bands remain descriptive because robust sector-neutral,
-point-in-time peer ranks are not implemented; banks, insurers, REITs, and
-industrial companies are therefore not forced into one generic valuation rank.
-The output exposes complete/current peer counts and feature coverage.
+All overall rankings now use completed-daily technical context only. Decision-
+facing fair-value ranges keep sector methods separate: ordinary companies use
+their multi-year issuer multiples and current sector peers, while banks and
+insurers use P/B relative to ROE. REITs and unassigned financial structures are
+withheld instead of being forced into either model. The output exposes
+complete/current peer counts and feature coverage.
 
 Rank-eligible, technical, and company-fundamental descriptive coverage are
 blocking data gates with configurable minima by asset class.
@@ -476,7 +477,8 @@ missing inputs, and remains `actionable: false`.
   and is exported with its reason/evidence IDs; raw Value and Quality scores are
   unchanged. Cyclical-peak evidence uses positive peak-cycle conditions and cannot
   reuse the negative-growth evidence owned by the shrinking component.
-  Banks, insurers, REITs and other generic non-comparable cases remain excluded.
+  This legacy descriptive list remains separate from decision-facing fair-value
+  gates.
 - **Potenzial / `analyst_potential`**: analyst target gap with at least five
   analysts, plus visible trend/timing components and explicit overbought or
   weak-trend penalties. Analyst consensus is not a model forecast.
@@ -638,12 +640,21 @@ investment advice.
   exact completed-bar price, score components, evidence quality, and alternative
   signals. `data/recommendation_outcomes.jsonl` appends matured 21/63/126/252
   session outcomes. A positive-return hit rate is not an alpha or benchmark claim.
-- `data/valuation_history.json` stores one point-in-time multiple snapshot per
-  month. An own five-year average is withheld until at least 48 monthly
-  observations exist. Current sector medians require at least five available peers.
-- Fair-value ranges are unvalidated interquartile implied-price ranges from
-  available sector medians and complete point-in-time own-history averages. If
-  fewer than two references exist, no range or verdict is produced.
+- `data/valuation_history.json` combines monthly snapshots with annual SEC
+  Companyfacts backfills. Ordinary-company history requires at least four annual
+  observations across two supported metrics. Current sector medians require at
+  least five available peers.
+- `data/financial_sector_history.json` stores four clean annual Common Equity,
+  ordinary-share, and common-net-income periods from yfinance for banks and
+  insurers. Their fair value compares P/B per unit of positive ROE against the
+  issuer's four-year median and the current bank or insurance peer median. The UI
+  states that this basis is one year shorter than for ordinary industrial values.
+- REITs remain withheld because neither SEC Companyfacts nor yfinance provides
+  consistent multi-year FFO/AFFO or direct NAV. Other unassigned financial
+  structures also remain fail-closed.
+- Every fair-value range retains the same width-factor 1.5 and deviation 50%
+  plausibility gates. If two qualified reference families do not exist, no
+  decision-facing range or verdict is produced.
 - Existing 1M/6M/12M/24M scenario ranges remain uncalibrated. Scenario
   probabilities are explicitly withheld while the strict probability engine has
   no accepted model.

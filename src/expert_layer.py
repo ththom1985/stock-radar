@@ -6,6 +6,11 @@ import statistics
 from datetime import datetime, timezone
 
 from .config import DATA
+from .financial_sector_history import (
+    financial_history_baseline,
+    financial_model_group,
+    financial_peer_benchmarks,
+)
 from .persistence import load_json
 
 WEIGHTS_PATH = DATA / "expert_score_weights.json"
@@ -44,6 +49,13 @@ SOURCE_CATALOG = {
         "cost": "free",
         "expected_delay": "provider dependent; refreshed weekly",
         "coverage": "global, field coverage varies",
+        "official": False,
+    },
+    "yfinance_financial_statements": {
+        "source": "Yahoo Finance annual financial statements via yfinance",
+        "cost": "free",
+        "expected_delay": "provider dependent; refreshed monthly",
+        "coverage": "four annual Common Equity periods for supported banks and insurers",
         "official": False,
     },
     "sec_companyfacts": {
@@ -227,18 +239,261 @@ def sector_valuation_medians(rows, minimum_peers=5):
 
 
 def _requires_special_sector_model(row):
-    sector = str(row.get("sector_display") or row.get("sector") or "").casefold()
-    industry = str(row.get("industry_display") or row.get("industry") or "").casefold()
+    return financial_model_group(row) != "standard"
+
+
+def _sector_model_reason(row):
+    group = financial_model_group(row)
+    if group == "reit":
+        return (
+            "Bewertung sektorbedingt nicht möglich: Für REITs fehlen belastbare "
+            "mehrjährige FFO-/AFFO- oder direkte NAV-Daten."
+        )
     return (
-        "financial" in sector
-        or "real estate" in sector
-        or "insurance" in industry
-        or "bank" in industry
-        or "reit" in industry
+        "Bewertung sektorbedingt nicht möglich: Für dieses Finanzgeschäft ist "
+        "noch kein fachlich passendes Bewertungsmodell zugeordnet."
     )
 
 
-def build_valuation_assessment(row, sector_medians=None, five_year=None):
+def _financial_valuation_assessment(row, history, peer):
+    group = financial_model_group(row)
+    current_price = _number(row.get("price_local"))
+    book_value_per_share = _number(row.get("bvps"))
+    price_to_book = _number(row.get("pb"))
+    roe_pct = _number(row.get("roe_pct"))
+    own_ratio = _number((history or {}).get("pb_to_roe_median"))
+    peer_ratio = _number((peer or {}).get("pb_to_roe_median"))
+    peer_count = int((peer or {}).get("peer_count") or 0)
+    history_complete = bool((history or {}).get("complete"))
+    reference_families = []
+    if history_complete and own_ratio is not None:
+        reference_families.append(
+            {
+                "id": "issuer_history",
+                "label": "Eigene Vierjahresbewertung",
+                "source": (
+                    "Yahoo Finance Common Equity, Ordinary Shares und Net Income "
+                    "+ historische Tageskurse"
+                ),
+                "metrics": ["pb_to_roe"],
+                "observation_count": (history or {}).get("annual_points_available", 0),
+            }
+        )
+    if peer_ratio is not None and peer_count >= 5:
+        reference_families.append(
+            {
+                "id": "sector_peers",
+                "label": (
+                    "Aktuelle Bankenvergleichsgruppe"
+                    if group == "bank"
+                    else "Aktuelle Versicherungsvergleichsgruppe"
+                ),
+                "source": "Yahoo Finance aktuelles P/B und ROE anderer Unternehmen",
+                "metrics": ["pb_to_roe"],
+                "observation_count": peer_count,
+            }
+        )
+    family_ids = {family["id"] for family in reference_families}
+    basis_quality = {
+        "status": (
+            "broad"
+            if {"issuer_history", "sector_peers"}.issubset(family_ids)
+            else "narrow"
+        ),
+        "independent_family_count": len(reference_families),
+        "reference_families": reference_families,
+        "definition": (
+            "Breit verlangt für Banken und Versicherer vier saubere Jahresperioden "
+            "mit Common Equity sowie eine ausreichend besetzte aktuelle P/B-zu-ROE-"
+            "Peergroup. Bewertung auf 4-Jahres-Basis, ein Jahr kürzer als bei "
+            "Industriewerten."
+        ),
+    }
+    fair_range = None
+    raw_fair_range = None
+    verdict = "unavailable"
+    current_roe = roe_pct / 100.0 if roe_pct is not None else None
+    current_pb_to_roe = (
+        price_to_book / current_roe
+        if price_to_book is not None
+        and price_to_book > 0
+        and current_roe is not None
+        and current_roe > 0
+        else None
+    )
+    expected_pb = {
+        "own_4y": current_roe * own_ratio
+        if current_roe is not None and own_ratio is not None
+        else None,
+        "peer": current_roe * peer_ratio
+        if current_roe is not None and peer_ratio is not None
+        else None,
+    }
+    implied_prices = sorted(
+        book_value_per_share * multiple
+        for multiple in expected_pb.values()
+        if book_value_per_share is not None
+        and multiple is not None
+        and multiple > 0
+    )
+    plausibility_gate = {
+        "status": "withheld_narrow_basis",
+        "max_deviation_pct": MAX_FAIR_VALUE_DEVIATION_PCT,
+        "max_width_factor": MAX_FAIR_VALUE_WIDTH_FACTOR,
+        "observed_deviation_pct": None,
+        "observed_width_factor": None,
+        "checks": {
+            "sector_model_supported": True,
+            "basis_broad": basis_quality["status"] == "broad",
+            "width_within_limit": False,
+            "deviation_within_limit": False,
+        },
+        "reason": (
+            "Für das P/B-zu-ROE-Modell fehlen vier vollständige Common-Equity-"
+            "Jahresperioden, eine ausreichend große Peergroup oder aktuelle "
+            "positive P/B-, ROE- und Buchwertdaten."
+        ),
+    }
+    if (
+        len(implied_prices) == 2
+        and current_price is not None
+        and current_price > 0
+        and basis_quality["status"] == "broad"
+    ):
+        lower, upper = implied_prices
+        fair_range = {
+            "lower": round(lower, 4),
+            "upper": round(upper, 4),
+            "currency": row.get("currency"),
+            "method": (
+                "P/B relativ zum ROE, abgeleitet aus eigener Vierjahreshistorie "
+                "und aktueller Sektor-Peergroup"
+            ),
+            "input_count": len(reference_families),
+            "implied_price_count": len(implied_prices),
+        }
+        raw_fair_range = dict(fair_range)
+        if current_price < lower * 0.85:
+            verdict = "clearly_undervalued"
+        elif current_price <= upper:
+            verdict = "fair"
+        elif current_price <= upper * 1.15:
+            verdict = "expensive"
+        else:
+            verdict = "overpriced"
+        deviation_pct = (
+            (lower / current_price - 1.0) * 100.0
+            if current_price < lower
+            else (current_price / upper - 1.0) * 100.0
+            if current_price > upper
+            else 0.0
+        )
+        width_factor = upper / lower
+        checks = {
+            "sector_model_supported": True,
+            "basis_broad": True,
+            "width_within_limit": width_factor <= MAX_FAIR_VALUE_WIDTH_FACTOR,
+            "deviation_within_limit": deviation_pct <= MAX_FAIR_VALUE_DEVIATION_PCT,
+        }
+        plausibility_gate.update(
+            {
+                "status": "pass",
+                "observed_deviation_pct": round(deviation_pct, 2),
+                "observed_width_factor": round(width_factor, 4),
+                "checks": checks,
+                "reason": None,
+            }
+        )
+        failures = [key for key, passed in checks.items() if not passed]
+        if failures:
+            status = (
+                "withheld_wide_range"
+                if not checks["width_within_limit"]
+                else "withheld_extreme_deviation"
+            )
+            reasons = []
+            if not checks["width_within_limit"]:
+                reasons.append(
+                    f"Der faire Bereich ist breiter als Faktor "
+                    f"{MAX_FAIR_VALUE_WIDTH_FACTOR:.1f}."
+                )
+            if not checks["deviation_within_limit"]:
+                reasons.append(
+                    "Der faire Bereich liegt mehr als "
+                    f"{MAX_FAIR_VALUE_DEVIATION_PCT:.0f}% vom aktuellen Kurs entfernt."
+                )
+            plausibility_gate.update({"status": status, "reason": " ".join(reasons)})
+            fair_range = None
+            verdict = "data_review_required"
+    return {
+        "model_status": EXPERT_MODEL_STATUS,
+        "valuation_status": (
+            "evidence_qualified_unbacktested"
+            if plausibility_gate["status"] == "pass"
+            else "withheld"
+        ),
+        "valuation_status_label": (
+            "Bewertung belastbar; Modell noch nicht rückgeprüft"
+            if plausibility_gate["status"] == "pass"
+            else "Bewertung zurückgehalten"
+        ),
+        "sector_model": f"{group}_pb_to_roe_4y",
+        "verdict": verdict,
+        "fair_value_range": fair_range,
+        "raw_fair_value_range": (
+            raw_fair_range if plausibility_gate["status"] != "pass" else None
+        ),
+        "plausibility_gate": plausibility_gate,
+        "basis_quality": basis_quality,
+        "metrics": {
+            "book_value_per_share": book_value_per_share,
+            "price_to_book": price_to_book,
+            "roe_pct": roe_pct,
+            "pb_to_roe": {
+                "current": round(current_pb_to_roe, 4)
+                if current_pb_to_roe is not None
+                else None,
+                "own_4y_median": own_ratio,
+                "peer_median": peer_ratio,
+                "peer_count": peer_count,
+            },
+            "expected_price_to_book": {
+                key: round(value, 4) if value is not None else None
+                for key, value in expected_pb.items()
+            },
+            "annual_calculation": (history or {}).get("annual_points") or [],
+        },
+        "own_history_months": 0,
+        "own_history_annual_points": (history or {}).get(
+            "annual_points_available", 0
+        ),
+        "own_history_type": "yfinance_common_equity_4y",
+        "own_5y_complete": False,
+        "history_note": (
+            "Bewertung auf 4-Jahres-Basis, ein Jahr kürzer als bei Industriewerten."
+        ),
+        "missing_note": (
+            plausibility_gate.get("reason")
+            if plausibility_gate["status"] != "pass"
+            else None
+        ),
+    }
+
+
+def build_valuation_assessment(
+    row,
+    sector_medians=None,
+    five_year=None,
+    *,
+    financial_history=None,
+    financial_peer=None,
+):
+    if financial_model_group(row) in {"bank", "insurance"}:
+        return _financial_valuation_assessment(
+            row,
+            financial_history or {},
+            financial_peer or {},
+        )
     sector_medians = sector_medians or {}
     five_year = five_year or {"metrics": {}, "months_available": 0, "complete": False}
     peers = sector_medians.get(row.get("sector")) or {}
@@ -389,8 +644,7 @@ def build_valuation_assessment(row, sector_medians=None, five_year=None):
             )
             reasons = {
                 "sector_model_supported": (
-                    "Für Financials oder REITs ist noch kein passendes "
-                    "sektorspezifisches Bewertungsmodell aktiv."
+                    _sector_model_reason(row)
                 ),
                 "basis_broad": (
                     "Die Bewertung besitzt noch nicht beide unabhängigen "
@@ -424,6 +678,11 @@ def build_valuation_assessment(row, sector_medians=None, five_year=None):
             "Bewertung belastbar; Modell noch nicht rückgeprüft"
             if plausibility_gate["status"] == "pass"
             else "Bewertung zurückgehalten"
+        ),
+        "sector_model": (
+            "standard_multiples"
+            if financial_model_group(row) == "standard"
+            else f"{financial_model_group(row)}_unavailable"
         ),
         "verdict": verdict,
         "fair_value_range": fair_range,
@@ -589,10 +848,16 @@ def build_expert_analysis(
     *,
     sector_medians=None,
     five_year=None,
+    financial_history=None,
+    financial_peer=None,
 ):
     weights = weights or load_score_weights()
     valuation_assessment = build_valuation_assessment(
-        row, sector_medians=sector_medians, five_year=five_year
+        row,
+        sector_medians=sector_medians,
+        five_year=five_year,
+        financial_history=financial_history,
+        financial_peer=financial_peer,
     )
     values = _component_values(row)
     if (
@@ -658,17 +923,36 @@ def build_expert_analysis(
     }
 
 
-def attach_expert_analysis(rows, weights=None, valuation_history=None):
+def attach_expert_analysis(
+    rows,
+    weights=None,
+    valuation_history=None,
+    *,
+    financial_history_records=None,
+    price_histories=None,
+):
     weights = weights or load_score_weights()
     sector_medians = sector_valuation_medians(rows)
+    financial_peers = financial_peer_benchmarks(rows)
     from .valuation_history import five_year_averages
 
     for row in rows:
+        group = financial_model_group(row)
+        financial_history = (
+            financial_history_baseline(
+                (financial_history_records or {}).get(row.get("symbol")),
+                (price_histories or {}).get(row.get("symbol")),
+            )
+            if group in {"bank", "insurance"}
+            else None
+        )
         row["expert_analysis"] = build_expert_analysis(
             row,
             weights,
             sector_medians=sector_medians,
             five_year=five_year_averages(valuation_history, row.get("symbol")),
+            financial_history=financial_history,
+            financial_peer=financial_peers.get(group),
         )
     return rows
 

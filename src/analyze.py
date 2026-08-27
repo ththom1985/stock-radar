@@ -91,6 +91,7 @@ from .recommendation_journal import (
 )
 from .rating import radar_elo, radar_score, stars
 from .score import score_daily_signal, score_longterm
+from .financial_sector_history import fetch_financial_sector_history
 from .sec_companyfacts import fetch_sec_companyfacts, merge_official_fundamentals
 from .sec_13f import fetch_13f_signals
 from .sec_insiders import fetch_insider_signals
@@ -186,6 +187,7 @@ def _copy_fundamental_context(row: dict, fundamental: dict) -> None:
     row["pe"] = _json_value(fundamental.get("pe"))
     row["forward_pe"] = _json_value(fundamental.get("forward_pe"))
     row["pb"] = _json_value(fundamental.get("pb"))
+    row["bvps"] = _json_value(fundamental.get("bvps"))
     row["peg"] = _json_value(fundamental.get("peg"))
     row["ev_ebitda"] = _json_value(fundamental.get("ev_ebitda"))
     row["price_to_sales"] = _json_value(fundamental.get("ps"))
@@ -954,6 +956,19 @@ def run(with_news=True, with_fundamentals=True):
         now=now,
     )
     expert_weights = load_score_weights()
+    financial_history_records, financial_history_status = (
+        fetch_financial_sector_history(rows)
+        if not market_data_only
+        else (
+            {},
+            {
+                "status": "skipped",
+                "reason": "market-data-only pipeline",
+                "candidate_count": 0,
+                "complete_count": 0,
+            },
+        )
+    )
     valuation_history = (
         update_valuation_history(
             rows,
@@ -968,6 +983,8 @@ def run(with_news=True, with_fundamentals=True):
         rows,
         expert_weights,
         valuation_history=valuation_history,
+        financial_history_records=financial_history_records,
+        price_histories=fetched.prices,
     )
     expert_rankings = build_expert_rankings(rows, top_n=TOP_N)
     if not market_data_only:
@@ -1120,6 +1137,7 @@ def run(with_news=True, with_fundamentals=True):
         "market_news": market_news,
         "news_source_status": news_status,
         "sec_companyfacts_status": sec_source_status,
+        "financial_sector_history_status": financial_history_status,
         "sec_insider_status": insider_source_status,
         "options_gex_status": gex_source_status,
         "finra_short_interest_status": finra_source_status,

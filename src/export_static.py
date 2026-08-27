@@ -239,6 +239,12 @@ def _compact_row(row: dict[str, Any]) -> dict[str, Any]:
         short_term = expert.get("short_term") or {}
         valuation = expert.get("valuation") or {}
         fair_range = valuation.get("fair_value_range") or {}
+        sector_model_codes = {
+            "reit_unavailable": 1,
+            "unsupported_financial_unavailable": 2,
+            "bank_pb_to_roe_4y": 3,
+            "insurance_pb_to_roe_4y": 3,
+        }
         compact["ea"] = [
             long_term.get("score"),
             long_term.get("coverage_pct"),
@@ -263,6 +269,7 @@ def _compact_row(row: dict[str, Any]) -> dict[str, Any]:
             fair_range.get("upper"),
             1 if (valuation.get("basis_quality") or {}).get("status") == "broad" else 0,
             1 if (expert.get("coverage_basis") or {}).get("status") == "narrower_non_us" else 0,
+            sector_model_codes.get(valuation.get("sector_model"), 0),
         ]
     compact["news"] = (compact.get("news") or [])[:3]
     compact["scenario_long"] = [
