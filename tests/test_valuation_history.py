@@ -3,11 +3,34 @@ from datetime import datetime, timezone
 
 import pandas as pd
 
-from src.expert_layer import build_valuation_assessment, sector_valuation_medians
+from src.expert_layer import (
+    _apply_minimum_fair_band,
+    build_valuation_assessment,
+    sector_valuation_medians,
+)
 from src.valuation_history import _sec_annual_backfill, five_year_averages
 
 
 class ValuationHistoryTests(unittest.TestCase):
+    def test_minimum_fair_band_uses_typical_daily_move(self):
+        lower, upper, audit = _apply_minimum_fair_band(
+            {"atr_pct": 3, "vol_annual_pct": 20},
+            99,
+            101,
+        )
+        self.assertEqual((lower, upper), (97, 103))
+        self.assertEqual(audit["status"], "expanded")
+        self.assertEqual(audit["minimum_half_width_pct"], 3)
+
+    def test_minimum_fair_band_never_shrinks_existing_range(self):
+        lower, upper, audit = _apply_minimum_fair_band(
+            {"atr_pct": 2, "vol_annual_pct": 20},
+            90,
+            110,
+        )
+        self.assertEqual((lower, upper), (90, 110))
+        self.assertEqual(audit["status"], "already_wide_enough")
+
     def test_five_year_average_is_withheld_until_enough_months_exist(self):
         history = {
             "symbols": {

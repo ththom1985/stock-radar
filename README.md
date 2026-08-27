@@ -652,9 +652,12 @@ investment advice.
 - REITs remain withheld because neither SEC Companyfacts nor yfinance provides
   consistent multi-year FFO/AFFO or direct NAV. Other unassigned financial
   structures also remain fail-closed.
-- Every fair-value range retains the same width-factor 1.5 and deviation 50%
-  plausibility gates. If two qualified reference families do not exist, no
-  decision-facing range or verdict is produced.
+- Every fair-value range is widened when necessary to at least plus/minus one
+  typical daily move around its midpoint. The half-width is
+  `max(ATR%, annualized volatility / sqrt(252))`; ranges are never narrowed.
+  The same maximum width-factor 1.5 and deviation 50% plausibility gates then
+  apply. If two qualified reference families do not exist, no decision-facing
+  range or verdict is produced.
 - Existing 1M/6M/12M/24M scenario ranges remain uncalibrated. Scenario
   probabilities are explicitly withheld while the strict probability engine has
   no accepted model.

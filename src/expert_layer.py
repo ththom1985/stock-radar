@@ -17,6 +17,7 @@ WEIGHTS_PATH = DATA / "expert_score_weights.json"
 EXPERT_MODEL_STATUS = "heuristic_unvalidated"
 MAX_FAIR_VALUE_DEVIATION_PCT = 50.0
 MAX_FAIR_VALUE_WIDTH_FACTOR = 1.5
+TRADING_DAYS_PER_YEAR = 252
 
 DEFAULT_WEIGHTS = {
     "long_term": {
@@ -255,6 +256,64 @@ def _sector_model_reason(row):
     )
 
 
+def _apply_minimum_fair_band(row, lower, upper):
+    midpoint = (lower + upper) / 2.0
+    atr_pct = _number(row.get("atr_pct"))
+    annual_volatility_pct = _number(row.get("vol_annual_pct"))
+    daily_volatility_pct = (
+        annual_volatility_pct / math.sqrt(TRADING_DAYS_PER_YEAR)
+        if annual_volatility_pct is not None
+        else None
+    )
+    anchors = [
+        value
+        for value in (atr_pct, daily_volatility_pct)
+        if value is not None and value > 0
+    ]
+    original_half_width_pct = (
+        (upper - lower) / (2.0 * midpoint) * 100.0 if midpoint > 0 else None
+    )
+    minimum_half_width_pct = max(anchors) if anchors else None
+    expanded = (
+        midpoint > 0
+        and original_half_width_pct is not None
+        and minimum_half_width_pct is not None
+        and original_half_width_pct < minimum_half_width_pct
+    )
+    adjusted_lower, adjusted_upper = lower, upper
+    if expanded:
+        half_width = midpoint * minimum_half_width_pct / 100.0
+        adjusted_lower = max(midpoint * 0.01, midpoint - half_width)
+        adjusted_upper = midpoint + half_width
+    return adjusted_lower, adjusted_upper, {
+        "status": "expanded" if expanded else "already_wide_enough",
+        "rule": (
+            "Mindestens plus/minus eine typische Tagesbewegung um den Mittelpunkt; "
+            "Halbbreite = max(ATR%, annualisierte Volatilität/sqrt(252))."
+        ),
+        "atr_pct": round(atr_pct, 4) if atr_pct is not None else None,
+        "daily_volatility_pct": (
+            round(daily_volatility_pct, 4)
+            if daily_volatility_pct is not None
+            else None
+        ),
+        "minimum_half_width_pct": (
+            round(minimum_half_width_pct, 4)
+            if minimum_half_width_pct is not None
+            else None
+        ),
+        "original_half_width_pct": (
+            round(original_half_width_pct, 4)
+            if original_half_width_pct is not None
+            else None
+        ),
+        "original_range": {
+            "lower": round(lower, 4),
+            "upper": round(upper, 4),
+        },
+    }
+
+
 def _financial_valuation_assessment(row, history, peer):
     group = financial_model_group(row)
     current_price = _number(row.get("price_local"))
@@ -311,6 +370,7 @@ def _financial_valuation_assessment(row, history, peer):
     }
     fair_range = None
     raw_fair_range = None
+    minimum_band = None
     verdict = "unavailable"
     current_roe = roe_pct / 100.0 if roe_pct is not None else None
     current_pb_to_roe = (
@@ -361,6 +421,11 @@ def _financial_valuation_assessment(row, history, peer):
         and basis_quality["status"] == "broad"
     ):
         lower, upper = implied_prices
+        lower, upper, minimum_band = _apply_minimum_fair_band(
+            row,
+            lower,
+            upper,
+        )
         fair_range = {
             "lower": round(lower, 4),
             "upper": round(upper, 4),
@@ -444,6 +509,7 @@ def _financial_valuation_assessment(row, history, peer):
             raw_fair_range if plausibility_gate["status"] != "pass" else None
         ),
         "plausibility_gate": plausibility_gate,
+        "minimum_band": minimum_band,
         "basis_quality": basis_quality,
         "metrics": {
             "book_value_per_share": book_value_per_share,
@@ -524,6 +590,7 @@ def build_valuation_assessment(
     )
     fair_range = None
     raw_fair_range = None
+    minimum_band = None
     verdict = "unavailable"
     own_metrics = [
         metric
@@ -594,6 +661,11 @@ def build_valuation_assessment(
         )
         lower = implied_prices[low_index]
         upper = implied_prices[high_index]
+        lower, upper, minimum_band = _apply_minimum_fair_band(
+            row,
+            lower,
+            upper,
+        )
         fair_range = {
             "lower": round(lower, 4),
             "upper": round(upper, 4),
@@ -692,6 +764,7 @@ def build_valuation_assessment(
             else None
         ),
         "plausibility_gate": plausibility_gate,
+        "minimum_band": minimum_band,
         "basis_quality": basis_quality,
         "metrics": metrics,
         "own_history_months": five_year.get("months_available", 0),
