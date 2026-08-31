@@ -237,6 +237,8 @@
   </main>
   <script>
     const MAX_OUTPUT_AGE_HOURS = 36;
+    const VALUATION_LISTS_ENABLED = false;
+    const VALUATION_REPAIR_MESSAGE = "Bewertungsmodell wird überarbeitet — Aussagen derzeit nicht belastbar.";
     const state = { data: null, bySymbol: new Map(), view: "today", selected: null, gateFailures: [] };
     const $ = (id) => document.getElementById(id);
     const categoryTitles = {
@@ -681,6 +683,12 @@
       if (state.view === "today") {
         const headline = state.data.today?.headline || "Heute keine belastbare Aussage";
         $("list-title").textContent = headline;
+        if (!VALUATION_LISTS_ENABLED) {
+          state.selected = null;
+          $("rows").innerHTML = `<div class="muted" style="padding:18px">${escapeHtml(VALUATION_REPAIR_MESSAGE)}</div>`;
+          renderDetail(null);
+          return;
+        }
         $("rows").innerHTML = items.map((item) => {
           const row = state.bySymbol.get(item.symbol) || {};
           const value = item.today || {};

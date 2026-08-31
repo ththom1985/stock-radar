@@ -863,6 +863,17 @@ def _render_question_view(key):
     question_views = data.get("question_views") or {}
     items = question_views.get(key) or []
     excluded = question_views.get("excluded_cheap") or []
+    if question_views.get("enabled") is False:
+        st.header(
+            "Billig mit Potenzial"
+            if key == "cheap_with_potential"
+            else "Teuer gerade"
+        )
+        st.warning(
+            question_views.get("empty_state")
+            or "Bewertungsmodell wird überarbeitet — Aussagen derzeit nicht belastbar."
+        )
+        return
 
     def render_excluded():
         if key != "cheap_with_potential" or not excluded:

@@ -1,5 +1,7 @@
 import unittest
 
+from unittest.mock import patch
+
 from src.question_views import build_question_views
 
 
@@ -32,6 +34,29 @@ def row(symbol="AAA", *, verdict="clearly_undervalued", price=50, lower=100, upp
 
 
 class QuestionViewsTests(unittest.TestCase):
+    def setUp(self):
+        self.enabled = patch(
+            "src.question_views.VALUATION_LISTS_ENABLED",
+            True,
+        )
+        self.enabled.start()
+
+    def tearDown(self):
+        self.enabled.stop()
+
+    def test_lists_are_disabled_by_default_during_repair(self):
+        self.enabled.stop()
+        result = build_question_views([row()])
+        self.assertFalse(result["enabled"])
+        self.assertEqual(result["cheap_with_potential"], [])
+        self.assertEqual(result["expensive_now"], [])
+        self.assertIn("überarbeitet", result["empty_state"])
+        self.enabled = patch(
+            "src.question_views.VALUATION_LISTS_ENABLED",
+            True,
+        )
+        self.enabled.start()
+
     def test_cheap_requires_gate_and_keeps_falling_knives_as_watch_items(self):
         valid = row()
         withheld = row("WITHHELD")

@@ -10,6 +10,10 @@ MIN_DISCOUNT_PCT = 15.0
 MIN_VALUE_POTENTIAL_SCORE = 65.0
 VALUATION_STATUS = "evidence_qualified_unbacktested"
 VALUATION_STATUS_LABEL = "Bewertung belastbar; Modell noch nicht rückgeprüft"
+VALUATION_LISTS_ENABLED = False
+VALUATION_REPAIR_MESSAGE = (
+    "Bewertungsmodell wird überarbeitet — Aussagen derzeit nicht belastbar."
+)
 
 
 def _number(value):
@@ -256,6 +260,33 @@ def _cheap_action(row):
 
 
 def build_question_views(rows, cheap_limit=5, expensive_limit=12):
+    if not VALUATION_LISTS_ENABLED:
+        return {
+            "valuation_status": "under_repair",
+            "valuation_status_label": VALUATION_REPAIR_MESSAGE,
+            "enabled": False,
+            "cheap_with_potential": [],
+            "excluded_cheap": [],
+            "expensive_now": [],
+            "selection_counts": {
+                "gate_ready": 0,
+                "materially_cheap": 0,
+                "potential_pass": 0,
+                "risk_excluded": 0,
+                "eligible": 0,
+                "visible": 0,
+            },
+            "sector_concentration": {
+                "dominant_sector": None,
+                "dominant_pct": 0.0,
+                "warning": None,
+            },
+            "empty_state": VALUATION_REPAIR_MESSAGE,
+            "rules": {
+                "cheap": VALUATION_REPAIR_MESSAGE,
+                "expensive": VALUATION_REPAIR_MESSAGE,
+            },
+        }
     cheap = []
     excluded_cheap = []
     expensive = []
