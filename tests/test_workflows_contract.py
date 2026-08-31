@@ -26,6 +26,12 @@ class WorkflowContractTests(unittest.TestCase):
             self.assertIn("data/probability_forward_status.json", text)
             self.assertIn("data/finra_short_interest.json", text)
             self.assertIn("data/valuation_anomalies.json", text)
+            self.assertIn("data/financial_sector_history.json", text)
+            self.assertIn("git add -u -- data docs/data.json", text)
+            self.assertIn("git status --porcelain", text)
+            self.assertIn("git pull --rebase --autostash origin main", text)
+            self.assertIn("All three pull/rebase/push attempts failed", text)
+            self.assertIn("Report publication failure", text)
             self.assertIn("FINRA_CLIENT_ID", text)
             self.assertIn("FINRA_CLIENT_SECRET", text)
             self.assertIn(

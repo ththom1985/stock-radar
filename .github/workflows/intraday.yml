@@ -45,6 +45,7 @@ jobs:
       - run: python -m src.export_static
 
       - name: Publish complete data transaction
+        id: publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
@@ -53,6 +54,9 @@ jobs:
           git config user.name "stock-radar-bot"
           git config user.email "bot@users.noreply.github.com"
           git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          # Stage every already-versioned runtime artifact. New untracked files
+          # still require an explicit allow-list entry and fail visibly below.
+          git add -u -- data docs/data.json
           git add \
             data/output/latest.json \
             data/failed_symbols.json \
@@ -74,6 +78,7 @@ jobs:
             data/recommendation_log.jsonl \
             data/recommendation_outcomes.jsonl \
             data/valuation_history.json \
+            data/financial_sector_history.json \
             data/options_gex.json \
             data/fred_regime.json \
             data/finra_short_interest.json \
@@ -94,13 +99,37 @@ jobs:
             exit 0
           fi
           git commit -m "Manual completed daily snapshot $(date -u +%Y-%m-%dT%H:%MZ)"
+          remaining="$(git status --porcelain)"
+          if [ -n "$remaining" ]; then
+            echo "::error title=Uncommitted runtime artifacts::Files remained after the snapshot commit."
+            printf '%s\n' "$remaining"
+            exit 1
+          fi
+          published=false
           for attempt in 1 2 3; do
-            if git pull --rebase origin main; then break; fi
-            if [ "$attempt" -eq 3 ]; then exit 1; fi
+            if git pull --rebase --autostash origin main && git push origin HEAD:main; then
+              published=true
+              break
+            fi
+            if git rev-parse --verify REBASE_HEAD >/dev/null 2>&1; then
+              git rebase --abort
+            fi
+            echo "::warning title=Snapshot publication retry::Attempt ${attempt} of 3 failed."
             sleep $((attempt * 5))
           done
-          for attempt in 1 2 3; do
-            if git push origin HEAD:main; then exit 0; fi
-            if [ "$attempt" -eq 3 ]; then exit 1; fi
-            sleep $((attempt * 5))
-          done
+          if [ "$published" != "true" ]; then
+            echo "::error title=Daily snapshot push failed::All three pull/rebase/push attempts failed."
+            git status --short
+            exit 1
+          fi
+
+      - name: Report publication failure
+        if: failure() && steps.publish.outcome == 'failure'
+        run: |
+          echo "::error title=Stock Radar publication failed::The analysis may have completed, but main was not updated."
+          printf '%s\n' \
+            "## Stock Radar publication failed" \
+            "" \
+            "The data build completed, but the snapshot transaction did not reach main." \
+            "Inspect the Publish complete data transaction step for named remaining files or push errors." \
+            >> "$GITHUB_STEP_SUMMARY"
