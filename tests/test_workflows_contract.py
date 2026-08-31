@@ -27,6 +27,7 @@ class WorkflowContractTests(unittest.TestCase):
             self.assertIn("data/finra_short_interest.json", text)
             self.assertIn("data/valuation_anomalies.json", text)
             self.assertIn("data/financial_sector_history.json", text)
+            self.assertIn("data/opportunity_history.json", text)
             self.assertIn("git add -u -- data docs/data.json", text)
             self.assertIn("git status --porcelain", text)
             self.assertIn("git pull --rebase --autostash origin main", text)

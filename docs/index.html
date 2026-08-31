@@ -195,6 +195,7 @@
         <button class="nav-button active" data-view="today">WO EINSTEIGEN?</button>
         <button class="nav-button" data-view="cheap_with_potential">BILLIG MIT POTENZIAL</button>
         <button class="nav-button" data-view="expensive_now">TEUER GERADE</button>
+        <button class="nav-button" data-view="waiting_for_entry">WARTET AUF EINSTIEG</button>
         <details class="expert-nav">
           <summary class="nav-button">EXPERTEN ▾</summary>
           <div class="expert-menu">
@@ -245,6 +246,7 @@
       today: "Beste Einstiegs-Kandidaten heute",
       cheap_with_potential: "Billig mit Potenzial",
       expensive_now: "Teuer gerade",
+      waiting_for_entry: "Wartet auf Einstieg",
       sweet_spot: "Sweet-Spot-Beobachtungszone",
       daily_setups: "Tages-Setups",
       undervalued_quality: "Unterbewertet",
@@ -601,6 +603,14 @@
           components: {}
         }));
       }
+      if (state.view === "waiting_for_entry") {
+        return (state.data.question_views?.waiting_for_entry || []).map((value) => ({
+          symbol: value.symbol,
+          question: value,
+          reasons: [value.action],
+          components: {}
+        }));
+      }
       if (state.view === "expert_long" || state.view === "expert_short") {
         const horizon = state.view === "expert_long" ? "long_term" : "short_term";
         let items = state.data.expert_layer?.rankings?.[horizon] || [];
@@ -655,7 +665,7 @@
       if (state.view === "health") return renderHealthView();
       $("health").hidden = true;
       $("cockpit").hidden = false;
-      const primaryView = ["today", "cheap_with_potential", "expensive_now"].includes(state.view);
+      const primaryView = ["today", "cheap_with_potential", "expensive_now", "waiting_for_entry"].includes(state.view);
       $("controls").hidden = primaryView;
       $("currency").hidden = primaryView;
       const items = categoryItems();
@@ -664,7 +674,9 @@
       $("list-subtitle").textContent = state.view === "all"
         ? "Alphabetische Suche, kein globales Cross-Currency-Ranking"
         : state.view === "today"
-        ? (state.data.today?.summary || "Timing und Bewertung gemeinsam")
+        ? (state.data.today?.market_summary || state.data.today?.summary || "Timing und Bewertung gemeinsam")
+        : state.view === "waiting_for_entry"
+        ? "Günstige Qualitätskandidaten, sortiert nach Nähe zur technischen Auslösezone."
         : state.view === "cheap_with_potential" || state.view === "expensive_now"
         ? (cat?.formula || "")
         : state.view === "expert_long" || state.view === "expert_short"
@@ -683,12 +695,6 @@
       if (state.view === "today") {
         const headline = state.data.today?.headline || "Heute keine belastbare Aussage";
         $("list-title").textContent = headline;
-        if (!VALUATION_LISTS_ENABLED) {
-          state.selected = null;
-          $("rows").innerHTML = `<div class="muted" style="padding:18px">${escapeHtml(VALUATION_REPAIR_MESSAGE)}</div>`;
-          renderDetail(null);
-          return;
-        }
         $("rows").innerHTML = items.map((item) => {
           const row = state.bySymbol.get(item.symbol) || {};
           const value = item.today || {};
@@ -696,6 +702,8 @@
           const zone = value.zone ? `${$number(value.zone.lower)}–${$number(value.zone.upper)} ${escapeHtml(value.zone.currency || "")}` : "keine belastbare Zone";
           return `<button class="today-card ${item.symbol === state.selected ? "selected" : ""}" data-symbol="${escapeHtml(item.symbol)}">
             <div class="today-card-head"><div><strong>${escapeHtml(row.display_name_full || row.short_name || item.symbol)}</strong><div class="symbol">${escapeHtml(item.symbol)}</div></div><strong>${$number(value.price)} ${escapeHtml(value.currency || "")}</strong></div>
+            ${value.situation?.label ? `<div class="question-copy"><strong>${escapeHtml(value.situation.label)}</strong></div>` : ""}
+            ${value.deal_quality?.label ? `<small class="row-meta">${escapeHtml(value.deal_quality.label)} · ${escapeHtml(value.deal_quality.comparison || "")}</small>` : ""}
             <div class="traffic ${escapeHtml(value.light || "red")}">${lamp} ${escapeHtml(value.status_label || "")}</div>
             <div>${escapeHtml(value.why || "")}</div><small class="row-meta">Einstiegszone: ${zone}</small>
             ${value.confluence_tier ? `<span class="badge green">${(value.contributing_groups || []).length} Signale ✓</span>` : ""}
@@ -710,16 +718,24 @@
         return;
       }
       if (state.view === "cheap_with_potential" || state.view === "expensive_now") {
+        if (!VALUATION_LISTS_ENABLED) {
+          state.selected = null;
+          $("rows").innerHTML = `<div class="muted" style="padding:18px">${escapeHtml(VALUATION_REPAIR_MESSAGE)}</div>`;
+          renderDetail(null);
+          return;
+        }
         const cards = items.map((item) => {
           const value = item.question || {};
           const badge = value.badge || {};
+          const quality = value.deal_quality || {};
           const metric = state.view === "cheap_with_potential"
-            ? `<strong>Attraktivität ${$number(value.attractiveness_score, 0)}</strong>`
+            ? `<strong>${escapeHtml(quality.label || "Deal-Qualität")} · ${"★".repeat(quality.stars || 0)}${"☆".repeat(5 - (quality.stars || 0))}</strong>`
             : `<strong>${percent(value.premium_pct)} über fair</strong>`;
           const copy = (value.sentences || [value.sentence]).filter(Boolean).map((text) => `<div class="question-copy">${escapeHtml(text)}</div>`).join("");
           return `<button class="today-card ${item.symbol === state.selected ? "selected" : ""}" data-symbol="${escapeHtml(item.symbol)}">
             <div class="today-card-head"><div><strong>${escapeHtml(value.name || item.symbol)}</strong><div class="symbol">${escapeHtml(item.symbol)}</div></div><div style="text-align:right"><strong>${$number(value.price)} ${escapeHtml(value.currency || "")}</strong><div class="badge ${badge.tone === "green" ? "green" : badge.tone === "yellow" ? "amber" : "neutral"}">${escapeHtml(badge.label || "Kein Setup")}</div></div></div>
-            <div class="question-copy">${metric}</div>${copy}<small class="row-meta" title="${escapeHtml(value.basis_definition || state.data.valuation_basis_contract?.broad_definition || "")}">Bewertungsbasis: ${escapeHtml(value.basis || "schmal")} ⓘ</small>${value.valuation_status_label ? `<small class="row-meta">${escapeHtml(value.valuation_status_label)}</small>` : ""}${value.geographic_note ? `<small class="row-meta">${escapeHtml(value.geographic_note)}</small>` : ""}
+            ${value.situation?.label ? `<div class="question-copy"><strong>${escapeHtml(value.situation.label)}</strong></div>` : ""}
+            <div class="question-copy">${metric}</div>${copy}${quality.comparison ? `<small class="row-meta">${escapeHtml(quality.comparison)} Grundlage: ${escapeHtml(quality.comparison_basis || "")}</small>` : ""}<small class="row-meta" title="${escapeHtml(value.basis_definition || state.data.valuation_basis_contract?.broad_definition || "")}">Bewertungsbasis: ${escapeHtml(value.basis || "schmal")} ⓘ</small>${value.valuation_status_label ? `<small class="row-meta">${escapeHtml(value.valuation_status_label)}</small>` : ""}${value.geographic_note ? `<small class="row-meta">${escapeHtml(value.geographic_note)}</small>` : ""}
           </button>`;
         }).join("");
         const excluded = state.view === "cheap_with_potential"
@@ -734,6 +750,17 @@
         }));
         if (!items.length) { state.selected = null; $("rows").innerHTML = `<div class="muted" style="padding:18px">${escapeHtml(state.view === "cheap_with_potential" ? state.data.question_views?.empty_state || "Heute kein belastbares Schnäppchen." : "Aktuell erfüllt kein Titel alle strengen Kriterien.")}</div>`; renderDetail(null); }
         else if (!items.some((item) => item.symbol === state.selected)) { state.selected = items[0].symbol; renderList(); renderDetail(state.bySymbol.get(state.selected)); }
+        return;
+      }
+      if (state.view === "waiting_for_entry") {
+        const triggered = items.filter((item) => item.question?.triggered_today).length;
+        $("rows").innerHTML = `${triggered ? `<div class="notice">Heute ausgelöst: ${triggered} Titel</div>` : ""}${items.map((item) => {
+          const value = item.question || {};
+          const trigger = Number.isFinite(value.trigger_price) ? `${$number(value.trigger_price)} ${escapeHtml(value.currency || "")}` : "technische Bestätigung";
+          const distance = Number.isFinite(value.distance_pct) ? ` · Abstand ${percent(value.distance_pct)}` : "";
+          return `<button class="today-card" data-symbol="${escapeHtml(item.symbol)}"><div class="today-card-head"><div><strong>${escapeHtml(value.name || item.symbol)}</strong><div class="symbol">${escapeHtml(item.symbol)}</div></div><strong>${$number(value.price)} ${escapeHtml(value.currency || "")}</strong></div><div class="question-copy"><strong>${escapeHtml(value.situation?.label || "")}</strong></div><div class="question-copy">${escapeHtml(value.action || "")}</div><small class="row-meta">Auslöser: ${trigger}${distance}</small></button>`;
+        }).join("")}`;
+        $("rows").querySelectorAll(".today-card").forEach((button) => button.addEventListener("click", () => renderDetail(state.bySymbol.get(button.dataset.symbol))));
         return;
       }
       $("rows").innerHTML = items.map((item, index) => {

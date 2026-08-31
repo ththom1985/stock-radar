@@ -215,9 +215,23 @@ def _fundamental_risk_reasons(row):
     return list(dict.fromkeys(reasons))
 
 
-def _cheap_action(row):
+def _cheap_action(row, previous_row=None):
     falling = _active(row.get("falling_knife"))
     bottoming = _active(row.get("bottoming"))
+    zone = local_zone(row)
+    target = _number((zone or {}).get("upper"))
+    price = _number(row.get("price_local"))
+    previous_price = _number((previous_row or {}).get("price_local"))
+    price_triggered = (
+        target is not None
+        and price is not None
+        and price <= target
+    )
+    triggered_today = (
+        price_triggered
+        and previous_price is not None
+        and previous_price > target
+    )
     if falling or bottoming:
         return {
             "code": "watch_falling",
@@ -228,10 +242,11 @@ def _cheap_action(row):
                 "label": "⚠️ Kurs fällt noch — beobachten, nicht greifen",
                 "tone": "yellow",
             },
-            "target_price": None,
+            "target_price": round(target, 4) if target is not None else None,
+            "price_triggered": price_triggered,
+            "triggered_today": triggered_today,
             "currency": row.get("currency"),
         }
-    zone = local_zone(row)
     if traffic_light(row) == "green":
         return {
             "code": "entry_now",
@@ -239,10 +254,13 @@ def _cheap_action(row):
             "sentence": "Einstieg jetzt möglich.",
             "badge": {"code": "buy_zone", "label": "Kaufzone ✓", "tone": "green"},
             "target_price": None,
+            "price_triggered": True,
+            "triggered_today": triggered_today,
             "currency": row.get("currency"),
         }
-    target = _number((zone or {}).get("upper"))
-    if target is not None:
+    if target is not None and price_triggered:
+        sentence = "Preiszone erreicht; für den Idealfall fehlt die technische Bestätigung."
+    elif target is not None:
         sentence = (
             f"Beobachten, Einstieg bei etwa {_german_number(target)} "
             f"{row.get('currency') or ''}."
@@ -255,11 +273,151 @@ def _cheap_action(row):
         "sentence": sentence,
         "badge": {"code": "watch", "label": "Beobachten", "tone": "yellow"},
         "target_price": round(target, 4) if target is not None else None,
+        "price_triggered": price_triggered,
+        "triggered_today": triggered_today,
         "currency": row.get("currency"),
     }
 
 
-def build_question_views(rows, cheap_limit=5, expensive_limit=12):
+def _situation(row, action):
+    timing = _number(row.get("entry_timing_score")) or 0
+    if timing >= 55 and action["code"] == "entry_now":
+        return {
+            "code": "ideal",
+            "label": "Idealfall: günstig UND am Einstiegspunkt",
+        }
+    if action["code"] == "watch_falling":
+        return {
+            "code": "cheap_falling",
+            "label": (
+                "Günstiges Unternehmen, Kurs fällt noch — "
+                "auf Stabilisierung warten"
+            ),
+        }
+    return {
+        "code": "cheap_wait",
+        "label": (
+            "Günstiges Unternehmen, technisches Einstiegssignal fehlt — "
+            "auf Rücksetzer oder Bestätigung warten"
+        ),
+    }
+
+
+def _deal_quality(row, discount, historical_scores):
+    timing = _number(row.get("entry_timing_score")) or 0
+    groups = (row.get("alternative_signals") or {}).get("contributing_groups") or []
+    signal_score = min(100.0, len(groups) / 4.0 * 100.0)
+    trap = _value_trap_risk(row)
+    risk_score = 100.0 if trap == "low" else 60.0 if trap == "medium" else 20.0
+    score = (
+        0.40 * min(100.0, discount / 50.0 * 100.0)
+        + 0.25 * timing
+        + 0.20 * signal_score
+        + 0.15 * risk_score
+    )
+    stars = max(1, min(5, math.ceil(score / 20.0)))
+    history = (
+        historical_scores
+        if isinstance(historical_scores, dict)
+        else {"scores": historical_scores or []}
+    )
+    reference = [
+        value
+        for value in history.get("scores") or []
+        if _number(value) is not None
+    ]
+    percentile = None
+    comparison = (
+        "Noch keine Vergleichshistorie; Einordnung nach festen Schwellen."
+    )
+    if reference:
+        percentile = sum(value <= score for value in reference) / len(reference) * 100.0
+        comparison = (
+            f"Besser als {percentile:.0f}% der gespeicherten Gelegenheiten."
+            if percentile >= 50
+            else f"Schwächer als {100.0 - percentile:.0f}% der gespeicherten Gelegenheiten."
+        )
+    return {
+        "score": round(score, 1),
+        "stars": stars,
+        "label": f"Deal-Qualität {stars} von 5",
+        "historical_percentile": (
+            round(percentile, 1) if percentile is not None else None
+        ),
+        "comparison": comparison,
+        "comparison_basis": (
+            f"{len(reference)} Gelegenheiten im aktuellen Snapshot; "
+            "die Historie baut sich ab jetzt auf"
+            if reference and (history.get("snapshot_count") or 1) == 1
+            else (
+                f"{len(reference)} Gelegenheiten aus {history.get('snapshot_count')} "
+                f"Snapshots, {history.get('from_date')} bis {history.get('to_date')}"
+                if reference
+                else "feste Schwellen; Historie baut sich ab jetzt auf"
+            )
+        ),
+        "components": {
+            "valuation_discount": round(min(100.0, discount / 50.0 * 100.0), 1),
+            "timing": round(timing, 1),
+            "signals": round(signal_score, 1),
+            "risk": round(risk_score, 1),
+        },
+    }
+
+
+def decision_overlay(row, historical_deal_scores=None):
+    valuation = ((row.get("expert_analysis") or {}).get("valuation") or {})
+    fair = valuation.get("fair_value_range") or {}
+    price = _number(row.get("price_local"))
+    lower = _number(fair.get("lower"))
+    timing = _number(row.get("entry_timing_score")) or 0
+    verdict = valuation.get("verdict")
+    discount = (
+        max(0.0, (lower / price - 1.0) * 100.0)
+        if price is not None and price > 0 and lower is not None
+        else 0.0
+    )
+    action = _cheap_action(row)
+    if verdict == "clearly_undervalued":
+        situation = _situation(row, action)
+    elif verdict in {"expensive", "overpriced"} and timing >= 55:
+        situation = {
+            "code": "momentum_only",
+            "label": "Nur Momentum, fundamental nicht günstig",
+        }
+    elif verdict in {"expensive", "overpriced"}:
+        situation = {
+            "code": "avoid",
+            "label": "Fundamental teuer und technisch kein Einstieg",
+        }
+    elif timing >= 55:
+        situation = {
+            "code": "fair_entry",
+            "label": "Fair bewertet und technisch am Einstiegspunkt",
+        }
+    else:
+        situation = {
+            "code": "wait",
+            "label": "Bewertung akzeptabel, technisches Einstiegssignal fehlt",
+        }
+    return {
+        "situation": situation,
+        "deal_quality": _deal_quality(
+            row,
+            discount,
+            historical_deal_scores,
+        ),
+    }
+
+
+def build_question_views(
+    rows,
+    cheap_limit=None,
+    expensive_limit=None,
+    *,
+    previous_snapshot=None,
+    historical_deal_scores=None,
+):
     if not VALUATION_LISTS_ENABLED:
         return {
             "valuation_status": "under_repair",
@@ -294,6 +452,12 @@ def build_question_views(rows, cheap_limit=5, expensive_limit=12):
     materially_cheap_count = 0
     potential_pass_count = 0
     risk_excluded_count = 0
+    previous_by_symbol = {
+        row.get("symbol"): row
+        for row in (previous_snapshot or {}).get("all", [])
+        if isinstance(row, dict)
+    }
+    fair_midpoint_gaps = []
     for row in rows:
         if row.get("asset_type") != "company_equity":
             continue
@@ -306,6 +470,8 @@ def build_question_views(rows, cheap_limit=5, expensive_limit=12):
         if not gate_passed or not price or not lower or not upper:
             continue
         gate_ready_count += 1
+        fair_midpoint = (lower + upper) / 2.0
+        fair_midpoint_gaps.append((price / fair_midpoint - 1.0) * 100.0)
 
         common = {
             "symbol": row.get("symbol"),
@@ -369,7 +535,16 @@ def build_question_views(rows, cheap_limit=5, expensive_limit=12):
                 )
                 driver = _potential_driver(row, analysis)
                 residual_risk = _material_risk(analysis)
-                action = _cheap_action(row)
+                action = _cheap_action(
+                    row,
+                    previous_by_symbol.get(row.get("symbol")),
+                )
+                situation = _situation(row, action)
+                deal_quality = _deal_quality(
+                    row,
+                    discount,
+                    historical_deal_scores,
+                )
                 trap_risk = _value_trap_risk(row)
                 risk_note = (
                     "Erhöhtes Rückschlagrisiko — kleiner positionieren."
@@ -414,12 +589,19 @@ def build_question_views(rows, cheap_limit=5, expensive_limit=12):
                             for key, value in action.items()
                             if key != "badge"
                         },
+                        "situation": situation,
+                        "deal_quality": deal_quality,
                         "sentences": sentences,
                     }
                 )
         if valuation.get("verdict") == "overpriced" and price > upper:
             premium = (price / upper - 1) * 100
-            if premium >= MIN_DISCOUNT_PCT and common["basis"] == "breit":
+            timing_score = _number(row.get("entry_timing_score")) or 0
+            if (
+                premium >= MIN_DISCOUNT_PCT
+                and common["basis"] == "breit"
+                and timing_score >= 55
+            ):
                 support = _price_support(row)
                 support_clause = f"; getragen durch {support}" if support else ""
                 expensive.append(
@@ -434,6 +616,10 @@ def build_question_views(rows, cheap_limit=5, expensive_limit=12):
                             f"{support_clause}. Wieder fair unter etwa {_german_number(upper)} "
                             f"{row.get('currency') or ''}."
                         ),
+                        "situation": {
+                            "code": "momentum_only",
+                            "label": "Nur Momentum, fundamental nicht günstig",
+                        },
                     }
                 )
     cheap.sort(key=lambda item: (-item["_rank_value"], -item["discount_pct"], item["symbol"]))
@@ -441,6 +627,46 @@ def build_question_views(rows, cheap_limit=5, expensive_limit=12):
     expensive.sort(key=lambda item: (-item["premium_pct"], item["symbol"]))
     for item in cheap:
         item.pop("_rank_value", None)
+    waiting = []
+    for item in cheap:
+        guidance = item.get("entry_guidance") or {}
+        if (item.get("situation") or {}).get("code") == "ideal":
+            continue
+        target = _number(guidance.get("target_price"))
+        price = _number(item.get("price"))
+        distance_pct = (
+            (price / target - 1.0) * 100.0
+            if target is not None and target > 0 and price is not None
+            else None
+        )
+        waiting.append(
+            {
+                "symbol": item["symbol"],
+                "name": item["name"],
+                "currency": item["currency"],
+                "price": item["price"],
+                "trigger_price": target,
+                "distance_pct": (
+                    round(distance_pct, 1)
+                    if distance_pct is not None
+                    else None
+                ),
+                "price_triggered": bool(guidance.get("price_triggered")),
+                "triggered_today": bool(guidance.get("triggered_today")),
+                "course_state": item.get("course_state"),
+                "situation": item.get("situation"),
+                "action": guidance.get("sentence"),
+            }
+        )
+    waiting.sort(
+        key=lambda item: (
+            not item["triggered_today"],
+            abs(item["distance_pct"])
+            if item["distance_pct"] is not None
+            else math.inf,
+            item["symbol"],
+        )
+    )
     sectors = Counter(
         str(
             next(
@@ -462,19 +688,62 @@ def build_question_views(rows, cheap_limit=5, expensive_limit=12):
         if dominant_pct > 50
         else None
     )
+    median_gap = (
+        sorted(fair_midpoint_gaps)[len(fair_midpoint_gaps) // 2]
+        if fair_midpoint_gaps
+        else None
+    )
+    top_deals = sum(
+        (item.get("deal_quality") or {}).get("stars", 0) >= 4
+        and (item.get("situation") or {}).get("code") == "ideal"
+        for item in cheap
+    )
+    if top_deals:
+        market_sentence = f"Mehrere erstklassige Gelegenheiten heute: {top_deals} Idealfälle."
+    elif median_gap is not None and median_gap > 0:
+        market_sentence = (
+            "Der Markt liegt derzeit im Median über den fairen Werten. "
+            "Es gibt aktuell keine erstklassigen Gelegenheiten — "
+            "die besten verfügbaren Kandidaten sind unten aufgeführt."
+        )
+    else:
+        market_sentence = (
+            "Der Markt liegt derzeit im Median nicht über den fairen Werten, "
+            "aber aktuell fehlt ein erstklassiger Idealfall."
+        )
     return {
+        "enabled": True,
         "valuation_status": VALUATION_STATUS,
         "valuation_status_label": VALUATION_STATUS_LABEL,
-        "cheap_with_potential": cheap[:cheap_limit],
+        "cheap_with_potential": (
+            cheap if cheap_limit is None else cheap[:cheap_limit]
+        ),
         "excluded_cheap": excluded_cheap,
-        "expensive_now": expensive[:expensive_limit],
+        "expensive_now": (
+            expensive if expensive_limit is None else expensive[:expensive_limit]
+        ),
+        "waiting_for_entry": waiting,
+        "triggered_today": [
+            item for item in waiting if item["triggered_today"]
+        ],
+        "market_state": {
+            "median_vs_fair_midpoint_pct": (
+                round(median_gap, 1) if median_gap is not None else None
+            ),
+            "top_deal_count": top_deals,
+            "sentence": market_sentence,
+        },
         "selection_counts": {
             "gate_ready": gate_ready_count,
             "materially_cheap": materially_cheap_count,
             "potential_pass": potential_pass_count,
             "risk_excluded": risk_excluded_count,
             "eligible": len(cheap),
-            "visible": min(len(cheap), cheap_limit),
+            "visible": (
+                len(cheap)
+                if cheap_limit is None
+                else min(len(cheap), cheap_limit)
+            ),
         },
         "sector_concentration": {
             "dominant_sector": dominant_sector,

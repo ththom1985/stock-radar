@@ -98,7 +98,8 @@ from .sec_insiders import fetch_insider_signals
 from .universe import load_universe
 from .valuation_history import update_valuation_history
 from .today_view import build_today_view
-from .question_views import build_question_views
+from .question_views import build_question_views, decision_overlay
+from .opportunity_history import update_opportunity_history
 from .wikipedia_attention import fetch_wikipedia_signals
 
 FAILED_MANIFEST = DATA / "failed_symbols.json"
@@ -1183,7 +1184,35 @@ def run(with_news=True, with_fundamentals=True):
         previous_snapshot=previous_snapshot,
         price_histories=fetched.prices,
     )
-    result["question_views"] = build_question_views(rows)
+    preliminary_question_views = build_question_views(
+        rows,
+        previous_snapshot=previous_snapshot,
+    )
+    deal_history = update_opportunity_history(
+        preliminary_question_views,
+        observed_at=now,
+    )
+    result["question_views"] = build_question_views(
+        rows,
+        previous_snapshot=previous_snapshot,
+        historical_deal_scores=deal_history,
+    )
+    result["today"]["market_summary"] = (
+        result["question_views"].get("market_state") or {}
+    ).get("sentence")
+    result["today"]["triggered_today"] = result["question_views"].get(
+        "triggered_today"
+    ) or []
+    rows_by_symbol = {row.get("symbol"): row for row in rows}
+    for candidate in result["today"].get("candidates") or []:
+        row = rows_by_symbol.get(candidate.get("symbol"))
+        if row:
+            candidate.update(
+                decision_overlay(
+                    row,
+                    historical_deal_scores=deal_history,
+                )
+            )
     valuation_anomalies = [
         {
             "symbol": row.get("symbol"),

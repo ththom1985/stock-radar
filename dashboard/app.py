@@ -788,6 +788,11 @@ def _render_today():
     st.header("Heute")
     color = "🟢" if today.get("candidate_count", 0) else "🟡"
     st.subheader(f"{color} {today.get('headline') or 'Keine belastbare Aussage'}")
+    if today.get("market_summary"):
+        st.info(today["market_summary"])
+    triggered = today.get("triggered_today") or []
+    if triggered:
+        st.success(f"Heute ausgelöst: {len(triggered)} Titel")
     st.caption(today.get("summary") or "")
     candidates = today.get("candidates") or []
     if not candidates:
@@ -805,6 +810,14 @@ def _render_today():
                     f"**{candidate.get('symbol')} · "
                     f"{_today_money(candidate.get('price'), candidate.get('currency'))}**"
                 )
+                situation = candidate.get("situation") or {}
+                if situation.get("label"):
+                    st.markdown(f"**{situation['label']}**")
+                quality = candidate.get("deal_quality") or {}
+                if quality.get("label"):
+                    st.caption(
+                        f"{quality['label']} · {quality.get('comparison') or ''}"
+                    )
                 st.markdown(f"**{candidate.get('status_label')}**")
                 st.write(candidate.get("why") or "")
                 zone = candidate.get("zone") or {}
@@ -916,6 +929,9 @@ def _render_question_view(key):
         with st.container(border=True):
             left, right = st.columns([3, 1])
             with left:
+                situation = item.get("situation") or {}
+                if situation.get("label"):
+                    st.markdown(f"**{situation['label']}**")
                 st.subheader(item.get("name") or item.get("symbol"))
                 st.caption(
                     f"{item.get('symbol')} · "
@@ -924,13 +940,21 @@ def _render_question_view(key):
             with right:
                 st.markdown(f"**{badge.get('label') or 'Kein Setup'}**")
                 if key == "cheap_with_potential":
+                    quality = item.get("deal_quality") or {}
                     st.metric(
-                        "Attraktivität",
-                        _number(item.get("attractiveness_score"), 0),
+                        quality.get("label") or "Deal-Qualität",
+                        f"{'★' * int(quality.get('stars') or 0)}"
+                        f"{'☆' * (5 - int(quality.get('stars') or 0))}",
                     )
             if key == "cheap_with_potential":
                 for sentence in item.get("sentences") or []:
                     st.write(sentence)
+                quality = item.get("deal_quality") or {}
+                if quality.get("comparison"):
+                    st.caption(
+                        f"{quality['comparison']} Grundlage: "
+                        f"{quality.get('comparison_basis') or 'noch keine Historie'}."
+                    )
             else:
                 st.write(item.get("sentence") or "")
             st.caption(
@@ -944,9 +968,42 @@ def _render_question_view(key):
     render_excluded()
 
 
+def _render_waiting_for_entry():
+    question_views = data.get("question_views") or {}
+    items = question_views.get("waiting_for_entry") or []
+    st.header("Wartet auf Einstieg")
+    st.caption(
+        "Günstige Qualitätskandidaten, sortiert nach Nähe zur technischen "
+        "Auslösezone. Eine erreichte Preiszone braucht weiterhin Bestätigung."
+    )
+    triggered = [item for item in items if item.get("triggered_today")]
+    if triggered:
+        st.success(f"Heute ausgelöst: {len(triggered)} Titel")
+    for item in items:
+        with st.container(border=True):
+            st.markdown(
+                f"### {item.get('name') or item.get('symbol')}\n"
+                f"**{item.get('symbol')} · "
+                f"{_today_money(item.get('price'), item.get('currency'))}**"
+            )
+            st.write((item.get("situation") or {}).get("label") or "")
+            st.write(item.get("action") or "")
+            if item.get("trigger_price") is not None:
+                st.caption(
+                    f"Auslöser: {_today_money(item.get('trigger_price'), item.get('currency'))} · "
+                    f"Abstand {item.get('distance_pct'):+.1f}%"
+                )
+
+
 primary_view = st.radio(
     "Hauptansicht",
-    ["WO EINSTEIGEN?", "BILLIG MIT POTENZIAL", "TEUER GERADE", "EXPERTEN"],
+    [
+        "WO EINSTEIGEN?",
+        "BILLIG MIT POTENZIAL",
+        "TEUER GERADE",
+        "WARTET AUF EINSTIEG",
+        "EXPERTEN",
+    ],
     horizontal=True,
     label_visibility="collapsed",
 )
@@ -958,6 +1015,9 @@ if primary_view == "BILLIG MIT POTENZIAL":
     st.stop()
 if primary_view == "TEUER GERADE":
     _render_question_view("expensive_now")
+    st.stop()
+if primary_view == "WARTET AUF EINSTIEG":
+    _render_waiting_for_entry()
     st.stop()
 
 st.header("Experten")

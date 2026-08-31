@@ -341,11 +341,6 @@ def entry_score(row):
     lt = row.get("longterm_score")
     if _has(lt):
         parts.append((lt, 0.12))
-    # 5) Cheap helps for the longer hold
-    vs = row.get("value_score")
-    if _fundamentals_complete(row) and _has(vs):
-        parts.append((vs, 0.08))
-
     if not parts:
         return None
     score = sum(v * w for v, w in parts) / sum(w for _, w in parts)
@@ -410,7 +405,7 @@ def entry_reason(row):
             return "Abwärtstrend, aber stark überverkauft und dreht – nur spekulativer Rebound"
         return "Abwärtstrend – Rücksetzer tragen erhöhtes Fallende-Messer-Risiko"
     if _has(rsi) and rsi >= 72:
-        return "heißgelaufen (überkauft) – besser einen Rücksetzer abwarten"
+        return "Kurs jüngst stark gelaufen (technisch überkauft) – Rücksetzer abwarten"
     if ext is not None and ext > 15:
         return "weit über dem Durchschnitt (gestreckt) – nicht hinterherlaufen"
     if dd == "NEGATIVE":
@@ -435,7 +430,7 @@ def entry_label(score):
         return "gemischt", "soon"
     if score >= 32:
         return "Bestätigung abwarten", "soon"
-    return "ungünstig (teuer/heiß)", "down"
+    return "technisch noch kein Einstieg", "down"
 
 
 _CYCLICAL_KEYS = ("semiconductor", "memory", "material", "metal", "mining", "steel",

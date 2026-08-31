@@ -15,6 +15,7 @@ def row(symbol="AAA", *, verdict="clearly_undervalued", price=50, lower=100, upp
         "price_local": price,
         "growth_score": 80,
         "quality_score": 85,
+        "entry_timing_score": 80,
         "sweet_spot": {"combined_status": "approaching"},
         "expert_analysis": {
             "signal": "wait_for_pullback",
@@ -133,6 +134,12 @@ class QuestionViewsTests(unittest.TestCase):
         self.assertEqual(result["cheap_with_potential"][0]["symbol"], "FIRST")
         self.assertGreaterEqual(result["cheap_with_potential"][0]["attractiveness_score"], 0)
 
+    def test_all_eligible_rows_are_returned_without_hard_limit(self):
+        rows = [row(f"C{index}", price=50 + index) for index in range(10)]
+        result = build_question_views(rows)
+        self.assertEqual(len(result["cheap_with_potential"]), 10)
+        self.assertEqual(result["selection_counts"]["visible"], 10)
+
     def test_expensive_is_sorted_by_premium_without_warning_score(self):
         high = row("HIGH", verdict="overpriced", price=220, lower=80, upper=100)
         low = row("LOW", verdict="overpriced", price=150, lower=80, upper=100)
@@ -140,6 +147,25 @@ class QuestionViewsTests(unittest.TestCase):
         self.assertEqual([item["symbol"] for item in result["expensive_now"]], ["HIGH", "LOW"])
         self.assertNotIn("score", result["expensive_now"][0])
         self.assertEqual(result["expensive_now"][0]["badge"]["label"], "Kein Setup")
+
+    def test_expensive_requires_constructive_technical_timing(self):
+        cold = row("COLD", verdict="overpriced", price=220, lower=80, upper=100)
+        cold["entry_timing_score"] = 20
+        self.assertEqual(build_question_views([cold])["expensive_now"], [])
+
+    def test_deal_quality_explains_available_comparison_basis(self):
+        result = build_question_views(
+            [row()],
+            historical_deal_scores={
+                "scores": [20, 40, 60],
+                "snapshot_count": 2,
+                "from_date": "2026-08-30",
+                "to_date": "2026-08-31",
+            },
+        )
+        quality = result["cheap_with_potential"][0]["deal_quality"]
+        self.assertIn("Deal-Qualität", quality["label"])
+        self.assertIn("2 Snapshots", quality["comparison_basis"])
 
     def test_non_us_origin_does_not_reduce_quality_label(self):
         eu = row()
