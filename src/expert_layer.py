@@ -258,7 +258,12 @@ def _sector_model_reason(row):
 
 def _apply_minimum_fair_band(row, lower, upper):
     midpoint = (lower + upper) / 2.0
-    atr_pct = _number(row.get("atr_pct"))
+    atr_value = _number(row.get("atr"))
+    atr_pct_of_fair_midpoint = (
+        atr_value / midpoint * 100.0
+        if atr_value is not None and atr_value > 0 and midpoint > 0
+        else None
+    )
     annual_volatility_pct = _number(row.get("vol_annual_pct"))
     daily_volatility_pct = (
         annual_volatility_pct / math.sqrt(TRADING_DAYS_PER_YEAR)
@@ -267,7 +272,7 @@ def _apply_minimum_fair_band(row, lower, upper):
     )
     anchors = [
         value
-        for value in (atr_pct, daily_volatility_pct)
+        for value in (atr_pct_of_fair_midpoint, daily_volatility_pct)
         if value is not None and value > 0
     ]
     original_half_width_pct = (
@@ -289,9 +294,15 @@ def _apply_minimum_fair_band(row, lower, upper):
         "status": "expanded" if expanded else "already_wide_enough",
         "rule": (
             "Mindestens plus/minus eine typische Tagesbewegung um den Mittelpunkt; "
-            "Halbbreite = max(ATR%, annualisierte Volatilität/sqrt(252))."
+            "Halbbreite = max(absoluter ATR, fairer Mittelpunkt mal "
+            "annualisierte Volatilität/sqrt(252))."
         ),
-        "atr_pct": round(atr_pct, 4) if atr_pct is not None else None,
+        "atr_value": round(atr_value, 4) if atr_value is not None else None,
+        "atr_pct_of_fair_midpoint": (
+            round(atr_pct_of_fair_midpoint, 4)
+            if atr_pct_of_fair_midpoint is not None
+            else None
+        ),
         "daily_volatility_pct": (
             round(daily_volatility_pct, 4)
             if daily_volatility_pct is not None
@@ -546,6 +557,92 @@ def _financial_valuation_assessment(row, history, peer):
     }
 
 
+def _standard_fundamental_inputs(row):
+    sec_latest = (row.get("sec_companyfacts") or {}).get("latest") or {}
+    shares = _number(sec_latest.get("diluted_shares")) or _number(
+        row.get("shares_outstanding")
+    )
+    eps = _number(sec_latest.get("diluted_eps")) or _number(row.get("eps"))
+    revenue = _number(sec_latest.get("revenue")) or _number(row.get("revenue"))
+    free_cash_flow = _number(sec_latest.get("free_cash_flow")) or _number(
+        row.get("free_cashflow")
+    )
+    ebitda = _number(row.get("ebitda"))
+    total_debt = _number(row.get("total_debt"))
+    total_cash = _number(row.get("total_cash"))
+    return {
+        "shares": shares,
+        "eps": eps if eps is not None and eps > 0 else None,
+        "revenue_per_share": (
+            revenue / shares
+            if revenue is not None and revenue > 0 and shares is not None and shares > 0
+            else None
+        ),
+        "fcf_per_share": (
+            free_cash_flow / shares
+            if free_cash_flow is not None
+            and free_cash_flow > 0
+            and shares is not None
+            and shares > 0
+            else None
+        ),
+        "ebitda": ebitda if ebitda is not None and ebitda > 0 else None,
+        "net_debt": (
+            total_debt - total_cash
+            if total_debt is not None and total_cash is not None
+            else None
+        ),
+        "sources": {
+            "shares": (
+                "SEC diluted weighted shares"
+                if _number(sec_latest.get("diluted_shares")) is not None
+                else "Yahoo Finance shares outstanding"
+            ),
+            "eps": (
+                "SEC diluted EPS"
+                if _number(sec_latest.get("diluted_eps")) is not None
+                else "Yahoo Finance trailing EPS"
+            ),
+            "revenue": (
+                "SEC annual revenue"
+                if _number(sec_latest.get("revenue")) is not None
+                else "Yahoo Finance total revenue"
+            ),
+            "free_cash_flow": (
+                "SEC annual operating cash flow less capex"
+                if _number(sec_latest.get("free_cash_flow")) is not None
+                else "Yahoo Finance free cash flow"
+            ),
+            "ebitda": "Yahoo Finance EBITDA",
+            "net_debt": "Yahoo Finance total debt less total cash",
+        },
+    }
+
+
+def _direct_implied_price(metric, reference, inputs):
+    if metric == "pe" and inputs.get("eps") is not None:
+        return reference * inputs["eps"], "EPS je Aktie"
+    if metric == "price_to_sales" and inputs.get("revenue_per_share") is not None:
+        return reference * inputs["revenue_per_share"], "Umsatz je Aktie"
+    if metric == "price_to_fcf" and inputs.get("fcf_per_share") is not None:
+        return reference * inputs["fcf_per_share"], "Free Cashflow je Aktie"
+    if (
+        metric == "ev_ebitda"
+        and inputs.get("ebitda") is not None
+        and inputs.get("net_debt") is not None
+        and inputs.get("shares") is not None
+        and inputs["shares"] > 0
+    ):
+        enterprise_value = reference * inputs["ebitda"]
+        equity_value = enterprise_value - inputs["net_debt"]
+        if equity_value > 0:
+            return (
+                equity_value / inputs["shares"],
+                "EBITDA, Nettoverschuldung und Aktienzahl",
+            )
+    return None, None
+
+
 def build_valuation_assessment(
     row,
     sector_medians=None,
@@ -564,8 +661,9 @@ def build_valuation_assessment(
     five_year = five_year or {"metrics": {}, "months_available": 0, "complete": False}
     peers = sector_medians.get(row.get("sector")) or {}
     metrics = {}
-    implied_prices = []
+    implied_price_components = []
     current_price = _number(row.get("price_local"))
+    fundamental_inputs = _standard_fundamental_inputs(row)
     for metric in VALUATION_METRICS:
         current = _number(row.get(metric))
         sector = _number(peers.get(metric))
@@ -578,31 +676,49 @@ def build_valuation_assessment(
             "sector_median": round(sector, 4) if sector is not None else None,
             "sector_peer_count": (peers.get("peer_counts") or {}).get(metric, 0),
         }
-        reference_values = [
-            value for value in (own_average, sector) if value is not None and value > 0
-        ]
-        if current_price and current and current > 0 and reference_values:
-            implied_prices.extend(
-                current_price * reference / current for reference in reference_values
+        for reference_type, reference in (
+            ("issuer_history", own_average),
+            ("sector_peers", sector),
+        ):
+            if reference is None or reference <= 0:
+                continue
+            implied_price, input_label = _direct_implied_price(
+                metric,
+                reference,
+                fundamental_inputs,
             )
+            if implied_price is not None and math.isfinite(implied_price) and implied_price > 0:
+                implied_price_components.append(
+                    {
+                        "metric": metric,
+                        "reference_type": reference_type,
+                        "reference_multiple": round(reference, 4),
+                        "fundamental_input": input_label,
+                        "implied_price": round(implied_price, 6),
+                    }
+                )
     implied_prices = sorted(
-        value for value in implied_prices if math.isfinite(value) and value > 0
+        component["implied_price"] for component in implied_price_components
     )
     fair_range = None
     raw_fair_range = None
     minimum_band = None
     verdict = "unavailable"
-    own_metrics = [
-        metric
-        for metric, values in metrics.items()
-        if values.get("own_5y_average") is not None
-    ]
-    peer_metrics = [
-        metric
-        for metric, values in metrics.items()
-        if values.get("sector_median") is not None
-        and (values.get("sector_peer_count") or 0) >= 5
-    ]
+    own_metrics = sorted(
+        {
+            component["metric"]
+            for component in implied_price_components
+            if component["reference_type"] == "issuer_history"
+        }
+    )
+    peer_metrics = sorted(
+        {
+            component["metric"]
+            for component in implied_price_components
+            if component["reference_type"] == "sector_peers"
+            and (metrics[component["metric"]].get("sector_peer_count") or 0) >= 5
+        }
+    )
     reference_families = []
     if five_year.get("complete") and len(own_metrics) >= 2:
         reference_families.append(
@@ -644,14 +760,29 @@ def build_valuation_assessment(
             "Kennzahlen derselben Familie zählen nicht mehrfach."
         ),
     }
+    sector_model_supported = not _requires_special_sector_model(row)
     plausibility_gate = {
-        "status": "pass",
+        "status": (
+            "withheld_narrow_basis"
+            if sector_model_supported
+            else "withheld_sector_model"
+        ),
         "max_deviation_pct": MAX_FAIR_VALUE_DEVIATION_PCT,
         "max_width_factor": MAX_FAIR_VALUE_WIDTH_FACTOR,
         "observed_deviation_pct": None,
         "observed_width_factor": None,
-        "checks": {},
-        "reason": None,
+        "checks": {
+            "sector_model_supported": sector_model_supported,
+            "basis_broad": basis_quality["status"] == "broad",
+            "width_within_limit": False,
+            "deviation_within_limit": False,
+        },
+        "reason": (
+            "Für die direkte Bewertung fehlen mindestens zwei belastbare "
+            "Fundamental-Referenzen."
+            if sector_model_supported
+            else _sector_model_reason(row)
+        ),
     }
     if len(implied_prices) >= 2 and current_price:
         low_index = max(0, round((len(implied_prices) - 1) * 0.25))
@@ -671,11 +802,12 @@ def build_valuation_assessment(
             "upper": round(upper, 4),
             "currency": row.get("currency"),
             "method": (
-                "interquartile implied-price range from available sector medians "
-                "and multi-year issuer valuation history"
+                "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; "
+                "der aktuelle Kurs wird nur anschließend verglichen"
             ),
             "input_count": len(reference_families),
             "implied_price_count": len(implied_prices),
+            "components": implied_price_components,
         }
         raw_fair_range = dict(fair_range)
         if current_price < lower * 0.85:
@@ -694,15 +826,21 @@ def build_valuation_assessment(
             else 0.0
         )
         width_factor = upper / lower
-        plausibility_gate["observed_deviation_pct"] = round(deviation_pct, 2)
-        plausibility_gate["observed_width_factor"] = round(width_factor, 4)
         checks = {
             "sector_model_supported": not _requires_special_sector_model(row),
             "basis_broad": basis_quality["status"] == "broad",
             "width_within_limit": width_factor <= MAX_FAIR_VALUE_WIDTH_FACTOR,
             "deviation_within_limit": deviation_pct <= MAX_FAIR_VALUE_DEVIATION_PCT,
         }
-        plausibility_gate["checks"] = checks
+        plausibility_gate.update(
+            {
+                "status": "pass",
+                "observed_deviation_pct": round(deviation_pct, 2),
+                "observed_width_factor": round(width_factor, 4),
+                "checks": checks,
+                "reason": None,
+            }
+        )
         failures = [key for key, passed in checks.items() if not passed]
         if failures:
             status = (
@@ -739,6 +877,8 @@ def build_valuation_assessment(
             )
             fair_range = None
             verdict = "data_review_required"
+    else:
+        verdict = "data_review_required"
     return {
         "model_status": EXPERT_MODEL_STATUS,
         "valuation_status": (
@@ -767,17 +907,15 @@ def build_valuation_assessment(
         "minimum_band": minimum_band,
         "basis_quality": basis_quality,
         "metrics": metrics,
+        "fundamental_inputs": fundamental_inputs,
         "own_history_months": five_year.get("months_available", 0),
         "own_history_annual_points": five_year.get("annual_points_available", 0),
         "own_history_type": five_year.get("history_type", "insufficient"),
         "own_5y_complete": bool(five_year.get("complete")),
         "missing_note": (
-            None
-            if five_year.get("complete")
-            else (
-                "Keine belastbare eigene Mehrjahresbewertung aus mindestens vier "
-                "Jahresperioden und zwei Kennzahlen."
-            )
+            plausibility_gate.get("reason")
+            if plausibility_gate["status"] != "pass"
+            else None
         ),
     }
 

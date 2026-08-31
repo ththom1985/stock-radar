@@ -407,7 +407,7 @@ The public GitHub Pages dashboard is available without a Streamlit account:
 payload from the validated output-v3 snapshot. Both analysis workflows regenerate and publish this
 payload after a successful run, so the Pages dashboard stays synchronized with
 `data/output/latest.json`.
-The exporter keeps all rendered identity, metric, scenario, news (up to three),
+The exporter keeps all rendered identity, metric, scenario, news (up to two),
 jurisdiction, valuation-thesis, entry-thesis, and Sweet-Spot reason content. Repeated per-row
 provenance/actionability fields and non-rendered compatibility/context duplicates
 are represented once by the top-level `instrument_contract` and
@@ -652,9 +652,16 @@ investment advice.
 - REITs remain withheld because neither SEC Companyfacts nor yfinance provides
   consistent multi-year FFO/AFFO or direct NAV. Other unassigned financial
   structures also remain fail-closed.
+- Ordinary-company implied prices use direct fundamental equations: reference
+  P/E times EPS per share, reference P/S times revenue per share, reference
+  P/FCF times free cash flow per share, and
+  `(reference EV/EBITDA * EBITDA - net debt) / shares`. Forward P/E and PEG do
+  not produce fair prices without a direct matching per-share fundamental.
+  Current price is only compared with the resulting range.
 - Every fair-value range is widened when necessary to at least plus/minus one
   typical daily move around its midpoint. The half-width is
-  `max(ATR%, annualized volatility / sqrt(252))`; ranges are never narrowed.
+  `max(absolute ATR, fair midpoint * annualized volatility / sqrt(252))`;
+  ranges are never narrowed and the current price is not an input.
   The same maximum width-factor 1.5 and deviation 50% plausibility gates then
   apply. If two qualified reference families do not exist, no decision-facing
   range or verdict is produced.

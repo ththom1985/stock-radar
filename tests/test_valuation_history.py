@@ -5,6 +5,7 @@ import pandas as pd
 
 from src.expert_layer import (
     _apply_minimum_fair_band,
+    _direct_implied_price,
     build_valuation_assessment,
     sector_valuation_medians,
 )
@@ -14,7 +15,7 @@ from src.valuation_history import _sec_annual_backfill, five_year_averages
 class ValuationHistoryTests(unittest.TestCase):
     def test_minimum_fair_band_uses_typical_daily_move(self):
         lower, upper, audit = _apply_minimum_fair_band(
-            {"atr_pct": 3, "vol_annual_pct": 20},
+            {"atr": 3, "vol_annual_pct": 20},
             99,
             101,
         )
@@ -24,7 +25,7 @@ class ValuationHistoryTests(unittest.TestCase):
 
     def test_minimum_fair_band_never_shrinks_existing_range(self):
         lower, upper, audit = _apply_minimum_fair_band(
-            {"atr_pct": 2, "vol_annual_pct": 20},
+            {"atr": 2, "vol_annual_pct": 20},
             90,
             110,
         )
@@ -81,6 +82,13 @@ class ValuationHistoryTests(unittest.TestCase):
             "price_local": 100,
             "pe": 20,
             "price_to_sales": 4,
+            "sec_companyfacts": {
+                "latest": {
+                    "diluted_eps": 5,
+                    "diluted_shares": 100,
+                    "revenue": 3000,
+                }
+            },
         }
         peers = {
             "Tech": {
@@ -109,6 +117,13 @@ class ValuationHistoryTests(unittest.TestCase):
             "price_local": 100,
             "pe": 20,
             "price_to_sales": 4,
+            "sec_companyfacts": {
+                "latest": {
+                    "diluted_eps": 5,
+                    "diluted_shares": 100,
+                    "revenue": 4000,
+                }
+            },
         }
         peers = {
             "Tech": {
@@ -134,6 +149,13 @@ class ValuationHistoryTests(unittest.TestCase):
             "pe": 7.7,
             "ev_ebitda": 5.5,
             "price_to_sales": 0.35,
+            "sec_companyfacts": {
+                "latest": {
+                    "diluted_eps": 20,
+                    "diluted_shares": 100,
+                    "revenue": 50000,
+                }
+            },
         }
         peers = {
             "Industrials": {
@@ -204,6 +226,13 @@ class ValuationHistoryTests(unittest.TestCase):
                 "price_local": 100,
                 "pe": 20,
                 "price_to_sales": 4,
+                "sec_companyfacts": {
+                    "latest": {
+                        "diluted_eps": 5,
+                        "diluted_shares": 100,
+                        "revenue": 3000,
+                    }
+                },
             },
             {
                 "Real Estate": {
@@ -223,6 +252,95 @@ class ValuationHistoryTests(unittest.TestCase):
             "withheld_sector_model",
         )
         self.assertIn("FFO-/AFFO", result["plausibility_gate"]["reason"])
+
+    def test_standard_fair_value_does_not_change_with_current_price(self):
+        row = {
+            "symbol": "DIRECT",
+            "sector": "Tech",
+            "currency": "USD",
+            "price_local": 100,
+            "sec_companyfacts": {
+                "latest": {
+                    "diluted_eps": 5,
+                    "diluted_shares": 100,
+                    "revenue": 3000,
+                    "free_cash_flow": 500,
+                }
+            },
+        }
+        peers = {
+            "Tech": {
+                "pe": 20,
+                "price_to_sales": 4,
+                "price_to_fcf": 20,
+                "peer_counts": {
+                    "pe": 10,
+                    "price_to_sales": 10,
+                    "price_to_fcf": 10,
+                },
+            }
+        }
+        own = {
+            "metrics": {
+                "pe": 18,
+                "price_to_sales": 3.5,
+                "price_to_fcf": 18,
+            },
+            "complete": True,
+            "annual_points_available": 5,
+        }
+        first = build_valuation_assessment(row, peers, own)
+        second = build_valuation_assessment(
+            {**row, "price_local": 150},
+            peers,
+            own,
+        )
+        self.assertEqual(
+            first["fair_value_range"],
+            second["fair_value_range"],
+        )
+
+    def test_ev_ebitda_converts_enterprise_to_equity_value(self):
+        price, label = _direct_implied_price(
+            "ev_ebitda",
+            10,
+            {
+                "ebitda": 1_000,
+                "net_debt": 200,
+                "shares": 100,
+            },
+        )
+        self.assertEqual(price, 98)
+        self.assertIn("Nettoverschuldung", label)
+
+    def test_financial_fair_value_does_not_use_current_price(self):
+        row = {
+            "symbol": "BANK",
+            "industry": "Banks - Diversified",
+            "currency": "USD",
+            "price_local": 100,
+            "bvps": 50,
+            "pb": 2,
+            "roe_pct": 10,
+        }
+        history = {
+            "complete": True,
+            "annual_points_available": 4,
+            "annual_points": [{"period_end": "2025-12-31"}] * 4,
+            "pb_to_roe_median": 20,
+        }
+        peer = {"pb_to_roe_median": 15, "peer_count": 32}
+        first = build_valuation_assessment(
+            row,
+            financial_history=history,
+            financial_peer=peer,
+        )
+        second = build_valuation_assessment(
+            {**row, "price_local": 150},
+            financial_history=history,
+            financial_peer=peer,
+        )
+        self.assertEqual(first["fair_value_range"], second["fair_value_range"])
 
 
 if __name__ == "__main__":

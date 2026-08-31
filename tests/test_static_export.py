@@ -191,7 +191,7 @@ class StaticExportTests(ProjectTempMixin, unittest.TestCase):
             )
             self.assertEqual(
                 len(compact_row["news"]),
-                min(3, len(source_row["news"])),
+                min(2, len(source_row["news"])),
             )
         generated = json.dumps(
             [

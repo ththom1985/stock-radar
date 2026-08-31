@@ -22,6 +22,7 @@ from .persistence import (
 FUND_CACHE = DATA / "fundamentals.json"
 FUND_MAX_AGE_DAYS = 7
 FETCH_PAUSE = 0.3
+PARSER_VERSION = 2
 
 # yfinance .info key -> our short name
 _FIELDS = {
@@ -45,6 +46,9 @@ _FIELDS = {
     "enterpriseValue": "enterprise_value",
     "ebitda": "ebitda",
     "freeCashflow": "free_cashflow",
+    "sharesOutstanding": "shares_outstanding",
+    "totalDebt": "total_debt",
+    "totalCash": "total_cash",
     "sector": "sector",
     "industry": "industry",
     # Analyst consensus
@@ -92,7 +96,7 @@ def fetch_fundamentals(symbols, max_age_days=FUND_MAX_AGE_DAYS, force=False, ver
     stale = []
     for s in symbols:
         entry = cache.get(s)
-        if force or not entry:
+        if force or not entry or entry.get("parser_version") != PARSER_VERSION:
             stale.append(s)
             continue
         try:
@@ -114,6 +118,7 @@ def fetch_fundamentals(symbols, max_age_days=FUND_MAX_AGE_DAYS, force=False, ver
                 raise ValueError("provider returned no usable fundamental fields")
             data["fetched_at"] = utc_now()
             data["last_success_at"] = data["fetched_at"]
+            data["parser_version"] = PARSER_VERSION
             cache[sym] = clear_cache_failure(data)
         except Exception as exc:  # noqa: BLE001
             cache[sym] = cache_failure(cache.get(sym), exc)

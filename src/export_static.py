@@ -271,7 +271,7 @@ def _compact_row(row: dict[str, Any]) -> dict[str, Any]:
             1 if (expert.get("coverage_basis") or {}).get("status") == "narrower_non_us" else 0,
             sector_model_codes.get(valuation.get("sector_model"), 0),
         ]
-    compact["news"] = (compact.get("news") or [])[:3]
+    compact["news"] = (compact.get("news") or [])[:2]
     compact["scenario_long"] = [
         {
             key: scenario.get(key)

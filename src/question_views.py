@@ -10,7 +10,7 @@ MIN_DISCOUNT_PCT = 15.0
 MIN_VALUE_POTENTIAL_SCORE = 65.0
 VALUATION_STATUS = "evidence_qualified_unbacktested"
 VALUATION_STATUS_LABEL = "Bewertung belastbar; Modell noch nicht rückgeprüft"
-VALUATION_LISTS_ENABLED = False
+VALUATION_LISTS_ENABLED = True
 VALUATION_REPAIR_MESSAGE = (
     "Bewertungsmodell wird überarbeitet — Aussagen derzeit nicht belastbar."
 )

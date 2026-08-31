@@ -45,17 +45,12 @@ class QuestionViewsTests(unittest.TestCase):
         self.enabled.stop()
 
     def test_lists_are_disabled_by_default_during_repair(self):
-        self.enabled.stop()
-        result = build_question_views([row()])
+        with patch("src.question_views.VALUATION_LISTS_ENABLED", False):
+            result = build_question_views([row()])
         self.assertFalse(result["enabled"])
         self.assertEqual(result["cheap_with_potential"], [])
         self.assertEqual(result["expensive_now"], [])
         self.assertIn("überarbeitet", result["empty_state"])
-        self.enabled = patch(
-            "src.question_views.VALUATION_LISTS_ENABLED",
-            True,
-        )
-        self.enabled.start()
 
     def test_cheap_requires_gate_and_keeps_falling_knives_as_watch_items(self):
         valid = row()

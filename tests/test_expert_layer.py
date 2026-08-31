@@ -66,6 +66,7 @@ class ExpertLayerTests(unittest.TestCase):
                 "tech_momentum": 90,
                 "tech_trend": 90,
                 "tech_volume": 90,
+                "catalyst_context": {"score": 90},
             },
             {"symbol": "EMPTY", "name": "Empty", "currency": "USD"},
         ]
