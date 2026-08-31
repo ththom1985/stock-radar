@@ -23,8 +23,15 @@ class StaticExportTests(ProjectTempMixin, unittest.TestCase):
         payload = export_static(DEFAULT_INPUT, output)
         raw = output.read_bytes()
         loaded = json.loads(raw.decode("utf-8"))
+        details = {}
+        for detail_file in sorted((self.work / "details").glob("*.json")):
+            details.update(json.loads(detail_file.read_text(encoding="utf-8")))
+        hydrated_rows = [
+            {**row, **details.get(row["symbol"], {})}
+            for row in loaded["instruments"]
+        ]
         expected = json.dumps(
-            payload,
+            loaded,
             ensure_ascii=False,
             separators=(",", ":"),
             allow_nan=False,
@@ -40,7 +47,8 @@ class StaticExportTests(ProjectTempMixin, unittest.TestCase):
         self.assertIn("in_sweet_spot", loaded["insight_rankings"]["categories"])
         self.assertIn("approaching_sweet_spot", loaded["insight_rankings"]["categories"])
         self.assertIn("entry_timing_score", loaded["instruments"][0])
-        self.assertIn("downside_structure", loaded["instruments"][0])
+        self.assertIn("detail_chunk", loaded["instruments"][0])
+        self.assertNotIn("downside_structure", loaded["instruments"][0])
         self.assertIn("pf", loaded["instruments"][0])
         self.assertEqual(
             loaded["probability_contract"]["ranking_separation"],
@@ -88,10 +96,10 @@ class StaticExportTests(ProjectTempMixin, unittest.TestCase):
             "entry_thesis",
             "sweet_spot",
         ):
-            self.assertIn(field, loaded["instruments"][0])
+            self.assertIn(field, hydrated_rows[0])
         self.assertNotIn("trade_plan_long", loaded["instruments"][0])
         self.assertNotIn("identity_source", loaded["instruments"][0])
-        self.assertNotIn("model_status", loaded["instruments"][0]["entry_thesis"])
+        self.assertNotIn("model_status", hydrated_rows[0]["entry_thesis"])
         self.assertEqual(
             loaded["instrument_contract"]["group_provenance"],
             "insight_metadata.provenance_catalog",
@@ -111,7 +119,7 @@ class StaticExportTests(ProjectTempMixin, unittest.TestCase):
 
         source = json.loads(DEFAULT_INPUT.read_text(encoding="utf-8"))
         source_by_symbol = {row["symbol"]: row for row in source["all"]}
-        compact_by_symbol = {row["symbol"]: row for row in loaded["instruments"]}
+        compact_by_symbol = {row["symbol"]: row for row in hydrated_rows}
         for symbol in ("PDD", "AAPL", "SHEL.L"):
             source_row = source_by_symbol[symbol]
             compact_row = compact_by_symbol[symbol]

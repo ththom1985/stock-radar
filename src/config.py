@@ -24,6 +24,8 @@ PRICES = DATA / "prices"
 OUTPUT = DATA / "output"
 HISTORY = OUTPUT / "history"
 TICKERS_CSV = DATA / "tickers.csv"
+SP1500_CSV = DATA / "sp1500_universe.csv"
+SP1500_STAGE = int(os.environ.get("STOCK_RADAR_SP1500_STAGE", "1"))
 
 for _d in (DATA, PRICES, OUTPUT, HISTORY):
     _d.mkdir(parents=True, exist_ok=True)

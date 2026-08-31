@@ -1251,7 +1251,8 @@ def run(with_news=True, with_fundamentals=True):
             "failed_symbols": failed_symbols,
         },
     )
-    atomic_write_json(OUTPUT / "latest.json", result)
+    # Preserve the full expanded contract below GitHub's single-file limit.
+    atomic_write_json(OUTPUT / "latest.json", result, indent=None)
     atomic_write_json(
         VALUATION_ANOMALIES,
         {

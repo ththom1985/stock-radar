@@ -547,12 +547,10 @@
       if (insights.model_status !== "heuristic_unvalidated" || insights.actionable !== false || insights.enabled !== true) failures.push("Insight-Gate ist nicht freigegeben.");
       if (hasActionableTrue(insights)) failures.push("Verschachteltes actionable=true erkannt.");
       if (instrumentContract.model_status !== "heuristic_unvalidated" || instrumentContract.actionable !== false) failures.push("Kompakter Instrumentvertrag ist nicht sicher.");
-      const identityFields = ["display_name_full", "short_name", "headquarters_country", "legal_domicile", "listing_country", "listing_market", "economic_exposure_country", "sector_display", "industry_display", "jurisdiction_risk", "valuation_context", "valuation_thesis", "entry_thesis", "sweet_spot", "probability_forecast", "analyst_context"];
+      const identityFields = ["display_name_full", "short_name", "headquarters_country", "legal_domicile", "listing_country", "listing_market", "economic_exposure_country", "sector_display", "industry_display", "sweet_spot", "probability_forecast", "detail_chunk"];
       for (const row of data?.instruments || []) {
         if (!identityFields.every((field) => Object.prototype.hasOwnProperty.call(row, field))) failures.push(`Identitäts-/Thesenfelder fehlen bei ${row.symbol || "unbekannt"}.`);
-        for (const group of [row.jurisdiction_risk, row.valuation_thesis, row.entry_thesis]) {
-          if (!group || typeof group !== "object") failures.push(`Kompakter Kontext fehlt bei ${row.symbol || "unbekannt"}.`);
-        }
+        if (typeof row.detail_chunk !== "string" || !row.detail_chunk.startsWith("details/")) failures.push(`Detailverweis fehlt bei ${row.symbol || "unbekannt"}.`);
         const probability = row.probability_forecast || {};
         if (!["withheld", "partial", "accepted"].includes(probability.status) || probability.actionable !== false) failures.push(`Probability-Vertrag ist ungültig bei ${row.symbol || "unbekannt"}.`);
         if (probability.status === "withheld" && (probability.forecasts || []).length) failures.push(`Withheld Probability enthält Modellwerte bei ${row.symbol || "unbekannt"}.`);
@@ -760,7 +758,10 @@
           const distance = Number.isFinite(value.distance_pct) ? ` · Abstand ${percent(value.distance_pct)}` : "";
           return `<button class="today-card" data-symbol="${escapeHtml(item.symbol)}"><div class="today-card-head"><div><strong>${escapeHtml(value.name || item.symbol)}</strong><div class="symbol">${escapeHtml(item.symbol)}</div></div><strong>${$number(value.price)} ${escapeHtml(value.currency || "")}</strong></div><div class="question-copy"><strong>${escapeHtml(value.situation?.label || "")}</strong></div><div class="question-copy">${escapeHtml(value.action || "")}</div><small class="row-meta">Auslöser: ${trigger}${distance}</small></button>`;
         }).join("")}`;
-        $("rows").querySelectorAll(".today-card").forEach((button) => button.addEventListener("click", () => renderDetail(state.bySymbol.get(button.dataset.symbol))));
+        $("rows").querySelectorAll(".today-card").forEach((button) => button.addEventListener("click", () => {
+          state.selected = button.dataset.symbol;
+          renderDetail(state.bySymbol.get(button.dataset.symbol));
+        }));
         return;
       }
       $("rows").innerHTML = items.map((item, index) => {
@@ -838,9 +839,18 @@
       </div>`;
     }
 
-    function renderDetail(row) {
+    async function renderDetail(row) {
       if (!row) { $("detail").innerHTML = `<div class="muted">Keine Instrumente erfüllen diese Auswahl.</div>`; return; }
       if (state.selected && state.selected !== row.symbol) return;
+      if (row.detail_chunk && !row.detail_loaded) {
+        $("detail").innerHTML = `<div class="muted">Detaildaten werden geladen …</div>`;
+        const response = await fetch(row.detail_chunk, { cache: "no-store" });
+        if (!response.ok) throw new Error(`Detaildaten konnten nicht geladen werden: ${response.status}`);
+        const chunk = await response.json();
+        if (state.selected && state.selected !== row.symbol) return;
+        Object.assign(row, chunk[row.symbol] || {}, { detail_loaded: true });
+        return renderDetail(row);
+      }
       $("detail").dataset.symbol = row.symbol;
       const analyst = row.analyst_context || {};
       const downside = row.downside_structure || {};

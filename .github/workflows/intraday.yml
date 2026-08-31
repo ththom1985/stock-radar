@@ -56,7 +56,7 @@ jobs:
           git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           # Stage every already-versioned runtime artifact. New untracked files
           # still require an explicit allow-list entry and fail visibly below.
-          git add -u -- data docs/data.json
+          git add -u -- data docs
           git add \
             data/output/latest.json \
             data/failed_symbols.json \
@@ -70,7 +70,8 @@ jobs:
             data/probability_models.json \
             data/probability_validation.json \
             data/probability_forward_status.json \
-            docs/data.json
+            docs/data.json \
+            docs/details
           for optional in \
             data/sec_ticker_map.json \
             data/sec_companyfacts.json \

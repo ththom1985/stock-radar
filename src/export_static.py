@@ -35,6 +35,23 @@ DEFAULT_OUTPUT = ROOT / "docs" / "data.json"
 STATIC_SCHEMA_VERSION = 3
 MAX_STATIC_BYTES = 10 * 1024 * 1024
 TARGET_STATIC_BYTES = int(8.5 * 1024 * 1024)
+DETAIL_CHUNK_SIZE = 100
+DETAIL_FIELDS = (
+    "jurisdiction_risk",
+    "falling_knife",
+    "bottoming",
+    "downside_structure",
+    "risk_warnings",
+    "bull_thesis",
+    "priced_in_note",
+    "trend_phase",
+    "analyst_context",
+    "valuation_context",
+    "valuation_thesis",
+    "entry_thesis",
+    "scenario_long",
+    "news",
+)
 _SWEET_REASON_FIELDS = (
     "why_zone_here",
     "why_green_or_not",
@@ -1642,8 +1659,38 @@ def export_static(
         "instruments": compact_rows,
     }
     validate_static_payload(payload)
+    public_payload = copy.deepcopy(payload)
+    public_rows = public_payload["instruments"]
+    details_directory = output_path.parent / "details"
+    details_directory.mkdir(parents=True, exist_ok=True)
+    written_detail_files = set()
+    for start in range(0, len(public_rows), DETAIL_CHUNK_SIZE):
+        filename = f"{start // DETAIL_CHUNK_SIZE:03d}.json"
+        relative_path = f"details/{filename}"
+        chunk = {}
+        for row in public_rows[start : start + DETAIL_CHUNK_SIZE]:
+            detail = {
+                field: row.pop(field)
+                for field in DETAIL_FIELDS
+                if field in row
+            }
+            row["detail_chunk"] = relative_path
+            chunk[row["symbol"]] = detail
+        atomic_write_bytes(
+            details_directory / filename,
+            json.dumps(
+                chunk,
+                ensure_ascii=False,
+                separators=(",", ":"),
+                allow_nan=False,
+            ).encode("utf-8"),
+        )
+        written_detail_files.add(filename)
+    for old_file in details_directory.glob("*.json"):
+        if old_file.name not in written_detail_files:
+            old_file.unlink()
     encoded = json.dumps(
-        payload,
+        public_payload,
         ensure_ascii=False,
         separators=(",", ":"),
         allow_nan=False,

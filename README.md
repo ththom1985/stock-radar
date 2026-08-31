@@ -440,6 +440,15 @@ Asset type uses provider `quoteType` when available and conservative symbol/name
 fallbacks. Company fundamental scoring is disabled for ETFs, funds, crypto,
 indices, futures, and other non-company instruments.
 
+The configured universe merges the original curated `data/tickers.csv` with
+the active stage of `data/sp1500_universe.csv`. The latter is a dated S&P 1500
+constituent snapshot assembled from the public Wikipedia S&P 500, S&P MidCap
+400, and S&P SmallCap 600 tables and restricted to symbols present in the SEC
+company-ticker map. Duplicates preserve the original curated entry. Stage 1
+adds 550 companies; the remaining 478 are recorded as stage 2 and stay inactive
+until the internal full snapshot is split below GitHub's 100 MiB file limit.
+`STOCK_RADAR_SP1500_STAGE` can override the active stage for controlled tests.
+
 All overall rankings now use completed-daily technical context only. Decision-
 facing fair-value ranges keep sector methods separate: ordinary companies use
 their multi-year issuer multiples and current sector peers, while banks and

@@ -121,6 +121,7 @@ def atomic_write_json(path: Path, value: Any, *, indent: int | None = 2) -> None
                 handle,
                 ensure_ascii=False,
                 indent=indent,
+                separators=(",", ":") if indent is None else None,
                 allow_nan=False,
             )
             handle.write("\n")
