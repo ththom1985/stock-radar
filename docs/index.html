@@ -693,7 +693,10 @@
       if (state.view === "today") {
         const headline = state.data.today?.headline || "Heute keine belastbare Aussage";
         $("list-title").textContent = headline;
-        $("rows").innerHTML = items.map((item) => {
+        const triggered = state.data.today?.triggered_today || [];
+        const near = state.data.today?.near_triggers || [];
+        const triggerNotice = `${triggered.length ? `<div class="notice">Heute ausgelöst: ${triggered.length} Titel (${triggered.map((item) => escapeHtml(item.symbol)).join(", ")})</div>` : ""}${near.length ? `<div class="notice">${near.length} Titel stehen an der Auslösezone (${near.map((item) => escapeHtml(item.symbol)).join(", ")})</div>` : ""}`;
+        $("rows").innerHTML = triggerNotice + items.map((item) => {
           const row = state.bySymbol.get(item.symbol) || {};
           const value = item.today || {};
           const lamp = value.light === "green" ? "🟢" : value.light === "yellow" ? "🟡" : "🔴";

@@ -165,7 +165,25 @@ class QuestionViewsTests(unittest.TestCase):
         )
         quality = result["cheap_with_potential"][0]["deal_quality"]
         self.assertIn("Deal-Qualität", quality["label"])
-        self.assertIn("2 Snapshots", quality["comparison_basis"])
+        self.assertIn("3 Gelegenheiten seit 30.08.2026", quality["comparison_basis"])
+        self.assertIn("belastbar ab", quality["comparison_basis"])
+        self.assertFalse(quality["history_reliable"])
+
+    def test_near_triggers_are_exposed_for_today_summary(self):
+        candidate = row()
+        candidate["price_local"] = 50.05
+        candidate["fx_usd"] = 1
+        candidate["sweet_spot"] = {
+            "combined_status": "approaching",
+            "lower": 45,
+            "ideal": 48,
+            "upper": 50,
+        }
+        result = build_question_views([candidate])
+        self.assertEqual(
+            [item["symbol"] for item in result["near_triggers"]],
+            ["AAA"],
+        )
 
     def test_non_us_origin_does_not_reduce_quality_label(self):
         eu = row()

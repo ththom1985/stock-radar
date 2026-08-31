@@ -1203,6 +1203,9 @@ def run(with_news=True, with_fundamentals=True):
     result["today"]["triggered_today"] = result["question_views"].get(
         "triggered_today"
     ) or []
+    result["today"]["near_triggers"] = result["question_views"].get(
+        "near_triggers"
+    ) or []
     rows_by_symbol = {row.get("symbol"): row for row in rows}
     for candidate in result["today"].get("candidates") or []:
         row = rows_by_symbol.get(candidate.get("symbol"))

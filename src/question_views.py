@@ -27,6 +27,14 @@ def _german_number(value):
     return f"{value:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
 
 
+def _german_date(value):
+    try:
+        year, month, day = str(value).split("-")
+        return f"{day}.{month}.{year}"
+    except ValueError:
+        return str(value or "heute")
+
+
 def _active(value):
     return bool(value.get("active", True)) if isinstance(value, dict) else bool(value)
 
@@ -332,11 +340,21 @@ def _deal_quality(row, discount, historical_scores):
     )
     if reference:
         percentile = sum(value <= score for value in reference) / len(reference) * 100.0
-        comparison = (
+        relative = (
             f"Besser als {percentile:.0f}% der gespeicherten Gelegenheiten."
             if percentile >= 50
             else f"Schwächer als {100.0 - percentile:.0f}% der gespeicherten Gelegenheiten."
         )
+        comparison = (
+            relative
+            if history.get("reliable")
+            else f"Vorläufig: {relative}"
+        )
+    observation_count = len(reference)
+    calendar_days = int(history.get("calendar_days") or 0)
+    requirement = history.get("reliability_requirement") or (
+        "mindestens 100 Gelegenheiten über mindestens 30 Kalendertage"
+    )
     return {
         "score": round(score, 1),
         "stars": stars,
@@ -346,16 +364,22 @@ def _deal_quality(row, discount, historical_scores):
         ),
         "comparison": comparison,
         "comparison_basis": (
-            f"{len(reference)} Gelegenheiten im aktuellen Snapshot; "
-            "die Historie baut sich ab jetzt auf"
-            if reference and (history.get("snapshot_count") or 1) == 1
+            f"Vergleich über {observation_count} Gelegenheiten seit "
+            f"{_german_date(history.get('from_date'))} "
+            f"({calendar_days or 1} Snapshot-Tag). Aufbauend; belastbar ab {requirement}"
+            if reference and not history.get("reliable")
             else (
-                f"{len(reference)} Gelegenheiten aus {history.get('snapshot_count')} "
-                f"Snapshots, {history.get('from_date')} bis {history.get('to_date')}"
+                f"Vergleich über {observation_count} Gelegenheiten seit "
+                f"{_german_date(history.get('from_date'))} "
+                f"({calendar_days} Kalendertage)"
                 if reference
                 else "feste Schwellen; Historie baut sich ab jetzt auf"
             )
         ),
+        "history_reliable": bool(history.get("reliable")),
+        "history_observation_count": observation_count,
+        "history_calendar_days": calendar_days,
+        "history_requirement": requirement,
         "components": {
             "valuation_discount": round(min(100.0, discount / 50.0 * 100.0), 1),
             "timing": round(timing, 1),
@@ -667,6 +691,12 @@ def build_question_views(
             item["symbol"],
         )
     )
+    near_triggers = [
+        item
+        for item in waiting
+        if item["distance_pct"] is not None
+        and abs(item["distance_pct"]) <= 0.15
+    ]
     sectors = Counter(
         str(
             next(
@@ -726,6 +756,7 @@ def build_question_views(
         "triggered_today": [
             item for item in waiting if item["triggered_today"]
         ],
+        "near_triggers": near_triggers,
         "market_state": {
             "median_vs_fair_midpoint_pct": (
                 round(median_gap, 1) if median_gap is not None else None

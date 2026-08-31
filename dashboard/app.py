@@ -793,6 +793,12 @@ def _render_today():
     triggered = today.get("triggered_today") or []
     if triggered:
         st.success(f"Heute ausgelöst: {len(triggered)} Titel")
+    near = today.get("near_triggers") or []
+    if near:
+        st.info(
+            f"{len(near)} Titel stehen an der Auslösezone "
+            f"({', '.join(item.get('symbol') for item in near)})."
+        )
     st.caption(today.get("summary") or "")
     candidates = today.get("candidates") or []
     if not candidates:
