@@ -3,7 +3,10 @@ __pycache__/
 *.pyc
 .env
 .streamlit/secrets.toml
-# Keep latest.json (committed by the workflow), ignore heavy per-run snapshots locally:
+# The workflow persists the full snapshot compressed to stay below GitHub's
+# 100 MiB single-file limit and restores latest.json before each build.
+data/output/latest.json
+!data/output/latest.json.gz
 data/output/history/*.json
 data/prices/
 data/dry-run/

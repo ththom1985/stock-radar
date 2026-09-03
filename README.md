@@ -383,7 +383,10 @@ Every output row contains:
   never used as an economic-exposure proxy: without a documented ticker override
   or the explicit Hong Kong listing rule, exposure remains `Nicht verfügbar`.
 
-`data/output/latest.json` uses schema `stock-radar-output`, version 3, and contains:
+The workflow stores the full snapshot as `data/output/latest.json.gz` to remain
+below GitHub's single-file limit and restores `data/output/latest.json` before
+analysis. The uncompressed snapshot uses schema `stock-radar-output`, version 3,
+and contains:
 
 - `data_status`: price/fresh-bar coverage, SLA, age distribution, failures, and
   blocking reasons;

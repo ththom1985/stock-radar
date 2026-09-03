@@ -31,6 +31,9 @@ jobs:
           python-version: "3.12"
           cache: pip
 
+      - name: Restore full snapshot
+        run: gzip -dk data/output/latest.json.gz
+
       - name: Install pinned direct dependencies
         run: python -m pip install -r requirements-ci.txt
 
@@ -58,6 +61,9 @@ jobs:
       - name: Build login-free static dashboard data
         run: python -m src.export_static
 
+      - name: Compress full snapshot
+        run: gzip -n -c -9 data/output/latest.json > data/output/latest.json.gz
+
       - name: Publish complete data transaction
         id: publish
         env:
@@ -72,7 +78,7 @@ jobs:
           # still require an explicit allow-list entry and fail visibly below.
           git add -u -- data docs
           git add \
-            data/output/latest.json \
+            data/output/latest.json.gz \
             data/failed_symbols.json \
             data/fundamentals.json \
             data/deep_fundamentals.json \

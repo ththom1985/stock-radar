@@ -28,6 +28,12 @@ class WorkflowContractTests(unittest.TestCase):
             self.assertIn("data/valuation_anomalies.json", text)
             self.assertIn("data/financial_sector_history.json", text)
             self.assertIn("data/opportunity_history.json", text)
+            self.assertIn("gzip -dk data/output/latest.json.gz", text)
+            self.assertIn(
+                "gzip -n -c -9 data/output/latest.json > data/output/latest.json.gz",
+                text,
+            )
+            self.assertIn("data/output/latest.json.gz", text)
             self.assertIn("git add -u -- data docs", text)
             self.assertIn("docs/details", text)
             self.assertIn("git status --porcelain", text)
