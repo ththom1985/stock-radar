@@ -91,6 +91,35 @@ def inspect_snapshot(path: Path | None = None) -> dict:
     if invalid_reference:
         findings.append(f"invalid/ranked reference-only rows: {invalid_reference}")
 
+    today = snapshot.get("today") or {}
+    question_views = snapshot.get("question_views") or {}
+    triggered = {
+        item.get("symbol") for item in today.get("triggered_today") or []
+    }
+    near = {item.get("symbol") for item in today.get("near_triggers") or []}
+    trigger_overlap = sorted((triggered & near) - {None})
+    if trigger_overlap:
+        findings.append(f"triggered and near-trigger lists overlap: {trigger_overlap}")
+    ideal_symbols = [
+        item.get("symbol")
+        for item in question_views.get("cheap_with_potential") or []
+        if (item.get("situation") or {}).get("code") == "ideal"
+    ]
+    if today.get("ideal_candidate_count") != len(ideal_symbols):
+        findings.append(
+            "today ideal count does not match strict question-view classifications"
+        )
+    candidates = today.get("candidates") or []
+    if ideal_symbols and (
+        not candidates or candidates[0].get("symbol") not in ideal_symbols
+    ):
+        findings.append("strict ideal candidate is not ranked first")
+    history = snapshot.get("opportunity_history_status")
+    if not isinstance(history, dict) or not isinstance(
+        history.get("observation_count"), int
+    ):
+        findings.append("opportunity history progress is missing")
+
     unavailable = [
         row for row in rows if not (row.get("sweet_spot") or {}).get("available")
     ]
@@ -102,7 +131,7 @@ def inspect_snapshot(path: Path | None = None) -> dict:
         unavailable_symbols[row["symbol"]] = cause
 
     return {
-        "status": "warning" if findings or unavailable else "ok",
+        "status": "error" if findings else ("warning" if unavailable else "ok"),
         "generated_at": snapshot.get("generated_at"),
         "instrument_count": len(rows),
         "doge_format": doge_format,
@@ -140,6 +169,8 @@ def main() -> None:
     if summary:
         with open(summary, "a", encoding="utf-8") as handle:
             handle.write(_markdown(report))
+    if report["findings"]:
+        raise SystemExit("published-data health checks failed")
 
 
 if __name__ == "__main__":

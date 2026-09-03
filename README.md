@@ -763,17 +763,22 @@ as-of dates.
 
 ## Automation
 
-`.github/workflows/daily.yml` runs once on weekdays at **23:15 UTC**, after the
-major US markets are closed in both daylight-saving seasons. The legacy
-`intraday.yml` filename is manual-only and has no schedule or intraday mode.
-Both workflows skip their job unless `github.ref` is exactly
+`.github/workflows/daily.yml` runs its primary build on weekdays at **23:15
+UTC**, after the major US markets are closed in both daylight-saving seasons.
+A **06:15 UTC Tuesday-Saturday** recovery check starts another build only when
+the committed snapshot is older than 12 hours or GitHub Pages does not serve
+the committed export. The legacy `intraday.yml` filename is manual-only and has
+no schedule or intraday mode. Both workflows skip their analysis job unless
+`github.ref` is exactly
 `refs/heads/main`, explicitly check out `main`, and can therefore never publish
 a feature-branch dispatch into `main`.
 
 Workflows use verified action commit SHAs, pinned direct Python dependencies,
-non-persisted checkout credentials, complete cache publication, and failing
-pull/push retries. The deterministic unit suite is a blocking step before
-analysis. Publication failures are not converted into successful jobs.
+non-persisted checkout credentials, complete cache publication, and guarded
+push retries. The deterministic unit suite and generated-data health checks
+block publication. A run refuses to rebase generated data onto source changes
+that arrived during analysis, and it succeeds only after GitHub Pages serves
+the exact exported payload.
 
 ## Setup and execution
 

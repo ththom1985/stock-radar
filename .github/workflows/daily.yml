@@ -4,6 +4,8 @@ on:
   schedule:
     # One conservative weekday run after US markets are closed in both DST seasons.
     - cron: "15 23 * * 1-5"
+    # Recovery check: rebuild only when the primary snapshot or live Pages data is stale.
+    - cron: "15 6 * * 2-6"
   workflow_dispatch:
 
 permissions:
@@ -14,8 +16,34 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  freshness:
+    runs-on: ubuntu-latest
+    outputs:
+      rebuild: ${{ steps.guard.outputs.rebuild }}
+      reason: ${{ steps.guard.outputs.reason }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Decide whether a rebuild is required
+        id: guard
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "${{ github.event.schedule }}" = "15 23 * * 1-5" ]; then
+            printf '%s\n' "rebuild=true" "reason=primary or manual run" >> "$GITHUB_OUTPUT"
+          else
+            python -m src.automation_guard \
+              --snapshot data/output/latest.json.gz \
+              --export docs/data.json \
+              --live-url https://ththom1985.github.io/stock-radar/data.json \
+              --max-age-hours 12 \
+              >> "$GITHUB_OUTPUT"
+          fi
+
   analyze:
-    if: github.ref == 'refs/heads/main'
+    needs: freshness
+    if: github.ref == 'refs/heads/main' && needs.freshness.outputs.rebuild == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
@@ -50,7 +78,6 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
       - name: Check published data health
-        continue-on-error: true
         run: python -m src.published_health
 
       # GitHub has no durable private ledger. This only injects the already
@@ -74,6 +101,7 @@ jobs:
           git config user.name "stock-radar-bot"
           git config user.email "bot@users.noreply.github.com"
           git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          source_sha="$(git rev-parse HEAD)"
           # Stage every already-versioned runtime artifact. New untracked files
           # still require an explicit allow-list entry and fail visibly below.
           git add -u -- data docs
@@ -129,12 +157,19 @@ jobs:
           fi
           published=false
           for attempt in 1 2 3; do
-            if git pull --rebase --autostash origin main && git push origin HEAD:main; then
+            git fetch origin main
+            remote_sha="$(git rev-parse origin/main)"
+            if [ "$remote_sha" = "$(git rev-parse HEAD)" ]; then
               published=true
               break
             fi
-            if git rev-parse --verify REBASE_HEAD >/dev/null 2>&1; then
-              git rebase --abort
+            if [ "$remote_sha" != "$source_sha" ]; then
+              echo "::error title=Source changed during analysis::Refusing to publish data built from ${source_sha} onto ${remote_sha}."
+              exit 1
+            fi
+            if git push origin HEAD:main; then
+              published=true
+              break
             fi
             echo "::warning title=Snapshot publication retry::Attempt ${attempt} of 3 failed."
             sleep $((attempt * 5))
@@ -144,6 +179,14 @@ jobs:
             git status --short
             exit 1
           fi
+
+      - name: Verify live GitHub Pages payload
+        run: >-
+          python -m src.verify_live
+          --expected docs/data.json
+          --url https://ththom1985.github.io/stock-radar/data.json
+          --attempts 48
+          --interval-seconds 15
 
       - name: Report publication failure
         if: failure() && steps.publish.outcome == 'failure'

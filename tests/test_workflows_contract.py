@@ -8,10 +8,15 @@ from tests.helpers import ROOT
 
 
 class WorkflowContractTests(unittest.TestCase):
-    def test_only_one_conservative_scheduled_run(self):
+    def test_primary_schedule_has_conditional_recovery_run(self):
         daily = (ROOT / ".github/workflows/daily.yml").read_text(encoding="utf-8")
         manual = (ROOT / ".github/workflows/intraday.yml").read_text(encoding="utf-8")
-        self.assertEqual(re.findall(r'cron:\s*"([^"]+)"', daily), ["15 23 * * 1-5"])
+        self.assertEqual(
+            re.findall(r'cron:\s*"([^"]+)"', daily),
+            ["15 23 * * 1-5", "15 6 * * 2-6"],
+        )
+        self.assertIn("python -m src.automation_guard", daily)
+        self.assertIn("needs.freshness.outputs.rebuild == 'true'", daily)
         self.assertNotIn("cron:", manual)
         self.assertNotIn("STOCK_RADAR_INTRADAY", daily + manual)
 
@@ -37,9 +42,13 @@ class WorkflowContractTests(unittest.TestCase):
             self.assertIn("git add -u -- data docs", text)
             self.assertIn("docs/details", text)
             self.assertIn("git status --porcelain", text)
-            self.assertIn("git pull --rebase --autostash origin main", text)
+            self.assertIn("source_sha=\"$(git rev-parse HEAD)\"", text)
+            self.assertIn("git fetch origin main", text)
+            self.assertIn("Source changed during analysis", text)
+            self.assertNotIn("git pull --rebase", text)
             self.assertIn("All three pull/rebase/push attempts failed", text)
             self.assertIn("Report publication failure", text)
+            self.assertIn("python -m src.verify_live", text)
             self.assertIn("FINRA_CLIENT_ID", text)
             self.assertIn("FINRA_CLIENT_SECRET", text)
             self.assertIn(
@@ -52,7 +61,8 @@ class WorkflowContractTests(unittest.TestCase):
             self.assertNotIn("|| true", text)
             self.assertNotIn("push ||", text)
             shas = re.findall(r"uses:\s*actions/[^@]+@([0-9a-f]{40})", text)
-            self.assertEqual(len(shas), 2)
+            expected_action_count = 3 if name == "daily.yml" else 2
+            self.assertEqual(len(shas), expected_action_count)
 
     def test_daily_tests_are_blocking_and_run_before_analysis(self):
         daily = (ROOT / ".github/workflows/daily.yml").read_text(encoding="utf-8")
@@ -60,14 +70,16 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn(command, daily)
         self.assertLess(daily.index(command), daily.index("python -m src.analyze"))
 
-    def test_live_data_health_runs_after_analysis_and_is_non_blocking(self):
+    def test_live_data_health_runs_after_analysis_and_blocks_publication(self):
         for name in ("daily.yml", "intraday.yml"):
             text = (ROOT / ".github/workflows" / name).read_text(encoding="utf-8")
             analysis = text.index("python -m src.analyze")
             health = text.index("python -m src.published_health")
+            publication = text.index("Publish complete data transaction")
             self.assertLess(analysis, health)
+            self.assertLess(health, publication)
             health_step = text[text.rfind("- name:", 0, health) : health]
-            self.assertIn("continue-on-error: true", health_step)
+            self.assertNotIn("continue-on-error: true", health_step)
 
     def test_publication_jobs_are_main_branch_only(self):
         for name in ("daily.yml", "intraday.yml"):
