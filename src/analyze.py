@@ -1187,6 +1187,9 @@ def run(with_news=True, with_fundamentals=True):
         preliminary_question_views,
         observed_at=now,
     )
+    result["opportunity_history_status"] = {
+        key: value for key, value in deal_history.items() if key != "scores"
+    }
     result["question_views"] = build_question_views(
         rows,
         previous_snapshot=previous_snapshot,

@@ -1623,6 +1623,20 @@ def export_static(
         "probability_baseline_catalog": probability_baseline_catalog,
         "probability_validation": probability_validation,
         "forward_validation_status": forward_validation_status,
+        "opportunity_history_status": snapshot.get(
+            "opportunity_history_status"
+        )
+        or {
+            "observation_count": 0,
+            "snapshot_count": 0,
+            "calendar_days": 0,
+            "from_date": None,
+            "to_date": None,
+            "reliable": False,
+            "reliability_requirement": (
+                "mindestens 100 Gelegenheiten über mindestens 30 Kalendertage"
+            ),
+        },
         "market_data_contract": snapshot.get("market_data_contract") or {},
         "rankings": rankings,
         "insight_rankings": snapshot["insight_rankings"],

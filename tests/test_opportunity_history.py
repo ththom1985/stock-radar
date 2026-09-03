@@ -30,7 +30,9 @@ class OpportunityHistoryTests(unittest.TestCase):
                     datetime(2026, 8, 31, 12, tzinfo=timezone.utc),
                 )
         self.assertEqual(first["scores"], [60, 70])
+        self.assertEqual(first["observation_count"], 2)
         self.assertEqual(second["scores"], [80])
+        self.assertEqual(second["observation_count"], 1)
         self.assertEqual(second["snapshot_count"], 1)
         self.assertEqual(second["calendar_days"], 1)
         self.assertFalse(second["reliable"])

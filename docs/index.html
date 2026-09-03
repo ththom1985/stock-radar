@@ -181,7 +181,7 @@
           <h1>Stock Radar</h1>
           <div class="subtitle">Transparente tägliche Research-Hinweise zu Timing, Bewertung, Analysten, Chancen und Risiken.</div>
         </div>
-        <div class="status-chip">System lernt noch · 0/100 Testfenster</div>
+        <div id="learning-status" class="status-chip">Lernfortschritt wird geladen …</div>
       </header>
       <section class="metrics">
         <div class="metric"><div class="metric-label">Datenstand</div><div id="generated" class="metric-value"></div></div>
@@ -1131,6 +1131,12 @@
         $("coverage").textContent = percent(state.data.data_status.coverage_pct);
         $("freshness").textContent = percent(state.data.data_status.fresh_bar_coverage_pct);
         $("failed-count").textContent = $number(state.data.data_status.failed_symbol_count, 0);
+        const history = state.data.opportunity_history_status || {};
+        const observations = Math.min(100, history.observation_count || 0);
+        const days = Math.min(30, history.calendar_days || 0);
+        $("learning-status").textContent = history.reliable
+          ? `Historienvergleich belastbar · ${observations} Gelegenheiten · ${days} Tage`
+          : `System lernt noch · ${observations}/100 Gelegenheiten · ${days}/30 Tage`;
         bind();
         state.gateFailures = staticGateFailures(state.data);
         if (state.gateFailures.length) {

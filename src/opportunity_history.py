@@ -69,6 +69,7 @@ def update_opportunity_history(question_views, observed_at=None):
     ]
     return {
         "scores": scores,
+        "observation_count": len(scores),
         "snapshot_count": len(snapshots),
         "calendar_days": calendar_days,
         "from_date": snapshots[0]["date"] if snapshots else None,
