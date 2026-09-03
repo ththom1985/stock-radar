@@ -1630,6 +1630,8 @@ def export_static(
             "headline": "Heute keine belastbare Aussage",
             "summary": "Der Heute-Presenter ist im Snapshot nicht verfügbar.",
             "candidate_count": 0,
+            "technical_candidate_count": 0,
+            "ideal_candidate_count": 0,
             "candidates": [],
             "changes": [],
         },

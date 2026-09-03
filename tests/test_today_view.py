@@ -16,4 +16,18 @@ class TodayViewTests(unittest.TestCase):
         self.assertEqual(view["candidate_count"],0)
         self.assertIn("kein überzeugender",view["headline"])
         self.assertEqual(len(view["candidates"]),1)
+    def test_ideal_candidate_is_ranked_ahead_of_stronger_technical_signals(self):
+        rows=[row(f"TECH{index}") for index in range(6)]
+        rows[5]["sweet_spot"]["reliability_score"]=1
+        question_views={"cheap_with_potential":[{
+            "symbol":"TECH5",
+            "situation":{"code":"ideal","label":"Idealfall: günstig UND am Einstiegspunkt"},
+            "deal_quality":{"label":"Deal-Qualität 4/5"},
+        }]}
+        view=build_today_view(rows,question_views=question_views)
+        self.assertEqual(view["candidates"][0]["symbol"],"TECH5")
+        self.assertTrue(view["candidates"][0]["ideal_entry"])
+        self.assertEqual(view["ideal_candidate_count"],1)
+        self.assertEqual(view["technical_candidate_count"],6)
+        self.assertIn("1 Idealfall",view["headline"])
 if __name__=="__main__":unittest.main()

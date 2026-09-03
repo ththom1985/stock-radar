@@ -788,6 +788,11 @@ def _render_today():
     st.header("Heute")
     color = "🟢" if today.get("candidate_count", 0) else "🟡"
     st.subheader(f"{color} {today.get('headline') or 'Keine belastbare Aussage'}")
+    st.caption(
+        f"Fundamental + Timing: {today.get('ideal_candidate_count', 0)} Idealfälle · "
+        f"Technische Einstiegszonen insgesamt: "
+        f"{today.get('technical_candidate_count', today.get('candidate_count', 0))}"
+    )
     if today.get("market_summary"):
         st.info(today["market_summary"])
     triggered = today.get("triggered_today") or []

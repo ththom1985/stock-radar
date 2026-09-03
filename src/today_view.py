@@ -76,24 +76,48 @@ def _reason(row,light):
     if light=="yellow":return "Der Kurs nähert sich einer interessanten Zone; Bestätigung abwarten."
     return "Timing, Bewertung oder Sicherheitsfilter sprechen derzeit gegen einen Einstieg."
 
-def build_today_view(rows,previous_snapshot=None,price_histories=None,limit=5):
+def build_today_view(
+    rows,
+    previous_snapshot=None,
+    price_histories=None,
+    question_views=None,
+    limit=5,
+):
+    ideal_by_symbol = {
+        item.get("symbol"): item
+        for item in (question_views or {}).get("cheap_with_potential", [])
+        if (item.get("situation") or {}).get("code") == "ideal"
+    }
     cards=[]
     for row in rows:
         if row.get("asset_type")!="company_equity":continue
         sweet=row.get("sweet_spot") or {}; light=traffic_light(row); zone=local_zone(row)
-        card={"symbol":row.get("symbol"),"name":row.get("display_name_full") or row.get("name"),"currency":row.get("currency"),"price":row.get("price_local"),"light":light,"status":sweet.get("combined_status"),"status_label":STATUS_LABELS.get(sweet.get("combined_status"),"Beobachten"),"zone":zone,"why":_reason(row,light),"plain":plain_language(row),"earnings_in_days":row.get("earnings_in_days"),"confluence_tier":(row.get("alternative_signals") or {}).get("confluence_tier"),"contributing_groups":(row.get("alternative_signals") or {}).get("contributing_groups") or [],"timing_score":row.get("entry_timing_score"),"evidence_score":sweet.get("reliability_score")}
+        ideal = ideal_by_symbol.get(row.get("symbol"))
+        card={"symbol":row.get("symbol"),"name":row.get("display_name_full") or row.get("name"),"currency":row.get("currency"),"price":row.get("price_local"),"light":light,"status":sweet.get("combined_status"),"status_label":STATUS_LABELS.get(sweet.get("combined_status"),"Beobachten"),"zone":zone,"why":_reason(row,light),"plain":plain_language(row),"earnings_in_days":row.get("earnings_in_days"),"confluence_tier":(row.get("alternative_signals") or {}).get("confluence_tier"),"contributing_groups":(row.get("alternative_signals") or {}).get("contributing_groups") or [],"timing_score":row.get("entry_timing_score"),"evidence_score":sweet.get("reliability_score"),"ideal_entry":bool(ideal)}
+        if ideal:
+            card["situation"] = ideal.get("situation")
+            card["deal_quality"] = ideal.get("deal_quality")
         if price_histories and row.get("symbol") in price_histories:
             frame=price_histories[row["symbol"]]
             card["sparkline"]=[round(float(value),6) for value in frame["RawClose"].dropna().tail(30)]
         cards.append(card)
     order={"green":0,"yellow":1,"red":2}
-    cards.sort(key=lambda item:(order[item["light"]],-(item.get("evidence_score") or 0),-(item.get("timing_score") or 0),item["symbol"]))
+    cards.sort(key=lambda item:(not item["ideal_entry"],order[item["light"]],-(item.get("evidence_score") or 0),-(item.get("timing_score") or 0),item["symbol"]))
     green=[item for item in cards if item["light"]=="green"]
-    selected=(green[:limit] if green else cards[:1])
-    if green:
+    ideal=[item for item in cards if item["ideal_entry"]]
+    if ideal:
+        selected=(ideal+[item for item in green if not item["ideal_entry"]])[:limit]
+        headline=f"{len(ideal)} Idealfall: günstig bewertet und technisch am Einstiegspunkt"
+        summary=(
+            f"Zuerst werden {len(ideal)} fundamental günstige Idealfälle gezeigt; "
+            f"danach folgen die stärksten technischen Signale."
+        )
+    elif green:
+        selected=green[:limit]
         headline=f"{len(green)} Titel liegen heute in einer überzeugenden Einstiegszone"
-        summary="Gezeigt werden die stärksten Hinweise aus Timing und Bewertung."
+        summary="Technische Einstiegszonen sind vorhanden, aber kein Titel erfüllt zugleich die strenge fundamentale Idealfall-Prüfung."
     else:
+        selected=cards[:1]
         best=cards[0] if cards else None
         headline="Heute kein überzeugender Einstieg"
         summary=(f"Bester Beobachtungskandidat: {best['name']}." if best else "Es liegen keine belastbaren Kandidaten vor.")
@@ -103,4 +127,4 @@ def build_today_view(rows,previous_snapshot=None,price_histories=None,limit=5):
         previous=previous_by_symbol.get(item["symbol"]) or {}; old=(previous.get("sweet_spot") or {}).get("combined_status")
         if old and old!=item["status"]:
             changes.append(f"{item['symbol']}: {STATUS_LABELS.get(old,old)} → {item['status_label']}")
-    return {"headline":headline,"summary":summary,"candidate_count":len(green),"candidates":selected,"changes":changes[:6],"disclaimer":"Hinweise nach Systemlogik, keine Anlageberatung. Die Entscheidung bleibt beim Nutzer."}
+    return {"headline":headline,"summary":summary,"candidate_count":len(green),"technical_candidate_count":len(green),"ideal_candidate_count":len(ideal),"candidates":selected,"changes":changes[:6],"disclaimer":"Hinweise nach Systemlogik, keine Anlageberatung. Die Entscheidung bleibt beim Nutzer."}

@@ -1179,11 +1179,6 @@ def run(with_news=True, with_fundamentals=True):
             insight_contract=INSIGHT_CONTRACT_VERSION,
         ),
     }
-    result["today"] = build_today_view(
-        rows,
-        previous_snapshot=previous_snapshot,
-        price_histories=fetched.prices,
-    )
     preliminary_question_views = build_question_views(
         rows,
         previous_snapshot=previous_snapshot,
@@ -1196,6 +1191,12 @@ def run(with_news=True, with_fundamentals=True):
         rows,
         previous_snapshot=previous_snapshot,
         historical_deal_scores=deal_history,
+    )
+    result["today"] = build_today_view(
+        rows,
+        previous_snapshot=previous_snapshot,
+        price_histories=fetched.prices,
+        question_views=result["question_views"],
     )
     result["today"]["market_summary"] = (
         result["question_views"].get("market_state") or {}

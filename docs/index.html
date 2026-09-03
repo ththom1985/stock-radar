@@ -695,7 +695,9 @@
         $("list-title").textContent = headline;
         const triggered = state.data.today?.triggered_today || [];
         const near = state.data.today?.near_triggers || [];
-        const triggerNotice = `${triggered.length ? `<div class="notice">Heute ausgelöst: ${triggered.length} Titel (${triggered.map((item) => escapeHtml(item.symbol)).join(", ")})</div>` : ""}${near.length ? `<div class="notice">${near.length} Titel stehen an der Auslösezone (${near.map((item) => escapeHtml(item.symbol)).join(", ")})</div>` : ""}`;
+        const idealCount = state.data.today?.ideal_candidate_count || 0;
+        const technicalCount = state.data.today?.technical_candidate_count ?? state.data.today?.candidate_count ?? 0;
+        const triggerNotice = `<div class="notice">Fundamental + Timing: ${idealCount} Idealfälle · Technische Einstiegszonen insgesamt: ${technicalCount}</div>${triggered.length ? `<div class="notice">Heute ausgelöst: ${triggered.length} Titel (${triggered.map((item) => escapeHtml(item.symbol)).join(", ")})</div>` : ""}${near.length ? `<div class="notice">${near.length} Titel stehen an der Auslösezone (${near.map((item) => escapeHtml(item.symbol)).join(", ")})</div>` : ""}`;
         $("rows").innerHTML = triggerNotice + items.map((item) => {
           const row = state.bySymbol.get(item.symbol) || {};
           const value = item.today || {};
