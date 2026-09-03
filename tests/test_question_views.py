@@ -185,6 +185,23 @@ class QuestionViewsTests(unittest.TestCase):
             ["AAA"],
         )
 
+    def test_triggered_today_is_not_also_exposed_as_near_trigger(self):
+        candidate = row(price=49.95)
+        candidate["fx_usd"] = 1
+        candidate["sweet_spot"] = {
+            "combined_status": "approaching",
+            "lower": 45,
+            "ideal": 48,
+            "upper": 50,
+        }
+        previous = {"all": [{"symbol": "AAA", "price_local": 50.1}]}
+        result = build_question_views([candidate], previous_snapshot=previous)
+        self.assertEqual(
+            [item["symbol"] for item in result["triggered_today"]],
+            ["AAA"],
+        )
+        self.assertEqual(result["near_triggers"], [])
+
     def test_non_us_origin_does_not_reduce_quality_label(self):
         eu = row()
         eu["expert_analysis"]["coverage_basis"]["status"] = "narrower_non_us"

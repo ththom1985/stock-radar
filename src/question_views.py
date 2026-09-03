@@ -696,6 +696,7 @@ def build_question_views(
         for item in waiting
         if item["distance_pct"] is not None
         and abs(item["distance_pct"]) <= 0.15
+        and not item["triggered_today"]
     ]
     sectors = Counter(
         str(
