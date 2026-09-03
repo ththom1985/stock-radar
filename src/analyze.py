@@ -399,10 +399,10 @@ def _paper_eligibility(row: dict) -> dict:
     return {"eligible": not reasons, "reasons": reasons}
 
 
-def _fetch_benchmarks(now: datetime) -> tuple[dict, dict]:
+def _fetch_benchmarks(now: datetime) -> tuple[dict, dict, dict]:
     symbols = {"sp500": "^GSPC", "ndx": "^NDX", "world": "URTH"}
     fetched = fetch_prices_with_status(
-        list(symbols.values()),
+        [*symbols.values(), "EURUSD=X"],
         period="3mo",
         now=now,
         verbose=False,
@@ -419,7 +419,15 @@ def _fetch_benchmarks(now: datetime) -> tuple[dict, dict]:
                 "source_interval": "1d",
                 "completed_bars_only": True,
             }
-    return values, fetched.failed_symbols
+    eurusd = fetched.prices.get("EURUSD=X")
+    fx_bars = {}
+    if eurusd is not None:
+        for index, bar in eurusd.iterrows():
+            fx_bars[index.date().isoformat()] = {
+                "open": float(bar["RawOpen"]),
+                "close": float(bar["RawClose"]),
+            }
+    return values, fetched.failed_symbols, fx_bars
 
 
 def _partition_rankings(rows: list[dict], top_n: int = TOP_N) -> dict:
@@ -1005,11 +1013,32 @@ def run(with_news=True, with_fundamentals=True):
         rankings_by_currency_asset,
         rows,
     )
+    preliminary_question_views = build_question_views(
+        rows,
+        previous_snapshot=previous_snapshot,
+    )
+    ideal_entries = {
+        item["symbol"]: {
+            "situation": item.get("situation"),
+            "deal_quality": item.get("deal_quality"),
+            "discount_pct": item.get("discount_pct"),
+            "potential_score": item.get("potential_score"),
+            "quality_score": item.get("quality_score"),
+            "growth_score": item.get("growth_score"),
+            "potential_driver": item.get("potential_driver"),
+            "residual_risk": item.get("residual_risk"),
+            "sentences": item.get("sentences") or [],
+        }
+        for item in preliminary_question_views.get("cheap_with_potential") or []
+        if (item.get("situation") or {}).get("code") == "ideal"
+        and item.get("symbol")
+    }
+    ideal_entry_symbols = set(ideal_entries)
 
-    benchmarks, benchmark_failures = (
+    benchmarks, benchmark_failures, paper_fx_bars = (
         _fetch_benchmarks(now)
         if not market_data_only
-        else ({}, {})
+        else ({}, {}, {})
     )
     price_action_rows = [
         row
@@ -1021,13 +1050,21 @@ def run(with_news=True, with_fundamentals=True):
         update_portfolio(
             price_action_rows,
             benchmarks=benchmarks,
-            action_data_allowed=bool(price_action_rows),
-            allow_orders=data_status["data_actionable"],
+            action_data_allowed=bool(price_action_rows) and bool(paper_fx_bars),
+            allow_orders=bool(price_action_rows) and bool(paper_fx_bars),
+            allow_entries=data_status["data_actionable"],
             observed_at=now,
+            entry_symbols=ideal_entry_symbols,
+            entry_theses=ideal_entries,
+            base_fx_bars=paper_fx_bars,
         )
-        if not market_data_only
+        if not market_data_only and paper_fx_bars
         else {
-            "simulation_status": "skipped_market_data_contract",
+            "simulation_status": (
+                "skipped_market_data_contract"
+                if market_data_only
+                else "skipped_eur_fx_unavailable"
+            ),
             "performance_actionable": False,
         }
     )
@@ -1179,10 +1216,6 @@ def run(with_news=True, with_fundamentals=True):
             insight_contract=INSIGHT_CONTRACT_VERSION,
         ),
     }
-    preliminary_question_views = build_question_views(
-        rows,
-        previous_snapshot=previous_snapshot,
-    )
     deal_history = update_opportunity_history(
         preliminary_question_views,
         observed_at=now,

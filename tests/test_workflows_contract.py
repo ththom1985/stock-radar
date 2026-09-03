@@ -51,6 +51,7 @@ class WorkflowContractTests(unittest.TestCase):
             self.assertIn("python -m src.verify_live", text)
             self.assertIn("FINRA_CLIENT_ID", text)
             self.assertIn("FINRA_CLIENT_SECRET", text)
+            self.assertIn('STOCK_RADAR_START_NEW_PAPER: "1"', text)
             self.assertIn(
                 "python -m src.probability_forward publish-status --aggregate-only",
                 text,

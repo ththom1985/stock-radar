@@ -119,6 +119,20 @@ def inspect_snapshot(path: Path | None = None) -> dict:
         history.get("observation_count"), int
     ):
         findings.append("opportunity history progress is missing")
+    paper = snapshot.get("paper")
+    if not isinstance(paper, dict):
+        findings.append("paper portfolio summary is missing")
+    else:
+        if paper.get("simulation_status") != "unvalidated":
+            findings.append("paper portfolio is not running")
+        if paper.get("base_currency") != "EUR":
+            findings.append("paper portfolio base currency is not EUR")
+        if paper.get("starting_cash") != 10_000.0:
+            findings.append("paper portfolio did not start with EUR 10,000")
+        if paper.get("migration_requires_review"):
+            findings.append("paper portfolio is still blocked by legacy review")
+        if paper.get("performance_actionable") is not False:
+            findings.append("paper portfolio must remain non-actionable")
 
     unavailable = [
         row for row in rows if not (row.get("sweet_spot") or {}).get("available")

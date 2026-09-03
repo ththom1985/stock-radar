@@ -23,6 +23,11 @@ START_CAPITAL = 10_000.0
 TARGET_POSITIONS = 10
 BUY_SCORE = 60
 SELL_SCORE = 42
+HARD_STOP_LOSS_PCT = -10.0
+TRAILING_ACTIVATION_PCT = 12.0
+TRAILING_STOP_PCT = 8.0
+TAKE_PROFIT_PCT = 30.0
+MAX_HOLDING_DAYS = 180
 MIN_AVG_DOLLAR_VOLUME = float(os.environ.get("STOCK_RADAR_MIN_DOLLAR_VOLUME", "20000000"))
 MAX_ATR_PCT = float(os.environ.get("STOCK_RADAR_MAX_PAPER_ATR_PCT", "5"))
 MAX_ANNUAL_VOL_PCT = float(os.environ.get("STOCK_RADAR_MAX_PAPER_ANNUAL_VOL_PCT", "60"))
@@ -44,7 +49,7 @@ def _initial(today: str) -> dict[str, Any]:
         "simulation_status": "unvalidated",
         "performance_actionable": False,
         "created": today,
-        "base_currency": "USD",
+        "base_currency": "EUR",
         "starting_cash": START_CAPITAL,
         "cash": START_CAPITAL,
         "positions": {},
@@ -56,14 +61,22 @@ def _initial(today: str) -> dict[str, Any]:
             "execution": "strictly later completed daily bar open",
             "slippage_bps": SLIPPAGE_BPS,
             "commission_bps": COMMISSION_BPS,
+            "hard_stop_loss_pct": HARD_STOP_LOSS_PCT,
+            "trailing_activation_pct": TRAILING_ACTIVATION_PCT,
+            "trailing_stop_pct": TRAILING_STOP_PCT,
+            "take_profit_pct": TAKE_PROFIT_PCT,
+            "max_holding_days": MAX_HOLDING_DAYS,
             "min_avg_dollar_volume": MIN_AVG_DOLLAR_VOLUME,
             "max_atr_pct": MAX_ATR_PCT,
             "max_annual_vol_pct": MAX_ANNUAL_VOL_PCT,
             "max_per_sector": MAX_PER_SECTOR,
             "max_per_country": MAX_PER_COUNTRY,
-            "currency": "USD only until point-in-time FX exists",
+            "base_currency": "EUR",
+            "fx_accounting": "daily USD-per-EUR rate stored with every fill and mark",
             "diversification": "issuer uniqueness plus sector/country caps; no correlation claim",
-            "order_not_before": "UTC creation date + two calendar dates",
+            "order_not_before": (
+                "first completed bar whose session open is after order creation"
+            ),
             "corporate_actions": (
                 "best effort from Yahoo daily action columns; missed-run gaps may remain incomplete"
             ),
@@ -120,18 +133,15 @@ def _migrate_legacy(legacy: dict[str, Any], today: str) -> dict[str, Any]:
     return migrated
 
 
-def _start_clean_v2_after_review(portfolio: dict[str, Any]) -> dict[str, Any]:
-    portfolio = copy.deepcopy(portfolio)
-    portfolio["legacy_frozen_positions"] = portfolio.get("positions") or {}
-    portfolio["positions"] = {}
-    portfolio["pending_orders"] = []
-    portfolio["equity_curve"] = []
-    portfolio["cash"] = START_CAPITAL
-    portfolio["starting_cash"] = START_CAPITAL
-    portfolio["migration_requires_review"] = False
-    portfolio["simulation_status"] = "unvalidated"
-    portfolio["clean_v2_started_at"] = utc_now()
-    portfolio["ledger"].append(
+def _start_clean_v2_after_review(portfolio: dict[str, Any], today: str) -> dict[str, Any]:
+    legacy_archive = copy.deepcopy(portfolio)
+    clean = _initial(today)
+    clean["legacy_archive"] = legacy_archive
+    clean["legacy_frozen_positions"] = legacy_archive.get("positions") or {}
+    clean["legacy_migrated"] = True
+    clean["migration_requires_review"] = False
+    clean["clean_v2_started_at"] = utc_now()
+    clean["ledger"].append(
         {
             "transaction_id": str(uuid.uuid4()),
             "type": "CLEAN_V2_SIMULATION_STARTED",
@@ -139,7 +149,7 @@ def _start_clean_v2_after_review(portfolio: dict[str, Any]) -> dict[str, Any]:
             "note": "Explicit STOCK_RADAR_START_NEW_PAPER=1 decision; legacy data preserved",
         }
     )
-    return portfolio
+    return clean
 
 
 def load_portfolio(today: str | None = None) -> dict[str, Any]:
@@ -152,11 +162,11 @@ def load_portfolio(today: str | None = None) -> dict[str, Any]:
             raw.get("migration_requires_review")
             and os.environ.get("STOCK_RADAR_START_NEW_PAPER") == "1"
         ):
-            return _start_clean_v2_after_review(raw)
+            return _start_clean_v2_after_review(raw, today)
         return raw
     migrated = _migrate_legacy(raw, today)
     if os.environ.get("STOCK_RADAR_START_NEW_PAPER") == "1":
-        return _start_clean_v2_after_review(migrated)
+        return _start_clean_v2_after_review(migrated, today)
     return migrated
 
 
@@ -184,7 +194,7 @@ def _order(
         "signal_timestamp": row.get("bar_timestamp"),
         "created_at": created.isoformat(timespec="seconds"),
         "observed_at": created.isoformat(timespec="seconds"),
-        "not_before_bar_date": (created.date() + timedelta(days=2)).isoformat(),
+        "not_before_bar_date": created.date().isoformat(),
         "status": "pending",
         "reason": reason,
         **extra,
@@ -210,7 +220,11 @@ def _row_actions(row: dict[str, Any]) -> list[dict[str, Any]]:
     )
 
 
-def _apply_corporate_actions(portfolio: dict[str, Any], rows: dict[str, dict[str, Any]]) -> None:
+def _apply_corporate_actions(
+    portfolio: dict[str, Any],
+    rows: dict[str, dict[str, Any]],
+    base_fx_bars: dict[str, dict[str, float]] | None,
+) -> None:
     for symbol, position in list(portfolio["positions"].items()):
         if position.get("legacy"):
             continue
@@ -274,6 +288,13 @@ def _apply_corporate_actions(portfolio: dict[str, Any], rows: dict[str, dict[str
                 )
             dividend = action.get("dividend_usd")
             if isinstance(dividend, (int, float)) and dividend > 0:
+                fx = (
+                    (base_fx_bars.get(bar_date) or {}).get("close")
+                    if base_fx_bars is not None
+                    else 1.0
+                )
+                if not isinstance(fx, (int, float)) or fx <= 0:
+                    continue
                 base_key = f"{symbol}|DIVIDEND|{bar_date}"
                 previous = processed.get(base_key)
                 previous_value = (
@@ -288,7 +309,7 @@ def _apply_corporate_actions(portfolio: dict[str, Any], rows: dict[str, dict[str
                     and isinstance(previous.get("quantity_basis"), (int, float))
                     else position["quantity"]
                 )
-                amount = quantity_basis * delta
+                amount = quantity_basis * delta / fx
                 portfolio["cash"] += amount
                 version_key = f"{base_key}|{float(dividend):.12g}"
                 processed[base_key] = {
@@ -310,6 +331,8 @@ def _apply_corporate_actions(portfolio: dict[str, Any], rows: dict[str, dict[str
                         "previous_dividend_per_share": previous_value,
                         "cash_delta_per_share": delta,
                         "cash_amount": amount,
+                        "base_fx_usd": fx,
+                        "fx_bar_date": bar_date,
                         "action_key": version_key,
                         "timestamp": utc_now(),
                     }
@@ -342,6 +365,9 @@ def _execute_pending(
     observed_at: datetime,
     *,
     allow_fills: bool = True,
+    allow_buy_fills: bool = True,
+    base_fx_bars: dict[str, dict[str, float]] | None = None,
+    eligible_buy_symbols: set[str] | None = None,
 ) -> None:
     if observed_at.tzinfo is None:
         observed_at = observed_at.replace(tzinfo=timezone.utc)
@@ -362,6 +388,19 @@ def _execute_pending(
             continue
         if not allow_fills:
             remaining.append(order)
+            continue
+        if order["action"] == "BUY" and not allow_buy_fills:
+            remaining.append(order)
+            continue
+        if (
+            order["action"] == "BUY"
+            and eligible_buy_symbols is not None
+            and order["symbol"] not in eligible_buy_symbols
+        ):
+            order["status"] = "cancelled"
+            order["cancelled_at"] = observed_at.isoformat(timespec="seconds")
+            order["cancel_reason"] = "strict ideal entry thesis no longer holds"
+            portfolio["ledger"].append({**order, "type": "ORDER_CANCELLED"})
             continue
         row = rows.get(order["symbol"])
         bar_date = row.get("bar_date") if row else None
@@ -395,6 +434,15 @@ def _execute_pending(
             order["last_error"] = "later bar has no valid raw USD open"
             remaining.append(order)
             continue
+        base_fx_usd = (
+            (base_fx_bars.get(bar_date) or {}).get("open")
+            if base_fx_bars is not None
+            else 1.0
+        )
+        if not isinstance(base_fx_usd, (int, float)) or base_fx_usd <= 0:
+            order["last_error"] = "later bar has no aligned EURUSD open"
+            remaining.append(order)
+            continue
         liquidity = row.get("avg_dollar_volume_20_usd")
         if not isinstance(liquidity, (int, float)) or liquidity < MIN_AVG_DOLLAR_VOLUME:
             order["status"] = "cancelled"
@@ -409,9 +457,11 @@ def _execute_pending(
             order["cancel_reason"] = "position already exists"
             portfolio["ledger"].append({**order, "type": "ORDER_CANCELLED"})
             continue
-        execution_price = open_price * (
+        raw_fill_price = open_price / base_fx_usd
+        execution_price = raw_fill_price * (
             1 + SLIPPAGE_BPS / 10_000 if action == "BUY" else 1 - SLIPPAGE_BPS / 10_000
         )
+        transaction_thesis = copy.deepcopy(order.get("thesis") or {})
         if action == "BUY":
             budget = min(float(order["target_notional"]), portfolio["cash"])
             gross_budget = budget / (1 + COMMISSION_BPS / 10_000)
@@ -431,7 +481,16 @@ def _execute_pending(
                 "entry_price": execution_price,
                 "cost_basis": gross + commission,
                 "entry_bar_date": bar_date,
-                "last_price": row.get("raw_close_usd") or execution_price,
+                "last_price": (
+                    row.get("raw_close_usd") / base_fx_usd
+                    if isinstance(row.get("raw_close_usd"), (int, float))
+                    else execution_price
+                ),
+                "high_watermark": (
+                    row.get("raw_close_usd") / base_fx_usd
+                    if isinstance(row.get("raw_close_usd"), (int, float))
+                    else execution_price
+                ),
                 "last_mark_bar_date": bar_date,
                 "last_action_bar_date": bar_date,
                 "processed_actions": {},
@@ -439,17 +498,27 @@ def _execute_pending(
                 "issuer_key": order.get("issuer_key"),
                 "sector": order.get("sector"),
                 "country": order.get("country"),
-                "currency": "USD",
+                "instrument_currency": "USD",
+                "base_currency": "EUR",
+                "entry_thesis": copy.deepcopy(order.get("thesis") or {}),
             }
         else:
             position = portfolio["positions"].get(order["symbol"])
             if not position:
                 continue
+            transaction_thesis = copy.deepcopy(
+                position.get("entry_thesis") or {}
+            )
             quantity = min(float(order.get("quantity") or 0), position["quantity"])
+            allocated_cost = position.get("cost_basis", 0.0) * (
+                quantity / position["quantity"]
+            )
             gross = quantity * execution_price
             commission = gross * COMMISSION_BPS / 10_000
+            realized_pnl = gross - commission - allocated_cost
             portfolio["cash"] += gross - commission
             position["quantity"] -= quantity
+            position["cost_basis"] -= allocated_cost
             if position["quantity"] <= 1e-12:
                 del portfolio["positions"][order["symbol"]]
 
@@ -469,11 +538,21 @@ def _execute_pending(
                 "fill_session_open_timestamp": row.get("session_open_timestamp"),
                 "fill_observed_at": observed_at.isoformat(timespec="seconds"),
                 "quantity": quantity,
-                "raw_fill_price": open_price,
+                "raw_fill_price": raw_fill_price,
+                "raw_fill_price_usd": open_price,
                 "execution_price": execution_price,
                 "gross_value": gross,
                 "commission": commission,
                 "slippage_bps": SLIPPAGE_BPS,
+                "base_fx_usd": base_fx_usd,
+                "reason": order.get("reason"),
+                "exit_trigger": order.get("exit_trigger"),
+                "thesis": transaction_thesis,
+                "signal_return_pct": order.get("return_pct"),
+                "signal_drawdown_from_peak_pct": order.get(
+                    "drawdown_from_peak_pct"
+                ),
+                "realized_pnl": realized_pnl if action == "SELL" else None,
                 "timestamp": utc_now(),
             }
         )
@@ -484,6 +563,9 @@ def _queue_signals(
     portfolio: dict[str, Any],
     rows: list[dict[str, Any]],
     observed_at: datetime,
+    entry_symbols: set[str] | None = None,
+    entry_theses: dict[str, dict[str, Any]] | None = None,
+    allow_entries: bool = True,
 ) -> None:
     if portfolio.get("migration_requires_review"):
         return
@@ -495,14 +577,69 @@ def _queue_signals(
             continue
         score = row.get("radar_score")
         direction = row.get("daily_signal_direction")
-        if (isinstance(score, (int, float)) and score < SELL_SCORE) or direction == "NEGATIVE":
+        price = position.get("last_price")
+        entry = position.get("entry_price")
+        peak = position.get("high_watermark") or price
+        return_pct = (
+            (price / entry - 1.0) * 100.0
+            if isinstance(price, (int, float))
+            and isinstance(entry, (int, float))
+            and entry > 0
+            else None
+        )
+        drawdown_from_peak_pct = (
+            (price / peak - 1.0) * 100.0
+            if isinstance(price, (int, float))
+            and isinstance(peak, (int, float))
+            and peak > 0
+            else None
+        )
+        peak_return_pct = (
+            (peak / entry - 1.0) * 100.0
+            if isinstance(peak, (int, float))
+            and isinstance(entry, (int, float))
+            and entry > 0
+            else None
+        )
+        try:
+            holding_days = (
+                datetime.fromisoformat(row["bar_date"]).date()
+                - datetime.fromisoformat(position["entry_bar_date"]).date()
+            ).days
+        except (KeyError, TypeError, ValueError):
+            holding_days = None
+        reason = None
+        trigger = None
+        if return_pct is not None and return_pct <= HARD_STOP_LOSS_PCT:
+            trigger, reason = "hard_stop", "Hard-Stop bei minus 10 Prozent erreicht"
+        elif (
+            peak_return_pct is not None
+            and peak_return_pct >= TRAILING_ACTIVATION_PCT
+            and drawdown_from_peak_pct is not None
+            and drawdown_from_peak_pct <= -TRAILING_STOP_PCT
+        ):
+            trigger, reason = "trailing_stop", "Gewinnsicherung vom Kurshoch ausgelöst"
+        elif return_pct is not None and return_pct >= TAKE_PROFIT_PCT:
+            trigger, reason = "take_profit", "Gewinnziel von 30 Prozent erreicht"
+        elif (isinstance(score, (int, float)) and score < SELL_SCORE) or direction == "NEGATIVE":
+            trigger, reason = "signal_break", "Kernsignal ist klar gebrochen"
+        elif holding_days is not None and holding_days >= MAX_HOLDING_DAYS:
+            trigger, reason = "time_exit", "Maximale Haltedauer von 180 Tagen erreicht"
+        if reason:
             portfolio["pending_orders"].append(
                 _order(
                     "SELL",
                     row,
-                    "core heuristic weakened; simulated long exit queued",
+                    reason,
                     observed_at,
                     quantity=position["quantity"],
+                    exit_trigger=trigger,
+                    return_pct=round(return_pct, 2) if return_pct is not None else None,
+                    drawdown_from_peak_pct=(
+                        round(drawdown_from_peak_pct, 2)
+                        if drawdown_from_peak_pct is not None
+                        else None
+                    ),
                 )
             )
             pending_symbols.add(symbol)
@@ -511,7 +648,7 @@ def _queue_signals(
         order["action"] == "BUY" for order in portfolio["pending_orders"]
     )
     slots = max(0, TARGET_POSITIONS - open_or_pending)
-    if not slots:
+    if not slots or not allow_entries:
         return
     candidates = sorted(
         (
@@ -529,6 +666,7 @@ def _queue_signals(
             and row["atr_pct"] <= MAX_ATR_PCT
             and isinstance(row.get("vol_annual_pct"), (int, float))
             and row["vol_annual_pct"] <= MAX_ANNUAL_VOL_PCT
+            and (entry_symbols is None or row["symbol"] in entry_symbols)
             and row["symbol"] not in portfolio["positions"]
             and row["symbol"] not in pending_symbols
         ),
@@ -578,13 +716,14 @@ def _queue_signals(
             _order(
                 "BUY",
                 row,
-                "research ranking signal queued for conservative later bar",
+                "Strikter Fundamental-plus-Timing-Idealfall",
                 observed_at,
                 target_notional=target,
                 issuer_key=issuer_key,
                 sector=sector,
                 country=country,
                 currency="USD",
+                thesis=copy.deepcopy((entry_theses or {}).get(row["symbol"]) or {}),
             )
         )
         issuer_keys.add(issuer_key)
@@ -596,23 +735,52 @@ def _queue_signals(
 def _mark_positions(
     portfolio: dict[str, Any],
     rows: dict[str, dict[str, Any]],
+    base_fx_bars: dict[str, dict[str, float]] | None = None,
 ) -> tuple[float, dict[str, str | None]]:
     invested = 0.0
     valuation_dates: dict[str, str | None] = {}
     for symbol, position in portfolio["positions"].items():
         row = rows.get(symbol)
+        bar_date = row.get("bar_date") if row else None
+        base_fx_usd = (
+            (base_fx_bars.get(bar_date) or {}).get("close")
+            if base_fx_bars is not None and bar_date
+            else 1.0 if base_fx_bars is None else None
+        )
         price = (
             position.get("last_price")
             if position.get("legacy")
-            else row.get("raw_close_usd") if row else position.get("last_price")
+            else (
+                row.get("raw_close_usd") / base_fx_usd
+                if row
+                and isinstance(row.get("raw_close_usd"), (int, float))
+                and isinstance(base_fx_usd, (int, float))
+                and base_fx_usd > 0
+                else position.get("last_price")
+            )
         )
         if isinstance(price, (int, float)) and price > 0:
             position["last_price"] = price
-            if row and not position.get("legacy"):
+            position["high_watermark"] = max(
+                float(position.get("high_watermark") or price),
+                price,
+            )
+            if isinstance(base_fx_usd, (int, float)) and base_fx_usd > 0:
+                position["last_base_fx_usd"] = base_fx_usd
+            if (
+                row
+                and not position.get("legacy")
+                and isinstance(base_fx_usd, (int, float))
+                and base_fx_usd > 0
+            ):
                 position["last_mark_bar_date"] = row.get("bar_date")
         valuation_dates[symbol] = (
             row.get("bar_date")
-            if row and not position.get("legacy") and row.get("bar_date")
+            if row
+            and not position.get("legacy")
+            and row.get("bar_date")
+            and isinstance(base_fx_usd, (int, float))
+            and base_fx_usd > 0
             else None
         )
         invested += position["quantity"] * (position.get("last_price") or position["entry_price"])
@@ -626,8 +794,11 @@ def _mark_and_snapshot(
     benchmarks: dict[str, dict[str, Any]] | None,
     *,
     record_snapshot: bool = True,
+    base_fx_bars: dict[str, dict[str, float]] | None = None,
 ) -> float:
-    invested, position_valuation_dates = _mark_positions(portfolio, rows)
+    invested, position_valuation_dates = _mark_positions(
+        portfolio, rows, base_fx_bars
+    )
     equity = portfolio["cash"] + invested
     valuation_dates = set(position_valuation_dates.values())
     if not position_valuation_dates:
@@ -692,37 +863,80 @@ def update_portfolio(
     allow_orders: bool = True,
     observed_at: datetime | None = None,
     data_allowed: bool | None = None,
+    entry_symbols: set[str] | None = None,
+    entry_theses: dict[str, dict[str, Any]] | None = None,
+    allow_entries: bool | None = None,
+    base_fx_bars: dict[str, dict[str, float]] | None = None,
 ) -> dict[str, Any]:
     if data_allowed is not None:
         action_data_allowed = data_allowed
         allow_orders = data_allowed
+    if allow_entries is None:
+        allow_entries = allow_orders
     observed_at = observed_at or datetime.now(timezone.utc)
     today = today or _today()
     portfolio = load_portfolio(today)
     by_symbol = {row["symbol"]: row for row in rows}
     migration_blocked = bool(portfolio.get("migration_requires_review"))
     if action_data_allowed:
-        _apply_corporate_actions(portfolio, by_symbol)
-        _mark_positions(portfolio, by_symbol)
+        _apply_corporate_actions(portfolio, by_symbol, base_fx_bars)
+        _mark_positions(portfolio, by_symbol, base_fx_bars)
     if not migration_blocked:
         _execute_pending(
             portfolio,
             by_symbol,
             observed_at,
             allow_fills=bool(action_data_allowed and allow_orders),
+            allow_buy_fills=bool(allow_entries),
+            base_fx_bars=base_fx_bars,
+            eligible_buy_symbols=entry_symbols,
         )
         if action_data_allowed:
-            _mark_positions(portfolio, by_symbol)
+            _mark_positions(portfolio, by_symbol, base_fx_bars)
         if allow_orders:
-            _queue_signals(portfolio, rows, observed_at)
+            _queue_signals(
+                portfolio,
+                rows,
+                observed_at,
+                entry_symbols=entry_symbols,
+                entry_theses=entry_theses,
+                allow_entries=bool(allow_entries),
+            )
     equity = _mark_and_snapshot(
         portfolio,
         by_symbol,
         today,
         benchmarks,
         record_snapshot=action_data_allowed,
+        base_fx_bars=base_fx_bars,
     )
     _save(portfolio)
+    positions = []
+    for position in portfolio["positions"].values():
+        value = position["quantity"] * position["last_price"]
+        cost = position.get("cost_basis") or value
+        positions.append(
+            {
+                "symbol": position["symbol"],
+                "name": position.get("name"),
+                "quantity": position["quantity"],
+                "entry_price": position["entry_price"],
+                "last_price": position["last_price"],
+                "value": value,
+                "pnl": value - cost,
+                "pnl_pct": (value / cost - 1.0) * 100.0 if cost else None,
+                "entry_bar_date": position.get("entry_bar_date"),
+            }
+        )
+    fills = [
+        entry for entry in portfolio["ledger"] if entry.get("type") == "FILL"
+    ]
+    realized_pnl = sum(
+        float(entry.get("realized_pnl") or 0.0) for entry in fills
+    )
+    commissions = sum(
+        float(entry.get("commission") or 0.0) for entry in fills
+    )
     return {
         "schema_version": SCHEMA_VERSION,
         "simulation_status": portfolio.get("simulation_status", "unvalidated"),
@@ -734,5 +948,23 @@ def update_portfolio(
         "pending_orders": len(portfolio["pending_orders"]),
         "ledger_entries": len(portfolio["ledger"]),
         "max_drawdown_pct": _max_drawdown(portfolio["equity_curve"]),
+        "total_return_pct": (
+            (equity / portfolio["starting_cash"] - 1.0) * 100.0
+            if portfolio.get("starting_cash")
+            else None
+        ),
+        "realized_pnl": realized_pnl,
+        "commissions": commissions,
         "legacy_migrated": bool(portfolio.get("legacy_migrated")),
+        "migration_requires_review": bool(
+            portfolio.get("migration_requires_review")
+        ),
+        "base_currency": portfolio.get("base_currency", "EUR"),
+        "starting_cash": portfolio.get("starting_cash", START_CAPITAL),
+        "positions": sorted(positions, key=lambda item: item["symbol"]),
+        "orders": copy.deepcopy(portfolio["pending_orders"]),
+        "recent_activity": copy.deepcopy(portfolio["ledger"][-20:]),
+        "activity": copy.deepcopy(portfolio["ledger"]),
+        "equity_curve": copy.deepcopy(portfolio["equity_curve"]),
+        "strategy": copy.deepcopy(portfolio.get("assumptions") or {}),
     }

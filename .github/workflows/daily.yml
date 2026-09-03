@@ -76,6 +76,7 @@ jobs:
           FINRA_CLIENT_ID: ${{ secrets.FINRA_CLIENT_ID }}
           FINRA_CLIENT_SECRET: ${{ secrets.FINRA_CLIENT_SECRET }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          STOCK_RADAR_START_NEW_PAPER: "1"
 
       - name: Check published data health
         run: python -m src.published_health

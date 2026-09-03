@@ -1292,10 +1292,10 @@ with tabs[8]:
 
 with tabs[10]:
     st.warning(
-        "Simulation is UNVALIDATED and performance is non-actionable. Orders fill only "
-        "on a completed bar dated at least two UTC dates after order observation, with "
-        "a session open later than creation and configured costs. Corporate actions "
-        "are best effort; legacy accounting remains explicitly marked."
+        "Automatisches Papierdepot mit 10.000 EUR Startkapital. Die Simulation ist "
+        "UNVALIDATED und handelt kein echtes Geld. Käufe benötigen einen strikten "
+        "Fundamental-plus-Timing-Idealfall; Ausführungen erfolgen erst an einem "
+        "späteren abgeschlossenen Tages-Open inklusive Kosten."
     )
     try:
         portfolio = validate_portfolio_contract(
@@ -1309,13 +1309,14 @@ with tabs[10]:
         simulation_metrics = st.columns(3)
         simulation_metrics[0].metric(
             "Simulation equity (non-actionable)",
-            _number(paper_summary.get("equity"), 2, " USD"),
+            _number(paper_summary.get("equity"), 2, " EUR"),
         )
         simulation_metrics[1].metric(
             "Cost-aware max drawdown",
             (
                 "— (legacy frozen)"
-                if paper_summary.get("legacy_migrated")
+                if paper_summary.get("migration_requires_review")
+                or paper_summary.get("simulation_status") == "legacy_frozen_unvalidated"
                 else _number(paper_summary.get("max_drawdown_pct"), 2, "%")
             ),
         )
@@ -1379,7 +1380,7 @@ with tabs[10]:
             item for item in (portfolio.get("ledger") or []) if item.get("type") == "FILL"
         ]
         total_cost = sum(float(item.get("commission") or 0) for item in fills)
-        st.metric("Recorded commissions", f"${total_cost:,.2f}")
+        st.metric("Recorded commissions", f"{total_cost:,.2f} EUR")
         st.dataframe(pd.DataFrame(fills[-50:]), hide_index=True, width="stretch")
 
 with tabs[11]:

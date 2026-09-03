@@ -353,6 +353,7 @@ class StaticExportTests(ProjectTempMixin, unittest.TestCase):
             "Alle suchen",
             "Datenqualität",
             "Sweet Spot",
+            "PAPIERDEPOT",
         ):
             self.assertIn(label, html)
         self.assertIn("--cp-success", html)

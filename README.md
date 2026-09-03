@@ -735,14 +735,19 @@ It may be added later as an optional local MCP adapter only.
 
 ## Paper simulation
 
-The paper module is an **UNVALIDATED, non-actionable simulation**:
+The paper module is an **UNVALIDATED, non-actionable EUR 10,000 simulation**:
 
-- a completed-bar signal creates a pending long-only order at observation time;
-- no bar before UTC creation-date + two calendar dates may fill, and a verified
-  session-open timestamp must be later than order creation;
+- only a strict `ideal` valuation-plus-timing classification creates a pending
+  long-only order at observation time;
+- the first completed bar whose session-open timestamp is later than order
+  creation may fill; earlier or same-signal bars are rejected;
 - fills store signal/fill timestamps, quantity, raw/execution prices, commission,
   slippage, not-before date, and fill-observation time;
-- only USD company equities are eligible until point-in-time historical FX exists;
+- USD company equities are converted into the EUR base currency using the
+  observed daily USD-per-EUR rate stored with every fill and mark;
+- exits are deterministic: -10% hard stop, an 8% trailing stop after a 12%
+  peak gain, +30% take profit, 180-day maximum holding period, or a clear
+  core-signal break;
 - issuer uniqueness, sector/country caps, minimum dollar volume, and maximum
   ATR/annualized volatility apply (no correlation-optimization claim);
 - bounded sparse action history is replayed using stable symbol/type/ex-date/value

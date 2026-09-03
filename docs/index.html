@@ -196,6 +196,7 @@
         <button class="nav-button" data-view="cheap_with_potential">BILLIG MIT POTENZIAL</button>
         <button class="nav-button" data-view="expensive_now">TEUER GERADE</button>
         <button class="nav-button" data-view="waiting_for_entry">WARTET AUF EINSTIEG</button>
+        <button class="nav-button" data-view="paper">PAPIERDEPOT</button>
         <details class="expert-nav">
           <summary class="nav-button">EXPERTEN ▾</summary>
           <div class="expert-menu">
@@ -233,6 +234,10 @@
         <div class="panel"><h2>Datenqualität</h2><div id="health-content" class="section"></div></div>
         <div class="panel"><h2>Fehlende Symbole</h2><div id="failures" class="section"></div></div>
       </section>
+      <section id="paper" class="health" hidden>
+        <div class="panel"><h2>Automatisches Papierdepot</h2><div id="paper-summary" class="section"></div></div>
+        <div class="panel"><h2>Regeln und Aktivität</h2><div id="paper-activity" class="section"></div></div>
+      </section>
       <footer class="footer">Abgeschlossene Tageskurse · fehlende oder auffällige Daten werden zurückgehalten · keine Anlageberatung.</footer>
     </div>
   </main>
@@ -258,6 +263,7 @@
       expert_long: "Long-Term Composite",
       expert_short: "Short-Term Composite",
       all: "Alle suchen",
+      paper: "Automatisches Papierdepot",
       health: "Datenqualität"
     };
     const sweetLabels = {
@@ -661,7 +667,8 @@
 
     function renderList() {
       if (state.view === "health") return renderHealthView();
-      $("health").hidden = true;
+      if (state.view === "paper") return renderPaperView();
+      $("health").hidden = true; $("paper").hidden = true;
       $("cockpit").hidden = false;
       const primaryView = ["today", "cheap_with_potential", "expensive_now", "waiting_for_entry"].includes(state.view);
       $("controls").hidden = primaryView;
@@ -1060,7 +1067,7 @@
     }
 
     function renderHealthView() {
-      $("cockpit").hidden = true; $("controls").hidden = true; $("health").hidden = false;
+      $("cockpit").hidden = true; $("controls").hidden = true; $("paper").hidden = true; $("health").hidden = false;
       const status = state.data.data_status || {}; const age = status.bar_age_distribution || {};
       const probability = state.data.probability_validation || {};
       const forward = state.data.forward_validation_status || {};
@@ -1096,6 +1103,52 @@
       </div>`;
       const failed = Object.entries(status.failed_symbols || {});
       $("failures").innerHTML = failed.length ? failed.map(([symbol, reason]) => `<div class="failure"><span class="symbol">${escapeHtml(symbol)}</span><span>${escapeHtml(reason)}</span></div>`).join("") : `<div class="muted">Keine fehlenden Symbole.</div>`;
+    }
+
+    function renderPaperView() {
+      $("cockpit").hidden = true; $("controls").hidden = true; $("health").hidden = true; $("paper").hidden = false;
+      const paper = state.data.paper || {};
+      const money = (value) => Number.isFinite(value) ? `${$number(value, 2)} €` : "–";
+      const positions = paper.positions || [];
+      const orders = paper.orders || [];
+      const activity = (paper.activity || []).slice().reverse();
+      const curve = paper.equity_curve || [];
+      const thesisText = (value) => {
+        const thesis = value?.thesis || value?.entry_thesis || {};
+        const sentences = thesis.sentences || [];
+        return sentences.length ? sentences.join(" ") : (value?.reason || value?.note || "–");
+      };
+      const positionTable = positions.length
+        ? `<table class="data-table"><tr><th>Titel</th><th>Einstieg</th><th>Aktuell</th><th>Wert</th><th>Ergebnis</th></tr>${positions.map((item) => `<tr><td><strong>${escapeHtml(item.symbol)}</strong><br><small>${escapeHtml(item.name || "")}</small></td><td>${money(item.entry_price)}</td><td>${money(item.last_price)}</td><td>${money(item.value)}</td><td>${money(item.pnl)} (${Number.isFinite(item.pnl_pct) ? `${$number(item.pnl_pct, 1)} %` : "–"})</td></tr>`).join("")}</table>`
+        : `<div class="muted">Noch keine ausgeführte Position. Gekauft wird ausschließlich nach einem strikten Fundamental-plus-Timing-Idealfall und erst zum späteren abgeschlossenen Tages-Open.</div>`;
+      const orderTable = orders.length
+        ? `<div class="section"><h3>Vorgemerkte Orders</h3><table class="data-table"><tr><th>Aktion</th><th>Titel</th><th>Signal / frühestens</th><th>Begründung</th></tr>${orders.map((item) => `<tr><td>${escapeHtml(item.action)}</td><td>${escapeHtml(item.symbol)}</td><td>${escapeHtml(item.signal_bar_date || "–")} / ${escapeHtml(item.not_before_bar_date || "–")}</td><td>${escapeHtml(thesisText(item))}</td></tr>`).join("")}</table></div>`
+        : "";
+      const developmentTable = curve.length
+        ? `<div class="section"><h3>Tägliche Entwicklung</h3><table class="data-table"><tr><th>Tag / Kursstand</th><th>Depotwert</th><th>Cash</th><th>Investiert</th><th>Positionen</th></tr>${curve.slice().reverse().map((item) => `<tr><td>${escapeHtml(item.date || "–")}<br><small>${escapeHtml(item.as_of_bar_date || "kein einheitlicher Kursstand")}</small></td><td>${money(item.equity)}</td><td>${money(item.cash)}</td><td>${money(item.invested)}</td><td>${escapeHtml(item.n_positions ?? "–")}</td></tr>`).join("")}</table></div>`
+        : "";
+      $("paper-summary").innerHTML = `<div class="detail-grid">
+        <div class="stat"><span>Depotwert</span><strong>${money(paper.equity)}</strong></div>
+        <div class="stat"><span>Cash</span><strong>${money(paper.cash)}</strong></div>
+        <div class="stat"><span>Investiert</span><strong>${money(paper.invested)}</strong></div>
+        <div class="stat"><span>Gesamtrendite</span><strong>${Number.isFinite(paper.total_return_pct) ? `${$number(paper.total_return_pct, 2)} %` : "–"}</strong></div>
+        <div class="stat"><span>Realisierter Gewinn/Verlust</span><strong>${money(paper.realized_pnl)}</strong></div>
+        <div class="stat"><span>Gebühren</span><strong>${money(paper.commissions)}</strong></div>
+        <div class="stat"><span>Positionen / vorgemerkt</span><strong>${escapeHtml(paper.n_positions || 0)} / ${escapeHtml(paper.pending_orders || 0)}</strong></div>
+        <div class="stat"><span>Maximaler Drawdown</span><strong>${Number.isFinite(paper.max_drawdown_pct) ? `${$number(paper.max_drawdown_pct, 1)} %` : "–"}</strong></div>
+        <div class="stat"><span>Status</span><strong>${escapeHtml(paper.simulation_status || "unavailable")}</strong></div>
+      </div>${positionTable}${orderTable}${developmentTable}`;
+      const rules = paper.strategy || {};
+      const activityTable = activity.length
+        ? `<table class="data-table"><tr><th>Typ</th><th>Titel</th><th>Zeitpunkt</th><th>Kurs / Wert / Kosten</th><th>Begründung</th></tr>${activity.map((item) => `<tr><td>${escapeHtml(item.action || item.type || "–")}</td><td>${escapeHtml(item.symbol || "–")}</td><td>${escapeHtml(item.fill_observed_at || item.cancelled_at || item.created_at || item.timestamp || item.bar_date || "–")}<br><small>Signal: ${escapeHtml(item.signal_bar_date || "–")} · Fill: ${escapeHtml(item.fill_bar_date || "–")}</small></td><td>${Number.isFinite(item.execution_price) ? `${money(item.execution_price)} × ${$number(item.quantity, 4)} = ${money(item.gross_value)}` : "–"}<br><small>Gebühr: ${money(item.commission)} · FX: ${Number.isFinite(item.base_fx_usd) ? $number(item.base_fx_usd, 4) : "–"}</small>${Number.isFinite(item.realized_pnl) ? `<br><strong>Realisiert: ${money(item.realized_pnl)}</strong>` : ""}</td><td>${escapeHtml(thesisText(item))}${item.exit_trigger ? `<br><small>Verkaufsregel: ${escapeHtml(item.exit_trigger)}</small>` : ""}${item.cancel_reason ? `<br><small>Storno: ${escapeHtml(item.cancel_reason)}</small>` : ""}</td></tr>`).join("")}</table>`
+        : `<div class="muted">Noch keine Aktivität.</div>`;
+      $("paper-activity").innerHTML = `<div class="notice">Simulation, kein echtes Geld. Käufe: nur strikte Idealfälle. Ausführung: ${escapeHtml(rules.execution || "späteres Tages-Open")}.</div>
+        <div class="detail-grid">
+          <div class="stat"><span>Hard-Stop</span><strong>${$number(rules.hard_stop_loss_pct, 0)} %</strong></div>
+          <div class="stat"><span>Gewinnziel</span><strong>+${$number(rules.take_profit_pct, 0)} %</strong></div>
+          <div class="stat"><span>Trailing-Stop</span><strong>${$number(rules.trailing_stop_pct, 0)} % ab +${$number(rules.trailing_activation_pct, 0)} %</strong></div>
+          <div class="stat"><span>Maximale Haltedauer</span><strong>${escapeHtml(rules.max_holding_days || "–")} Tage</strong></div>
+        </div>${activityTable}`;
     }
 
     function setView(view) {

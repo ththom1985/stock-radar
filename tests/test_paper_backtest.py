@@ -77,32 +77,28 @@ class PaperBacktestTests(ProjectTempMixin, unittest.TestCase):
             observed_at=created,
         )
         order = load_json(paper.PORTFOLIO_FILE)["pending_orders"][0]
-        self.assertEqual(order["not_before_bar_date"], "2026-08-13")
-
-        for bar_date, observation in (
-            ("2026-08-11", "2026-08-12T23:15:00"),
-            ("2026-08-12", "2026-08-13T23:15:00"),
-        ):
-            paper.update_portfolio(
-                [research_row(bar_date, open_price=105.0)],
-                today=bar_date,
-                observed_at=observed(observation),
-            )
-            self.assertEqual(load_json(paper.PORTFOLIO_FILE)["positions"], {})
+        self.assertEqual(order["not_before_bar_date"], "2026-08-11")
 
         paper.update_portfolio(
-            [research_row("2026-08-13", open_price=106.0)],
-            today="2026-08-14",
-            observed_at=observed("2026-08-14T23:15:00"),
+            [research_row("2026-08-11", open_price=105.0)],
+            today="2026-08-12",
+            observed_at=observed("2026-08-12T23:15:00"),
+        )
+        self.assertEqual(load_json(paper.PORTFOLIO_FILE)["positions"], {})
+
+        paper.update_portfolio(
+            [research_row("2026-08-12", open_price=106.0)],
+            today="2026-08-13",
+            observed_at=observed("2026-08-13T23:15:00"),
         )
         state = load_json(paper.PORTFOLIO_FILE)
         fill = next(entry for entry in state["ledger"] if entry.get("type") == "FILL")
-        self.assertEqual(fill["fill_bar_date"], "2026-08-13")
+        self.assertEqual(fill["fill_bar_date"], "2026-08-12")
         self.assertGreater(
             datetime.fromisoformat(fill["fill_session_open_timestamp"]),
             datetime.fromisoformat(fill["created_at"]),
         )
-        self.assertEqual(fill["fill_observed_at"], "2026-08-14T23:15:00+00:00")
+        self.assertEqual(fill["fill_observed_at"], "2026-08-13T23:15:00+00:00")
 
     def test_non_usd_instrument_is_labelled_and_never_queued(self):
         row = research_row("2026-08-10", symbol="SAP.DE", currency="EUR")
@@ -346,6 +342,131 @@ class PaperBacktestTests(ProjectTempMixin, unittest.TestCase):
             paper.MAX_PER_COUNTRY,
         )
 
+    def test_entries_are_restricted_to_explicit_ideal_symbols(self):
+        rows = [
+            research_row("2026-08-10", symbol="IDEAL"),
+            research_row("2026-08-10", symbol="RANKED"),
+        ]
+        paper.update_portfolio(
+            rows,
+            today="2026-08-11",
+            observed_at=observed("2026-08-11T23:15:00"),
+            entry_symbols={"IDEAL"},
+            entry_theses={
+                "IDEAL": {
+                    "sentences": [
+                        "Deutlich unter der fairen Grenze.",
+                        "Technischer Einstieg bestätigt.",
+                    ]
+                }
+            },
+        )
+        orders = load_json(paper.PORTFOLIO_FILE)["pending_orders"]
+        self.assertEqual([order["symbol"] for order in orders], ["IDEAL"])
+        self.assertEqual(
+            orders[0]["thesis"]["sentences"],
+            [
+                "Deutlich unter der fairen Grenze.",
+                "Technischer Einstieg bestätigt.",
+            ],
+        )
+
+    def test_hard_stop_and_trailing_profit_queue_deterministic_exits(self):
+        for symbol, close, peak, expected_trigger in (
+            ("STOP", 89.0, 100.0, "hard_stop"),
+            ("TRAIL", 110.0, 120.0, "trailing_stop"),
+        ):
+            portfolio = paper._initial("2026-08-01")
+            portfolio["cash"] = 9000.0
+            portfolio["positions"][symbol] = {
+                "symbol": symbol,
+                "name": symbol,
+                "quantity": 10.0,
+                "entry_price": 100.0,
+                "cost_basis": 1000.0,
+                "last_price": peak,
+                "high_watermark": peak,
+                "entry_bar_date": "2026-08-01",
+                "last_action_bar_date": "2026-08-01",
+                "legacy": False,
+            }
+            atomic_write_json(paper.PORTFOLIO_FILE, portfolio)
+            paper.update_portfolio(
+                [research_row("2026-08-10", symbol=symbol, close_price=close)],
+                today="2026-08-11",
+                observed_at=observed("2026-08-11T23:15:00"),
+                entry_symbols=set(),
+            )
+            order = load_json(paper.PORTFOLIO_FILE)["pending_orders"][0]
+            self.assertEqual(order["action"], "SELL")
+            self.assertEqual(order["exit_trigger"], expected_trigger)
+            paper.PORTFOLIO_FILE.unlink()
+
+    def test_entry_gate_does_not_block_risk_exit(self):
+        portfolio = paper._initial("2026-08-01")
+        portfolio["cash"] = 9000.0
+        portfolio["positions"]["STOP"] = {
+            "symbol": "STOP",
+            "name": "STOP",
+            "quantity": 10.0,
+            "entry_price": 100.0,
+            "cost_basis": 1000.0,
+            "last_price": 100.0,
+            "high_watermark": 100.0,
+            "entry_bar_date": "2026-08-01",
+            "last_action_bar_date": "2026-08-01",
+            "legacy": False,
+        }
+        atomic_write_json(paper.PORTFOLIO_FILE, portfolio)
+        paper.update_portfolio(
+            [research_row("2026-08-10", symbol="STOP", close_price=89.0)],
+            today="2026-08-11",
+            observed_at=observed("2026-08-11T23:15:00"),
+            allow_entries=False,
+            entry_symbols=set(),
+        )
+        order = load_json(paper.PORTFOLIO_FILE)["pending_orders"][0]
+        self.assertEqual(order["action"], "SELL")
+        self.assertEqual(order["exit_trigger"], "hard_stop")
+
+    def test_pending_buy_is_cancelled_when_ideal_thesis_disappears(self):
+        paper.update_portfolio(
+            [research_row("2026-08-10")],
+            today="2026-08-11",
+            observed_at=observed("2026-08-11T23:15:00"),
+            entry_symbols={"ABC"},
+        )
+        paper.update_portfolio(
+            [research_row("2026-08-12")],
+            today="2026-08-13",
+            observed_at=observed("2026-08-13T23:15:00"),
+            entry_symbols=set(),
+        )
+        state = load_json(paper.PORTFOLIO_FILE)
+        self.assertEqual(state["positions"], {})
+        self.assertEqual(state["pending_orders"], [])
+        self.assertEqual(state["ledger"][-1]["type"], "ORDER_CANCELLED")
+        self.assertIn("no longer holds", state["ledger"][-1]["cancel_reason"])
+
+    def test_eur_fx_is_applied_to_fills_and_marks(self):
+        paper.update_portfolio(
+            [research_row("2026-08-10")],
+            today="2026-08-11",
+            observed_at=observed("2026-08-11T23:15:00"),
+        )
+        result = paper.update_portfolio(
+            [research_row("2026-08-13", open_price=100.0, close_price=110.0)],
+            today="2026-08-14",
+            observed_at=observed("2026-08-14T23:15:00"),
+            base_fx_bars={"2026-08-13": {"open": 2.0, "close": 2.0}},
+            entry_symbols={"ABC"},
+        )
+        state = load_json(paper.PORTFOLIO_FILE)
+        self.assertEqual(state["base_currency"], "EUR")
+        self.assertAlmostEqual(state["positions"]["ABC"]["entry_price"], 50.05)
+        self.assertAlmostEqual(state["positions"]["ABC"]["last_price"], 55.0)
+        self.assertEqual(result["base_currency"], "EUR")
+
     def test_benchmark_values_require_common_completed_bar_date(self):
         paper.update_portfolio(
             [research_row("2026-08-10")],
@@ -419,6 +540,7 @@ class PaperBacktestTests(ProjectTempMixin, unittest.TestCase):
         with patch.dict("os.environ", {"STOCK_RADAR_START_NEW_PAPER": "1"}):
             started = paper.load_portfolio("2026-08-12")
         self.assertEqual(started["cash"], paper.START_CAPITAL)
+        self.assertEqual(started["base_currency"], "EUR")
         self.assertEqual(started["positions"], {})
         self.assertIn("ABC", started["legacy_frozen_positions"])
 

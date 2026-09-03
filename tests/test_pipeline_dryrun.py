@@ -131,7 +131,7 @@ class DryRunPipelineTests(ProjectTempMixin, unittest.TestCase):
             "load_aschenbrenner",
             return_value={"holdings": {}, "report_quarter": None},
         ), patch.object(
-            analyze, "_fetch_benchmarks", return_value=({}, {})
+            analyze, "_fetch_benchmarks", return_value=({}, {}, {})
         ):
             result = analyze.run()
 
