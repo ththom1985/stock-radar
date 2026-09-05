@@ -10,6 +10,67 @@
  "positions": {},
  "pending_orders": [
   {
+   "order_id": "b984f993-466f-4b67-862a-5be5d5fccbe3",
+   "action": "BUY",
+   "symbol": "ZBH",
+   "name": "Zimmer Biomet",
+   "signal_bar_date": "2026-09-03",
+   "signal_timestamp": "2026-09-03T00:00:00",
+   "created_at": "2026-09-05T00:56:30+00:00",
+   "observed_at": "2026-09-05T00:56:30+00:00",
+   "not_before_bar_date": "2026-09-05",
+   "status": "pending",
+   "reason": "Strikter Fundamental-plus-Timing-Idealfall",
+   "target_notional": 1000.0,
+   "issuer_key": "name:zimmer biomet",
+   "sector": "Healthcare",
+   "country": "us",
+   "currency": "USD",
+   "thesis": {
+    "situation": {
+     "code": "ideal",
+     "label": "Idealfall: günstig UND am Einstiegspunkt"
+    },
+    "deal_quality": {
+     "score": 57.6,
+     "stars": 3,
+     "label": "Deal-Qualität 3 von 5",
+     "historical_percentile": null,
+     "comparison": "Noch keine Vergleichshistorie; Einordnung nach festen Schwellen.",
+     "comparison_basis": "feste Schwellen; Historie baut sich ab jetzt auf",
+     "history_reliable": false,
+     "history_observation_count": 0,
+     "history_calendar_days": 0,
+     "history_requirement": "mindestens 100 Gelegenheiten über mindestens 30 Kalendertage",
+     "components": {
+      "valuation_discount": 62.8,
+      "timing": 70.0,
+      "signals": 0.0,
+      "risk": 100.0
+     }
+    },
+    "discount_pct": 31.4,
+    "potential_score": 83.0,
+    "quality_score": 89.4,
+    "growth_score": 73.3,
+    "potential_driver": "Umsatzwachstum von +7.2%",
+    "residual_risk": null,
+    "sentences": [
+     "Der Kurs liegt rund 31% unter der unteren plausiblen fairen Grenze.",
+     "Dafür spricht Umsatzwachstum von +7.2%.",
+     "Einstieg jetzt möglich."
+    ]
+   }
+  }
+ ],
+ "ledger": [
+  {
+   "transaction_id": "55c2072f-345a-42e1-90ea-b07d9eef7684",
+   "type": "CLEAN_V2_SIMULATION_STARTED",
+   "timestamp": "2026-09-03T10:18:04+00:00",
+   "note": "Explicit STOCK_RADAR_START_NEW_PAPER=1 decision; legacy data preserved"
+  },
+  {
    "order_id": "03dc815a-392d-4ebf-8f50-63724acb2980",
    "action": "BUY",
    "symbol": "ASB",
@@ -19,7 +80,7 @@
    "created_at": "2026-09-03T10:07:40+00:00",
    "observed_at": "2026-09-03T10:07:40+00:00",
    "not_before_bar_date": "2026-09-03",
-   "status": "pending",
+   "status": "cancelled",
    "reason": "Strikter Fundamental-plus-Timing-Idealfall",
    "target_notional": 1000.0,
    "issuer_key": "name:associated bank",
@@ -60,15 +121,10 @@
      "Dafür spricht Umsatzwachstum von +23.5%.",
      "Einstieg jetzt möglich."
     ]
-   }
-  }
- ],
- "ledger": [
-  {
-   "transaction_id": "55c2072f-345a-42e1-90ea-b07d9eef7684",
-   "type": "CLEAN_V2_SIMULATION_STARTED",
-   "timestamp": "2026-09-03T10:18:04+00:00",
-   "note": "Explicit STOCK_RADAR_START_NEW_PAPER=1 decision; legacy data preserved"
+   },
+   "cancelled_at": "2026-09-05T00:56:30+00:00",
+   "cancel_reason": "strict ideal entry thesis no longer holds",
+   "type": "ORDER_CANCELLED"
   }
  ],
  "equity_curve": [
@@ -131,6 +187,33 @@
      "aligned": false
     }
    }
+  },
+  {
+   "date": "2026-09-05",
+   "as_of_bar_date": null,
+   "valuation_status": "mixed_or_stale",
+   "position_valuation_dates": {},
+   "equity": 10000.0,
+   "cash": 10000.0,
+   "invested": 0.0,
+   "n_positions": 0,
+   "benchmark_status": {
+    "sp500": {
+     "portfolio_bar_date": null,
+     "benchmark_bar_date": "2026-09-04",
+     "aligned": false
+    },
+    "ndx": {
+     "portfolio_bar_date": null,
+     "benchmark_bar_date": "2026-09-04",
+     "aligned": false
+    },
+    "world": {
+     "portfolio_bar_date": null,
+     "benchmark_bar_date": "2026-09-03",
+     "aligned": false
+    }
+   }
   }
  ],
  "assumptions": {
@@ -157,7 +240,7 @@
  "_meta": {
   "schema": "stock-radar-paper-portfolio",
   "schema_version": 2,
-  "written_at": "2026-09-04T01:09:18+00:00"
+  "written_at": "2026-09-05T01:17:37+00:00"
  },
  "legacy_archive": {
   "schema": "stock-radar-paper-portfolio",
