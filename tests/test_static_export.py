@@ -13,6 +13,7 @@ from src.export_static import (
     validate_static_payload,
 )
 from src.data_quality import FORBIDDEN_RESEARCH_PHRASES
+from src.freshness import build_session_freshness
 from tests.helpers import ProjectTempMixin
 from tests.helpers import ROOT
 
@@ -39,6 +40,10 @@ class StaticExportTests(ProjectTempMixin, unittest.TestCase):
         size = len(raw)
 
         self.assertEqual("stock-radar-static", loaded["schema"])
+        self.assertEqual(
+            loaded["data_status"]["session_freshness"],
+            build_session_freshness(loaded["instruments"]),
+        )
         self.assertEqual(STATIC_SCHEMA_VERSION, loaded["schema_version"])
         self.assertEqual(len(payload["instruments"]), len(loaded["instruments"]))
         self.assertGreater(len(loaded["instruments"]), 1000)
@@ -360,11 +365,12 @@ class StaticExportTests(ProjectTempMixin, unittest.TestCase):
         self.assertIn("--cp-warning", html)
         self.assertIn("--cp-danger", html)
         self.assertEqual(html.count('id="detail"'), 1)
-        self.assertIn("const MAX_OUTPUT_AGE_HOURS = 36", html)
+        self.assertIn('<script src="freshness.js"></script>', html)
         self.assertIn('status.status !== "ok"', html)
         self.assertIn("status.data_actionable !== true", html)
         self.assertIn("(status.blocking_reasons || []).length", html)
-        self.assertIn("ageHours > MAX_OUTPUT_AGE_HOURS", html)
+        self.assertIn("sessionFreshness(data, nowMs).researchFailures", html)
+        self.assertNotIn("MAX_OUTPUT_AGE_HOURS", html)
         self.assertIn("insights.actionable !== false", html)
         self.assertIn("instrumentContract.actionable !== false", html)
         self.assertIn("state.data.schema_version !== 3", html)

@@ -36,7 +36,7 @@ class OpportunityHistoryTests(unittest.TestCase):
         self.assertEqual(second["snapshot_count"], 1)
         self.assertEqual(second["calendar_days"], 1)
         self.assertFalse(second["reliable"])
-        self.assertIn("100 Gelegenheiten", second["reliability_requirement"])
+        self.assertIn("100 Scores", second["reliability_requirement"])
 
 
 if __name__ == "__main__":

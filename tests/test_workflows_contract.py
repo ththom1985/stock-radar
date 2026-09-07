@@ -13,9 +13,10 @@ class WorkflowContractTests(unittest.TestCase):
         manual = (ROOT / ".github/workflows/intraday.yml").read_text(encoding="utf-8")
         self.assertEqual(
             re.findall(r'cron:\s*"([^"]+)"', daily),
-            ["15 23 * * 1-5", "15 6 * * 2-6"],
+            ["15 23 * * 1-5", "15 2,6,9,18 * * *"],
         )
         self.assertIn("python -m src.automation_guard", daily)
+        self.assertNotIn("--max-age-hours", daily)
         self.assertIn("needs.freshness.outputs.rebuild == 'true'", daily)
         self.assertNotIn("cron:", manual)
         self.assertNotIn("STOCK_RADAR_INTRADAY", daily + manual)

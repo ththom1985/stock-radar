@@ -97,9 +97,9 @@ class PersistenceQualityTests(ProjectTempMixin, unittest.TestCase):
             "all": [],
         }
         self.assertIs(validate_output_contract(output), output)
-        allowed, reasons = dashboard_gate(output, now=now, max_output_age_hours=36)
+        allowed, reasons = dashboard_gate(output, now=now)
         self.assertFalse(allowed)
-        self.assertTrue(any("hours old" in reason for reason in reasons))
+        self.assertTrue(any("freshness contract is missing" in reason for reason in reasons))
 
     def test_completeness_gate_blocks(self):
         status = build_data_status(
@@ -109,6 +109,46 @@ class PersistenceQualityTests(ProjectTempMixin, unittest.TestCase):
             now=datetime(2026, 8, 12, tzinfo=timezone.utc),
         )
         self.assertEqual(status["status"], "blocked")
+        self.assertFalse(status["data_actionable"])
+
+    def test_dashboard_rechecks_real_sessions_not_generation_age(self):
+        row = enrich_row({
+            "symbol": "AAPL", "bar_date": "2026-09-04",
+            "asset_type": "company_equity", "currency": "USD",
+            "feature_coverage": {
+                "rank_eligible": True, "technical_complete": False,
+                "fundamental_complete": False, "fundamental_current": False,
+            },
+            "scenario_long": [],
+        })
+        output = {
+            "schema": OUTPUT_SCHEMA, "schema_version": OUTPUT_SCHEMA_VERSION,
+            "generated_at": "2026-09-05T01:17:37+00:00",
+            "data_status": build_data_status(
+                universe_size=1, rows=[row], failed_symbols={},
+                now=datetime(2026, 9, 5, 2, tzinfo=timezone.utc),
+            ),
+            "model_status": {"validation": "unvalidated", "actionable": False},
+            "rankings_by_currency_asset": {},
+            "insight_rankings": self._empty_insights(),
+            "insight_metadata": self._insight_metadata(),
+            "all": [row],
+        }
+        monday = datetime(2026, 9, 7, 11, tzinfo=timezone.utc)
+        self.assertEqual(dashboard_gate(output, now=monday), (True, []))
+        output["all"][0]["bar_date"] = "2026-09-03"
+        output["generated_at"] = monday.isoformat()
+        allowed, reasons = dashboard_gate(output, now=monday)
+        self.assertFalse(allowed)
+        self.assertTrue(any("missing completed sessions" in reason for reason in reasons))
+
+    def test_future_bar_is_not_counted_as_fresh_coverage(self):
+        status = build_data_status(
+            universe_size=1, rows=[{"symbol": "AAPL", "bar_date": "2026-09-08"}],
+            failed_symbols={}, now=datetime(2026, 9, 7, 11, tzinfo=timezone.utc),
+        )
+        self.assertEqual(status["fresh_bar_coverage_pct"], 0)
+        self.assertEqual(status["future_bar_symbols"], ["AAPL"])
         self.assertFalse(status["data_actionable"])
 
     def test_synthetic_v3_output_roundtrip_contract(self):

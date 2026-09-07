@@ -634,7 +634,40 @@ likelihood, probability, expected return, or recommendation strength.
 
 The static cockpit applies the same fail-closed contract before rendering any
 tips: status must be `ok`, `data_actionable` true, blocking reasons empty, model
-and insight actionability false, and `generated_at` no older than 36 hours.
+and insight actionability false. Freshness is based on actual `bar_date` values,
+not elapsed hours since `generated_at`; future/invalid timestamps remain blocked.
+Both dashboards use the `completed-session-v1` contract and require at least the
+existing 97% fresh-bar SLA **in each calendar scope**. Stale instruments and
+failing scopes are withheld from research lists, without disabling current US
+research because Asia or crypto is stale. Diagnostics still report every failing
+scope; global snapshot summaries are not current-market conclusions after filtering.
+Invalid contracts, future data and other structural gates remain fail-closed. All other data,
+feature, model, risk and ranking gates remain unchanged.
+
+Each real bar is fresh until the next expected session's regular close plus the
+existing 90-minute completion buffer. The NYSE holiday projection is shared with
+forward validation; early closes conservatively retain the regular close.
+For example, Friday September 4, 2026 US bars remain current through Labor Day
+and until Tuesday September 8 at 21:30 UTC. Thursday September 3 bars are missing
+Friday and remain stale even if analysis was generated on Saturday or Monday.
+There is no intentional extra one-session lag: ingestion filters incomplete
+bars, and indicators use the latest retained bar. A nonempty Yahoo response whose
+last bar predates the expected session is retried individually with an explicit
+exclusive end date. Persistent gaps remain visible, never relabeled fresh.
+The September 7 audit found that the stored AAPL response ended September 3 with
+zero partial rows excluded, while a direct Yahoo chart request contained September 4.
+The proven ingestion defect was accepting stale nonempty responses without retry;
+the historical provider-side reason cannot be reconstructed from that snapshot.
+
+Crypto uses UTC daily sessions seven days a week. Known non-US symbol profiles
+use their local close/DST and a disclosed weekday fallback (Sunday-Thursday for
+Saudi Arabia); **local holidays are not modeled**, so these markets may block
+conservatively on local holidays rather than incorrectly inheriting US holidays.
+Unknown mappings/non-US index calendars fail closed. Unscheduled exchange
+closures are not automatically detected. Static exports carry bar-derived
+completion deadlines; the browser rechecks them every minute without needing
+a second JavaScript holiday implementation. Missing legacy contracts require a
+new export; regenerating an export never refreshes the underlying bar dates.
 
 ## Free expert-analysis layer
 
@@ -739,12 +772,23 @@ The paper module is an **UNVALIDATED, non-actionable EUR 10,000 simulation**:
 
 - only a strict `ideal` valuation-plus-timing classification creates a pending
   long-only order at observation time;
-- the first completed bar whose session-open timestamp is later than order
-  creation may fill; earlier or same-signal bars are rejected;
+- strategy version 3 fixes the intended execution date to the first scheduled US
+  session opening after order creation. Only that completed bar may fill.
+  If the available bar has moved past it, cancel with an explicit missed-session
+  event: do not invent fills at a later open or reconstruct missing intervening
+  holdings. A delayed observation of the intended bar is labeled with its actual
+  observation time. Later end-of-day ideal membership/liquidity cannot veto a fill;
 - fills store signal/fill timestamps, quantity, raw/execution prices, commission,
   slippage, not-before date, and fill-observation time;
-- USD company equities are converted into the EUR base currency using the
-  observed daily USD-per-EUR rate stored with every fill and mark;
+- USD fills use the most recent preceding-date EURUSD close (maximum seven days
+  old); same-day FX open is not a simultaneous stock-open quote. This is an explicit
+  daily accounting approximation, not an executable FX price. Marks require the
+  same-date daily close. Missing FX cannot silently become 1:1 in production;
+- creation, fill and cancellation are separate append-only ledger events. The
+  display distinguishes event type from BUY/SELL and execution from observation.
+  Upgrading an existing portfolio appends a strategy-version event and explicit
+  cancellations of legacy pending orders; historical ASB cancellations and prior
+  fills are not rewritten, and the EUR 10,000 ledger is not reset;
 - exits are deterministic: -10% hard stop, an 8% trailing stop after a 12%
   peak gain, +30% take profit, 180-day maximum holding period, or a clear
   core-signal break;
@@ -752,7 +796,8 @@ The paper module is an **UNVALIDATED, non-actionable EUR 10,000 simulation**:
   ATR/annualized volatility apply (no correlation-optimization claim);
 - bounded sparse action history is replayed using stable symbol/type/ex-date/value
   keys; late-reported actions remain eligible and corrected values apply explicit
-  delta/correction ledger entries exactly once;
+  delta/correction ledger entries exactly once. Splits also adjust the high
+  watermark, so a neutral split cannot manufacture a trailing-stop loss;
 - legacy portfolio data is preserved and marked during migration, never reset.
   Legacy positions are frozen because their historical fills are incompatible
   with v2 accounting; starting a separate clean v2 simulation requires an
@@ -762,17 +807,42 @@ The paper module is an **UNVALIDATED, non-actionable EUR 10,000 simulation**:
 Corporate-action coverage may remain incomplete across missed runs. Consequently,
 paper performance remains explicitly non-actionable.
 
-Portfolio benchmarks use the same completed-session ingestion contract. Values
-are stored with their own bar dates and rebased only on common portfolio/benchmark
-as-of dates.
+Portfolio benchmarks use the same completed-session ingestion contract. New
+observations are EUR-converted using same-date daily FX and only stored against
+matching portfolio dates. Old untagged/USD points are not silently reinterpreted.
+Price indices and ETF total returns are not interchangeable: no benchmark
+outperformance claim is made.
+
+### Valuation percentages and score history
+
+`discount_pct = 100 * (1 - price / fair_lower)` is the true discount and drives
+the 15% threshold and deal scores. `upside_to_fair_lower_pct =
+100 * (fair_lower / price - 1)` is a different quantity, not a discount.
+For BR at 178.91 with fair lower 265.3709 these are 32.6% and 48.3%.
+Valuation inputs are plausibility-checked, not return-validated.
+
+The opportunity reference stores descriptive score distributions, not realized
+returns. Repeated snapshots are not independent trials; 100 scores across 30
+calendar days only describe reference coverage, never validate a strategy.
+Corrected score version 2 excludes legacy scores from new percentiles while
+retaining the old snapshots. `reliable` remains false; `reference_ready` is only
+a descriptive sample-size flag, not a release gate.
 
 ## Automation
 
 `.github/workflows/daily.yml` runs its primary build on weekdays at **23:15
 UTC**, after the major US markets are closed in both daylight-saving seasons.
-A **06:15 UTC Tuesday-Saturday** recovery check starts another build only when
-the committed snapshot is older than 12 hours or GitHub Pages does not serve
-the committed export. The legacy `intraday.yml` filename is manual-only and has
+Daily recovery checks at **02:15, 06:15, 09:15 and 18:15 UTC** include Monday and weekends
+and cover crypto, Asia and Europe in addition to the primary US run. Each starts
+another build when actual completed sessions are missing, bar evidence is
+invalid, or GitHub Pages does not serve the exact committed export. Even a small
+missing minority below the dashboard SLA is retried. A matching fresh generation
+timestamp cannot hide old bars; a complete US-only Friday snapshot does not
+rebuild merely because a holiday weekend elapsed. Crypto still requires weekend
+updates. GitHub schedules are best-effort and may be delayed; failures remain
+visible until a successful rebuild/publication. The guard uses only the standard
+library and the same calendar as the UI contract.
+The legacy `intraday.yml` filename is manual-only and has
 no schedule or intraday mode. Both workflows skip their analysis job unless
 `github.ref` is exactly
 `refs/heads/main`, explicitly check out `main`, and can therefore never publish
@@ -886,8 +956,6 @@ run_backtest(["AAPL", "MSFT", "..."], round_trip_cost_bps=20)
 Environment variables:
 
 - `STOCK_RADAR_MIN_COVERAGE_PCT` (default `97.0`)
-- `STOCK_RADAR_MAX_BAR_AGE_DAYS` (default `4`)
-- `STOCK_RADAR_MAX_OUTPUT_AGE_HOURS` (default `36`)
 - `STOCK_RADAR_MIN_RANK_COVERAGE_COMPANY_PCT` (default `70`)
 - `STOCK_RADAR_MIN_RANK_COVERAGE_FUND_PCT` (default `70`)
 - `STOCK_RADAR_MIN_RANK_COVERAGE_CRYPTO_PCT` (default `70`)

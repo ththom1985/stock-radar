@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, timezone
 
 from src.automation_guard import recovery_needed
 from src.verify_live import live_matches
+from tests.test_freshness import payloads
 
 
 class AutomationGuardTests(unittest.TestCase):
@@ -10,11 +11,8 @@ class AutomationGuardTests(unittest.TestCase):
         now = datetime(2026, 9, 3, 6, tzinfo=timezone.utc)
         generated = (now - timedelta(hours=7)).isoformat()
         rebuild, _ = recovery_needed(
-            {"generated_at": generated},
-            {"generated_at": generated},
-            {"generated_at": generated},
+            *payloads([{"symbol": "AAPL", "bar_date": "2026-09-02"}], generated),
             now=now,
-            max_age_hours=12,
         )
         self.assertFalse(rebuild)
 
@@ -22,14 +20,11 @@ class AutomationGuardTests(unittest.TestCase):
         now = datetime(2026, 9, 3, 6, tzinfo=timezone.utc)
         generated = (now - timedelta(hours=31)).isoformat()
         rebuild, reason = recovery_needed(
-            {"generated_at": generated},
-            {"generated_at": generated},
-            {"generated_at": generated},
+            *payloads([{"symbol": "AAPL", "bar_date": "2026-09-01"}], generated),
             now=now,
-            max_age_hours=12,
         )
         self.assertTrue(rebuild)
-        self.assertIn("31.0 hours", reason)
+        self.assertIn("missing completed sessions", reason)
 
     def test_live_mismatch_requires_recovery(self):
         now = datetime(2026, 9, 3, 6, tzinfo=timezone.utc)
@@ -40,7 +35,6 @@ class AutomationGuardTests(unittest.TestCase):
             {"generated_at": generated},
             {"generated_at": older},
             now=now,
-            max_age_hours=12,
         )
         self.assertTrue(rebuild)
 
@@ -53,7 +47,6 @@ class AutomationGuardTests(unittest.TestCase):
             {"generated_at": stale},
             {"generated_at": stale},
             now=now,
-            max_age_hours=12,
         )
         self.assertTrue(rebuild)
         self.assertIn("timestamps differ", reason)
@@ -66,7 +59,6 @@ class AutomationGuardTests(unittest.TestCase):
                 {},
                 [],
                 now=now,
-                max_age_hours=12,
             )
         with self.assertRaisesRegex(ValueError, "roots must be objects"):
             live_matches({}, [])

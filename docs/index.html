@@ -241,8 +241,8 @@
       <footer class="footer">Abgeschlossene Tageskurse · fehlende oder auffällige Daten werden zurückgehalten · keine Anlageberatung.</footer>
     </div>
   </main>
+  <script src="freshness.js"></script>
   <script>
-    const MAX_OUTPUT_AGE_HOURS = 36;
     const VALUATION_LISTS_ENABLED = true;
     const VALUATION_REPAIR_MESSAGE = "Bewertungsmodell wird überarbeitet — Aussagen derzeit nicht belastbar.";
     const state = { data: null, bySymbol: new Map(), view: "today", selected: null, gateFailures: [] };
@@ -544,11 +544,7 @@
       if (status.status !== "ok") failures.push("Datenstatus ist nicht OK.");
       if (status.data_actionable !== true) failures.push("Daten-Gate ist nicht freigegeben.");
       if ((status.blocking_reasons || []).length) failures.push(...status.blocking_reasons);
-      const generatedMs = Date.parse(data?.generated_at || "");
-      const ageHours = (nowMs - generatedMs) / 3600000;
-      if (!Number.isFinite(generatedMs)) failures.push("Ungültiger Datenzeitstempel.");
-      else if (ageHours > MAX_OUTPUT_AGE_HOURS) failures.push(`Daten sind ${ageHours.toFixed(1)} Stunden alt (Limit ${MAX_OUTPUT_AGE_HOURS}).`);
-      else if (ageHours < -1) failures.push("Datenzeitstempel liegt in der Zukunft.");
+      failures.push(...sessionFreshness(data, nowMs).researchFailures);
       if (model.validation !== "unvalidated" || model.actionable !== false) failures.push("Unsicherer Modellstatus.");
       if (insights.model_status !== "heuristic_unvalidated" || insights.actionable !== false || insights.enabled !== true) failures.push("Insight-Gate ist nicht freigegeben.");
       if (hasActionableTrue(insights)) failures.push("Verschachteltes actionable=true erkannt.");
@@ -673,7 +669,13 @@
       const primaryView = ["today", "cheap_with_potential", "expensive_now", "waiting_for_entry"].includes(state.view);
       $("controls").hidden = primaryView;
       $("currency").hidden = primaryView;
-      const items = categoryItems();
+      const currentFreshness = sessionFreshness(state.data);
+      const freshSymbols = new Set(currentFreshness.freshSymbols);
+      const items = categoryItems().filter(item => freshSymbols.has(item.symbol));
+      if (state.selected && !freshSymbols.has(state.selected)) {
+        state.selected = null;
+        renderDetail(null);
+      }
       const cat = category();
       $("list-title").textContent = categoryTitles[state.view];
       $("list-subtitle").textContent = state.view === "all"
@@ -694,16 +696,20 @@
         ? "Diese Titel tragen erhöhte sichtbare Risiken und werden deshalb derzeit gemieden."
         : `${$("currency").value} · ${cat?.formula || ""}`;
       $("result-count").textContent = `${items.length} sichtbar`;
+      if (currentFreshness.failures.length) {
+        $("list-subtitle").textContent = "Nur aktuell freigegebene Märkte/Titel; marktweite Einschätzungen des alten Snapshots sind zurückgehalten.";
+      }
       if (state.view === "cheap_with_potential" && state.data.question_views?.sector_concentration?.warning) {
         $("list-subtitle").textContent += ` · ${state.data.question_views.sector_concentration.warning}`;
       }
       if (state.view === "today") {
         const headline = state.data.today?.headline || "Heute keine belastbare Aussage";
         $("list-title").textContent = headline;
-        const triggered = state.data.today?.triggered_today || [];
-        const near = state.data.today?.near_triggers || [];
-        const idealCount = state.data.today?.ideal_candidate_count || 0;
-        const technicalCount = state.data.today?.technical_candidate_count ?? state.data.today?.candidate_count ?? 0;
+        const triggered = (state.data.today?.triggered_today || []).filter(item => freshSymbols.has(item.symbol));
+        const near = (state.data.today?.near_triggers || []).filter(item => freshSymbols.has(item.symbol));
+        const idealCount = items.filter(item => item.today?.situation?.code === "ideal").length;
+        const technicalCount = items.length;
+        if (currentFreshness.failures.length) $("list-title").textContent = "Aktuelle Kandidaten aus freigegebenen Märkten";
         const triggerNotice = `<div class="notice">Fundamental + Timing: ${idealCount} Idealfälle · Technische Einstiegszonen insgesamt: ${technicalCount}</div>${triggered.length ? `<div class="notice">Heute ausgelöst: ${triggered.length} Titel (${triggered.map((item) => escapeHtml(item.symbol)).join(", ")})</div>` : ""}${near.length ? `<div class="notice">${near.length} Titel stehen an der Auslösezone (${near.map((item) => escapeHtml(item.symbol)).join(", ")})</div>` : ""}`;
         $("rows").innerHTML = triggerNotice + items.map((item) => {
           const row = state.bySymbol.get(item.symbol) || {};
@@ -749,7 +755,7 @@
           </button>`;
         }).join("");
         const excluded = state.view === "cheap_with_potential"
-          ? (state.data.question_views?.excluded_cheap || [])
+          ? (state.data.question_views?.excluded_cheap || []).filter(item => freshSymbols.has(item.symbol))
           : [];
         const exclusions = excluded.length
           ? `<details class="card" style="padding:14px"><summary>Warum ${excluded.length} günstige Kandidaten fehlen</summary>${excluded.map((candidate) => `<div class="question-copy"><strong>${escapeHtml(candidate.symbol)}</strong> · ${percent(candidate.discount_pct)} unter fair · ${escapeHtml((candidate.reasons || []).join(" "))}</div>`).join("")}</details>`
@@ -1069,6 +1075,7 @@
     function renderHealthView() {
       $("cockpit").hidden = true; $("controls").hidden = true; $("paper").hidden = true; $("health").hidden = false;
       const status = state.data.data_status || {}; const age = status.bar_age_distribution || {};
+      const currentFreshness = sessionFreshness(state.data);
       const probability = state.data.probability_validation || {};
       const forward = state.data.forward_validation_status || {};
       const providerCoverage = probability.provider_coverage || {};
@@ -1079,11 +1086,15 @@
         ? `<table class="data-table"><tr><th>Modell</th><th>Freigabe</th><th>Brier skill</th><th>Max ECE</th><th>volle Folds</th><th>Jahre/min. Train</th></tr>${probabilityModels.map(([key, model]) => `<tr><td>${escapeHtml(key)}</td><td>${model.accepted ? "ja" : "nein"}</td><td>${$number(model.brier_skill, 3)}</td><td>${$number(Math.max(...Object.values(model.classwise_ece || {}).filter(Number.isFinite)), 3)}</td><td>${escapeHtml(model.full_test_fold_count ?? model.fold_count ?? "–")}</td><td>${$number(model.history_years, 1)} / ${$number(model.min_usable_train_years, 1)}</td></tr>`).join("")}</table>`
         : `<div class="muted">Noch keine Release-Validierung ausgeführt.</div>`;
       $("health-content").innerHTML = `${state.gateFailures.map((reason) => callout(reason, "danger")).join("")}<div class="detail-grid">
-        <div class="stat"><span>Status</span><strong>${escapeHtml(status.status || "–")}</strong></div>
+        <div class="stat"><span>Status beim Build</span><strong>${escapeHtml(status.status || "–")}</strong></div>
         <div class="stat"><span>Coverage</span><strong>${percent(status.coverage_pct)}</strong></div>
-        <div class="stat"><span>Frische Bars</span><strong>${percent(status.fresh_bar_coverage_pct)}</strong></div>
-        <div class="stat"><span>Median / Max Alter</span><strong>${$number(age.median_days, 0)} / ${$number(age.max_days, 0)} Tage</strong></div>
+        <div class="stat"><span>Frische Bars jetzt</span><strong>${percent(currentFreshness.freshPct)}</strong></div>
+        <div class="stat"><span>Median / Max Alter beim Build</span><strong>${$number(age.median_days, 0)} / ${$number(age.max_days, 0)} Tage</strong></div>
       </div><div class="section"><h3>Blocking Reasons</h3>${(status.blocking_reasons || []).map((reason) => callout(reason, "danger")).join("") || `<div class="muted">Keine.</div>`}</div>
+      <div class="section"><h3>Handelssitzungen und Kalenderabdeckung</h3>
+        <div class="muted">Frisch bis zum nächsten erwarteten abgeschlossenen Tageskurs plus 90 Minuten. US-Feiertage gelten nicht für andere Märkte; internationale Feiertage sind im konservativen Wochentags-Fallback nicht modelliert.</div>
+        <table class="data-table"><tr><th>Markt</th><th>Frisch jetzt</th><th>Kalender</th></tr>${currentFreshness.markets.map((scope) => `<tr><td>${escapeHtml(scope.market)}</td><td>${percent(scope.freshPct)}</td><td>${escapeHtml(scope.calendar)}</td></tr>`).join("")}</table>
+      </div>
       <div class="section"><h3>Probability-Validierung</h3><div class="detail-grid">
         <div class="stat"><span>Status</span><strong>${escapeHtml(probability.status || "unavailable")}</strong></div>
         <div class="stat"><span>Getestet</span><strong>${escapeHtml(probability.tested_model_count ?? 0)}</strong></div>
@@ -1111,12 +1122,19 @@
       const money = (value) => Number.isFinite(value) ? `${$number(value, 2)} €` : "–";
       const positions = paper.positions || [];
       const orders = paper.orders || [];
-      const activity = (paper.activity || []).slice().reverse();
+      const activity = (paper.activity || []).slice().reverse().map(item => ({
+        ...item,
+        action: [item.type, item.action].filter(Boolean).join(" · "),
+        fill_observed_at: item.type === "FILL"
+          ? `Ausführung: ${item.fill_session_open_timestamp || item.fill_timestamp || item.fill_bar_date || "–"} · Erfasst: ${item.fill_observed_at || item.timestamp || "–"}`
+          : undefined
+      }));
       const curve = paper.equity_curve || [];
       const thesisText = (value) => {
         const thesis = value?.thesis || value?.entry_thesis || {};
         const sentences = thesis.sentences || [];
-        return sentences.length ? sentences.join(" ") : (value?.reason || value?.note || "–");
+        const text = sentences.length ? sentences.join(" ") : (value?.reason || value?.note || "–");
+        return value?.strategy_version === 3 ? text : `Historisch dokumentiert, nicht neu berechnet: ${text}`;
       };
       const positionTable = positions.length
         ? `<table class="data-table"><tr><th>Titel</th><th>Einstieg</th><th>Aktuell</th><th>Wert</th><th>Ergebnis</th></tr>${positions.map((item) => `<tr><td><strong>${escapeHtml(item.symbol)}</strong><br><small>${escapeHtml(item.name || "")}</small></td><td>${money(item.entry_price)}</td><td>${money(item.last_price)}</td><td>${money(item.value)}</td><td>${money(item.pnl)} (${Number.isFinite(item.pnl_pct) ? `${$number(item.pnl_pct, 1)} %` : "–"})</td></tr>`).join("")}</table>`
@@ -1142,7 +1160,7 @@
       const activityTable = activity.length
         ? `<table class="data-table"><tr><th>Typ</th><th>Titel</th><th>Zeitpunkt</th><th>Kurs / Wert / Kosten</th><th>Begründung</th></tr>${activity.map((item) => `<tr><td>${escapeHtml(item.action || item.type || "–")}</td><td>${escapeHtml(item.symbol || "–")}</td><td>${escapeHtml(item.fill_observed_at || item.cancelled_at || item.created_at || item.timestamp || item.bar_date || "–")}<br><small>Signal: ${escapeHtml(item.signal_bar_date || "–")} · Fill: ${escapeHtml(item.fill_bar_date || "–")}</small></td><td>${Number.isFinite(item.execution_price) ? `${money(item.execution_price)} × ${$number(item.quantity, 4)} = ${money(item.gross_value)}` : "–"}<br><small>Gebühr: ${money(item.commission)} · FX: ${Number.isFinite(item.base_fx_usd) ? $number(item.base_fx_usd, 4) : "–"}</small>${Number.isFinite(item.realized_pnl) ? `<br><strong>Realisiert: ${money(item.realized_pnl)}</strong>` : ""}</td><td>${escapeHtml(thesisText(item))}${item.exit_trigger ? `<br><small>Verkaufsregel: ${escapeHtml(item.exit_trigger)}</small>` : ""}${item.cancel_reason ? `<br><small>Storno: ${escapeHtml(item.cancel_reason)}</small>` : ""}</td></tr>`).join("")}</table>`
         : `<div class="muted">Noch keine Aktivität.</div>`;
-      $("paper-activity").innerHTML = `<div class="notice">Simulation, kein echtes Geld. Käufe: nur strikte Idealfälle. Ausführung: ${escapeHtml(rules.execution || "späteres Tages-Open")}.</div>
+      $("paper-activity").innerHTML = `<div class="notice">Simulation, kein echtes Geld. Strategieversion ${escapeHtml(paper.strategy_version || "Legacy")}. Historische Ereignisse bleiben unverändert. Neue Strategie 3: FX zum vorherigen Tageskurs, keine zeitgleiche Devisenausführung; alte Ereignisse behalten ihre damalige Konvention. Kein belastbarer Benchmark-Outperformancevergleich. Käufe: nur strikte Idealfälle. Ausführung dieses Datenstands: ${escapeHtml(rules.execution || "Legacy-Tages-Open")}.</div>
         <div class="detail-grid">
           <div class="stat"><span>Hard-Stop</span><strong>${$number(rules.hard_stop_loss_pct, 0)} %</strong></div>
           <div class="stat"><span>Gewinnziel</span><strong>+${$number(rules.take_profit_pct, 0)} %</strong></div>
@@ -1182,14 +1200,13 @@
         $("generated").textContent = new Date(state.data.generated_at).toLocaleString("de-DE");
         $("instrument-count").textContent = $number(state.data.instruments.length, 0);
         $("coverage").textContent = percent(state.data.data_status.coverage_pct);
-        $("freshness").textContent = percent(state.data.data_status.fresh_bar_coverage_pct);
+        $("freshness").textContent = percent(sessionFreshness(state.data).freshPct);
         $("failed-count").textContent = $number(state.data.data_status.failed_symbol_count, 0);
         const history = state.data.opportunity_history_status || {};
-        const observations = Math.min(100, history.observation_count || 0);
-        const days = Math.min(30, history.calendar_days || 0);
-        $("learning-status").textContent = history.reliable
-          ? `Historienvergleich belastbar · ${observations} Gelegenheiten · ${days} Tage`
-          : `System lernt noch · ${observations}/100 Gelegenheiten · ${days}/30 Tage`;
+        const observations = history.observation_count || 0;
+        const days = history.calendar_days || 0;
+        $("learning-status").textContent =
+          `Deskriptive Score-Referenz · ${observations} Beobachtungen · ${days} Kalendertage · kein Renditenachweis`;
         bind();
         state.gateFailures = staticGateFailures(state.data);
         if (state.gateFailures.length) {
@@ -1211,6 +1228,22 @@
       }
     }
     start();
+    setInterval(() => {
+      if (!state.data || state.gateFailures.length) return;
+      state.gateFailures = staticGateFailures(state.data);
+      $("freshness").textContent = percent(sessionFreshness(state.data).freshPct);
+      if (!state.gateFailures.length) renderList();
+      if (state.gateFailures.length) {
+        document.querySelectorAll(".nav-button").forEach((button) => {
+          button.disabled = button.dataset.view !== "health";
+          button.classList.toggle("active", button.dataset.view === "health");
+        });
+        document.querySelector(".notice").textContent =
+          "Neue abgeschlossene Handelssitzungen fehlen. Bitte nach der nächsten Datenveröffentlichung neu laden.";
+        state.view = "health";
+        renderHealthView();
+      }
+    }, 60000);
   </script>
 </body>
 </html>

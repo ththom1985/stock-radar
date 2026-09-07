@@ -7,7 +7,7 @@ import re
 import time
 import urllib.parse
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any, Callable
 
 import pandas as pd
@@ -15,6 +15,7 @@ import yfinance as yf
 
 from .config import FETCH_CHUNK, FETCH_PAUSE, HISTORY_PERIOD
 from .markets import market_profile, session_is_complete, session_metadata
+from .freshness import latest_completed_session
 
 
 @dataclass
@@ -166,6 +167,19 @@ def _default_download(symbols: list[str], period: str) -> pd.DataFrame:
     )
 
 
+def _refresh_download(symbols: list[str], period: str) -> pd.DataFrame:
+    """Explicit exclusive end avoids accepting a stale nonempty range response."""
+    match = re.fullmatch(r"(\d+)(y|mo|d)", period)
+    count, unit = (int(match[1]), match[2]) if match else (5, "y")
+    end = pd.Timestamp(datetime.now(timezone.utc).date() + timedelta(days=1))
+    start = end - pd.DateOffset(**{ {"y": "years", "mo": "months", "d": "days"}[unit]: count})
+    return yf.download(
+        tickers=symbols, start=start.date().isoformat(), end=end.date().isoformat(),
+        interval="1d", group_by="ticker", auto_adjust=False, actions=True,
+        threads=False, progress=False, timeout=30,
+    )
+
+
 def _stooq_symbol(symbol: str) -> str | None:
     """Conservative Stooq mapping for ordinary US ticker symbols only."""
     if not re.fullmatch(r"[A-Z]{1,5}", symbol):
@@ -268,6 +282,33 @@ def fetch_prices_with_status(
             print(f"  Batch {index}: {done}/{total} | successful {len(result.prices)}")
         if index * FETCH_CHUNK < total:
             time.sleep(FETCH_PAUSE)
+
+    # A nonempty provider response is not evidence that its latest session arrived.
+    # Retry stale symbols once, individually, before retaining explicitly stale data.
+    refresh = _refresh_download if downloader is None else downloader
+    for symbol in list(result.prices):
+        try:
+            expected = latest_completed_session(symbol, now).isoformat()
+        except ValueError:
+            continue
+        info = result.bar_info[symbol]
+        info["expected_bar_date"] = expected
+        if info["bar_date"] >= expected:
+            continue
+        info["refresh_attempted"] = True
+        try:
+            raw = _symbol_frame(refresh([symbol], period), symbol, 1)
+            frame, refreshed = completed_daily_bars(raw, now=now, symbol=symbol)
+            if not frame.empty and refreshed["bar_date"] > info["bar_date"]:
+                result.prices[symbol] = frame
+                result.bar_info[symbol] = {
+                    **refreshed, "price_provider": "yfinance",
+                    "expected_bar_date": expected, "refresh_attempted": True,
+                }
+            result.bar_info[symbol]["missing_latest_session"] = result.bar_info[symbol]["bar_date"] < expected
+        except Exception as exc:
+            info["missing_latest_session"] = True
+            info["refresh_error"] = str(exc)[:200]
 
     fallback_enabled = (
         os.environ.get("STOCK_RADAR_STOOQ_FALLBACK", "1") == "1"

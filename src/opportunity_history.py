@@ -24,6 +24,7 @@ def update_opportunity_history(question_views, observed_at=None):
     ]
     current = {
         "date": observed_at.date().isoformat(),
+        "score_version": 2,
         "scores": [
             item["deal_quality"]["score"]
             for item in question_views.get("cheap_with_potential") or []
@@ -52,34 +53,39 @@ def update_opportunity_history(question_views, observed_at=None):
         },
         indent=1,
     )
+    reference_snapshots = [snapshot for snapshot in snapshots
+                           if snapshot.get("score_version") == 2 and snapshot.get("scores")]
     calendar_days = (
         (
-            datetime.fromisoformat(snapshots[-1]["date"]).date()
-            - datetime.fromisoformat(snapshots[0]["date"]).date()
+            datetime.fromisoformat(reference_snapshots[-1]["date"]).date()
+            - datetime.fromisoformat(reference_snapshots[0]["date"]).date()
         ).days
         + 1
-        if snapshots
+        if reference_snapshots
         else 0
     )
     scores = [
         score
-        for snapshot in snapshots
+        for snapshot in reference_snapshots
         for score in snapshot.get("scores") or []
         if isinstance(score, (int, float))
     ]
     return {
         "scores": scores,
         "observation_count": len(scores),
-        "snapshot_count": len(snapshots),
+        "snapshot_count": len(reference_snapshots),
         "calendar_days": calendar_days,
-        "from_date": snapshots[0]["date"] if snapshots else None,
-        "to_date": snapshots[-1]["date"] if snapshots else None,
-        "reliable": (
+        "from_date": reference_snapshots[0]["date"] if reference_snapshots else None,
+        "to_date": reference_snapshots[-1]["date"] if reference_snapshots else None,
+        "reliable": False,
+        "reference_ready": (
             len(scores) >= MIN_RELIABLE_OBSERVATIONS
             and calendar_days >= MIN_RELIABLE_CALENDAR_DAYS
         ),
+        "validation": "descriptive_score_distribution_only",
+        "score_version": 2,
         "reliability_requirement": (
-            f"mindestens {MIN_RELIABLE_OBSERVATIONS} Gelegenheiten über "
-            f"mindestens {MIN_RELIABLE_CALENDAR_DAYS} Kalendertage"
+            f"deskriptive Referenz ab {MIN_RELIABLE_OBSERVATIONS} Scores über "
+            f"{MIN_RELIABLE_CALENDAR_DAYS} Kalendertage; keine Renditevalidierung"
         ),
     }

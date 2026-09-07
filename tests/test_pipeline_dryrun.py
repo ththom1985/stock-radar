@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import unittest
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from unittest.mock import patch
 
 import numpy as np
@@ -9,6 +9,7 @@ import pandas as pd
 
 import src.analyze as analyze
 from src.fetch import PriceFetchResult
+from src.freshness import latest_completed_session
 from src.fx import FXResult
 from src.persistence import load_json
 from tests.helpers import ROOT, ProjectTempMixin
@@ -17,7 +18,7 @@ from tests.helpers import ROOT, ProjectTempMixin
 class DryRunPipelineTests(ProjectTempMixin, unittest.TestCase):
     def test_network_independent_pipeline_contract_does_not_mutate_tracked_data(self):
         now = datetime.now(timezone.utc)
-        bar_date = (now.date() - timedelta(days=1)).isoformat()
+        bar_date = latest_completed_session("AAA", now).isoformat()
         index = pd.date_range(end=bar_date, periods=260, freq="B")
         close = pd.Series(np.linspace(80, 120, len(index)), index=index)
         frame = pd.DataFrame(

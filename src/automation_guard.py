@@ -8,6 +8,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 from urllib.request import Request, urlopen
 
+from .freshness import build_session_freshness, evaluate_session_freshness, timestamp_failures
+from .verify_live import live_matches
+
 
 def _generated_at(payload: dict) -> datetime:
     value = payload.get("generated_at")
@@ -36,7 +39,6 @@ def recovery_needed(
     live: dict,
     *,
     now: datetime,
-    max_age_hours: float,
 ) -> tuple[bool, str]:
     for label, payload in (
         ("snapshot", snapshot),
@@ -53,13 +55,28 @@ def recovery_needed(
     if len(set(timestamps.values())) != 1:
         rendered = {key: value.isoformat() for key, value in timestamps.items()}
         return True, f"generation timestamps differ: {rendered}"
-    deployed_time = timestamps["live payload"]
-    age_hours = (
-        now.astimezone(timezone.utc) - deployed_time
-    ).total_seconds() / 3600
-    if age_hours < 0 or age_hours > max_age_hours:
-        return True, f"deployed payload age is {age_hours:.1f} hours"
-    return False, f"deployed payload is {age_hours:.1f} hours old and matches"
+    matched, reason = live_matches(exported, live)
+    if not matched:
+        return True, reason
+    snapshot_contract = build_session_freshness(snapshot.get("all") or [])
+    exported_contract = build_session_freshness(exported.get("instruments") or [])
+    if snapshot_contract != exported_contract:
+        return True, "snapshot/export completed-bar evidence differs"
+    for label, payload in (("snapshot", snapshot), ("export", exported), ("live", live)):
+        failures = timestamp_failures(payload, now)
+        rows = payload.get("all") if label == "snapshot" else payload.get("instruments")
+        if not isinstance(rows, list) or not rows:
+            return True, f"{label}: no completed-bar evidence"
+        current = evaluate_session_freshness(build_session_freshness(rows), now=now)
+        failures.extend(current["blocking_reasons"])
+        # Retry even a small missing minority which still meets the dashboard SLA.
+        if current["stale_symbols"]:
+            failures.append(f"missing completed sessions for {len(current['stale_symbols'])} instruments")
+        if failures:
+            return True, f"{label}: " + "; ".join(failures)
+    if (exported.get("data_status") or {}).get("session_freshness") != exported_contract:
+        return True, "export completed-session freshness contract is missing or differs"
+    return False, "all completed sessions are present and deployed content matches"
 
 
 def main() -> None:
@@ -67,7 +84,6 @@ def main() -> None:
     parser.add_argument("--snapshot", type=Path, required=True)
     parser.add_argument("--export", type=Path, required=True)
     parser.add_argument("--live-url", required=True)
-    parser.add_argument("--max-age-hours", type=float, default=12)
     args = parser.parse_args()
     try:
         snapshot = _load_snapshot(args.snapshot)
@@ -78,9 +94,8 @@ def main() -> None:
             exported,
             live,
             now=datetime.now(timezone.utc),
-            max_age_hours=args.max_age_hours,
         )
-    except (OSError, ValueError, json.JSONDecodeError) as exc:
+    except (OSError, ValueError, TypeError, KeyError) as exc:
         rebuild, reason = True, f"freshness check failed: {exc}"
     print(f"rebuild={'true' if rebuild else 'false'}")
     print(f"reason={reason}")

@@ -9,7 +9,7 @@ from .today_view import STATUS_LABELS, local_zone, traffic_light
 MIN_DISCOUNT_PCT = 15.0
 MIN_VALUE_POTENTIAL_SCORE = 65.0
 VALUATION_STATUS = "evidence_qualified_unbacktested"
-VALUATION_STATUS_LABEL = "Bewertung belastbar; Modell noch nicht rückgeprüft"
+VALUATION_STATUS_LABEL = "Bewertungsdaten plausibilisiert; Modell nicht rückgeprüft"
 VALUATION_LISTS_ENABLED = True
 VALUATION_REPAIR_MESSAGE = (
     "Bewertungsmodell wird überarbeitet — Aussagen derzeit nicht belastbar."
@@ -341,9 +341,9 @@ def _deal_quality(row, discount, historical_scores):
     if reference:
         percentile = sum(value <= score for value in reference) / len(reference) * 100.0
         relative = (
-            f"Besser als {percentile:.0f}% der gespeicherten Gelegenheiten."
+            f"Score mindestens so hoch wie {percentile:.0f}% der gespeicherten Scores; kein Renditevergleich."
             if percentile >= 50
-            else f"Schwächer als {100.0 - percentile:.0f}% der gespeicherten Gelegenheiten."
+            else f"Score niedriger als {100.0 - percentile:.0f}% der gespeicherten Scores; kein Renditevergleich."
         )
         comparison = (
             relative
@@ -366,7 +366,7 @@ def _deal_quality(row, discount, historical_scores):
         "comparison_basis": (
             f"Vergleich über {observation_count} Gelegenheiten seit "
             f"{_german_date(history.get('from_date'))} "
-            f"({calendar_days or 1} Snapshot-Tag). Aufbauend; belastbar ab {requirement}"
+            f"({calendar_days or 1} Kalendertage). Deskriptive Referenz; keine Prognosevalidierung."
             if reference and not history.get("reliable")
             else (
                 f"Vergleich über {observation_count} Gelegenheiten seit "
@@ -376,7 +376,8 @@ def _deal_quality(row, discount, historical_scores):
                 else "feste Schwellen; Historie baut sich ab jetzt auf"
             )
         ),
-        "history_reliable": bool(history.get("reliable")),
+        "history_reliable": False,
+        "reference_ready": bool(history.get("reference_ready")),
         "history_observation_count": observation_count,
         "history_calendar_days": calendar_days,
         "history_requirement": requirement,
@@ -397,13 +398,17 @@ def decision_overlay(row, historical_deal_scores=None):
     timing = _number(row.get("entry_timing_score")) or 0
     verdict = valuation.get("verdict")
     discount = (
-        max(0.0, (lower / price - 1.0) * 100.0)
-        if price is not None and price > 0 and lower is not None
+        max(0.0, (1.0 - price / lower) * 100.0)
+        if price is not None and price > 0 and lower is not None and lower > 0
         else 0.0
     )
     action = _cheap_action(row)
     if verdict == "clearly_undervalued":
-        situation = _situation(row, action)
+        eligible = build_question_views([row]).get("cheap_with_potential") or []
+        situation = (_situation(row, action) if eligible else {
+            "code": "wait",
+            "label": "Kein strikter Idealfall: Bewertungs-, Qualitäts- oder Risikofilter nicht erfüllt",
+        })
     elif verdict in {"expensive", "overpriced"} and timing >= 55:
         situation = {
             "code": "momentum_only",
@@ -518,7 +523,8 @@ def build_question_views(
             "badge": _badge(row),
         }
         if valuation.get("verdict") == "clearly_undervalued" and price < lower:
-            discount = (lower / price - 1) * 100
+            discount = (1 - price / lower) * 100
+            upside = (lower / price - 1) * 100
             potential = _value_potential(row)
             fundamental_risks = _fundamental_risk_reasons(row)
             if discount >= MIN_DISCOUNT_PCT and common["basis"] == "breit":
@@ -541,6 +547,7 @@ def build_question_views(
                                 or row.get("symbol")
                             ),
                             "discount_pct": round(discount, 1),
+                            "upside_to_fair_lower_pct": round(upside, 1),
                             "potential_score": round(potential["score"], 1),
                             "value_trap_risk": _value_trap_risk(row),
                             "risk_penalty": _number(
@@ -590,6 +597,7 @@ def build_question_views(
                         **common,
                         "badge": action["badge"],
                         "discount_pct": round(discount, 1),
+                        "upside_to_fair_lower_pct": round(upside, 1),
                         "attractiveness_score": round(min(100.0, attractiveness), 1),
                         "_rank_value": rank_value,
                         "potential_score": round(potential["score"], 1),
@@ -744,6 +752,7 @@ def build_question_views(
         )
     return {
         "enabled": True,
+        "decision_method_version": 2,
         "valuation_status": VALUATION_STATUS,
         "valuation_status_label": VALUATION_STATUS_LABEL,
         "cheap_with_potential": (

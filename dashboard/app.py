@@ -20,6 +20,8 @@ from src.data_quality import (
     validate_portfolio_contract,
 )
 from src.persistence import PersistenceError, load_json
+from src.paper_trader import eur_benchmark_observation
+from src.freshness import build_session_freshness, evaluate_session_freshness, filter_research_symbols
 from src.probability_forward_public import (
     load_forward_validation_status,
     validate_forward_validation_status,
@@ -54,6 +56,9 @@ except (PersistenceError, DataContractError) as exc:
     )
 
 status = data["data_status"]
+current_freshness = evaluate_session_freshness(
+    build_session_freshness(data["all"]), now=datetime.now(timezone.utc)
+)
 model = data["model_status"]
 try:
     forward_validation = validate_forward_validation_status(
@@ -87,10 +92,17 @@ if not allowed:
         )
     st.stop()
 
+if current_freshness["blocking_reasons"]:
+    st.warning("Veraltete Märkte/Titel werden zurückgehalten; frische Märkte bleiben verfügbar. Globale Zusammenfassungen gelten nur für den Build-Zeitpunkt.")
+allowed_symbols = set(current_freshness["fresh_symbols"])
+for key in ("all", "rankings_by_currency_asset", "insight_rankings", "today", "question_views", "expert_layer"):
+    if key in data:
+        data[key] = filter_research_symbols(data[key], allowed_symbols)
+
 metrics = st.columns(5)
 metrics[0].metric("Snapshot", data["generated_at"].replace("T", " ")[:19] + " UTC")
 metrics[1].metric("Preisabdeckung", f"{status.get('coverage_pct', 0):.2f}%")
-metrics[2].metric("Aktuelle Kurse", f"{status.get('fresh_bar_coverage_pct', 0):.2f}%")
+metrics[2].metric("Aktuelle Kurse", f"{current_freshness['fresh_bar_coverage_pct']:.2f}%")
 metrics[3].metric("Fehlende Titel", status.get("failed_symbol_count", 0))
 metrics[4].metric("Selbstprüfung", "läuft")
 
@@ -109,6 +121,7 @@ with st.expander("Technischer Daten- und Modellstatus", expanded=not allowed):
             "schema": data.get("schema"),
             "schema_version": data.get("schema_version"),
             "data_status": status,
+            "current_session_freshness": current_freshness,
             "model_status": model,
             "probability_validation": data.get("probability_validation"),
             "forward_validation_status": forward_validation,
@@ -1364,6 +1377,11 @@ with tabs[10]:
                 date_column = f"{column}_bar_date"
                 if date_column in curve:
                     aligned = pd.to_datetime(curve[date_column]) == curve["as_of_bar_date"]
+                    eur = pd.Series([
+                        eur_benchmark_observation(point, column.removeprefix("bench_"))
+                        for point in portfolio.get("equity_curve") or []
+                    ], index=curve.index)
+                    aligned &= eur
                     curve.loc[~aligned, column] = None
                 else:
                     curve[column] = None
@@ -1374,14 +1392,14 @@ with tabs[10]:
                 rebased["portfolio"] = comparison["equity"].to_numpy() / common_start["equity"] * 100
                 for column in benchmark_columns:
                     rebased[column] = comparison[column].to_numpy() / common_start[column] * 100
-                st.caption("All displayed series use the same first common observation.")
+                st.caption("Gemeinsame EUR-Beobachtungen; alte USD/ungekennzeichnete Punkte ausgeschlossen. Tages-FX-Näherung, unterschiedliche Preis-/Total-Return-Basis: kein belastbarer Outperformancevergleich.")
                 st.line_chart(rebased)
         fills = [
             item for item in (portfolio.get("ledger") or []) if item.get("type") == "FILL"
         ]
         total_cost = sum(float(item.get("commission") or 0) for item in fills)
         st.metric("Recorded commissions", f"{total_cost:,.2f} EUR")
-        st.dataframe(pd.DataFrame(fills[-50:]), hide_index=True, width="stretch")
+        st.dataframe(pd.DataFrame(portfolio.get("ledger") or []), hide_index=True, width="stretch")
 
 with tabs[11]:
     st.warning(

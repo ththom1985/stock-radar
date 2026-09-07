@@ -119,7 +119,7 @@ class PaperBacktestTests(ProjectTempMixin, unittest.TestCase):
             observed_at=observed("2026-08-11T23:15:00"),
         )
         paper.update_portfolio(
-            [research_row("2026-08-13")],
+            [research_row("2026-08-12")],
             today="2026-08-14",
             observed_at=observed("2026-08-14T23:15:00"),
         )
@@ -429,7 +429,7 @@ class PaperBacktestTests(ProjectTempMixin, unittest.TestCase):
         self.assertEqual(order["action"], "SELL")
         self.assertEqual(order["exit_trigger"], "hard_stop")
 
-    def test_pending_buy_is_cancelled_when_ideal_thesis_disappears(self):
+    def test_pending_buy_fills_even_when_later_ideal_thesis_disappears(self):
         paper.update_portfolio(
             [research_row("2026-08-10")],
             today="2026-08-11",
@@ -443,10 +443,9 @@ class PaperBacktestTests(ProjectTempMixin, unittest.TestCase):
             entry_symbols=set(),
         )
         state = load_json(paper.PORTFOLIO_FILE)
-        self.assertEqual(state["positions"], {})
+        self.assertIn("ABC", state["positions"])
         self.assertEqual(state["pending_orders"], [])
-        self.assertEqual(state["ledger"][-1]["type"], "ORDER_CANCELLED")
-        self.assertIn("no longer holds", state["ledger"][-1]["cancel_reason"])
+        self.assertEqual(state["ledger"][-1]["type"], "FILL")
 
     def test_eur_fx_is_applied_to_fills_and_marks(self):
         paper.update_portfolio(
@@ -455,10 +454,10 @@ class PaperBacktestTests(ProjectTempMixin, unittest.TestCase):
             observed_at=observed("2026-08-11T23:15:00"),
         )
         result = paper.update_portfolio(
-            [research_row("2026-08-13", open_price=100.0, close_price=110.0)],
+            [research_row("2026-08-12", open_price=100.0, close_price=110.0)],
             today="2026-08-14",
             observed_at=observed("2026-08-14T23:15:00"),
-            base_fx_bars={"2026-08-13": {"open": 2.0, "close": 2.0}},
+            base_fx_bars={"2026-08-11": {"close": 2.0}, "2026-08-12": {"open": 99.0, "close": 2.0}},
             entry_symbols={"ABC"},
         )
         state = load_json(paper.PORTFOLIO_FILE)
@@ -466,6 +465,8 @@ class PaperBacktestTests(ProjectTempMixin, unittest.TestCase):
         self.assertAlmostEqual(state["positions"]["ABC"]["entry_price"], 50.05)
         self.assertAlmostEqual(state["positions"]["ABC"]["last_price"], 55.0)
         self.assertEqual(result["base_currency"], "EUR")
+        fill = next(event for event in state["ledger"] if event["type"] == "FILL")
+        self.assertEqual(fill["fx_bar_date"], "2026-08-11")
 
     def test_benchmark_values_require_common_completed_bar_date(self):
         paper.update_portfolio(
@@ -484,7 +485,7 @@ class PaperBacktestTests(ProjectTempMixin, unittest.TestCase):
             today="2026-08-12",
             observed_at=observed("2026-08-12T23:15:00"),
             allow_orders=False,
-            benchmarks={"sp500": {"value": 6010.0, "bar_date": "2026-08-11"}},
+            benchmarks={"sp500": {"value": 6010.0, "bar_date": "2026-08-11", "currency": "EUR"}},
         )
         second = load_json(paper.PORTFOLIO_FILE)["equity_curve"][-1]
         self.assertEqual(second["bench_sp500_bar_date"], second["as_of_bar_date"])

@@ -9,6 +9,7 @@ from statistics import median
 from typing import Any
 
 from .persistence import SCHEMA_VERSION
+from .freshness import build_session_freshness, evaluate_session_freshness, timestamp_failures
 from .probability_inference import validate_probability_forecast
 from .sweet_spot import confirmed_status_violations, green_invariant_blockers
 
@@ -29,8 +30,6 @@ REQUIRED_INSIGHT_CATEGORIES = (
     "quality_momentum",
 )
 MIN_COVERAGE_PCT = float(os.environ.get("STOCK_RADAR_MIN_COVERAGE_PCT", "97.0"))
-MAX_BAR_AGE_DAYS = int(os.environ.get("STOCK_RADAR_MAX_BAR_AGE_DAYS", "4"))
-MAX_OUTPUT_AGE_HOURS = int(os.environ.get("STOCK_RADAR_MAX_OUTPUT_AGE_HOURS", "36"))
 MIN_RANK_COVERAGE_PCT = {
     "company_equity": float(
         os.environ.get("STOCK_RADAR_MIN_RANK_COVERAGE_COMPANY_PCT", "70")
@@ -675,7 +674,6 @@ def build_data_status(
     failed_symbols: dict[str, str],
     now: datetime | None = None,
     min_coverage_pct: float = MIN_COVERAGE_PCT,
-    max_bar_age_days: int = MAX_BAR_AGE_DAYS,
     extra_blockers: list[str] | None = None,
     feature_coverage: dict[str, dict[str, int]] | None = None,
     min_rank_coverage_pct: dict[str, float] | None = None,
@@ -685,25 +683,25 @@ def build_data_status(
     today = now.date()
     ages: list[float] = []
     missing_bar_date: list[str] = []
-    stale_symbols: list[str] = []
-    future_bar_symbols: list[str] = []
+    session_contract = build_session_freshness(rows)
+    session_status = evaluate_session_freshness(
+        session_contract, now=now, min_coverage_pct=min_coverage_pct
+    )
+    stale_symbols = session_status["stale_symbols"]
+    future_bar_symbols = session_status["future_symbols"]
     for row in rows:
         raw = row.get("bar_date")
         try:
             age = float((today - date.fromisoformat(str(raw))).days)
             ages.append(age)
-            if age < 0:
-                future_bar_symbols.append(str(row.get("symbol") or ""))
-            if age > max_bar_age_days:
-                stale_symbols.append(str(row.get("symbol") or ""))
         except (TypeError, ValueError):
             missing_bar_date.append(str(row.get("symbol") or ""))
 
     analyzed = len(rows)
     coverage = analyzed / universe_size * 100 if universe_size else 0.0
-    fresh_count = sum(age <= max_bar_age_days for age in ages)
-    fresh_pct = fresh_count / analyzed * 100 if analyzed else 0.0
+    fresh_pct = session_status["fresh_bar_coverage_pct"]
     blockers = list(extra_blockers or [])
+    blockers.extend(session_status["research_blocking_reasons"])
     if coverage < min_coverage_pct:
         blockers.append(
             f"price coverage {coverage:.2f}% is below the {min_coverage_pct:.2f}% SLA"
@@ -712,10 +710,6 @@ def build_data_status(
         blockers.append(f"{len(missing_bar_date)} rows have no completed-bar date")
     if future_bar_symbols:
         blockers.append(f"{len(future_bar_symbols)} rows have future completed-bar dates")
-    if fresh_pct < min_coverage_pct:
-        blockers.append(
-            f"fresh completed-bar coverage {fresh_pct:.2f}% is below the {min_coverage_pct:.2f}% SLA"
-        )
 
     minimums = min_rank_coverage_pct or MIN_RANK_COVERAGE_PCT
     feature_status = {}
@@ -773,12 +767,15 @@ def build_data_status(
         "coverage_pct": coverage,
         "coverage_sla_pct": min_coverage_pct,
         "fresh_bar_coverage_pct": fresh_pct,
-        "max_bar_age_days": max_bar_age_days,
+        "session_freshness": session_contract,
+        "session_freshness_markets": session_status["markets"],
+        "session_blocking_reasons": session_status["blocking_reasons"],
         "bar_age_distribution": distribution,
         "failed_symbol_count": len(failed_symbols),
         "failed_symbols": failed_symbols,
         "stale_symbols": stale_symbols,
         "missing_bar_date_symbols": missing_bar_date,
+        "invalid_session_symbols": session_status["invalid_symbols"],
         "future_bar_symbols": future_bar_symbols,
         "feature_coverage": feature_status,
         "blocking_reasons": blockers,
@@ -1066,7 +1063,6 @@ def dashboard_gate(
     data: dict[str, Any],
     *,
     now: datetime | None = None,
-    max_output_age_hours: int = MAX_OUTPUT_AGE_HOURS,
 ) -> tuple[bool, list[str]]:
     """Return whether research cards may be rendered and blocking reasons."""
     validate_output_contract(data)
@@ -1076,18 +1072,12 @@ def dashboard_gate(
         reasons.append("data_status.status is not 'ok'")
     if data["data_status"].get("data_actionable") is not True:
         reasons.append("data_status.data_actionable is not true")
-    try:
-        generated = datetime.fromisoformat(data["generated_at"])
-        if generated.tzinfo is None:
-            generated = generated.replace(tzinfo=timezone.utc)
-        age_h = (now - generated.astimezone(timezone.utc)).total_seconds() / 3600
-        if age_h > max_output_age_hours:
-            reasons.append(
-                f"output is {age_h:.1f} hours old (limit {max_output_age_hours} hours)"
-            )
-        if age_h < -1:
-            reasons.append("output timestamp is in the future")
-    except ValueError:
-        reasons.append("generated_at is not a valid ISO timestamp")
+    reasons.extend(timestamp_failures(data, now))
+    current = evaluate_session_freshness(
+        build_session_freshness(data["all"]),
+        now=now,
+        min_coverage_pct=max(MIN_COVERAGE_PCT, data["data_status"].get("coverage_sla_pct", MIN_COVERAGE_PCT)),
+    )
+    reasons.extend(current["research_blocking_reasons"])
     # Avoid duplicate messages from intentionally redundant consistency checks.
     return not reasons, list(dict.fromkeys(reasons))

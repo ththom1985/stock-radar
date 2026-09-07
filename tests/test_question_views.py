@@ -166,7 +166,7 @@ class QuestionViewsTests(unittest.TestCase):
         quality = result["cheap_with_potential"][0]["deal_quality"]
         self.assertIn("Deal-Qualität", quality["label"])
         self.assertIn("3 Gelegenheiten seit 30.08.2026", quality["comparison_basis"])
-        self.assertIn("belastbar ab", quality["comparison_basis"])
+        self.assertIn("keine Prognosevalidierung", quality["comparison_basis"])
         self.assertFalse(quality["history_reliable"])
 
     def test_near_triggers_are_exposed_for_today_summary(self):
@@ -218,7 +218,7 @@ class QuestionViewsTests(unittest.TestCase):
         result = build_question_views([row()])
         self.assertNotIn("actionable", result)
         self.assertEqual(result["valuation_status"], "evidence_qualified_unbacktested")
-        self.assertIn("noch nicht rückgeprüft", result["valuation_status_label"])
+        self.assertIn("nicht rückgeprüft", result["valuation_status_label"])
 
 
 if __name__ == "__main__":

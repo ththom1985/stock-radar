@@ -15,6 +15,8 @@ from typing import Any
 
 from .assets import COMPANY_EQUITY
 from .config import DATA
+from .markets import US, session_bounds
+from .market_calendar import _is_projected_us_session
 from .persistence import SCHEMA_VERSION, atomic_write_json, load_json, schema_meta, utc_now
 
 PORTFOLIO_FILE = DATA / "portfolio.json"
@@ -36,6 +38,42 @@ MAX_PER_COUNTRY = int(os.environ.get("STOCK_RADAR_MAX_PAPER_PER_COUNTRY", "4"))
 ORDER_MAX_AGE_DAYS = int(os.environ.get("STOCK_RADAR_PAPER_ORDER_MAX_AGE_DAYS", "7"))
 SLIPPAGE_BPS = float(os.environ.get("STOCK_RADAR_PAPER_SLIPPAGE_BPS", "10"))
 COMMISSION_BPS = float(os.environ.get("STOCK_RADAR_PAPER_COMMISSION_BPS", "5"))
+STRATEGY_VERSION = 3
+
+
+def _next_execution_date(created: datetime) -> str:
+    day = created.astimezone(timezone.utc).date()
+    while not _is_projected_us_session(day) or session_bounds(day, US)[0] <= created:
+        day += timedelta(days=1)
+    return day.isoformat()
+
+
+def _queue_order(portfolio: dict, order: dict) -> None:
+    portfolio["pending_orders"].append(order)
+    portfolio["ledger"].append({
+        **copy.deepcopy(order), "type": "ORDER_CREATED",
+        "timestamp": order["created_at"],
+    })
+
+
+def _execution_fx(bars: dict | None, bar_date: str) -> tuple[float | None, str | None]:
+    if bars is None:
+        return 1.0, None  # Unit-test/USD accounting convention only; production passes EUR bars.
+    dates = sorted(day for day in bars if day < bar_date)
+    if not dates:
+        return None, None
+    day = dates[-1]
+    rate = bars[day].get("close")
+    if (datetime.fromisoformat(bar_date) - datetime.fromisoformat(day)).days > 7:
+        return None, None
+    return rate, day
+
+
+def eur_benchmark_observation(point: dict, key: str) -> bool:
+    status = (point.get("benchmark_status") or {}).get(key) or {}
+    return bool(status.get("currency") == "EUR" and status.get("aligned") is True
+                and point.get("as_of_bar_date")
+                and point.get(f"bench_{key}_bar_date") == point["as_of_bar_date"])
 
 
 def _today() -> str:
@@ -47,6 +85,7 @@ def _initial(today: str) -> dict[str, Any]:
         "schema": "stock-radar-paper-portfolio",
         "schema_version": SCHEMA_VERSION,
         "simulation_status": "unvalidated",
+        "strategy_version": STRATEGY_VERSION,
         "performance_actionable": False,
         "created": today,
         "base_currency": "EUR",
@@ -58,7 +97,7 @@ def _initial(today: str) -> dict[str, Any]:
         "equity_curve": [],
         "assumptions": {
             "long_only": True,
-            "execution": "strictly later completed daily bar open",
+            "execution": "first scheduled US session open after order creation; missed sessions cancel, never backfill",
             "slippage_bps": SLIPPAGE_BPS,
             "commission_bps": COMMISSION_BPS,
             "hard_stop_loss_pct": HARD_STOP_LOSS_PCT,
@@ -72,7 +111,8 @@ def _initial(today: str) -> dict[str, Any]:
             "max_per_sector": MAX_PER_SECTOR,
             "max_per_country": MAX_PER_COUNTRY,
             "base_currency": "EUR",
-            "fx_accounting": "daily USD-per-EUR rate stored with every fill and mark",
+            "fx_accounting": "fills: previous dated EURUSD close (daily approximation, not synchronous FX); marks: same-date daily close",
+            "benchmark_comparability": "EUR-converted observations only; no benchmark outperformance claim",
             "diversification": "issuer uniqueness plus sector/country caps; no correlation claim",
             "order_not_before": (
                 "first completed bar whose session open is after order creation"
@@ -187,14 +227,22 @@ def _order(
     created = observed_at.astimezone(timezone.utc)
     return {
         "order_id": str(uuid.uuid4()),
+        "strategy_version": STRATEGY_VERSION,
         "action": action,
         "symbol": row["symbol"],
         "name": row.get("name"),
         "signal_bar_date": row["bar_date"],
         "signal_timestamp": row.get("bar_timestamp"),
+        "signal_constraints": {
+            key: row.get(key) for key in (
+                "radar_score", "avg_dollar_volume_20_usd", "atr_pct",
+                "vol_annual_pct", "daily_signal_direction",
+            )
+        },
         "created_at": created.isoformat(timespec="seconds"),
         "observed_at": created.isoformat(timespec="seconds"),
         "not_before_bar_date": created.date().isoformat(),
+        "expected_fill_bar_date": _next_execution_date(created),
         "status": "pending",
         "reason": reason,
         **extra,
@@ -260,6 +308,8 @@ def _apply_corporate_actions(
                 position["entry_price"] /= correction_ratio
                 if isinstance(position.get("last_price"), (int, float)):
                     position["last_price"] /= correction_ratio
+                if isinstance(position.get("high_watermark"), (int, float)):
+                    position["high_watermark"] /= correction_ratio
                 for pending in portfolio["pending_orders"]:
                     if pending.get("symbol") == symbol and pending.get("action") == "SELL":
                         pending["quantity"] = (
@@ -288,11 +338,7 @@ def _apply_corporate_actions(
                 )
             dividend = action.get("dividend_usd")
             if isinstance(dividend, (int, float)) and dividend > 0:
-                fx = (
-                    (base_fx_bars.get(bar_date) or {}).get("close")
-                    if base_fx_bars is not None
-                    else 1.0
-                )
+                fx, fx_date = _execution_fx(base_fx_bars, bar_date)
                 if not isinstance(fx, (int, float)) or fx <= 0:
                     continue
                 base_key = f"{symbol}|DIVIDEND|{bar_date}"
@@ -332,7 +378,7 @@ def _apply_corporate_actions(
                         "cash_delta_per_share": delta,
                         "cash_amount": amount,
                         "base_fx_usd": fx,
-                        "fx_bar_date": bar_date,
+                        "fx_bar_date": fx_date,
                         "action_key": version_key,
                         "timestamp": utc_now(),
                     }
@@ -392,24 +438,22 @@ def _execute_pending(
         if order["action"] == "BUY" and not allow_buy_fills:
             remaining.append(order)
             continue
-        if (
-            order["action"] == "BUY"
-            and eligible_buy_symbols is not None
-            and order["symbol"] not in eligible_buy_symbols
-        ):
-            order["status"] = "cancelled"
-            order["cancelled_at"] = observed_at.isoformat(timespec="seconds")
-            order["cancel_reason"] = "strict ideal entry thesis no longer holds"
-            portfolio["ledger"].append({**order, "type": "ORDER_CANCELLED"})
-            continue
         row = rows.get(order["symbol"])
         bar_date = row.get("bar_date") if row else None
         open_price = row.get("raw_open_usd") if row else None
+        expected = order.get("expected_fill_bar_date")
+        if expected and bar_date and bar_date > expected:
+            order["status"] = "cancelled"
+            order["cancelled_at"] = observed_at.isoformat(timespec="seconds")
+            order["cancel_reason"] = "missed execution session; historical fills are not reconstructed"
+            portfolio["ledger"].append({**order, "type": "ORDER_CANCELLED"})
+            continue
         if (
             not row
             or not bar_date
             or bar_date <= order["signal_bar_date"]
             or bar_date < order.get("not_before_bar_date", "9999-12-31")
+            or (expected and bar_date != expected)
         ):
             remaining.append(order)
             continue
@@ -422,9 +466,17 @@ def _execute_pending(
             portfolio["ledger"].append({**order, "type": "ORDER_CANCELLED"})
             continue
         session_open = row.get("session_open_timestamp")
+        if not session_open:
+            order["last_error"] = "missing execution session timestamp"
+            remaining.append(order)
+            continue
         if session_open:
             try:
                 if _parse_utc(session_open) <= _parse_utc(order["created_at"]):
+                    remaining.append(order)
+                    continue
+                _, close = session_bounds(datetime.fromisoformat(bar_date).date(), US)
+                if observed_at < close + timedelta(minutes=90):
                     remaining.append(order)
                     continue
             except (TypeError, ValueError):
@@ -434,21 +486,10 @@ def _execute_pending(
             order["last_error"] = "later bar has no valid raw USD open"
             remaining.append(order)
             continue
-        base_fx_usd = (
-            (base_fx_bars.get(bar_date) or {}).get("open")
-            if base_fx_bars is not None
-            else 1.0
-        )
+        base_fx_usd, fx_bar_date = _execution_fx(base_fx_bars, bar_date)
         if not isinstance(base_fx_usd, (int, float)) or base_fx_usd <= 0:
-            order["last_error"] = "later bar has no aligned EURUSD open"
+            order["last_error"] = "no preceding completed EURUSD close within 7 days"
             remaining.append(order)
-            continue
-        liquidity = row.get("avg_dollar_volume_20_usd")
-        if not isinstance(liquidity, (int, float)) or liquidity < MIN_AVG_DOLLAR_VOLUME:
-            order["status"] = "cancelled"
-            order["cancelled_at"] = utc_now()
-            order["cancel_reason"] = "liquidity below configured minimum"
-            portfolio["ledger"].append({**order, "type": "ORDER_CANCELLED"})
             continue
 
         action = order["action"]
@@ -481,16 +522,8 @@ def _execute_pending(
                 "entry_price": execution_price,
                 "cost_basis": gross + commission,
                 "entry_bar_date": bar_date,
-                "last_price": (
-                    row.get("raw_close_usd") / base_fx_usd
-                    if isinstance(row.get("raw_close_usd"), (int, float))
-                    else execution_price
-                ),
-                "high_watermark": (
-                    row.get("raw_close_usd") / base_fx_usd
-                    if isinstance(row.get("raw_close_usd"), (int, float))
-                    else execution_price
-                ),
+                "last_price": execution_price,
+                "high_watermark": execution_price,
                 "last_mark_bar_date": bar_date,
                 "last_action_bar_date": bar_date,
                 "processed_actions": {},
@@ -534,7 +567,7 @@ def _execute_pending(
                 "created_at": order.get("created_at"),
                 "not_before_bar_date": order.get("not_before_bar_date"),
                 "fill_bar_date": bar_date,
-                "fill_timestamp": row.get("bar_timestamp"),
+                "fill_timestamp": row.get("session_open_timestamp"),
                 "fill_session_open_timestamp": row.get("session_open_timestamp"),
                 "fill_observed_at": observed_at.isoformat(timespec="seconds"),
                 "quantity": quantity,
@@ -545,6 +578,9 @@ def _execute_pending(
                 "commission": commission,
                 "slippage_bps": SLIPPAGE_BPS,
                 "base_fx_usd": base_fx_usd,
+                "fx_bar_date": fx_bar_date,
+                "fx_convention": "preceding daily close, not synchronous execution FX",
+                "strategy_version": order.get("strategy_version"),
                 "reason": order.get("reason"),
                 "exit_trigger": order.get("exit_trigger"),
                 "thesis": transaction_thesis,
@@ -626,7 +662,7 @@ def _queue_signals(
         elif holding_days is not None and holding_days >= MAX_HOLDING_DAYS:
             trigger, reason = "time_exit", "Maximale Haltedauer von 180 Tagen erreicht"
         if reason:
-            portfolio["pending_orders"].append(
+            _queue_order(portfolio,
                 _order(
                     "SELL",
                     row,
@@ -656,6 +692,7 @@ def _queue_signals(
             for row in rows
             if row.get("asset_type") == COMPANY_EQUITY
             and row.get("currency") == "USD"
+            and "." not in row["symbol"]
             and (row.get("paper_eligibility") or {}).get("eligible") is True
             and isinstance(row.get("radar_score"), (int, float))
             and row["radar_score"] >= BUY_SCORE
@@ -712,7 +749,7 @@ def _queue_signals(
         country_limit = 1 if country == "unknown" else MAX_PER_COUNTRY
         if sector_counts[sector] >= sector_limit or country_counts[country] >= country_limit:
             continue
-        portfolio["pending_orders"].append(
+        _queue_order(portfolio,
             _order(
                 "BUY",
                 row,
@@ -827,7 +864,9 @@ def _mark_and_snapshot(
         benchmark_status[key] = {
             "portfolio_bar_date": as_of_bar_date,
             "benchmark_bar_date": benchmark_date,
-            "aligned": bool(as_of_bar_date and benchmark_date == as_of_bar_date),
+            "aligned": bool(as_of_bar_date and benchmark_date == as_of_bar_date and benchmark.get("currency") == "EUR"),
+            "currency": benchmark.get("currency"),
+            "comparison_status": "descriptive_only_not_comparable_total_return",
         }
         if benchmark_status[key]["aligned"] and isinstance(benchmark.get("value"), (int, float)):
             snapshot[f"bench_{key}"] = benchmark["value"]
@@ -876,6 +915,21 @@ def update_portfolio(
     observed_at = observed_at or datetime.now(timezone.utc)
     today = today or _today()
     portfolio = load_portfolio(today)
+    if portfolio.get("strategy_version") != STRATEGY_VERSION:
+        portfolio["ledger"].append({
+            "type": "STRATEGY_VERSION_CHANGED", "strategy_version": STRATEGY_VERSION,
+            "timestamp": observed_at.isoformat(),
+            "note": "Causal order policy enabled. Historical fills/cancellations unchanged; legacy pending orders cancelled, not reconstructed.",
+        })
+        for order in portfolio["pending_orders"]:
+            portfolio["ledger"].append({
+                **copy.deepcopy(order), "type": "ORDER_CANCELLED", "status": "cancelled",
+                "cancelled_at": observed_at.isoformat(),
+                "cancel_reason": "legacy pending order predates causal strategy version",
+            })
+        portfolio["pending_orders"] = []
+        portfolio["strategy_version"] = STRATEGY_VERSION
+        portfolio["assumptions"].update(_initial(today)["assumptions"])
     by_symbol = {row["symbol"]: row for row in rows}
     migration_blocked = bool(portfolio.get("migration_requires_review"))
     if action_data_allowed:
@@ -887,7 +941,7 @@ def update_portfolio(
             by_symbol,
             observed_at,
             allow_fills=bool(action_data_allowed and allow_orders),
-            allow_buy_fills=bool(allow_entries),
+            allow_buy_fills=True,
             base_fx_bars=base_fx_bars,
             eligible_buy_symbols=entry_symbols,
         )
@@ -940,6 +994,7 @@ def update_portfolio(
     return {
         "schema_version": SCHEMA_VERSION,
         "simulation_status": portfolio.get("simulation_status", "unvalidated"),
+        "strategy_version": portfolio.get("strategy_version"),
         "performance_actionable": False,
         "equity": equity,
         "cash": portfolio["cash"],

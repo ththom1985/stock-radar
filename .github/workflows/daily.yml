@@ -4,8 +4,9 @@ on:
   schedule:
     # One conservative weekday run after US markets are closed in both DST seasons.
     - cron: "15 23 * * 1-5"
-    # Recovery check: rebuild only when the primary snapshot or live Pages data is stale.
-    - cron: "15 6 * * 2-6"
+    # Daily recovery includes Monday, holidays and weekends (24x7 crypto).
+    # Skip only when actual completed sessions and deployed content match.
+    - cron: "15 2,6,9,18 * * *"
   workflow_dispatch:
 
 permissions:
@@ -37,7 +38,6 @@ jobs:
               --snapshot data/output/latest.json.gz \
               --export docs/data.json \
               --live-url https://ththom1985.github.io/stock-radar/data.json \
-              --max-age-hours 12 \
               >> "$GITHUB_OUTPUT"
           fi
 

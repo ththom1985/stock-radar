@@ -38,7 +38,7 @@ _PROFILES = {
     ".CO": MarketProfile("Europe/Copenhagen", time(9, 0), time(17, 0)),
     ".WA": MarketProfile("Europe/Warsaw", time(9, 0), time(17, 0)),
     ".AT": MarketProfile("Europe/Athens", time(10, 15), time(17, 20)),
-    ".T": MarketProfile("Asia/Tokyo", time(9, 0), time(15, 0)),
+    ".T": MarketProfile("Asia/Tokyo", time(9, 0), time(15, 30)),
     ".HK": MarketProfile("Asia/Hong_Kong", time(9, 30), time(16, 0)),
     ".KS": MarketProfile("Asia/Seoul", time(9, 0), time(15, 30)),
     ".KQ": MarketProfile("Asia/Seoul", time(9, 0), time(15, 30)),
@@ -65,8 +65,8 @@ _PROFILES = {
 
 def market_profile(symbol: str | None, index_timezone=None) -> MarketProfile:
     symbol = (symbol or "").upper()
-    if symbol.endswith("-USD") or symbol.startswith("^") or symbol.endswith("=F"):
-        if symbol.endswith("-USD"):
+    if symbol.endswith("-USD") or symbol.endswith("=X") or symbol.startswith("^") or symbol.endswith("=F"):
+        if symbol.endswith("-USD") or symbol.endswith("=X"):
             base = UTC_DAILY
         elif symbol.startswith("^"):
             base = US

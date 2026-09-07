@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from .data_quality import validate_insight_contract, validate_output_contract
+from .freshness import build_session_freshness
 from .insights import INSIGHT_CONTRACT_VERSION
 from .persistence import atomic_write_bytes, load_json, schema_meta
 from .probability_inference import (
@@ -1459,6 +1460,9 @@ def validate_static_payload(payload: Any) -> dict[str, Any]:
                     raise ValueError(
                         "Static reference-only zone leaked into sweet category"
                     )
+    session_contract = (payload.get("data_status") or {}).get("session_freshness")
+    if session_contract is not None and session_contract != build_session_freshness(payload["instruments"]):
+        raise ValueError("Static completed-session freshness evidence differs from real bars")
     return payload
 
 
@@ -1468,6 +1472,24 @@ def export_static(
 ) -> dict[str, Any]:
     snapshot = load_json(input_path, required=True, expected_type=dict)
     validate_output_contract(snapshot)
+    if (snapshot.get("question_views") or {}).get("decision_method_version") != 2:
+        # Re-present stored evidence without claiming fresh prices or rewriting paper history.
+        from .question_views import build_question_views, decision_overlay
+        from .today_view import build_today_view
+        old_cards = {item.get("symbol"): item for item in (snapshot.get("today") or {}).get("candidates", [])}
+        snapshot["question_views"] = build_question_views(snapshot["all"])
+        snapshot["today"] = build_today_view(snapshot["all"], question_views=snapshot["question_views"])
+        by_symbol = {row["symbol"]: row for row in snapshot["all"]}
+        for item in snapshot["today"]["candidates"]:
+            item.update(decision_overlay(by_symbol[item["symbol"]]))
+            if old_cards.get(item["symbol"], {}).get("sparkline"):
+                item["sparkline"] = old_cards[item["symbol"]]["sparkline"]
+        snapshot["today"]["market_summary"] = snapshot["question_views"]["market_state"]["sentence"]
+        snapshot["opportunity_history_status"] = {
+            "observation_count": 0, "snapshot_count": 0, "calendar_days": 0,
+            "reliable": False, "reference_ready": False, "score_version": 2,
+            "validation": "legacy scores excluded; descriptive only",
+        }
 
     rankings = {}
     for currency, by_asset in snapshot["rankings_by_currency_asset"].items():
@@ -1523,7 +1545,10 @@ def export_static(
         "schema": "stock-radar-static",
         "schema_version": STATIC_SCHEMA_VERSION,
         "generated_at": snapshot["generated_at"],
-        "data_status": snapshot["data_status"],
+        "data_status": {
+            **snapshot["data_status"],
+            "session_freshness": build_session_freshness(snapshot["all"]),
+        },
         "model_status": snapshot["model_status"],
         "insight_metadata": snapshot["insight_metadata"],
         "instrument_contract": STATIC_INSTRUMENT_CONTRACT,

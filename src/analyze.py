@@ -381,6 +381,8 @@ def _paper_eligibility(row: dict) -> dict:
         reasons.append("paper simulation accepts company equities only")
     if row.get("currency") != "USD":
         reasons.append("non-USD paper fills disabled until point-in-time FX exists")
+    if "." in str(row.get("symbol") or ""):
+        reasons.append("paper execution calendar currently supports US listings only")
     if not (row.get("feature_coverage") or {}).get("rank_eligible"):
         reasons.append("instrument is not rank-eligible")
     liquidity = row.get("avg_dollar_volume_20_usd")
@@ -427,6 +429,15 @@ def _fetch_benchmarks(now: datetime) -> tuple[dict, dict, dict]:
                 "open": float(bar["RawOpen"]),
                 "close": float(bar["RawClose"]),
             }
+    for benchmark in values.values():
+        fx = (fx_bars.get(benchmark["bar_date"]) or {}).get("close")
+        benchmark["source_value_usd"] = benchmark["value"]
+        benchmark["currency"] = "EUR" if fx and fx > 0 else "USD"
+        benchmark["comparison_status"] = "descriptive_only_not_comparable_total_return"
+        if fx and fx > 0:
+            benchmark["value"] /= fx
+            benchmark["base_fx_usd"] = fx
+            benchmark["fx_bar_date"] = benchmark["bar_date"]
     return values, fetched.failed_symbols, fx_bars
 
 
@@ -867,7 +878,10 @@ def run(with_news=True, with_fundamentals=True):
     stale_or_invalid = set(data_status.get("stale_symbols") or [])
     stale_or_invalid.update(data_status.get("missing_bar_date_symbols") or [])
     stale_or_invalid.update(data_status.get("future_bar_symbols") or [])
-    fresh_rows = [row for row in rows if row["symbol"] not in stale_or_invalid]
+    stale_or_invalid.update(data_status.get("invalid_session_symbols") or [])
+    from .freshness import build_session_freshness, evaluate_session_freshness
+    fresh_symbols = set(evaluate_session_freshness(build_session_freshness(rows), now=now)["fresh_symbols"])
+    fresh_rows = [row for row in rows if row["symbol"] in fresh_symbols]
     rankable = [
         row
         for row in fresh_rows

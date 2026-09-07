@@ -26,6 +26,19 @@ from tests.helpers import ROOT
 
 
 class DataSourceTests(unittest.TestCase):
+    def test_latest_completed_friday_is_not_unconditionally_dropped(self):
+        frame = pd.DataFrame(
+            {"Open": [100, 101], "High": [102, 103], "Low": [99, 100],
+             "Close": [101, 102], "Volume": [1000, 1100]},
+            index=pd.to_datetime(["2026-09-03", "2026-09-04"]),
+        )
+        completed, info = completed_daily_bars(
+            frame, symbol="AAPL", now=datetime(2026, 9, 4, 23, 15, tzinfo=timezone.utc)
+        )
+        self.assertEqual(info["bar_date"], "2026-09-04")
+        self.assertEqual(info["excluded_partial_rows"], 0)
+        self.assertEqual(completed["Close"].iloc[-1], 102)
+
     def test_current_local_daily_bar_is_excluded_and_raw_prices_preserved(self):
         index = pd.date_range("2026-08-10", periods=3, freq="D", tz="UTC")
         raw = pd.DataFrame(
@@ -161,7 +174,7 @@ class DataSourceTests(unittest.TestCase):
         after_tokyo, _ = completed_daily_bars(
             daily_frame("2026-01-06"),
             symbol="7203.T",
-            now=datetime(2026, 1, 6, 7, 31, tzinfo=timezone.utc),
+            now=datetime(2026, 1, 6, 8, 1, tzinfo=timezone.utc),
         )
         self.assertTrue(before_tokyo.empty)
         self.assertEqual(len(after_tokyo), 1)
