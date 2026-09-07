@@ -1,4 +1,6 @@
 import copy
+import ast
+import inspect
 import json
 import subprocess
 import unittest
@@ -8,6 +10,7 @@ from unittest.mock import patch
 import pandas as pd
 
 from src import paper_trader as paper
+from src import analyze
 from src.fetch import fetch_prices_with_status
 from src.freshness import build_session_freshness, evaluate_session_freshness
 from src.question_views import build_question_views
@@ -19,6 +22,18 @@ from tests.test_question_views import row
 
 
 class AuditRegressionTests(unittest.TestCase):
+    def test_pipeline_dates_orders_after_inputs_have_been_collected(self):
+        tree = ast.parse(inspect.getsource(analyze.run))
+        calls = [node for node in ast.walk(tree) if isinstance(node, ast.Call)
+                 and isinstance(node.func, ast.Name) and node.func.id == "update_portfolio"]
+        self.assertEqual(len(calls), 1)
+        timestamp = next(arg.value for arg in calls[0].keywords if arg.arg == "observed_at")
+        self.assertEqual(ast.unparse(timestamp), "datetime.now(timezone.utc)")
+        # A collection spanning the open must target tomorrow, not that past open.
+        order = paper._order("BUY", research_row("2026-09-08"), "collected",
+                             observed("2026-09-09T13:35:00"), target_notional=1000)
+        self.assertEqual(order["expected_fill_bar_date"], "2026-09-10")
+
     def test_usd_foreign_listing_cannot_use_us_execution_calendar(self):
         state = paper._initial("2026-09-02")
         candidate = research_row("2026-09-02", symbol="ABC.L", currency="USD")

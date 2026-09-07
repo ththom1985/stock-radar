@@ -1067,7 +1067,7 @@ def run(with_news=True, with_fundamentals=True):
             action_data_allowed=bool(price_action_rows) and bool(paper_fx_bars),
             allow_orders=bool(price_action_rows) and bool(paper_fx_bars),
             allow_entries=data_status["data_actionable"],
-            observed_at=now,
+            observed_at=datetime.now(timezone.utc),
             entry_symbols=ideal_entry_symbols,
             entry_theses=ideal_entries,
             base_fx_bars=paper_fx_bars,

@@ -771,7 +771,8 @@ It may be added later as an optional local MCP adapter only.
 The paper module is an **UNVALIDATED, non-actionable EUR 10,000 simulation**:
 
 - only a strict `ideal` valuation-plus-timing classification creates a pending
-  long-only order at observation time;
+  long-only order after input collection has finished, using the current order
+  observation time rather than the earlier pipeline-start timestamp;
 - strategy version 3 fixes the intended execution date to the first scheduled US
   session opening after order creation. Only that completed bar may fill.
   If the available bar has moved past it, cancel with an explicit missed-session
