@@ -22,6 +22,11 @@ from tests.test_question_views import row
 
 
 class AuditRegressionTests(unittest.TestCase):
+    def test_pending_order_view_prefers_scheduled_execution_session(self):
+        html = (ROOT / "docs" / "index.html").read_text(encoding="utf-8")
+        self.assertIn("item.expected_fill_bar_date || item.not_before_bar_date", html)
+        self.assertIn("Signal / Ausführungssitzung", html)
+
     def test_pipeline_dates_orders_after_inputs_have_been_collected(self):
         tree = ast.parse(inspect.getsource(analyze.run))
         calls = [node for node in ast.walk(tree) if isinstance(node, ast.Call)
