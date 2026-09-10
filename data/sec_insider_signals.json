@@ -1578,7 +1578,7 @@
  "_meta": {
   "schema": "stock-radar-sec-insider-cache",
   "schema_version": 1,
-  "written_at": "2026-09-10T01:19:14+00:00",
+  "written_at": "2026-09-10T07:30:02+00:00",
   "refreshed": 15
  },
  "INTC": {
@@ -5527,8 +5527,8 @@
   "transactions": [],
   "source": "SEC EDGAR Form 4",
   "source_url": "https://www.sec.gov/edgar/browse/?CIK=831001&owner=only",
-  "fetched_at": "2026-09-08T01:22:10+00:00",
-  "last_success_at": "2026-09-08T01:22:10+00:00",
+  "fetched_at": "2026-09-10T07:29:46+00:00",
+  "last_success_at": "2026-09-10T07:29:46+00:00",
   "expected_delay": "normally up to 2 business days"
  },
  "SCHW": {
@@ -5611,8 +5611,8 @@
   ],
   "source": "SEC EDGAR Form 4",
   "source_url": "https://www.sec.gov/edgar/browse/?CIK=316709&owner=only",
-  "fetched_at": "2026-09-08T01:22:11+00:00",
-  "last_success_at": "2026-09-08T01:22:11+00:00",
+  "fetched_at": "2026-09-10T07:29:47+00:00",
+  "last_success_at": "2026-09-10T07:29:47+00:00",
   "expected_delay": "normally up to 2 business days"
  },
  "DKNG": {
@@ -5640,8 +5640,8 @@
   ],
   "source": "SEC EDGAR Form 4",
   "source_url": "https://www.sec.gov/edgar/browse/?CIK=1883685&owner=only",
-  "fetched_at": "2026-09-08T01:22:12+00:00",
-  "last_success_at": "2026-09-08T01:22:12+00:00",
+  "fetched_at": "2026-09-10T07:29:48+00:00",
+  "last_success_at": "2026-09-10T07:29:48+00:00",
   "expected_delay": "normally up to 2 business days"
  },
  "BALY": {
@@ -5657,8 +5657,8 @@
   "transactions": [],
   "source": "SEC EDGAR Form 4",
   "source_url": "https://www.sec.gov/edgar/browse/?CIK=1747079&owner=only",
-  "fetched_at": "2026-09-08T01:22:13+00:00",
-  "last_success_at": "2026-09-08T01:22:13+00:00",
+  "fetched_at": "2026-09-10T07:29:49+00:00",
+  "last_success_at": "2026-09-10T07:29:49+00:00",
   "expected_delay": "normally up to 2 business days"
  },
  "QBTS": {
@@ -5669,9 +5669,20 @@
   "purchase_count_90d": 0,
   "sale_count_90d": 2,
   "purchase_value_90d": 0,
-  "sale_value_90d": 409096.71,
+  "sale_value_90d": 71842.27,
   "lookback_days": 90,
   "transactions": [
+   {
+    "transaction_date": "2026-09-08",
+    "code": "S",
+    "owner": "DiLullo John D",
+    "is_director": true,
+    "is_officer": false,
+    "officer_title": null,
+    "shares": 1100.0,
+    "price": 18.0005,
+    "value": 19800.55
+   },
    {
     "transaction_date": "2026-07-20",
     "code": "S",
@@ -5682,23 +5693,12 @@
     "shares": 3070.0,
     "price": 16.9517,
     "value": 52041.719
-   },
-   {
-    "transaction_date": "2026-06-15",
-    "code": "S",
-    "owner": "Ghai Rohit",
-    "is_director": true,
-    "is_officer": false,
-    "officer_title": null,
-    "shares": 13518.0,
-    "price": 26.4133,
-    "value": 357054.9894
    }
   ],
   "source": "SEC EDGAR Form 4",
   "source_url": "https://www.sec.gov/edgar/browse/?CIK=1907982&owner=only",
-  "fetched_at": "2026-09-08T01:22:14+00:00",
-  "last_success_at": "2026-09-08T01:22:14+00:00",
+  "fetched_at": "2026-09-10T07:29:50+00:00",
+  "last_success_at": "2026-09-10T07:29:50+00:00",
   "expected_delay": "normally up to 2 business days"
  },
  "GM": {
@@ -5858,48 +5858,114 @@
   ],
   "source": "SEC EDGAR Form 4",
   "source_url": "https://www.sec.gov/edgar/browse/?CIK=1467858&owner=only",
-  "fetched_at": "2026-09-08T01:22:15+00:00",
-  "last_success_at": "2026-09-08T01:22:15+00:00",
+  "fetched_at": "2026-09-10T07:29:51+00:00",
+  "last_success_at": "2026-09-10T07:29:51+00:00",
   "expected_delay": "normally up to 2 business days"
  },
  "TSM": {
-  "score": 60.0,
+  "score": 85.0,
   "direction": "positive",
-  "cluster_purchase": false,
-  "cluster_owner_count": 0,
-  "purchase_count_90d": 2,
+  "cluster_purchase": true,
+  "cluster_owner_count": 8,
+  "purchase_count_90d": 8,
   "sale_count_90d": 0,
-  "purchase_value_90d": 154180.0,
+  "purchase_value_90d": 40081.2,
   "sale_value_90d": 0,
   "lookback_days": 90,
   "transactions": [
    {
-    "transaction_date": "2026-07-02",
+    "transaction_date": "2026-09-07",
     "code": "P",
-    "owner": "Fang Shu-Hua",
+    "owner": "Wu Yi-Huang",
     "is_director": false,
     "is_officer": true,
-    "officer_title": "SVP and GC",
-    "shares": 1000.0,
-    "price": 77.09,
-    "value": 77090.0
+    "officer_title": "VP",
+    "shares": 40.0,
+    "price": 76.2,
+    "value": 3048.0
    },
    {
-    "transaction_date": "2026-07-02",
+    "transaction_date": "2026-09-07",
     "code": "P",
-    "owner": "Fang Shu-Hua",
+    "owner": "Yoo Chue-San",
     "is_director": false,
     "is_officer": true,
-    "officer_title": "SVP and GC",
-    "shares": 1000.0,
-    "price": 77.09,
-    "value": 77090.0
+    "officer_title": "VP",
+    "shares": 53.0,
+    "price": 76.2,
+    "value": 4038.6000000000004
+   },
+   {
+    "transaction_date": "2026-09-07",
+    "code": "P",
+    "owner": "Yeap Choh Fei",
+    "is_director": false,
+    "is_officer": true,
+    "officer_title": "SVP",
+    "shares": 54.0,
+    "price": 76.2,
+    "value": 4114.8
+   },
+   {
+    "transaction_date": "2026-09-07",
+    "code": "P",
+    "owner": "Zhang Kevin Xiaoqiang",
+    "is_director": false,
+    "is_officer": true,
+    "officer_title": "SVP and Deputy Co-COO",
+    "shares": 61.0,
+    "price": 76.2,
+    "value": 4648.2
+   },
+   {
+    "transaction_date": "2026-09-07",
+    "code": "P",
+    "owner": "Yuan Lipen",
+    "is_director": false,
+    "is_officer": true,
+    "officer_title": "VP",
+    "shares": 41.0,
+    "price": 76.2,
+    "value": 3124.2000000000003
+   },
+   {
+    "transaction_date": "2026-09-07",
+    "code": "P",
+    "owner": "Mii Yuh-Jier",
+    "is_director": false,
+    "is_officer": true,
+    "officer_title": "EVP and Co-COO",
+    "shares": 71.0,
+    "price": 76.2,
+    "value": 5410.2
+   },
+   {
+    "transaction_date": "2026-09-07",
+    "code": "P",
+    "owner": "Wu Shien-Yang",
+    "is_director": false,
+    "is_officer": true,
+    "officer_title": "SVP",
+    "shares": 57.0,
+    "price": 76.2,
+    "value": 4343.400000000001
+   },
+   {
+    "transaction_date": "2026-09-07",
+    "code": "P",
+    "owner": "Wei Che-Chia",
+    "is_director": true,
+    "is_officer": true,
+    "officer_title": "Chairman and CEO",
+    "shares": 149.0,
+    "price": 76.2,
+    "value": 11353.800000000001
    }
   ],
   "source": "SEC EDGAR Form 4",
   "source_url": "https://www.sec.gov/edgar/browse/?CIK=1046179&owner=only",
-  "fetched_at": "2026-09-08T01:22:17+00:00",
-  "last_success_at": "2026-09-08T01:22:17+00:00",
+  "fetched_at": "2026-09-10T07:29:53+00:00",
+  "last_success_at": "2026-09-10T07:29:53+00:00",
   "expected_delay": "normally up to 2 business days"
  },
  "AXON": {
@@ -6180,8 +6246,8 @@
   ],
   "source": "SEC EDGAR Form 4",
   "source_url": "https://www.sec.gov/edgar/browse/?CIK=1069183&owner=only",
-  "fetched_at": "2026-09-08T01:22:18+00:00",
-  "last_success_at": "2026-09-08T01:22:18+00:00",
+  "fetched_at": "2026-09-10T07:29:54+00:00",
+  "last_success_at": "2026-09-10T07:29:54+00:00",
   "expected_delay": "normally up to 2 business days"
  },
  "LMT": {
@@ -6297,8 +6363,8 @@
   ],
   "source": "SEC EDGAR Form 4",
   "source_url": "https://www.sec.gov/edgar/browse/?CIK=936468&owner=only",
-  "fetched_at": "2026-09-08T01:22:19+00:00",
-  "last_success_at": "2026-09-08T01:22:19+00:00",
+  "fetched_at": "2026-09-10T07:29:55+00:00",
+  "last_success_at": "2026-09-10T07:29:55+00:00",
   "expected_delay": "normally up to 2 business days"
  },
  "NOC": {
@@ -6425,8 +6491,8 @@
   ],
   "source": "SEC EDGAR Form 4",
   "source_url": "https://www.sec.gov/edgar/browse/?CIK=1133421&owner=only",
-  "fetched_at": "2026-09-08T01:22:20+00:00",
-  "last_success_at": "2026-09-08T01:22:20+00:00",
+  "fetched_at": "2026-09-10T07:29:56+00:00",
+  "last_success_at": "2026-09-10T07:29:56+00:00",
   "expected_delay": "normally up to 2 business days"
  },
  "BA": {
@@ -6442,8 +6508,8 @@
   "transactions": [],
   "source": "SEC EDGAR Form 4",
   "source_url": "https://www.sec.gov/edgar/browse/?CIK=12927&owner=only",
-  "fetched_at": "2026-09-08T01:22:21+00:00",
-  "last_success_at": "2026-09-08T01:22:21+00:00",
+  "fetched_at": "2026-09-10T07:29:57+00:00",
+  "last_success_at": "2026-09-10T07:29:57+00:00",
   "expected_delay": "normally up to 2 business days"
  },
  "CAT": {
@@ -6614,8 +6680,8 @@
   ],
   "source": "SEC EDGAR Form 4",
   "source_url": "https://www.sec.gov/edgar/browse/?CIK=18230&owner=only",
-  "fetched_at": "2026-09-08T01:22:23+00:00",
-  "last_success_at": "2026-09-08T01:22:23+00:00",
+  "fetched_at": "2026-09-10T07:29:58+00:00",
+  "last_success_at": "2026-09-10T07:29:58+00:00",
   "expected_delay": "normally up to 2 business days"
  },
  "AGCO": {
@@ -6624,11 +6690,33 @@
   "cluster_purchase": false,
   "cluster_owner_count": 0,
   "purchase_count_90d": 1,
-  "sale_count_90d": 3,
+  "sale_count_90d": 5,
   "purchase_value_90d": 100710.0,
-  "sale_value_90d": 56996782.16,
+  "sale_value_90d": 57467541.16,
   "lookback_days": 90,
   "transactions": [
+   {
+    "transaction_date": "2026-09-04",
+    "code": "S",
+    "owner": "Bennett Kelvin Eugene",
+    "is_director": false,
+    "is_officer": true,
+    "officer_title": "SVP Engineering",
+    "shares": 1000.0,
+    "price": 132.89,
+    "value": 132890.0
+   },
+   {
+    "transaction_date": "2026-09-04",
+    "code": "S",
+    "owner": "Hansotia Eric P",
+    "is_director": true,
+    "is_officer": true,
+    "officer_title": "Chairman, President and CEO",
+    "shares": 2604.0,
+    "price": 129.75,
+    "value": 337869.0
+   },
    {
     "transaction_date": "2026-08-14",
     "code": "P",
@@ -6676,8 +6764,8 @@
   ],
   "source": "SEC EDGAR Form 4",
   "source_url": "https://www.sec.gov/edgar/browse/?CIK=880266&owner=only",
-  "fetched_at": "2026-09-08T01:22:24+00:00",
-  "last_success_at": "2026-09-08T01:22:24+00:00",
+  "fetched_at": "2026-09-10T07:30:00+00:00",
+  "last_success_at": "2026-09-10T07:30:00+00:00",
   "expected_delay": "normally up to 2 business days"
  },
  "CNH": {
@@ -6693,8 +6781,8 @@
   "transactions": [],
   "source": "SEC EDGAR Form 4",
   "source_url": "https://www.sec.gov/edgar/browse/?CIK=1567094&owner=only",
-  "fetched_at": "2026-09-08T01:22:24+00:00",
-  "last_success_at": "2026-09-08T01:22:24+00:00",
+  "fetched_at": "2026-09-10T07:30:00+00:00",
+  "last_success_at": "2026-09-10T07:30:00+00:00",
   "expected_delay": "normally up to 2 business days"
  },
  "AVAV": {
@@ -6755,8 +6843,8 @@
   ],
   "source": "SEC EDGAR Form 4",
   "source_url": "https://www.sec.gov/edgar/browse/?CIK=1368622&owner=only",
-  "fetched_at": "2026-09-08T01:22:26+00:00",
-  "last_success_at": "2026-09-08T01:22:26+00:00",
+  "fetched_at": "2026-09-10T07:30:01+00:00",
+  "last_success_at": "2026-09-10T07:30:01+00:00",
   "expected_delay": "normally up to 2 business days"
  },
  "BLBD": {
