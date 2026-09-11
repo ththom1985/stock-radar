@@ -95,7 +95,7 @@
  "_meta": {
   "schema": "stock-radar-earnings-tone-cache",
   "schema_version": 2,
-  "written_at": "2026-09-11T13:47:34+00:00",
+  "written_at": "2026-09-11T21:10:59+00:00",
   "refreshed": 3
  },
  "EIX": {
@@ -3332,5 +3332,73 @@
   "expected_delay": "source publication time",
   "fetched_at": "2026-09-11T13:47:34+00:00",
   "last_success_at": "2026-09-11T13:47:34+00:00"
+ },
+ "AM": {
+  "score": 45.0,
+  "direction": "neutral",
+  "transcript_status": "prepared-only",
+  "analysis_method": "free_financial_lexicon_v1",
+  "current_tone": 45,
+  "previous_tone": 49,
+  "tone_shift": -4,
+  "hedging_shift": 1,
+  "qa_evasiveness_shift": null,
+  "qa_status": "not_available",
+  "cfo_tone_shift": null,
+  "cfo_weight": null,
+  "reason": "Free lexicon: positive/negative 17/24 vs 18/19; Q&A/CFO unavailable.",
+  "current_period": {
+   "period": "2026-07-29",
+   "filing_date": "2026-07-29",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1623925/000110465926088210/tm2621395d1_ex99-1.htm"
+  },
+  "previous_period": {
+   "period": "2026-04-29",
+   "filing_date": "2026-04-29",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1623925/000110465926051547/tm2612867d1_ex99-1.htm"
+  },
+  "source": "free earnings text + transparent financial lexicon",
+  "expected_delay": "source publication time",
+  "fetched_at": "2026-09-11T21:10:48+00:00",
+  "last_success_at": "2026-09-11T21:10:48+00:00"
+ },
+ "MSM": {
+  "_refresh_failure": {
+   "at": "2026-09-11T21:10:58+00:00",
+   "error": "HTTP Error 503: Service Unavailable"
+  }
+ },
+ "ADP": {
+  "score": 60.0,
+  "direction": "positive",
+  "transcript_status": "prepared-only",
+  "analysis_method": "free_financial_lexicon_v1",
+  "current_tone": 60,
+  "previous_tone": 51,
+  "tone_shift": 9,
+  "hedging_shift": -1,
+  "qa_evasiveness_shift": null,
+  "qa_status": "not_available",
+  "cfo_tone_shift": null,
+  "cfo_weight": null,
+  "reason": "Free lexicon: positive/negative 36/18 vs 49/30; Q&A/CFO unavailable.",
+  "current_period": {
+   "period": "2026-07-29",
+   "filing_date": "2026-07-29",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/8670/000000867026000025/q4fy26exhibit99.htm"
+  },
+  "previous_period": {
+   "period": "2026-06-26",
+   "filing_date": "2026-06-26",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/8670/000095014226001884/eh260799361_ex1002.htm"
+  },
+  "source": "free earnings text + transparent financial lexicon",
+  "expected_delay": "source publication time",
+  "fetched_at": "2026-09-11T21:10:59+00:00",
+  "last_success_at": "2026-09-11T21:10:59+00:00"
  }
 }
