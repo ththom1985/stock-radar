@@ -6,64 +6,8 @@
  "created": "2026-09-03",
  "base_currency": "EUR",
  "starting_cash": 10000.0,
- "cash": 6958.132653657901,
+ "cash": 6956.415158485574,
  "positions": {
-  "ASB": {
-   "symbol": "ASB",
-   "name": "Associated Bank",
-   "quantity": 38.045204747075516,
-   "entry_price": 26.187968964838824,
-   "cost_basis": 996.8248044979409,
-   "entry_bar_date": "2026-09-09",
-   "last_price": 25.7938844790946,
-   "high_watermark": 26.254391248377697,
-   "last_mark_bar_date": "2026-09-16",
-   "last_action_bar_date": "2026-09-09",
-   "processed_actions": {},
-   "legacy": false,
-   "issuer_key": "name:associated bank",
-   "sector": "Financial Services",
-   "country": "us",
-   "instrument_currency": "USD",
-   "base_currency": "EUR",
-   "entry_thesis": {
-    "situation": {
-     "code": "ideal",
-     "label": "Idealfall: günstig UND am Einstiegspunkt"
-    },
-    "deal_quality": {
-     "score": 39.9,
-     "stars": 2,
-     "label": "Deal-Qualität 2 von 5",
-     "historical_percentile": null,
-     "comparison": "Noch keine Vergleichshistorie; Einordnung nach festen Schwellen.",
-     "comparison_basis": "feste Schwellen; Historie baut sich ab jetzt auf",
-     "history_reliable": false,
-     "reference_ready": false,
-     "history_observation_count": 0,
-     "history_calendar_days": 0,
-     "history_requirement": "mindestens 100 Gelegenheiten über mindestens 30 Kalendertage",
-     "components": {
-      "valuation_discount": 31.7,
-      "timing": 77.0,
-      "signals": 25.0,
-      "risk": 20.0
-     }
-    },
-    "discount_pct": 15.8,
-    "potential_score": 81.5,
-    "quality_score": 92.5,
-    "growth_score": 65.0,
-    "potential_driver": "Umsatzwachstum von +23.5%",
-    "residual_risk": null,
-    "sentences": [
-     "Der Kurs liegt rund 16% unter der unteren plausiblen fairen Grenze.",
-     "Dafür spricht Umsatzwachstum von +23.5%.",
-     "Einstieg jetzt möglich."
-    ]
-   },
-   "last_base_fx_usd": 1.153761863708496
-  },
   "INCY": {
    "symbol": "INCY",
    "name": "Incyte",
@@ -71,9 +15,9 @@
    "entry_price": 107.68997938883352,
    "cost_basis": 994.6795626852331,
    "entry_bar_date": "2026-09-10",
-   "last_price": 108.12456532322925,
-   "high_watermark": 108.12456532322925,
-   "last_mark_bar_date": "2026-09-16",
+   "last_price": 111.26550399319532,
+   "high_watermark": 111.26550399319532,
+   "last_mark_bar_date": "2026-09-17",
    "last_action_bar_date": "2026-09-10",
    "processed_actions": {},
    "legacy": false,
@@ -118,7 +62,7 @@
      "Einstieg jetzt möglich."
     ]
    },
-   "last_base_fx_usd": 1.153761863708496
+   "last_base_fx_usd": 1.1469862461090088
   },
   "ZBH": {
    "symbol": "ZBH",
@@ -127,9 +71,9 @@
    "entry_price": 83.26461058533901,
    "cost_basis": 989.8246188067682,
    "entry_bar_date": "2026-09-15",
-   "last_price": 83.88212665325958,
+   "last_price": 82.17186589615177,
    "high_watermark": 85.21420728577222,
-   "last_mark_bar_date": "2026-09-16",
+   "last_mark_bar_date": "2026-09-17",
    "last_action_bar_date": "2026-09-15",
    "processed_actions": {},
    "legacy": false,
@@ -174,63 +118,27 @@
      "Einstieg jetzt möglich."
     ]
    },
-   "last_base_fx_usd": 1.153761863708496
-  }
- },
- "pending_orders": [
-  {
-   "order_id": "4deb81cb-c8c0-485b-94a7-f6d6642834fa",
-   "strategy_version": 3,
-   "action": "SELL",
-   "symbol": "ASB",
-   "name": "Associated Bank",
-   "signal_bar_date": "2026-09-16",
-   "signal_timestamp": "2026-09-16T00:00:00",
-   "signal_constraints": {
-    "radar_score": 70,
-    "avg_dollar_volume_20_usd": 55587061.43404007,
-    "atr_pct": 2.0017627336732606,
-    "vol_annual_pct": 25.486942351126007,
-    "daily_signal_direction": "NEGATIVE"
-   },
-   "created_at": "2026-09-17T07:56:33+00:00",
-   "observed_at": "2026-09-17T07:56:33+00:00",
-   "not_before_bar_date": "2026-09-17",
-   "expected_fill_bar_date": "2026-09-17",
-   "status": "pending",
-   "reason": "Kernsignal ist klar gebrochen",
-   "quantity": 38.045204747075516,
-   "exit_trigger": "signal_break",
-   "return_pct": -1.5,
-   "drawdown_from_peak_pct": -1.75
+   "last_base_fx_usd": 1.1469862461090088
   },
-  {
-   "order_id": "756ccafd-852a-4bf1-932f-7c99a221c49b",
-   "strategy_version": 3,
-   "action": "BUY",
+  "CDW": {
    "symbol": "CDW",
    "name": "CDW Corporation",
-   "signal_bar_date": "2026-09-16",
-   "signal_timestamp": "2026-09-16T00:00:00",
-   "signal_constraints": {
-    "radar_score": 82,
-    "avg_dollar_volume_20_usd": 246230974.36302185,
-    "atr_pct": 4.375750505791567,
-    "vol_annual_pct": 46.891553268333396,
-    "daily_signal_direction": "NEUTRAL"
-   },
-   "created_at": "2026-09-17T07:56:33+00:00",
-   "observed_at": "2026-09-17T07:56:33+00:00",
-   "not_before_bar_date": "2026-09-17",
-   "expected_fill_bar_date": "2026-09-17",
-   "status": "pending",
-   "reason": "Strikter Fundamental-plus-Timing-Idealfall",
-   "target_notional": 993.4327922921178,
+   "quantity": 7.593839461826341,
+   "entry_price": 130.75550637085087,
+   "cost_basis": 993.4327922921179,
+   "entry_bar_date": "2026-09-17",
+   "last_price": 130.08002271551416,
+   "high_watermark": 130.75550637085087,
+   "last_mark_bar_date": "2026-09-17",
+   "last_action_bar_date": "2026-09-17",
+   "processed_actions": {},
+   "legacy": false,
    "issuer_key": "name:cdw corporation",
    "sector": "Technology",
    "country": "us",
-   "currency": "USD",
-   "thesis": {
+   "instrument_currency": "USD",
+   "base_currency": "EUR",
+   "entry_thesis": {
     "situation": {
      "code": "ideal",
      "label": "Idealfall: günstig UND am Einstiegspunkt"
@@ -263,6 +171,72 @@
     "sentences": [
      "Der Kurs liegt rund 21% unter der unteren plausiblen fairen Grenze.",
      "Dafür spricht Umsatzwachstum von +6.8%.",
+     "Einstieg jetzt möglich."
+    ]
+   },
+   "last_base_fx_usd": 1.1469862461090088
+  }
+ },
+ "pending_orders": [
+  {
+   "order_id": "7b9970a4-e3a8-4ae3-8644-d8dbe0621852",
+   "strategy_version": 3,
+   "action": "BUY",
+   "symbol": "ASB",
+   "name": "Associated Bank",
+   "signal_bar_date": "2026-09-17",
+   "signal_timestamp": "2026-09-17T00:00:00",
+   "signal_constraints": {
+    "radar_score": 86,
+    "avg_dollar_volume_20_usd": 56172169.68691826,
+    "atr_pct": 1.954106966167069,
+    "vol_annual_pct": 25.46268201846513,
+    "daily_signal_direction": "NEUTRAL"
+   },
+   "created_at": "2026-09-18T07:37:04+00:00",
+   "observed_at": "2026-09-18T07:37:04+00:00",
+   "not_before_bar_date": "2026-09-18",
+   "expected_fill_bar_date": "2026-09-18",
+   "status": "pending",
+   "reason": "Strikter Fundamental-plus-Timing-Idealfall",
+   "target_notional": 994.7759529530802,
+   "issuer_key": "name:associated bank",
+   "sector": "Financial Services",
+   "country": "us",
+   "currency": "USD",
+   "thesis": {
+    "situation": {
+     "code": "ideal",
+     "label": "Idealfall: günstig UND am Einstiegspunkt"
+    },
+    "deal_quality": {
+     "score": 44.6,
+     "stars": 3,
+     "label": "Deal-Qualität 3 von 5",
+     "historical_percentile": null,
+     "comparison": "Noch keine Vergleichshistorie; Einordnung nach festen Schwellen.",
+     "comparison_basis": "feste Schwellen; Historie baut sich ab jetzt auf",
+     "history_reliable": false,
+     "reference_ready": false,
+     "history_observation_count": 0,
+     "history_calendar_days": 0,
+     "history_requirement": "mindestens 100 Gelegenheiten über mindestens 30 Kalendertage",
+     "components": {
+      "valuation_discount": 34.6,
+      "timing": 91.0,
+      "signals": 25.0,
+      "risk": 20.0
+     }
+    },
+    "discount_pct": 17.3,
+    "potential_score": 81.5,
+    "quality_score": 92.5,
+    "growth_score": 65.0,
+    "potential_driver": "Umsatzwachstum von +23.5%",
+    "residual_risk": null,
+    "sentences": [
+     "Der Kurs liegt rund 17% unter der unteren plausiblen fairen Grenze.",
+     "Dafür spricht Umsatzwachstum von +23.5%.",
      "Einstieg jetzt möglich."
     ]
    }
@@ -1342,6 +1316,207 @@
    },
    "type": "ORDER_CREATED",
    "timestamp": "2026-09-17T07:56:33+00:00"
+  },
+  {
+   "transaction_id": "11632d6d-2690-40a8-8470-9df2683f83fd",
+   "type": "FILL",
+   "order_id": "4deb81cb-c8c0-485b-94a7-f6d6642834fa",
+   "action": "SELL",
+   "symbol": "ASB",
+   "signal_bar_date": "2026-09-16",
+   "signal_timestamp": "2026-09-16T00:00:00",
+   "created_at": "2026-09-17T07:56:33+00:00",
+   "not_before_bar_date": "2026-09-17",
+   "fill_bar_date": "2026-09-17",
+   "fill_timestamp": "2026-09-17T13:30:00+00:00",
+   "fill_session_open_timestamp": "2026-09-17T13:30:00+00:00",
+   "fill_observed_at": "2026-09-18T07:37:04+00:00",
+   "quantity": 38.045204747075516,
+   "raw_fill_price": 26.105907801822937,
+   "raw_fill_price_usd": 30.1200008392334,
+   "execution_price": 26.079801894021113,
+   "gross_value": 992.2114028212011,
+   "commission": 0.4961057014106005,
+   "slippage_bps": 10.0,
+   "base_fx_usd": 1.153761863708496,
+   "fx_bar_date": "2026-09-16",
+   "fx_convention": "preceding daily close, not synchronous execution FX",
+   "strategy_version": 3,
+   "reason": "Kernsignal ist klar gebrochen",
+   "exit_trigger": "signal_break",
+   "thesis": {
+    "situation": {
+     "code": "ideal",
+     "label": "Idealfall: günstig UND am Einstiegspunkt"
+    },
+    "deal_quality": {
+     "score": 39.9,
+     "stars": 2,
+     "label": "Deal-Qualität 2 von 5",
+     "historical_percentile": null,
+     "comparison": "Noch keine Vergleichshistorie; Einordnung nach festen Schwellen.",
+     "comparison_basis": "feste Schwellen; Historie baut sich ab jetzt auf",
+     "history_reliable": false,
+     "reference_ready": false,
+     "history_observation_count": 0,
+     "history_calendar_days": 0,
+     "history_requirement": "mindestens 100 Gelegenheiten über mindestens 30 Kalendertage",
+     "components": {
+      "valuation_discount": 31.7,
+      "timing": 77.0,
+      "signals": 25.0,
+      "risk": 20.0
+     }
+    },
+    "discount_pct": 15.8,
+    "potential_score": 81.5,
+    "quality_score": 92.5,
+    "growth_score": 65.0,
+    "potential_driver": "Umsatzwachstum von +23.5%",
+    "residual_risk": null,
+    "sentences": [
+     "Der Kurs liegt rund 16% unter der unteren plausiblen fairen Grenze.",
+     "Dafür spricht Umsatzwachstum von +23.5%.",
+     "Einstieg jetzt möglich."
+    ]
+   },
+   "signal_return_pct": -1.5,
+   "signal_drawdown_from_peak_pct": -1.75,
+   "realized_pnl": -5.109507378150397,
+   "timestamp": "2026-09-18T07:37:04+00:00"
+  },
+  {
+   "transaction_id": "1cc19d4e-abfd-4908-88e9-89b3ba11e891",
+   "type": "FILL",
+   "order_id": "756ccafd-852a-4bf1-932f-7c99a221c49b",
+   "action": "BUY",
+   "symbol": "CDW",
+   "signal_bar_date": "2026-09-16",
+   "signal_timestamp": "2026-09-16T00:00:00",
+   "created_at": "2026-09-17T07:56:33+00:00",
+   "not_before_bar_date": "2026-09-17",
+   "fill_bar_date": "2026-09-17",
+   "fill_timestamp": "2026-09-17T13:30:00+00:00",
+   "fill_session_open_timestamp": "2026-09-17T13:30:00+00:00",
+   "fill_observed_at": "2026-09-18T07:37:04+00:00",
+   "quantity": 7.593839461826341,
+   "raw_fill_price": 130.6248814893615,
+   "raw_fill_price_usd": 150.7100067138672,
+   "execution_price": 130.75550637085087,
+   "gross_value": 992.9363241300529,
+   "commission": 0.4964681620650264,
+   "slippage_bps": 10.0,
+   "base_fx_usd": 1.153761863708496,
+   "fx_bar_date": "2026-09-16",
+   "fx_convention": "preceding daily close, not synchronous execution FX",
+   "strategy_version": 3,
+   "reason": "Strikter Fundamental-plus-Timing-Idealfall",
+   "exit_trigger": null,
+   "thesis": {
+    "situation": {
+     "code": "ideal",
+     "label": "Idealfall: günstig UND am Einstiegspunkt"
+    },
+    "deal_quality": {
+     "score": 66.2,
+     "stars": 4,
+     "label": "Deal-Qualität 4 von 5",
+     "historical_percentile": null,
+     "comparison": "Noch keine Vergleichshistorie; Einordnung nach festen Schwellen.",
+     "comparison_basis": "feste Schwellen; Historie baut sich ab jetzt auf",
+     "history_reliable": false,
+     "reference_ready": false,
+     "history_observation_count": 0,
+     "history_calendar_days": 0,
+     "history_requirement": "mindestens 100 Gelegenheiten über mindestens 30 Kalendertage",
+     "components": {
+      "valuation_discount": 41.8,
+      "timing": 78.0,
+      "signals": 75.0,
+      "risk": 100.0
+     }
+    },
+    "discount_pct": 20.9,
+    "potential_score": 70.3,
+    "quality_score": 81.7,
+    "growth_score": 53.3,
+    "potential_driver": "Umsatzwachstum von +6.8%",
+    "residual_risk": null,
+    "sentences": [
+     "Der Kurs liegt rund 21% unter der unteren plausiblen fairen Grenze.",
+     "Dafür spricht Umsatzwachstum von +6.8%.",
+     "Einstieg jetzt möglich."
+    ]
+   },
+   "signal_return_pct": null,
+   "signal_drawdown_from_peak_pct": null,
+   "realized_pnl": null,
+   "timestamp": "2026-09-18T07:37:04+00:00"
+  },
+  {
+   "order_id": "7b9970a4-e3a8-4ae3-8644-d8dbe0621852",
+   "strategy_version": 3,
+   "action": "BUY",
+   "symbol": "ASB",
+   "name": "Associated Bank",
+   "signal_bar_date": "2026-09-17",
+   "signal_timestamp": "2026-09-17T00:00:00",
+   "signal_constraints": {
+    "radar_score": 86,
+    "avg_dollar_volume_20_usd": 56172169.68691826,
+    "atr_pct": 1.954106966167069,
+    "vol_annual_pct": 25.46268201846513,
+    "daily_signal_direction": "NEUTRAL"
+   },
+   "created_at": "2026-09-18T07:37:04+00:00",
+   "observed_at": "2026-09-18T07:37:04+00:00",
+   "not_before_bar_date": "2026-09-18",
+   "expected_fill_bar_date": "2026-09-18",
+   "status": "pending",
+   "reason": "Strikter Fundamental-plus-Timing-Idealfall",
+   "target_notional": 994.7759529530802,
+   "issuer_key": "name:associated bank",
+   "sector": "Financial Services",
+   "country": "us",
+   "currency": "USD",
+   "thesis": {
+    "situation": {
+     "code": "ideal",
+     "label": "Idealfall: günstig UND am Einstiegspunkt"
+    },
+    "deal_quality": {
+     "score": 44.6,
+     "stars": 3,
+     "label": "Deal-Qualität 3 von 5",
+     "historical_percentile": null,
+     "comparison": "Noch keine Vergleichshistorie; Einordnung nach festen Schwellen.",
+     "comparison_basis": "feste Schwellen; Historie baut sich ab jetzt auf",
+     "history_reliable": false,
+     "reference_ready": false,
+     "history_observation_count": 0,
+     "history_calendar_days": 0,
+     "history_requirement": "mindestens 100 Gelegenheiten über mindestens 30 Kalendertage",
+     "components": {
+      "valuation_discount": 34.6,
+      "timing": 91.0,
+      "signals": 25.0,
+      "risk": 20.0
+     }
+    },
+    "discount_pct": 17.3,
+    "potential_score": 81.5,
+    "quality_score": 92.5,
+    "growth_score": 65.0,
+    "potential_driver": "Umsatzwachstum von +23.5%",
+    "residual_risk": null,
+    "sentences": [
+     "Der Kurs liegt rund 17% unter der unteren plausiblen fairen Grenze.",
+     "Dafür spricht Umsatzwachstum von +23.5%.",
+     "Einstieg jetzt möglich."
+    ]
+   },
+   "type": "ORDER_CREATED",
+   "timestamp": "2026-09-18T07:37:04+00:00"
   }
  ],
  "equity_curve": [
@@ -1873,36 +2048,42 @@
   },
   {
    "date": "2026-09-18",
-   "as_of_bar_date": null,
-   "valuation_status": "mixed_or_stale",
+   "as_of_bar_date": "2026-09-17",
+   "valuation_status": "aligned_completed_bar",
    "position_valuation_dates": {
-    "ASB": null,
-    "INCY": null,
-    "ZBH": null
+    "INCY": "2026-09-17",
+    "ZBH": "2026-09-17",
+    "CDW": "2026-09-17"
    },
-   "equity": 9934.327922921178,
-   "cash": 6958.132653657901,
-   "invested": 2976.1952692632776,
+   "equity": 9947.759529530802,
+   "cash": 6956.415158485574,
+   "invested": 2991.3443710452284,
    "n_positions": 3,
+   "bench_sp500": 6658.981126874918,
+   "bench_sp500_bar_date": "2026-09-17",
+   "bench_ndx": 25673.350982755706,
+   "bench_ndx_bar_date": "2026-09-17",
+   "bench_world": 180.65605181997455,
+   "bench_world_bar_date": "2026-09-17",
    "benchmark_status": {
     "sp500": {
-     "portfolio_bar_date": null,
+     "portfolio_bar_date": "2026-09-17",
      "benchmark_bar_date": "2026-09-17",
-     "aligned": false,
-     "currency": "USD",
+     "aligned": true,
+     "currency": "EUR",
      "comparison_status": "descriptive_only_not_comparable_total_return"
     },
     "ndx": {
-     "portfolio_bar_date": null,
+     "portfolio_bar_date": "2026-09-17",
      "benchmark_bar_date": "2026-09-17",
-     "aligned": false,
-     "currency": "USD",
+     "aligned": true,
+     "currency": "EUR",
      "comparison_status": "descriptive_only_not_comparable_total_return"
     },
     "world": {
-     "portfolio_bar_date": null,
-     "benchmark_bar_date": "2026-09-16",
-     "aligned": false,
+     "portfolio_bar_date": "2026-09-17",
+     "benchmark_bar_date": "2026-09-17",
+     "aligned": true,
      "currency": "EUR",
      "comparison_status": "descriptive_only_not_comparable_total_return"
     }
@@ -1934,7 +2115,7 @@
  "_meta": {
   "schema": "stock-radar-paper-portfolio",
   "schema_version": 2,
-  "written_at": "2026-09-18T01:31:51+00:00"
+  "written_at": "2026-09-18T07:37:04+00:00"
  },
  "legacy_archive": {
   "schema": "stock-radar-paper-portfolio",
