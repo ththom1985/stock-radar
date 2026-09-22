@@ -1,7 +1,7 @@
 {
  "schema": "stock-radar-valuation-anomalies",
  "schema_version": 1,
- "generated_at": "2026-09-21T22:27:59+00:00",
+ "generated_at": "2026-09-22T01:48:55+00:00",
  "anomalies": [
   {
    "symbol": "AAPL",
@@ -4206,8 +4206,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 3964.2916,
-    "upper": 4171.2144,
+    "lower": 3964.2915,
+    "upper": 4171.2145,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -4291,8 +4291,8 @@
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 670.41,
-    "observed_width_factor": 16.0942,
+    "observed_deviation_pct": 670.27,
+    "observed_width_factor": 16.1446,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -4302,8 +4302,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 3.6459,
-    "upper": 58.6778,
+    "lower": 3.6352,
+    "upper": 58.6885,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -7676,9 +7676,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 59.9798,
+      "reference_multiple": 59.9799,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 406.663044
+      "implied_price": 406.663722
      },
      {
       "metric": "pe",
@@ -7727,7 +7727,7 @@
    "metrics": {
     "pe": {
      "current": null,
-     "own_5y_average": 59.9798,
+     "own_5y_average": 59.9799,
      "sector_median": 25.302,
      "sector_peer_count": 113
     },
@@ -9451,7 +9451,7 @@
   {
    "symbol": "PDD",
    "name": "PDD Holdings Inc.",
-   "price_local": 79.29499816894531,
+   "price_local": 79.30000305175781,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
@@ -19449,14 +19449,14 @@
   {
    "symbol": "AZN.L",
    "name": "AstraZeneca PLC",
-   "price_local": 12560.0,
+   "price_local": 12500.0,
    "currency": "GBp",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 9333.09,
-    "observed_width_factor": 1.0685,
+    "observed_deviation_pct": 9284.23,
+    "observed_width_factor": 1.0694,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -19466,8 +19466,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 124.6139,
-    "upper": 133.1483,
+    "lower": 124.56,
+    "upper": 133.2022,
     "currency": "GBp",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -19545,13 +19545,13 @@
   {
    "symbol": "SHEL.L",
    "name": "Shell plc",
-   "price_local": 3488.5,
+   "price_local": 3539.0,
    "currency": "GBp",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 4151.54,
+    "observed_deviation_pct": 4213.09,
     "observed_width_factor": 1.514,
     "checks": {
      "sector_model_supported": true,
@@ -19641,13 +19641,13 @@
   {
    "symbol": "BP.L",
    "name": "BP p.l.c.",
-   "price_local": 542.9000244140625,
+   "price_local": 558.7000122070312,
    "currency": "GBp",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 2590.42,
+    "observed_deviation_pct": 2668.72,
     "observed_width_factor": 1.8534,
     "checks": {
      "sector_model_supported": true,
@@ -19737,14 +19737,14 @@
   {
    "symbol": "ULVR.L",
    "name": "Unilever PLC",
-   "price_local": 4642.5,
+   "price_local": 4621.0,
    "currency": "GBp",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 10039.39,
-    "observed_width_factor": 1.0539,
+    "observed_deviation_pct": 9990.48,
+    "observed_width_factor": 1.0544,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -19754,8 +19754,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 43.4435,
-    "upper": 45.7868,
+    "lower": 43.4347,
+    "upper": 45.7957,
     "currency": "GBp",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -19833,14 +19833,14 @@
   {
    "symbol": "RR.L",
    "name": "Rolls-Royce Holdings plc",
-   "price_local": 1504.800048828125,
+   "price_local": 1450.0,
    "currency": "GBp",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 14589.07,
-    "observed_width_factor": 1.1113,
+    "observed_deviation_pct": 14077.54,
+    "observed_width_factor": 1.1074,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -19850,8 +19850,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 9.2185,
-    "upper": 10.2444,
+    "lower": 9.2354,
+    "upper": 10.2274,
     "currency": "GBp",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -19929,13 +19929,13 @@
   {
    "symbol": "REL.L",
    "name": "RELX PLC",
-   "price_local": 2480.0,
+   "price_local": 2499.0,
    "currency": "GBp",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 8130.93,
+    "observed_deviation_pct": 8193.99,
     "observed_width_factor": 1.2607,
     "checks": {
      "sector_model_supported": true,
@@ -20025,13 +20025,13 @@
   {
    "symbol": "BATS.L",
    "name": "British American Tobacco p.l.c.",
-   "price_local": 4166.0,
+   "price_local": 4196.0,
    "currency": "GBp",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 9565.99,
+    "observed_deviation_pct": 9635.59,
     "observed_width_factor": 1.8344,
     "checks": {
      "sector_model_supported": true,
@@ -20121,13 +20121,13 @@
   {
    "symbol": "BRBY.L",
    "name": "Burberry Group plc",
-   "price_local": 1025.5,
+   "price_local": 996.0,
    "currency": "GBp",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 12652.71,
+    "observed_deviation_pct": 12285.86,
     "observed_width_factor": 1.2565,
     "checks": {
      "sector_model_supported": true,
@@ -20217,14 +20217,14 @@
   {
    "symbol": "KLR.L",
    "name": "Keller Group plc",
-   "price_local": 3232.0,
+   "price_local": 3118.0,
    "currency": "GBp",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 4634.73,
-    "observed_width_factor": 1.0534,
+    "observed_deviation_pct": 4476.74,
+    "observed_width_factor": 1.0491,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -20234,8 +20234,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 64.8021,
-    "upper": 68.2615,
+    "lower": 64.9364,
+    "upper": 68.1272,
     "currency": "GBp",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -20313,13 +20313,13 @@
   {
    "symbol": "EZJ.L",
    "name": "easyJet plc",
-   "price_local": 670.5999755859375,
+   "price_local": 667.4000244140625,
    "currency": "GBp",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 1900.34,
+    "observed_deviation_pct": 1890.79,
     "observed_width_factor": 2.2906,
     "checks": {
      "sector_model_supported": true,
@@ -20402,13 +20402,13 @@
   {
    "symbol": "AML.L",
    "name": "Aston Martin Lagonda Global Holdings plc",
-   "price_local": 32.65999984741211,
+   "price_local": 32.58000183105469,
    "currency": "GBp",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 1844.82,
+    "observed_deviation_pct": 1840.05,
     "observed_width_factor": 5.9565,
     "checks": {
      "sector_model_supported": true,
@@ -25195,8 +25195,8 @@
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 106.09,
-    "observed_width_factor": 1.1593,
+    "observed_deviation_pct": 106.28,
+    "observed_width_factor": 1.1591,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
@@ -25206,8 +25206,8 @@
     "reason": "Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 151.7953,
-    "upper": 175.9708,
+    "lower": 151.673,
+    "upper": 175.8074,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 2,
@@ -25216,9 +25216,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 51.4096,
+      "reference_multiple": 51.3161,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 245.223792
+      "implied_price": 244.777797
      },
      {
       "metric": "pe",
@@ -25237,9 +25237,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 28.0155,
+      "reference_multiple": 27.9646,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 155.369703
+      "implied_price": 155.087419
      },
      {
       "metric": "price_to_fcf",
@@ -25251,9 +25251,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "issuer_history",
-      "reference_multiple": 11.8972,
+      "reference_multiple": 11.8755,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 156.619909
+      "implied_price": 156.33424
      },
      {
       "metric": "price_to_sales",
@@ -25267,7 +25267,7 @@
    "metrics": {
     "pe": {
      "current": 46.3167,
-     "own_5y_average": 51.4096,
+     "own_5y_average": 51.3161,
      "sector_median": 35.8797,
      "sector_peer_count": 222
     },
@@ -25291,13 +25291,13 @@
     },
     "price_to_fcf": {
      "current": 64.3236,
-     "own_5y_average": 28.0155,
+     "own_5y_average": 27.9646,
      "sector_median": 28.2651,
      "sector_peer_count": 208
     },
     "price_to_sales": {
      "current": 27.0979,
-     "own_5y_average": 11.8972,
+     "own_5y_average": 11.8755,
      "sector_median": 4.8503,
      "sector_peer_count": 288
     }
@@ -25578,7 +25578,7 @@
   {
    "symbol": "STX",
    "name": "Seagate Technology Holdings plc",
-   "price_local": 877.3250122070312,
+   "price_local": 877.3300170898438,
    "currency": "USD",
    "gate": {
     "status": "withheld_extreme_deviation",
@@ -25832,7 +25832,7 @@
     "annual_calculation": [
      {
       "period_end": "2022-12-31",
-      "price": 9.3551,
+      "price": 9.3552,
       "book_value_per_share": 33.856,
       "price_to_book": 0.2763,
       "roe_pct": 7.1537,
@@ -27158,8 +27158,8 @@
     "status": "withheld_sector_model",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 123.69,
-    "observed_width_factor": 1.0732,
+    "observed_deviation_pct": 123.66,
+    "observed_width_factor": 1.0735,
     "checks": {
      "sector_model_supported": false,
      "basis_broad": false,
@@ -27169,8 +27169,8 @@
     "reason": "Bewertung sektorbedingt nicht möglich: Für dieses Finanzgeschäft ist noch kein fachlich passendes Bewertungsmodell zugeordnet. Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 154.1041,
-    "upper": 165.3873,
+    "lower": 154.083,
+    "upper": 165.4084,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -27744,7 +27744,7 @@
   {
    "symbol": "SMT.L",
    "name": "Scottish Mortgage Ord",
-   "price_local": 1554.5,
+   "price_local": 1513.5,
    "currency": "GBp",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -30397,8 +30397,8 @@
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 471.54,
-    "observed_width_factor": 1.8168,
+    "observed_deviation_pct": 471.49,
+    "observed_width_factor": 1.8173,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -30408,8 +30408,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 8.9785,
-    "upper": 16.3119,
+    "lower": 8.9769,
+    "upper": 16.3135,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -30942,8 +30942,8 @@
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 81.68,
-    "observed_width_factor": 1.2063,
+    "observed_deviation_pct": 81.65,
+    "observed_width_factor": 1.2068,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -30953,8 +30953,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 136.8661,
-    "upper": 165.1057,
+    "lower": 136.8396,
+    "upper": 165.1322,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -33002,8 +33002,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 125.8742,
-    "upper": 170.9176,
+    "lower": 125.8745,
+    "upper": 170.9172,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -33410,8 +33410,8 @@
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 101.04,
-    "observed_width_factor": 1.241,
+    "observed_deviation_pct": 100.88,
+    "observed_width_factor": 1.2431,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
@@ -33421,8 +33421,8 @@
     "reason": "Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 654.3984,
-    "upper": 812.087,
+    "lower": 653.7645,
+    "upper": 812.7209,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 2,
@@ -33897,8 +33897,8 @@
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 679.15,
-    "observed_width_factor": 5.3944,
+    "observed_deviation_pct": 678.87,
+    "observed_width_factor": 5.4067,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -33908,8 +33908,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 8.3671,
-    "upper": 45.1351,
+    "lower": 8.351,
+    "upper": 45.1511,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -34463,8 +34463,8 @@
     "reason": "Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 108.399,
-    "upper": 150.662,
+    "lower": 108.3969,
+    "upper": 150.6642,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 2,
@@ -35122,8 +35122,8 @@
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 32.44,
-    "observed_width_factor": 1.1658,
+    "observed_deviation_pct": 32.43,
+    "observed_width_factor": 1.1661,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -35133,8 +35133,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 18.8143,
-    "upper": 21.9339,
+    "lower": 18.8118,
+    "upper": 21.9364,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -36680,7 +36680,7 @@
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 127.4,
+    "observed_deviation_pct": 127.39,
     "observed_width_factor": 1.1774,
     "checks": {
      "sector_model_supported": true,
@@ -36691,8 +36691,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 679.9527,
-    "upper": 800.5716,
+    "lower": 679.9389,
+    "upper": 800.5855,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -37336,7 +37336,7 @@
      },
      {
       "period_end": "2023-12-31",
-      "price": 8409.3516,
+      "price": 8409.3525,
       "book_value_per_share": 1965.9798,
       "price_to_book": 4.2774,
       "roe_pct": 20.0693,
@@ -37344,7 +37344,7 @@
      },
      {
       "period_end": "2024-12-31",
-      "price": 8898.9863,
+      "price": 8898.9873,
       "book_value_per_share": 2130.5254,
       "price_to_book": 4.1769,
       "roe_pct": 20.8788,
@@ -39633,13 +39633,13 @@
   {
    "symbol": "PEGA",
    "name": "Pegasystems Inc.",
-   "price_local": 34.96500015258789,
+   "price_local": 34.970001220703125,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 5.2,
+    "observed_deviation_pct": 5.18,
     "observed_width_factor": 2.0777,
     "checks": {
      "sector_model_supported": true,
@@ -40540,9 +40540,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 42.5648,
+      "reference_multiple": 42.5647,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 194.095488
+      "implied_price": 194.095032
      },
      {
       "metric": "pe",
@@ -40591,7 +40591,7 @@
    "metrics": {
     "pe": {
      "current": 45.4869,
-     "own_5y_average": 42.5648,
+     "own_5y_average": 42.5647,
      "sector_median": 35.8797,
      "sector_peer_count": 222
     },
@@ -42930,8 +42930,8 @@
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 160.25,
-    "observed_width_factor": 1.4305,
+    "observed_deviation_pct": 160.2,
+    "observed_width_factor": 1.4312,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -42941,8 +42941,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 18.4778,
-    "upper": 26.4326,
+    "lower": 18.4728,
+    "upper": 26.4376,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -43023,8 +43023,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 71.1081,
-    "upper": 92.0687,
+    "lower": 71.1085,
+    "upper": 92.0684,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -43550,8 +43550,8 @@
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 143.01,
-    "observed_width_factor": 1.1868,
+    "observed_deviation_pct": 142.97,
+    "observed_width_factor": 1.1872,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -43561,8 +43561,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 115.7573,
-    "upper": 137.382,
+    "lower": 115.7359,
+    "upper": 137.4034,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -48635,8 +48635,8 @@
     "reason": "Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 89.9402,
-    "upper": 107.0197,
+    "lower": 89.94,
+    "upper": 107.0198,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 2,
@@ -49395,13 +49395,13 @@
   {
    "symbol": "BA.L",
    "name": "BAE Systems plc",
-   "price_local": 2050.0,
+   "price_local": 2025.0,
    "currency": "GBp",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 8601.1,
+    "observed_deviation_pct": 8494.99,
     "observed_width_factor": 1.2418,
     "checks": {
      "sector_model_supported": true,
@@ -50688,8 +50688,8 @@
     "reason": "Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 86.8594,
-    "upper": 103.0921,
+    "lower": 86.8592,
+    "upper": 103.0923,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 2,
@@ -53062,8 +53062,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 106.255,
-    "upper": 113.7203,
+    "lower": 106.2553,
+    "upper": 113.7199,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -53443,13 +53443,13 @@
   {
    "symbol": "HUBB",
    "name": "Hubbell Incorporated",
-   "price_local": 457.489990234375,
+   "price_local": 446.9200134277344,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 2.05,
+    "observed_deviation_pct": 0.0,
     "observed_width_factor": 1.3344,
     "checks": {
      "sector_model_supported": true,
@@ -53872,8 +53872,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 213.3005,
-    "upper": 232.2229,
+    "lower": 213.3004,
+    "upper": 232.2231,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -54074,8 +54074,8 @@
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 80.65,
-    "observed_width_factor": 1.0941,
+    "observed_deviation_pct": 80.64,
+    "observed_width_factor": 1.0942,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -54085,8 +54085,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 44.6951,
-    "upper": 48.901,
+    "lower": 44.6922,
+    "upper": 48.9038,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -55976,13 +55976,13 @@
   {
    "symbol": "VNET",
    "name": "VNET Group, Inc.",
-   "price_local": 7.235000133514404,
+   "price_local": 7.239999771118164,
    "currency": "USD",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 298.08,
+    "observed_deviation_pct": 297.81,
     "observed_width_factor": 1.1217,
     "checks": {
      "sector_model_supported": true,
@@ -62142,7 +62142,7 @@
     "annual_calculation": [
      {
       "period_end": "2024-12-31",
-      "price": 186.3652,
+      "price": 186.3653,
       "book_value_per_share": 73.3707,
       "price_to_book": 2.5401,
       "roe_pct": 23.4041,
@@ -62266,7 +62266,7 @@
      },
      {
       "period_end": "2023-12-31",
-      "price": 63.7131,
+      "price": 63.7132,
       "book_value_per_share": 65.1327,
       "price_to_book": 0.9782,
       "roe_pct": 8.0551,
@@ -62603,7 +62603,7 @@
      },
      {
       "period_end": "2023-10-31",
-      "price": 50.465,
+      "price": 50.4649,
       "book_value_per_share": 56.5236,
       "price_to_book": 0.8928,
       "roe_pct": 9.9498,
@@ -62960,8 +62960,8 @@
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 62.69,
-    "observed_width_factor": 1.0949,
+    "observed_deviation_pct": 62.6,
+    "observed_width_factor": 1.0962,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -62971,8 +62971,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 121.1665,
-    "upper": 132.6676,
+    "lower": 121.0915,
+    "upper": 132.7426,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -63284,7 +63284,7 @@
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 0.0,
-    "observed_width_factor": 1.0507,
+    "observed_width_factor": 1.0508,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -63294,8 +63294,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 197.5396,
-    "upper": 207.5595,
+    "lower": 197.5342,
+    "upper": 207.5649,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -70410,8 +70410,8 @@
     "reason": "Bewertung sektorbedingt nicht möglich: Für REITs fehlen belastbare mehrjährige FFO-/AFFO- oder direkte NAV-Daten."
    },
    "raw_fair_value_range": {
-    "lower": 127.3491,
-    "upper": 132.5866,
+    "lower": 127.3495,
+    "upper": 132.5863,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 2,
@@ -70441,9 +70441,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 17.7344,
+      "reference_multiple": 17.7343,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 154.883087
+      "implied_price": 154.882214
      },
      {
       "metric": "price_to_fcf",
@@ -70495,7 +70495,7 @@
     },
     "price_to_fcf": {
      "current": 16.3971,
-     "own_5y_average": 17.7344,
+     "own_5y_average": 17.7343,
      "sector_median": 15.1336,
      "sector_peer_count": 66
     },
@@ -70991,7 +70991,7 @@
      {
       "metric": "price_to_sales",
       "reference_type": "issuer_history",
-      "reference_multiple": 15350.446,
+      "reference_multiple": 15350.4461,
       "fundamental_input": "Umsatz je Aktie",
       "implied_price": 38.879274
      },
@@ -71037,7 +71037,7 @@
     },
     "price_to_sales": {
      "current": 15030.1573,
-     "own_5y_average": 15350.446,
+     "own_5y_average": 15350.4461,
      "sector_median": 7.5184,
      "sector_peer_count": 71
     }
@@ -73715,7 +73715,7 @@
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 39.35,
-    "observed_width_factor": 1.0439,
+    "observed_width_factor": 1.044,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -73725,8 +73725,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 103.8713,
-    "upper": 108.4361,
+    "lower": 103.8706,
+    "upper": 108.4368,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -73821,8 +73821,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 82.484,
-    "upper": 87.2369,
+    "lower": 82.4837,
+    "upper": 87.2373,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -77397,9 +77397,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 53.4999,
+      "reference_multiple": 53.5,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 173.280319
+      "implied_price": 173.280643
      },
      {
       "metric": "price_to_fcf",
@@ -77451,7 +77451,7 @@
     },
     "price_to_fcf": {
      "current": 23.2217,
-     "own_5y_average": 53.4999,
+     "own_5y_average": 53.5,
      "sector_median": 28.2651,
      "sector_peer_count": 208
     },
@@ -80251,7 +80251,7 @@
   {
    "symbol": "ICLN",
    "name": "iShares Global Clean Energy ETF",
-   "price_local": 17.795000076293945,
+   "price_local": 17.799999237060547,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -80900,7 +80900,7 @@
   {
    "symbol": "FINX",
    "name": "Global X FinTech ETF",
-   "price_local": 25.992399215698242,
+   "price_local": 25.992000579833984,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -81077,7 +81077,7 @@
   {
    "symbol": "DRIV",
    "name": "Global X Autonomous & Electric Vehicles ETF",
-   "price_local": 34.24190139770508,
+   "price_local": 34.242000579833984,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -84254,8 +84254,8 @@
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 1.12,
-    "observed_width_factor": 1.0386,
+    "observed_deviation_pct": 1.11,
+    "observed_width_factor": 1.0388,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -84265,8 +84265,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 60.3797,
-    "upper": 62.7119,
+    "lower": 60.3747,
+    "upper": 62.7169,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -84762,8 +84762,8 @@
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 53.23,
-    "observed_width_factor": 1.065,
+    "observed_deviation_pct": 53.21,
+    "observed_width_factor": 1.0654,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
@@ -84773,8 +84773,8 @@
     "reason": "Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 94.2976,
-    "upper": 100.4281,
+    "lower": 94.2822,
+    "upper": 100.4435,
     "currency": "USD",
     "method": "P/B relativ zum ROE, abgeleitet aus eigener Vierjahreshistorie und aktueller Sektor-Peergroup",
     "input_count": 2,
@@ -86382,9 +86382,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "issuer_history",
-      "reference_multiple": 1790.7123,
+      "reference_multiple": 1790.7124,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 214.141011
+      "implied_price": 214.141023
      },
      {
       "metric": "price_to_sales",
@@ -86428,7 +86428,7 @@
     },
     "price_to_sales": {
      "current": 766.1987,
-     "own_5y_average": 1790.7123,
+     "own_5y_average": 1790.7124,
      "sector_median": 7.5184,
      "sector_peer_count": 71
     }
@@ -86795,7 +86795,7 @@
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 0.0,
-    "observed_width_factor": 1.5128,
+    "observed_width_factor": 1.5267,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
@@ -86805,7 +86805,7 @@
     "reason": "Der faire Bereich ist breiter als Faktor 1.5."
    },
    "raw_fair_value_range": {
-    "lower": 123.7566,
+    "lower": 122.6334,
     "upper": 187.2233,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
@@ -86815,9 +86815,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 18.1935,
+      "reference_multiple": 18.0286,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 127.900305
+      "implied_price": 126.741058
      },
      {
       "metric": "pe",
@@ -86836,9 +86836,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 7.5147,
+      "reference_multiple": 7.4465,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 123.756581
+      "implied_price": 122.633423
      },
      {
       "metric": "price_to_fcf",
@@ -86859,7 +86859,7 @@
    "metrics": {
     "pe": {
      "current": 19.9573,
-     "own_5y_average": 18.1935,
+     "own_5y_average": 18.0286,
      "sector_median": 20.0932,
      "sector_peer_count": 53
     },
@@ -86883,7 +86883,7 @@
     },
     "price_to_fcf": {
      "current": 7.6991,
-     "own_5y_average": 7.5147,
+     "own_5y_average": 7.4465,
      "sector_median": 11.3685,
      "sector_peer_count": 25
     },
@@ -87585,7 +87585,7 @@
     "annual_calculation": [
      {
       "period_end": "2022-12-31",
-      "price": 233.2046,
+      "price": 233.2047,
       "book_value_per_share": 27.6996,
       "price_to_book": 8.4191,
       "roe_pct": 20.6136,
@@ -87683,9 +87683,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "issuer_history",
-      "reference_multiple": 1584.9941,
+      "reference_multiple": 1584.994,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 230.884388
+      "implied_price": 230.884373
      },
      {
       "metric": "price_to_sales",
@@ -87729,7 +87729,7 @@
     },
     "price_to_sales": {
      "current": 1994.0178,
-     "own_5y_average": 1584.9941,
+     "own_5y_average": 1584.994,
      "sector_median": 7.5184,
      "sector_peer_count": 71
     }
@@ -90767,7 +90767,7 @@
     "annual_calculation": [
      {
       "period_end": "2022-12-31",
-      "price": 155.7635,
+      "price": 155.7634,
       "book_value_per_share": 21.2617,
       "price_to_book": 7.326,
       "roe_pct": 28.9924,
@@ -93036,9 +93036,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "issuer_history",
-      "reference_multiple": 1761.7985,
+      "reference_multiple": 1761.7984,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 60.460992
+      "implied_price": 60.460988
      },
      {
       "metric": "price_to_sales",
@@ -93082,7 +93082,7 @@
     },
     "price_to_sales": {
      "current": 1105.2527,
-     "own_5y_average": 1761.7985,
+     "own_5y_average": 1761.7984,
      "sector_median": 7.5184,
      "sector_peer_count": 71
     }
@@ -93910,7 +93910,7 @@
      },
      {
       "period_end": "2023-12-31",
-      "price": 233.9453,
+      "price": 233.9452,
       "book_value_per_share": 92.8436,
       "price_to_book": 2.5198,
       "roe_pct": 11.0819,
@@ -93937,7 +93937,7 @@
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 56.63,
-    "observed_width_factor": 1.0821,
+    "observed_width_factor": 1.0822,
     "checks": {
      "sector_model_supported": false,
      "basis_broad": true,
@@ -93947,8 +93947,8 @@
     "reason": "Bewertung sektorbedingt nicht möglich: Für REITs fehlen belastbare mehrjährige FFO-/AFFO- oder direkte NAV-Daten. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 12.3955,
-    "upper": 13.4135,
+    "lower": 12.3952,
+    "upper": 13.4138,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 2,
@@ -94624,9 +94624,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 77.5546,
+      "reference_multiple": 77.5547,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 326.504866
+      "implied_price": 326.505287
      },
      {
       "metric": "pe",
@@ -94675,7 +94675,7 @@
    "metrics": {
     "pe": {
      "current": 22.1585,
-     "own_5y_average": 77.5546,
+     "own_5y_average": 77.5547,
      "sector_median": 27.1033,
      "sector_peer_count": 242
     },
@@ -96920,7 +96920,7 @@
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 55.83,
-    "observed_width_factor": 2.5396,
+    "observed_width_factor": 2.5417,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
@@ -96930,7 +96930,7 @@
     "reason": "Der faire Bereich ist breiter als Faktor 1.5. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 15.5602,
+    "lower": 15.5476,
     "upper": 39.5172,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
@@ -96947,9 +96947,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 54.5506,
+      "reference_multiple": 54.5062,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 15.560217
+      "implied_price": 15.547552
      },
      {
       "metric": "price_to_fcf",
@@ -96961,9 +96961,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "issuer_history",
-      "reference_multiple": 1.6543,
+      "reference_multiple": 1.653,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 37.450606
+      "implied_price": 37.421176
      },
      {
       "metric": "price_to_sales",
@@ -96977,7 +96977,7 @@
    "metrics": {
     "pe": {
      "current": null,
-     "own_5y_average": 45.287,
+     "own_5y_average": 45.2501,
      "sector_median": 25.302,
      "sector_peer_count": 113
     },
@@ -97001,13 +97001,13 @@
     },
     "price_to_fcf": {
      "current": 216.681,
-     "own_5y_average": 54.5506,
+     "own_5y_average": 54.5062,
      "sector_median": 20.7524,
      "sector_peer_count": 109
     },
     "price_to_sales": {
      "current": 2.7302,
-     "own_5y_average": 1.6543,
+     "own_5y_average": 1.653,
      "sector_median": 3.3171,
      "sector_peer_count": 165
     }
@@ -97984,8 +97984,8 @@
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 56.57,
-    "observed_width_factor": 1.1298,
+    "observed_deviation_pct": 56.56,
+    "observed_width_factor": 1.13,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
@@ -97995,8 +97995,8 @@
     "reason": "Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 35.0421,
-    "upper": 39.5922,
+    "lower": 35.0388,
+    "upper": 39.5955,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 2,
@@ -99453,8 +99453,8 @@
     "reason": "Bewertung sektorbedingt nicht möglich: Für REITs fehlen belastbare mehrjährige FFO-/AFFO- oder direkte NAV-Daten."
    },
    "raw_fair_value_range": {
-    "lower": 39.5432,
-    "upper": 40.9644,
+    "lower": 39.5435,
+    "upper": 40.9641,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 2,
@@ -100020,8 +100020,8 @@
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 58.12,
-    "observed_width_factor": 1.4072,
+    "observed_deviation_pct": 59.23,
+    "observed_width_factor": 1.3973,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
@@ -100032,7 +100032,7 @@
    },
    "raw_fair_value_range": {
     "lower": 56.2023,
-    "upper": 79.0865,
+    "upper": 78.5335,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 2,
@@ -100041,9 +100041,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 18.3922,
+      "reference_multiple": 18.2636,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 79.08646
+      "implied_price": 78.53348
      },
      {
       "metric": "pe",
@@ -100062,9 +100062,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 52.0256,
+      "reference_multiple": 51.6618,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 223.836972
+      "implied_price": 222.271744
      },
      {
       "metric": "price_to_fcf",
@@ -100076,9 +100076,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "issuer_history",
-      "reference_multiple": 6.861,
+      "reference_multiple": 6.813,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 83.202176
+      "implied_price": 82.620088
      },
      {
       "metric": "price_to_sales",
@@ -100092,7 +100092,7 @@
    "metrics": {
     "pe": {
      "current": 27.4232,
-     "own_5y_average": 18.3922,
+     "own_5y_average": 18.2636,
      "sector_median": 16.034,
      "sector_peer_count": 64
     },
@@ -100116,13 +100116,13 @@
     },
     "price_to_fcf": {
      "current": 28.9275,
-     "own_5y_average": 52.0256,
+     "own_5y_average": 51.6618,
      "sector_median": 13.0629,
      "sector_peer_count": 43
     },
     "price_to_sales": {
      "current": 10.2631,
-     "own_5y_average": 6.861,
+     "own_5y_average": 6.813,
      "sector_median": 2.197,
      "sector_peer_count": 70
     }
@@ -101409,8 +101409,8 @@
     "reason": "Bewertung sektorbedingt nicht möglich: Für dieses Finanzgeschäft ist noch kein fachlich passendes Bewertungsmodell zugeordnet."
    },
    "raw_fair_value_range": {
-    "lower": 133.3216,
-    "upper": 148.0824,
+    "lower": 133.3212,
+    "upper": 148.0828,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 2,
@@ -101632,8 +101632,8 @@
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 90.1,
-    "observed_width_factor": 1.185,
+    "observed_deviation_pct": 90.08,
+    "observed_width_factor": 1.1852,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -101643,8 +101643,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 104.8277,
-    "upper": 124.2199,
+    "lower": 104.8163,
+    "upper": 124.2313,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -104115,7 +104115,7 @@
     "status": "withheld_sector_model",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 21.74,
+    "observed_deviation_pct": 21.75,
     "observed_width_factor": 1.0375,
     "checks": {
      "sector_model_supported": false,
@@ -104126,8 +104126,8 @@
     "reason": "Bewertung sektorbedingt nicht möglich: Für REITs fehlen belastbare mehrjährige FFO-/AFFO- oder direkte NAV-Daten. Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 17.8475,
-    "upper": 18.5172,
+    "lower": 17.8479,
+    "upper": 18.5169,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -104885,7 +104885,7 @@
     "annual_calculation": [
      {
       "period_end": "2022-12-31",
-      "price": 259.7841,
+      "price": 259.784,
       "book_value_per_share": 32.2838,
       "price_to_book": 8.0469,
       "roe_pct": 21.3447,
@@ -104901,7 +104901,7 @@
      },
      {
       "period_end": "2024-12-31",
-      "price": 463.3974,
+      "price": 463.3973,
       "book_value_per_share": 63.7483,
       "price_to_book": 7.2692,
       "roe_pct": 27.9627,
@@ -105265,7 +105265,7 @@
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 0.0,
-    "observed_width_factor": 1.5027,
+    "observed_width_factor": 1.5198,
     "checks": {
      "sector_model_supported": false,
      "basis_broad": true,
@@ -105275,7 +105275,7 @@
     "reason": "Bewertung sektorbedingt nicht möglich: Für REITs fehlen belastbare mehrjährige FFO-/AFFO- oder direkte NAV-Daten. Der faire Bereich ist breiter als Faktor 1.5."
    },
    "raw_fair_value_range": {
-    "lower": 106.1699,
+    "lower": 104.9766,
     "upper": 159.5451,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
@@ -105285,9 +105285,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 23.3086,
+      "reference_multiple": 23.0467,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 134.490622
+      "implied_price": 132.979459
      },
      {
       "metric": "pe",
@@ -105306,9 +105306,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 15.7929,
+      "reference_multiple": 15.6154,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 106.169865
+      "implied_price": 104.976598
      },
      {
       "metric": "price_to_fcf",
@@ -105329,7 +105329,7 @@
    "metrics": {
     "pe": {
      "current": 26.6569,
-     "own_5y_average": 23.3086,
+     "own_5y_average": 23.0467,
      "sector_median": 27.6508,
      "sector_peer_count": 66
     },
@@ -105353,7 +105353,7 @@
     },
     "price_to_fcf": {
      "current": 21.7115,
-     "own_5y_average": 15.7929,
+     "own_5y_average": 15.6154,
      "sector_median": 15.1336,
      "sector_peer_count": 66
     },
@@ -107087,9 +107087,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 22.8733,
+      "reference_multiple": 22.8734,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 129.920344
+      "implied_price": 129.920912
      },
      {
       "metric": "pe",
@@ -107108,9 +107108,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 1490.0136,
+      "reference_multiple": 1490.0139,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 3057.625919
+      "implied_price": 3057.626535
      },
      {
       "metric": "price_to_fcf",
@@ -107138,7 +107138,7 @@
    "metrics": {
     "pe": {
      "current": 11.1421,
-     "own_5y_average": 22.8733,
+     "own_5y_average": 22.8734,
      "sector_median": 16.034,
      "sector_peer_count": 64
     },
@@ -107162,7 +107162,7 @@
     },
     "price_to_fcf": {
      "current": 40.6163,
-     "own_5y_average": 1490.0136,
+     "own_5y_average": 1490.0139,
      "sector_median": 13.0629,
      "sector_peer_count": 43
     },
@@ -108112,8 +108112,8 @@
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 93.24,
-    "observed_width_factor": 1.2543,
+    "observed_deviation_pct": 93.22,
+    "observed_width_factor": 1.2546,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
@@ -108123,8 +108123,8 @@
     "reason": "Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 46.8928,
-    "upper": 58.8189,
+    "lower": 46.8867,
+    "upper": 58.825,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 2,
@@ -110678,7 +110678,7 @@
     "annual_calculation": [
      {
       "period_end": "2022-12-31",
-      "price": 83.3617,
+      "price": 83.3616,
       "book_value_per_share": 38.5748,
       "price_to_book": 2.161,
       "roe_pct": 9.2666,
@@ -112251,7 +112251,7 @@
       "book_value_per_share": 68.8715,
       "price_to_book": 1.6596,
       "roe_pct": 1.4317,
-      "pb_to_roe": 115.9155
+      "pb_to_roe": 115.9154
      },
      {
       "period_end": "2024-12-31",
@@ -112281,8 +112281,8 @@
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 32.08,
-    "observed_width_factor": 1.0454,
+    "observed_deviation_pct": 32.05,
+    "observed_width_factor": 1.046,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -112292,8 +112292,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 151.6827,
-    "upper": 158.5746,
+    "lower": 151.6434,
+    "upper": 158.6138,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -113243,7 +113243,7 @@
     "annual_calculation": [
      {
       "period_end": "2022-12-31",
-      "price": 37.0804,
+      "price": 37.0805,
       "book_value_per_share": 44.1709,
       "price_to_book": 0.8395,
       "roe_pct": 16.1099,
@@ -114399,9 +114399,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 44.3322,
+      "reference_multiple": 44.3321,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 262.889946
+      "implied_price": 262.889353
      },
      {
       "metric": "pe",
@@ -114443,7 +114443,7 @@
    "metrics": {
     "pe": {
      "current": 16.213,
-     "own_5y_average": 44.3322,
+     "own_5y_average": 44.3321,
      "sector_median": 16.034,
      "sector_peer_count": 64
     },
@@ -114783,7 +114783,7 @@
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 69.59,
+    "observed_deviation_pct": 69.58,
     "observed_width_factor": 1.121,
     "checks": {
      "sector_model_supported": true,
@@ -114794,8 +114794,8 @@
     "reason": "Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 171.0462,
-    "upper": 191.7368,
+    "lower": 171.0405,
+    "upper": 191.7425,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 2,
@@ -115601,13 +115601,13 @@
   {
    "symbol": "ACAD",
    "name": "ACADIA Pharmaceuticals Inc.",
-   "price_local": 26.395000457763672,
+   "price_local": 26.399999618530273,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 26.19,
+    "observed_deviation_pct": 26.21,
     "observed_width_factor": 1.5609,
     "checks": {
      "sector_model_supported": true,
@@ -116048,7 +116048,7 @@
   {
    "symbol": "ADEA",
    "name": "Adeia Inc.",
-   "price_local": 25.530000686645508,
+   "price_local": 24.80500030517578,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
