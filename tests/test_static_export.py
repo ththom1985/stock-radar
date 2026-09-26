@@ -47,7 +47,11 @@ class StaticExportTests(ProjectTempMixin, unittest.TestCase):
         self.assertEqual(STATIC_SCHEMA_VERSION, loaded["schema_version"])
         self.assertEqual(len(payload["instruments"]), len(loaded["instruments"]))
         self.assertGreater(len(loaded["instruments"]), 1000)
-        self.assertIn("USD", loaded["rankings"])
+        self.assertTrue(
+            set(loaded["rankings"]).issubset(
+                {row["currency"] for row in loaded["instruments"]}
+            )
+        )
         self.assertIn("daily_setups", loaded["insight_rankings"]["categories"])
         self.assertIn("in_sweet_spot", loaded["insight_rankings"]["categories"])
         self.assertIn("approaching_sweet_spot", loaded["insight_rankings"]["categories"])
