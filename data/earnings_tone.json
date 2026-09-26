@@ -95,7 +95,7 @@
  "_meta": {
   "schema": "stock-radar-earnings-tone-cache",
   "schema_version": 2,
-  "written_at": "2026-09-26T09:15:38+00:00",
+  "written_at": "2026-09-26T13:59:49+00:00",
   "refreshed": 3
  },
  "EIX": {
@@ -5609,7 +5609,7 @@
  },
  "EQNR": {
   "_refresh_failure": {
-   "at": "2026-09-26T09:15:34+00:00",
+   "at": "2026-09-26T13:59:46+00:00",
    "error": "fewer than two free quarterly earnings texts"
   }
  },
@@ -5674,5 +5674,67 @@
   "expected_delay": "source publication time",
   "fetched_at": "2026-09-26T09:15:38+00:00",
   "last_success_at": "2026-09-26T09:15:38+00:00"
+ },
+ "BLK": {
+  "score": 53.0,
+  "direction": "neutral",
+  "transcript_status": "prepared-only",
+  "analysis_method": "free_financial_lexicon_v1",
+  "current_tone": 52,
+  "previous_tone": 49,
+  "tone_shift": 3,
+  "hedging_shift": 0,
+  "qa_evasiveness_shift": null,
+  "qa_status": "not_available",
+  "cfo_tone_shift": null,
+  "cfo_weight": null,
+  "reason": "Free lexicon: positive/negative 36/31 vs 26/29; Q&A/CFO unavailable.",
+  "current_period": {
+   "period": "2026-07-15",
+   "filing_date": "2026-07-15",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/2012383/000119312526304013/blk-ex99_1.htm"
+  },
+  "previous_period": {
+   "period": "2026-04-14",
+   "filing_date": "2026-04-14",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/2012383/000119312526153768/blk-ex99_1.htm"
+  },
+  "source": "free earnings text + transparent financial lexicon",
+  "expected_delay": "source publication time",
+  "fetched_at": "2026-09-26T13:59:47+00:00",
+  "last_success_at": "2026-09-26T13:59:47+00:00"
+ },
+ "CVX": {
+  "score": 56.0,
+  "direction": "positive",
+  "transcript_status": "prepared-only",
+  "analysis_method": "free_financial_lexicon_v1",
+  "current_tone": 42,
+  "previous_tone": 37,
+  "tone_shift": 5,
+  "hedging_shift": -1,
+  "qa_evasiveness_shift": null,
+  "qa_status": "not_available",
+  "cfo_tone_shift": null,
+  "cfo_weight": null,
+  "reason": "Free lexicon: positive/negative 21/33 vs 15/35; Q&A/CFO unavailable.",
+  "current_period": {
+   "period": "2026-07-31",
+   "filing_date": "2026-07-31",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/93410/000009341026000162/a06302026ex9918-k.htm"
+  },
+  "previous_period": {
+   "period": "2026-05-01",
+   "filing_date": "2026-05-01",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/93410/000009341026000110/a03312026ex9918-k.htm"
+  },
+  "source": "free earnings text + transparent financial lexicon",
+  "expected_delay": "source publication time",
+  "fetched_at": "2026-09-26T13:59:49+00:00",
+  "last_success_at": "2026-09-26T13:59:49+00:00"
  }
 }
