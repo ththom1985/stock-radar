@@ -1,7 +1,7 @@
 {
  "schema": "stock-radar-valuation-anomalies",
  "schema_version": 1,
- "generated_at": "2026-09-27T14:56:34+00:00",
+ "generated_at": "2026-09-27T21:32:43+00:00",
  "anomalies": [
   {
    "symbol": "NVDA",
@@ -7463,9 +7463,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 59.9798,
+      "reference_multiple": 59.9799,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 406.663044
+      "implied_price": 406.663722
      },
      {
       "metric": "pe",
@@ -7514,7 +7514,7 @@
    "metrics": {
     "pe": {
      "current": null,
-     "own_5y_average": 59.9798,
+     "own_5y_average": 59.9799,
      "sector_median": 25.302,
      "sector_peer_count": 113
     },
@@ -23389,75 +23389,61 @@
    "price_local": 43.95000076293945,
    "currency": "USD",
    "gate": {
-    "status": "withheld_wide_range",
+    "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 0.0,
-    "observed_width_factor": 7.1943,
+    "observed_deviation_pct": 41.14,
+    "observed_width_factor": 1.3475,
     "checks": {
      "sector_model_supported": true,
-     "basis_broad": true,
-     "width_within_limit": false,
+     "basis_broad": false,
+     "width_within_limit": true,
      "deviation_within_limit": true
     },
-    "reason": "Der faire Bereich ist breiter als Faktor 1.5."
+    "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 9.6174,
-    "upper": 69.1899,
+    "lower": 62.0302,
+    "upper": 83.5853,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
-    "input_count": 2,
-    "implied_price_count": 6,
+    "input_count": 1,
+    "implied_price_count": 4,
     "components": [
-     {
-      "metric": "pe",
-      "reference_type": "issuer_history",
-      "reference_multiple": 12.5501,
-      "fundamental_input": "EPS je Aktie",
-      "implied_price": 8.910571
-     },
      {
       "metric": "pe",
       "reference_type": "sector_peers",
       "reference_multiple": 13.5456,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 9.617376
+      "implied_price": 40.907712
      },
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
       "reference_multiple": 11.303,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 69.1899
+      "implied_price": 62.030215
      },
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
       "reference_multiple": 11.8488,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 68.678585
-     },
-     {
-      "metric": "price_to_sales",
-      "reference_type": "issuer_history",
-      "reference_multiple": 0.0717,
-      "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 32.20615
+      "implied_price": 525.92007
      },
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
       "reference_multiple": 3.6873,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 1656.258552
+      "implied_price": 83.585256
      }
     ]
    },
    "metrics": {
     "pe": {
      "current": 14.5033,
-     "own_5y_average": 12.5501,
+     "own_5y_average": null,
      "sector_median": 13.5456,
      "sector_peer_count": 187
     },
@@ -23480,14 +23466,14 @@
      "sector_peer_count": 83
     },
     "price_to_fcf": {
-     "current": 9.0138,
+     "current": 1.0553,
      "own_5y_average": null,
      "sector_median": 11.8488,
      "sector_peer_count": 140
     },
     "price_to_sales": {
-     "current": 0.1163,
-     "own_5y_average": 0.0717,
+     "current": 2.0663,
+     "own_5y_average": null,
      "sector_median": 3.6873,
      "sector_peer_count": 199
     }
@@ -24072,40 +24058,17 @@
     "status": "withheld_sector_model",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 353.06,
-    "observed_width_factor": 2.5505,
+    "observed_deviation_pct": null,
+    "observed_width_factor": null,
     "checks": {
      "sector_model_supported": false,
      "basis_broad": false,
      "width_within_limit": false,
      "deviation_within_limit": false
     },
-    "reason": "Bewertung sektorbedingt nicht möglich: Für dieses Finanzgeschäft ist noch kein fachlich passendes Bewertungsmodell zugeordnet. Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
+    "reason": "Bewertung sektorbedingt nicht möglich: Für dieses Finanzgeschäft ist noch kein fachlich passendes Bewertungsmodell zugeordnet."
    },
-   "raw_fair_value_range": {
-    "lower": 3.8186,
-    "upper": 9.7394,
-    "currency": "USD",
-    "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
-    "input_count": 1,
-    "implied_price_count": 2,
-    "components": [
-     {
-      "metric": "pe",
-      "reference_type": "sector_peers",
-      "reference_multiple": 13.5456,
-      "fundamental_input": "EPS je Aktie",
-      "implied_price": 5.282784
-     },
-     {
-      "metric": "price_to_sales",
-      "reference_type": "sector_peers",
-      "reference_multiple": 3.6873,
-      "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 8.275288
-     }
-    ]
-   },
+   "raw_fair_value_range": null,
    "metrics": {
     "pe": {
      "current": null,
@@ -24138,7 +24101,7 @@
      "sector_peer_count": 140
     },
     "price_to_sales": {
-     "current": 37.1468,
+     "current": 26.3242,
      "own_5y_average": null,
      "sector_median": 3.6873,
      "sector_peer_count": 199
@@ -25120,9 +25083,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 42.9706,
+      "reference_multiple": 42.9705,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 78.636198
+      "implied_price": 78.636015
      },
      {
       "metric": "pe",
@@ -25171,7 +25134,7 @@
    "metrics": {
     "pe": {
      "current": 72.9266,
-     "own_5y_average": 42.9706,
+     "own_5y_average": 42.9705,
      "sector_median": 35.6916,
      "sector_peer_count": 222
     },
@@ -25619,7 +25582,7 @@
     "annual_calculation": [
      {
       "period_end": "2022-12-31",
-      "price": 9.3551,
+      "price": 9.3552,
       "book_value_per_share": 33.856,
       "price_to_book": 0.2763,
       "roe_pct": 7.1537,
@@ -29555,9 +29518,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 263.7035,
+      "reference_multiple": 263.7036,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 279.52571
+      "implied_price": 279.525816
      },
      {
       "metric": "pe",
@@ -29606,7 +29569,7 @@
    "metrics": {
     "pe": {
      "current": 55.4138,
-     "own_5y_average": 263.7035,
+     "own_5y_average": 263.7036,
      "sector_median": 22.152,
      "sector_peer_count": 47
     },
@@ -37232,7 +37195,7 @@
     "annual_calculation": [
      {
       "period_end": "2022-12-31",
-      "price": 7463.4297,
+      "price": 7463.4287,
       "book_value_per_share": 1792.89,
       "price_to_book": 4.1628,
       "roe_pct": 18.4309,
@@ -38191,7 +38154,7 @@
   {
    "symbol": "2222.SR",
    "name": "Saudi Arabian Oil Company",
-   "price_local": 25.81999969482422,
+   "price_local": 25.780000686645508,
    "currency": "SAR",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -40435,7 +40398,7 @@
    },
    "raw_fair_value_range": {
     "lower": 134.8068,
-    "upper": 184.9111,
+    "upper": 184.9114,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 2,
@@ -40465,9 +40428,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 64.8574,
+      "reference_multiple": 64.8575,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 184.911076
+      "implied_price": 184.911361
      },
      {
       "metric": "price_to_fcf",
@@ -40519,7 +40482,7 @@
     },
     "price_to_fcf": {
      "current": 95.0332,
-     "own_5y_average": 64.8574,
+     "own_5y_average": 64.8575,
      "sector_median": 28.4104,
      "sector_peer_count": 207
     },
@@ -40561,9 +40524,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 42.5648,
+      "reference_multiple": 42.5647,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 194.095488
+      "implied_price": 194.095032
      },
      {
       "metric": "pe",
@@ -40612,7 +40575,7 @@
    "metrics": {
     "pe": {
      "current": 45.4869,
-     "own_5y_average": 42.5648,
+     "own_5y_average": 42.5647,
      "sector_median": 35.6916,
      "sector_peer_count": 222
     },
@@ -50709,8 +50672,8 @@
     "reason": "Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 87.1738,
-    "upper": 102.7777,
+    "lower": 87.1735,
+    "upper": 102.7774,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 2,
@@ -50719,9 +50682,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 19.199,
+      "reference_multiple": 19.1989,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 100.60276
+      "implied_price": 100.602236
      },
      {
       "metric": "pe",
@@ -50770,7 +50733,7 @@
    "metrics": {
     "pe": {
      "current": 29.6942,
-     "own_5y_average": 19.199,
+     "own_5y_average": 19.1989,
      "sector_median": 21.8595,
      "sector_peer_count": 69
     },
@@ -62046,7 +62009,7 @@
     "annual_calculation": [
      {
       "period_end": "2024-12-31",
-      "price": 186.3653,
+      "price": 186.3652,
       "book_value_per_share": 73.3707,
       "price_to_book": 2.5401,
       "roe_pct": 23.4041,
@@ -62268,7 +62231,7 @@
     "annual_calculation": [
      {
       "period_end": "2022-12-31",
-      "price": 181.7058,
+      "price": 181.7057,
       "book_value_per_share": 43.1505,
       "price_to_book": 4.211,
       "roe_pct": 12.1856,
@@ -62499,7 +62462,7 @@
     "annual_calculation": [
      {
       "period_end": "2022-10-31",
-      "price": 55.189,
+      "price": 55.1889,
       "book_value_per_share": 54.9963,
       "price_to_book": 1.0035,
       "roe_pct": 17.1477,
@@ -63295,7 +63258,7 @@
    },
    "raw_fair_value_range": {
     "lower": 171.8006,
-    "upper": 294.6826,
+    "upper": 294.6833,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 2,
@@ -63304,9 +63267,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 43.3995,
+      "reference_multiple": 43.3996,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 294.682605
+      "implied_price": 294.683284
      },
      {
       "metric": "pe",
@@ -63355,7 +63318,7 @@
    "metrics": {
     "pe": {
      "current": 46.2043,
-     "own_5y_average": 43.3995,
+     "own_5y_average": 43.3996,
      "sector_median": 25.302,
      "sector_peer_count": 113
     },
@@ -71012,9 +70975,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "issuer_history",
-      "reference_multiple": 15350.4452,
+      "reference_multiple": 15350.4456,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 38.879272
+      "implied_price": 38.879273
      },
      {
       "metric": "price_to_sales",
@@ -71058,7 +71021,7 @@
     },
     "price_to_sales": {
      "current": 15030.1573,
-     "own_5y_average": 15350.4452,
+     "own_5y_average": 15350.4456,
      "sector_median": 7.5184,
      "sector_peer_count": 71
     }
@@ -77418,9 +77381,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 53.4999,
+      "reference_multiple": 53.5,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 173.280319
+      "implied_price": 173.280643
      },
      {
       "metric": "price_to_fcf",
@@ -77472,7 +77435,7 @@
     },
     "price_to_fcf": {
      "current": 23.2217,
-     "own_5y_average": 53.4999,
+     "own_5y_average": 53.5,
      "sector_median": 28.4104,
      "sector_peer_count": 207
     },
@@ -84901,7 +84864,7 @@
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 0.0,
-    "observed_width_factor": 2.0163,
+    "observed_width_factor": 2.051,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
@@ -84912,7 +84875,7 @@
    },
    "raw_fair_value_range": {
     "lower": 46.7311,
-    "upper": 94.2215,
+    "upper": 95.8454,
     "currency": "USD",
     "method": "P/B relativ zum ROE, abgeleitet aus eigener Vierjahreshistorie und aktueller Sektor-Peergroup",
     "input_count": 2,
@@ -84924,46 +84887,46 @@
     "roe_pct": 10.023,
     "pb_to_roe": {
      "current": 16.8247,
-     "own_4y_median": 24.6539,
+     "own_4y_median": 25.0788,
      "peer_median": 12.2276,
      "peer_count": 49
     },
     "expected_price_to_book": {
-     "own_4y": 2.4711,
+     "own_4y": 2.5136,
      "peer": 1.2256
     },
     "annual_calculation": [
      {
       "period_end": "2022-12-31",
-      "price": 55.4412,
+      "price": 56.97,
       "book_value_per_share": 16.2662,
-      "price_to_book": 3.4084,
+      "price_to_book": 3.5023,
       "roe_pct": 14.3056,
-      "pb_to_roe": 23.8254
+      "pb_to_roe": 24.4824
      },
      {
       "period_end": "2023-12-31",
-      "price": 69.7069,
+      "price": 71.11,
       "book_value_per_share": 19.603,
-      "price_to_book": 3.5559,
+      "price_to_book": 3.6275,
       "roe_pct": 15.3791,
-      "pb_to_roe": 23.1219
+      "pb_to_roe": 23.5873
      },
      {
       "period_end": "2024-12-31",
-      "price": 100.6041,
+      "price": 102.02,
       "book_value_per_share": 22.4508,
-      "price_to_book": 4.4811,
+      "price_to_book": 4.5442,
       "roe_pct": 15.2804,
-      "pb_to_roe": 29.3258
+      "pb_to_roe": 29.7385
      },
      {
       "period_end": "2025-12-31",
-      "price": 79.1017,
+      "price": 79.7,
       "book_value_per_share": 37.3423,
-      "price_to_book": 2.1183,
+      "price_to_book": 2.1343,
       "roe_pct": 8.3127,
-      "pb_to_roe": 25.4824
+      "pb_to_roe": 25.6752
      }
     ]
    }
@@ -86326,9 +86289,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "issuer_history",
-      "reference_multiple": 1790.7125,
+      "reference_multiple": 1790.7123,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 214.141035
+      "implied_price": 214.141011
      },
      {
       "metric": "price_to_sales",
@@ -86372,7 +86335,7 @@
     },
     "price_to_sales": {
      "current": 766.1987,
-     "own_5y_average": 1790.7125,
+     "own_5y_average": 1790.7123,
      "sector_median": 7.5184,
      "sector_peer_count": 71
     }
@@ -87537,7 +87500,7 @@
      },
      {
       "period_end": "2023-12-31",
-      "price": 320.305,
+      "price": 320.3051,
       "book_value_per_share": 31.8003,
       "price_to_book": 10.0724,
       "roe_pct": 26.8253,
@@ -92980,9 +92943,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "issuer_history",
-      "reference_multiple": 1761.7985,
+      "reference_multiple": 1761.7983,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 60.460992
+      "implied_price": 60.460985
      },
      {
       "metric": "price_to_sales",
@@ -93026,7 +92989,7 @@
     },
     "price_to_sales": {
      "current": 1105.2527,
-     "own_5y_average": 1761.7985,
+     "own_5y_average": 1761.7983,
      "sector_median": 7.5184,
      "sector_peer_count": 71
     }
@@ -94568,9 +94531,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 77.5546,
+      "reference_multiple": 77.5547,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 326.504866
+      "implied_price": 326.505287
      },
      {
       "metric": "pe",
@@ -94619,7 +94582,7 @@
    "metrics": {
     "pe": {
      "current": 22.1585,
-     "own_5y_average": 77.5546,
+     "own_5y_average": 77.5547,
      "sector_median": 27.1033,
      "sector_peer_count": 242
     },
@@ -103146,9 +103109,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 44.5495,
+      "reference_multiple": 44.5496,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 74.168265
+      "implied_price": 74.168431
      },
      {
       "metric": "price_to_fcf",
@@ -103200,7 +103163,7 @@
     },
     "price_to_fcf": {
      "current": 93.0217,
-     "own_5y_average": 44.5495,
+     "own_5y_average": 44.5496,
      "sector_median": 14.4749,
      "sector_peer_count": 128
     },
@@ -107031,9 +106994,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 22.8734,
+      "reference_multiple": 22.8733,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 129.920912
+      "implied_price": 129.920344
      },
      {
       "metric": "pe",
@@ -107052,9 +107015,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 1490.0138,
+      "reference_multiple": 1490.0137,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 3057.62633
+      "implied_price": 3057.626125
      },
      {
       "metric": "price_to_fcf",
@@ -107082,7 +107045,7 @@
    "metrics": {
     "pe": {
      "current": 11.1421,
-     "own_5y_average": 22.8734,
+     "own_5y_average": 22.8733,
      "sector_median": 16.034,
      "sector_peer_count": 64
     },
@@ -107106,7 +107069,7 @@
     },
     "price_to_fcf": {
      "current": 40.6163,
-     "own_5y_average": 1490.0138,
+     "own_5y_average": 1490.0137,
      "sector_median": 13.0629,
      "sector_peer_count": 43
     },
@@ -112183,7 +112146,7 @@
     "annual_calculation": [
      {
       "period_end": "2022-12-31",
-      "price": 123.7168,
+      "price": 123.7169,
       "book_value_per_share": 65.5534,
       "price_to_book": 1.8873,
       "roe_pct": 4.9706,
@@ -112195,7 +112158,7 @@
       "book_value_per_share": 68.8715,
       "price_to_book": 1.6596,
       "roe_pct": 1.4317,
-      "pb_to_roe": 115.9154
+      "pb_to_roe": 115.9155
      },
      {
       "period_end": "2024-12-31",
@@ -112651,9 +112614,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 398.7832,
+      "reference_multiple": 398.7831,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 370.868376
+      "implied_price": 370.868283
      },
      {
       "metric": "pe",
@@ -112695,7 +112658,7 @@
    "metrics": {
     "pe": {
      "current": 21.6627,
-     "own_5y_average": 398.7832,
+     "own_5y_average": 398.7831,
      "sector_median": 27.1033,
      "sector_peer_count": 242
     },
