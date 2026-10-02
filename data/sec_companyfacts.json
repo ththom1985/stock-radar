@@ -2861,7 +2861,7 @@
  "_meta": {
   "schema": "stock-radar-sec-companyfacts-cache",
   "schema_version": 1,
-  "written_at": "2026-10-02T02:23:36+00:00",
+  "written_at": "2026-10-02T08:42:18+00:00",
   "refreshed": 25
  },
  "PANW": {
@@ -27674,7 +27674,7 @@
  },
  "IBN": {
   "_refresh_failure": {
-   "at": "2026-10-02T02:23:28+00:00",
+   "at": "2026-10-02T08:42:09+00:00",
    "error": "HTTP Error 404: Not Found"
   }
  },
@@ -53776,20 +53776,81 @@
   "parser_version": 2,
   "entity_name": "Uranium Royalty Corp.",
   "cik": "2143673",
-  "latest": {},
-  "annual": [],
+  "latest": {
+   "period_end": "2026-04-30",
+   "net_income": 40249000.0,
+   "filed": "2026-07-28",
+   "form": "10-K",
+   "accession": "0001193125-26-321135",
+   "operating_cash_flow": 178456000.0,
+   "assets": 373320000.0,
+   "liabilities": 60550000.0,
+   "equity": 312770000.0,
+   "diluted_eps": 0.29,
+   "diluted_shares": 139416613.0,
+   "free_cash_flow": 178456000.0
+  },
+  "annual": [
+   {
+    "period_end": "2023-04-30",
+    "equity": 130987000.0,
+    "filed": "2026-07-28",
+    "form": "10-K",
+    "accession": "0001193125-26-321135"
+   },
+   {
+    "period_end": "2024-04-30",
+    "net_income": 13705000.0,
+    "filed": "2026-07-28",
+    "form": "10-K",
+    "accession": "0001193125-26-321135",
+    "operating_cash_flow": -76434000.0,
+    "equity": 200414000.0,
+    "diluted_eps": 0.12,
+    "diluted_shares": 115155252.0,
+    "free_cash_flow": -76434000.0
+   },
+   {
+    "period_end": "2025-04-30",
+    "net_income": -4509000.0,
+    "filed": "2026-07-28",
+    "form": "10-K",
+    "accession": "0001193125-26-321135",
+    "operating_cash_flow": -15059000.0,
+    "assets": 216119000.0,
+    "liabilities": 1016000.0,
+    "equity": 215103000.0,
+    "diluted_eps": -0.04,
+    "diluted_shares": 126795491.0,
+    "free_cash_flow": -15059000.0
+   },
+   {
+    "period_end": "2026-04-30",
+    "net_income": 40249000.0,
+    "filed": "2026-07-28",
+    "form": "10-K",
+    "accession": "0001193125-26-321135",
+    "operating_cash_flow": 178456000.0,
+    "assets": 373320000.0,
+    "liabilities": 60550000.0,
+    "equity": 312770000.0,
+    "diluted_eps": 0.29,
+    "diluted_shares": 139416613.0,
+    "free_cash_flow": 178456000.0
+   }
+  ],
   "derived": {
    "profit_margin": null,
-   "return_on_equity": null,
-   "return_on_assets": null,
+   "return_on_equity": 0.12868561562809733,
+   "return_on_assets": 0.10781367191685418,
    "debt_to_equity": null,
    "revenue_growth": null,
-   "fcf_conversion": null
+   "fcf_conversion": 4.433799597505528
   },
   "source": "SEC EDGAR Companyfacts",
   "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0002143673.json",
-  "fetched_at": "2026-08-26T10:32:44+00:00",
-  "last_success_at": "2026-08-26T10:32:44+00:00"
+  "fetched_at": "2026-10-02T08:42:09+00:00",
+  "last_success_at": "2026-10-02T08:42:09+00:00"
  },
  "SIDU": {
   "parser_version": 2,
@@ -53901,8 +53962,8 @@
   },
   "source": "SEC EDGAR Companyfacts",
   "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001879726.json",
-  "fetched_at": "2026-08-26T10:32:45+00:00",
-  "last_success_at": "2026-08-26T10:32:45+00:00"
+  "fetched_at": "2026-10-02T08:42:09+00:00",
+  "last_success_at": "2026-10-02T08:42:09+00:00"
  },
  "JPM": {
   "parser_version": 2,
@@ -54010,12 +54071,12 @@
   },
   "source": "SEC EDGAR Companyfacts",
   "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000019617.json",
-  "fetched_at": "2026-08-26T10:32:46+00:00",
-  "last_success_at": "2026-08-26T10:32:46+00:00"
+  "fetched_at": "2026-10-02T08:42:10+00:00",
+  "last_success_at": "2026-10-02T08:42:10+00:00"
  },
  "BAC": {
   "parser_version": 2,
-  "entity_name": "BANK OF AMERICA CORP /DE/",
+  "entity_name": "BofA Finance LLC",
   "cik": 70858,
   "latest": {
    "period_end": "2025-12-31",
@@ -54125,8 +54186,8 @@
   },
   "source": "SEC EDGAR Companyfacts",
   "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000070858.json",
-  "fetched_at": "2026-08-26T10:32:47+00:00",
-  "last_success_at": "2026-08-26T10:32:47+00:00"
+  "fetched_at": "2026-10-02T08:42:10+00:00",
+  "last_success_at": "2026-10-02T08:42:10+00:00"
  },
  "WFC": {
   "parser_version": 2,
@@ -54234,8 +54295,8 @@
   },
   "source": "SEC EDGAR Companyfacts",
   "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000072971.json",
-  "fetched_at": "2026-08-26T10:32:48+00:00",
-  "last_success_at": "2026-08-26T10:32:48+00:00"
+  "fetched_at": "2026-10-02T08:42:11+00:00",
+  "last_success_at": "2026-10-02T08:42:11+00:00"
  },
  "GS": {
   "parser_version": 2,
@@ -54343,8 +54404,8 @@
   },
   "source": "SEC EDGAR Companyfacts",
   "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000886982.json",
-  "fetched_at": "2026-08-26T10:32:49+00:00",
-  "last_success_at": "2026-08-26T10:32:49+00:00"
+  "fetched_at": "2026-10-02T08:42:11+00:00",
+  "last_success_at": "2026-10-02T08:42:11+00:00"
  },
  "MS": {
   "parser_version": 2,
@@ -54446,8 +54507,8 @@
   },
   "source": "SEC EDGAR Companyfacts",
   "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000895421.json",
-  "fetched_at": "2026-08-26T10:32:50+00:00",
-  "last_success_at": "2026-08-26T10:32:50+00:00"
+  "fetched_at": "2026-10-02T08:42:12+00:00",
+  "last_success_at": "2026-10-02T08:42:12+00:00"
  },
  "BLK": {
   "parser_version": 2,
@@ -54546,8 +54607,8 @@
   },
   "source": "SEC EDGAR Companyfacts",
   "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0002012383.json",
-  "fetched_at": "2026-08-26T10:32:50+00:00",
-  "last_success_at": "2026-08-26T10:32:50+00:00"
+  "fetched_at": "2026-10-02T08:42:12+00:00",
+  "last_success_at": "2026-10-02T08:42:12+00:00"
  },
  "KKR": {
   "parser_version": 2,
@@ -54636,8 +54697,8 @@
   },
   "source": "SEC EDGAR Companyfacts",
   "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001404912.json",
-  "fetched_at": "2026-08-26T10:32:51+00:00",
-  "last_success_at": "2026-08-26T10:32:51+00:00"
+  "fetched_at": "2026-10-02T08:42:12+00:00",
+  "last_success_at": "2026-10-02T08:42:12+00:00"
  },
  "BX": {
   "parser_version": 2,
@@ -54757,8 +54818,8 @@
   },
   "source": "SEC EDGAR Companyfacts",
   "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001393818.json",
-  "fetched_at": "2026-08-26T10:32:52+00:00",
-  "last_success_at": "2026-08-26T10:32:52+00:00"
+  "fetched_at": "2026-10-02T08:42:13+00:00",
+  "last_success_at": "2026-10-02T08:42:13+00:00"
  },
  "APO": {
   "parser_version": 2,
@@ -54864,8 +54925,8 @@
   },
   "source": "SEC EDGAR Companyfacts",
   "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001858681.json",
-  "fetched_at": "2026-08-26T10:32:52+00:00",
-  "last_success_at": "2026-08-26T10:32:52+00:00"
+  "fetched_at": "2026-10-02T08:42:13+00:00",
+  "last_success_at": "2026-10-02T08:42:13+00:00"
  },
  "ARES": {
   "parser_version": 2,
@@ -54961,8 +55022,8 @@
   },
   "source": "SEC EDGAR Companyfacts",
   "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001176948.json",
-  "fetched_at": "2026-08-26T10:32:53+00:00",
-  "last_success_at": "2026-08-26T10:32:53+00:00"
+  "fetched_at": "2026-10-02T08:42:13+00:00",
+  "last_success_at": "2026-10-02T08:42:13+00:00"
  },
  "BAM": {
   "parser_version": 2,
@@ -55053,8 +55114,8 @@
   },
   "source": "SEC EDGAR Companyfacts",
   "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001937926.json",
-  "fetched_at": "2026-08-26T10:32:53+00:00",
-  "last_success_at": "2026-08-26T10:32:53+00:00"
+  "fetched_at": "2026-10-02T08:42:14+00:00",
+  "last_success_at": "2026-10-02T08:42:14+00:00"
  },
  "OWL": {
   "parser_version": 2,
@@ -55174,8 +55235,8 @@
   },
   "source": "SEC EDGAR Companyfacts",
   "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001823945.json",
-  "fetched_at": "2026-08-26T10:32:54+00:00",
-  "last_success_at": "2026-08-26T10:32:54+00:00"
+  "fetched_at": "2026-10-02T08:42:14+00:00",
+  "last_success_at": "2026-10-02T08:42:14+00:00"
  },
  "TROW": {
   "parser_version": 2,
@@ -55289,8 +55350,8 @@
   },
   "source": "SEC EDGAR Companyfacts",
   "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001113169.json",
-  "fetched_at": "2026-08-26T10:32:55+00:00",
-  "last_success_at": "2026-08-26T10:32:55+00:00"
+  "fetched_at": "2026-10-02T08:42:14+00:00",
+  "last_success_at": "2026-10-02T08:42:14+00:00"
  },
  "MSCI": {
   "parser_version": 2,
@@ -55408,8 +55469,8 @@
   },
   "source": "SEC EDGAR Companyfacts",
   "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001408198.json",
-  "fetched_at": "2026-08-26T10:32:55+00:00",
-  "last_success_at": "2026-08-26T10:32:55+00:00"
+  "fetched_at": "2026-10-02T08:42:15+00:00",
+  "last_success_at": "2026-10-02T08:42:15+00:00"
  },
  "SPGI": {
   "parser_version": 2,
@@ -55523,8 +55584,8 @@
   },
   "source": "SEC EDGAR Companyfacts",
   "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000064040.json",
-  "fetched_at": "2026-08-26T10:32:56+00:00",
-  "last_success_at": "2026-08-26T10:32:56+00:00"
+  "fetched_at": "2026-10-02T08:42:15+00:00",
+  "last_success_at": "2026-10-02T08:42:15+00:00"
  },
  "MCO": {
   "parser_version": 2,
@@ -55642,8 +55703,8 @@
   },
   "source": "SEC EDGAR Companyfacts",
   "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001059556.json",
-  "fetched_at": "2026-08-26T10:32:57+00:00",
-  "last_success_at": "2026-08-26T10:32:57+00:00"
+  "fetched_at": "2026-10-02T08:42:15+00:00",
+  "last_success_at": "2026-10-02T08:42:15+00:00"
  },
  "ICE": {
   "parser_version": 2,
@@ -55763,8 +55824,8 @@
   },
   "source": "SEC EDGAR Companyfacts",
   "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001571949.json",
-  "fetched_at": "2026-08-26T10:32:58+00:00",
-  "last_success_at": "2026-08-26T10:32:58+00:00"
+  "fetched_at": "2026-10-02T08:42:16+00:00",
+  "last_success_at": "2026-10-02T08:42:16+00:00"
  },
  "CME": {
   "parser_version": 2,
@@ -55878,8 +55939,8 @@
   },
   "source": "SEC EDGAR Companyfacts",
   "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001156375.json",
-  "fetched_at": "2026-08-26T10:32:58+00:00",
-  "last_success_at": "2026-08-26T10:32:58+00:00"
+  "fetched_at": "2026-10-02T08:42:16+00:00",
+  "last_success_at": "2026-10-02T08:42:16+00:00"
  },
  "NDAQ": {
   "parser_version": 2,
@@ -55993,8 +56054,8 @@
   },
   "source": "SEC EDGAR Companyfacts",
   "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001120193.json",
-  "fetched_at": "2026-08-26T10:32:59+00:00",
-  "last_success_at": "2026-08-26T10:32:59+00:00"
+  "fetched_at": "2026-10-02T08:42:16+00:00",
+  "last_success_at": "2026-10-02T08:42:16+00:00"
  },
  "FIS": {
   "parser_version": 2,
@@ -56084,47 +56145,30 @@
   },
   "source": "SEC EDGAR Companyfacts",
   "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001136893.json",
-  "fetched_at": "2026-08-26T10:33:00+00:00",
-  "last_success_at": "2026-08-26T10:33:00+00:00"
+  "fetched_at": "2026-10-02T08:42:17+00:00",
+  "last_success_at": "2026-10-02T08:42:17+00:00"
  },
  "JKHY": {
   "parser_version": 2,
   "entity_name": "JACK HENRY & ASSOCIATES, INC.",
   "cik": 779152,
   "latest": {
-   "period_end": "2025-06-30",
-   "revenue": 2375288000.0,
-   "filed": "2025-08-25",
+   "period_end": "2026-06-30",
+   "revenue": 2544339000.0,
+   "filed": "2026-08-28",
    "form": "10-K",
-   "accession": "0000779152-25-000055",
-   "net_income": 455748000.0,
-   "operating_cash_flow": 641504000.0,
-   "capex": 53358000.0,
-   "assets": 3043970000.0,
-   "liabilities": 913138000.0,
-   "equity": 2130832000.0,
-   "long_term_debt": 0.0,
-   "diluted_eps": 6.24,
-   "diluted_shares": 73045000.0,
-   "free_cash_flow": 588146000.0
+   "accession": "0000779152-26-000067",
+   "net_income": 502776000.0,
+   "operating_cash_flow": 761960000.0,
+   "capex": 67103000.0,
+   "assets": 3145711000.0,
+   "liabilities": 1093762000.0,
+   "equity": 2051949000.0,
+   "diluted_eps": 6.98,
+   "diluted_shares": 72043000.0,
+   "free_cash_flow": 694857000.0
   },
   "annual": [
-   {
-    "period_end": "2021-06-30",
-    "revenue": 1758225000.0,
-    "filed": "2023-08-24",
-    "form": "10-K",
-    "accession": "0000779152-23-000062",
-    "net_income": 311469000.0,
-    "operating_cash_flow": 462129000.0,
-    "capex": 22988000.0,
-    "assets": 2336156000.0,
-    "liabilities": 1016864000.0,
-    "equity": 1319292000.0,
-    "diluted_eps": 4.12,
-    "diluted_shares": 75658000.0,
-    "free_cash_flow": 439141000.0
-   },
    {
     "period_end": "2022-06-30",
     "revenue": 1942884000.0,
@@ -56161,9 +56205,9 @@
    {
     "period_end": "2024-06-30",
     "revenue": 2215543000.0,
-    "filed": "2025-08-25",
+    "filed": "2026-08-28",
     "form": "10-K",
-    "accession": "0000779152-25-000055",
+    "accession": "0000779152-26-000067",
     "net_income": 381816000.0,
     "operating_cash_flow": 568041000.0,
     "capex": 58118000.0,
@@ -56178,9 +56222,9 @@
    {
     "period_end": "2025-06-30",
     "revenue": 2375288000.0,
-    "filed": "2025-08-25",
+    "filed": "2026-08-28",
     "form": "10-K",
-    "accession": "0000779152-25-000055",
+    "accession": "0000779152-26-000067",
     "net_income": 455748000.0,
     "operating_cash_flow": 641504000.0,
     "capex": 53358000.0,
@@ -56191,20 +56235,36 @@
     "diluted_eps": 6.24,
     "diluted_shares": 73045000.0,
     "free_cash_flow": 588146000.0
+   },
+   {
+    "period_end": "2026-06-30",
+    "revenue": 2544339000.0,
+    "filed": "2026-08-28",
+    "form": "10-K",
+    "accession": "0000779152-26-000067",
+    "net_income": 502776000.0,
+    "operating_cash_flow": 761960000.0,
+    "capex": 67103000.0,
+    "assets": 3145711000.0,
+    "liabilities": 1093762000.0,
+    "equity": 2051949000.0,
+    "diluted_eps": 6.98,
+    "diluted_shares": 72043000.0,
+    "free_cash_flow": 694857000.0
    }
   ],
   "derived": {
-   "profit_margin": 0.19187062789859588,
-   "return_on_equity": 0.21388265240995066,
-   "return_on_assets": 0.14972158069888994,
-   "debt_to_equity": 0.0,
-   "revenue_growth": 0.07210196326589013,
-   "fcf_conversion": 1.2905070345892906
+   "profit_margin": 0.19760574357426428,
+   "return_on_equity": 0.24502363362832116,
+   "return_on_assets": 0.15982904977602838,
+   "debt_to_equity": null,
+   "revenue_growth": 0.0711707380326092,
+   "fcf_conversion": 1.3820409088739318
   },
   "source": "SEC EDGAR Companyfacts",
   "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000779152.json",
-  "fetched_at": "2026-08-26T10:33:01+00:00",
-  "last_success_at": "2026-08-26T10:33:01+00:00"
+  "fetched_at": "2026-10-02T08:42:17+00:00",
+  "last_success_at": "2026-10-02T08:42:17+00:00"
  },
  "PGR": {
   "parser_version": 2,
@@ -56324,8 +56384,8 @@
   },
   "source": "SEC EDGAR Companyfacts",
   "source_url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000080661.json",
-  "fetched_at": "2026-08-26T10:33:02+00:00",
-  "last_success_at": "2026-08-26T10:33:02+00:00"
+  "fetched_at": "2026-10-02T08:42:18+00:00",
+  "last_success_at": "2026-10-02T08:42:18+00:00"
  },
  "TRV": {
   "parser_version": 2,
