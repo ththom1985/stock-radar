@@ -202,7 +202,7 @@
  "_meta": {
   "schema": "stock-radar-options-gex-cache",
   "schema_version": 1,
-  "written_at": "2026-10-07T03:18:06+00:00",
+  "written_at": "2026-10-07T08:45:55+00:00",
   "refreshed": 5
  },
  "GWW": {
@@ -9575,41 +9575,41 @@
  },
  "AAT": {
   "score": 50.0,
-  "direction": "dampening",
-  "net_gex_usd_per_1pct": 8725.06,
-  "gex_to_market_cap": 5.2e-06,
-  "contract_rows_used": 13,
+  "direction": "amplifying",
+  "net_gex_usd_per_1pct": -82.65,
+  "gex_to_market_cap": -5e-08,
+  "contract_rows_used": 7,
   "gamma_walls": [
    {
     "strike": 22.5,
-    "gex_usd_per_1pct": 7397.79
-   },
-   {
-    "strike": 20.0,
-    "gex_usd_per_1pct": 703.23
-   },
-   {
-    "strike": 25.0,
-    "gex_usd_per_1pct": 580.09
+    "gex_usd_per_1pct": -77.15
    },
    {
     "strike": 30.0,
-    "gex_usd_per_1pct": 34.33
+    "gex_usd_per_1pct": 33.66
    },
    {
     "strike": 17.5,
-    "gex_usd_per_1pct": 28.1
+    "gex_usd_per_1pct": 27.4
+   },
+   {
+    "strike": 25.0,
+    "gex_usd_per_1pct": -26.15
+   },
+   {
+    "strike": 20.0,
+    "gex_usd_per_1pct": -21.74
    },
    {
     "strike": 15.0,
-    "gex_usd_per_1pct": -18.47
+    "gex_usd_per_1pct": -18.67
    }
   ],
   "method": "Black-Scholes gamma × open interest × 100 shares × spot² × 1%; calls positive, puts negative as a dealer-position proxy",
   "limitations": "Yahoo open interest/IV can be delayed; dealer sign is assumed, zero-DTE intraday changes and customer positioning are not observable",
   "source": "Yahoo Finance options via yfinance",
-  "fetched_at": "2026-10-03T14:32:26+00:00",
-  "last_success_at": "2026-10-03T14:32:26+00:00",
+  "fetched_at": "2026-10-07T08:45:51+00:00",
+  "last_success_at": "2026-10-07T08:45:51+00:00",
   "expected_delay": "provider dependent; not exchange-certified real time",
   "expiration_count": 2
  },
@@ -10795,8 +10795,8 @@
   "method": "Black-Scholes gamma × open interest × 100 shares × spot² × 1%; calls positive, puts negative as a dealer-position proxy",
   "limitations": "Yahoo open interest/IV can be delayed; dealer sign is assumed, zero-DTE intraday changes and customer positioning are not observable",
   "source": "Yahoo Finance options via yfinance",
-  "fetched_at": "2026-10-02T08:43:00+00:00",
-  "last_success_at": "2026-10-02T08:43:00+00:00",
+  "fetched_at": "2026-10-07T08:45:55+00:00",
+  "last_success_at": "2026-10-07T08:45:55+00:00",
   "expected_delay": "provider dependent; not exchange-certified real time",
   "expiration_count": 4
  },
@@ -13218,50 +13218,50 @@
   "expiration_count": 2
  },
  "COKE": {
-  "score": 49.7,
-  "direction": "amplifying",
-  "net_gex_usd_per_1pct": -1080294.58,
-  "gex_to_market_cap": -8.384e-05,
-  "contract_rows_used": 78,
+  "score": 50.0,
+  "direction": "dampening",
+  "net_gex_usd_per_1pct": 417.11,
+  "gex_to_market_cap": 3e-08,
+  "contract_rows_used": 9,
   "gamma_walls": [
    {
-    "strike": 180.0,
-    "gex_usd_per_1pct": -1436751.95
-   },
-   {
-    "strike": 200.0,
-    "gex_usd_per_1pct": 135070.33
+    "strike": 300.0,
+    "gex_usd_per_1pct": 4620.3
    },
    {
     "strike": 210.0,
-    "gex_usd_per_1pct": 86860.82
+    "gex_usd_per_1pct": -3361.36
    },
    {
-    "strike": 195.0,
-    "gex_usd_per_1pct": 57879.09
-   },
-   {
-    "strike": 190.0,
-    "gex_usd_per_1pct": 54364.56
+    "strike": 110.0,
+    "gex_usd_per_1pct": -1320.33
    },
    {
     "strike": 220.0,
-    "gex_usd_per_1pct": 49479.82
+    "gex_usd_per_1pct": -655.74
    },
    {
-    "strike": 230.0,
-    "gex_usd_per_1pct": 43820.42
+    "strike": 150.0,
+    "gex_usd_per_1pct": 471.01
    },
    {
-    "strike": 175.0,
-    "gex_usd_per_1pct": -42493.92
+    "strike": 135.0,
+    "gex_usd_per_1pct": 210.67
+   },
+   {
+    "strike": 155.0,
+    "gex_usd_per_1pct": 174.27
+   },
+   {
+    "strike": 270.0,
+    "gex_usd_per_1pct": 157.68
    }
   ],
   "method": "Black-Scholes gamma × open interest × 100 shares × spot² × 1%; calls positive, puts negative as a dealer-position proxy",
   "limitations": "Yahoo open interest/IV can be delayed; dealer sign is assumed, zero-DTE intraday changes and customer positioning are not observable",
   "source": "Yahoo Finance options via yfinance",
-  "fetched_at": "2026-10-03T14:32:23+00:00",
-  "last_success_at": "2026-10-03T14:32:23+00:00",
+  "fetched_at": "2026-10-07T08:45:53+00:00",
+  "last_success_at": "2026-10-07T08:45:53+00:00",
   "expected_delay": "provider dependent; not exchange-certified real time",
   "expiration_count": 3
  },
@@ -13645,6 +13645,69 @@
   "source": "Yahoo Finance options via yfinance",
   "fetched_at": "2026-10-06T22:48:53+00:00",
   "last_success_at": "2026-10-06T22:48:53+00:00",
+  "expected_delay": "provider dependent; not exchange-certified real time",
+  "expiration_count": 3
+ },
+ "TECK": {
+  "score": 50.0,
+  "direction": "neutral",
+  "net_gex_usd_per_1pct": 0.0,
+  "gex_to_market_cap": 0.0,
+  "contract_rows_used": 0,
+  "gamma_walls": [],
+  "method": "Black-Scholes gamma × open interest × 100 shares × spot² × 1%; calls positive, puts negative as a dealer-position proxy",
+  "limitations": "Yahoo open interest/IV can be delayed; dealer sign is assumed, zero-DTE intraday changes and customer positioning are not observable",
+  "source": "Yahoo Finance options via yfinance",
+  "fetched_at": "2026-10-07T08:45:52+00:00",
+  "last_success_at": "2026-10-07T08:45:52+00:00",
+  "expected_delay": "provider dependent; not exchange-certified real time",
+  "expiration_count": 4
+ },
+ "ASH": {
+  "score": 50.1,
+  "direction": "dampening",
+  "net_gex_usd_per_1pct": 57118.46,
+  "gex_to_market_cap": 1.813e-05,
+  "contract_rows_used": 16,
+  "gamma_walls": [
+   {
+    "strike": 70.0,
+    "gex_usd_per_1pct": 55688.96
+   },
+   {
+    "strike": 55.0,
+    "gex_usd_per_1pct": 1196.5
+   },
+   {
+    "strike": 50.0,
+    "gex_usd_per_1pct": 685.22
+   },
+   {
+    "strike": 45.0,
+    "gex_usd_per_1pct": -303.0
+   },
+   {
+    "strike": 40.0,
+    "gex_usd_per_1pct": -197.58
+   },
+   {
+    "strike": 75.0,
+    "gex_usd_per_1pct": -137.86
+   },
+   {
+    "strike": 100.0,
+    "gex_usd_per_1pct": 119.95
+   },
+   {
+    "strike": 65.0,
+    "gex_usd_per_1pct": 87.09
+   }
+  ],
+  "method": "Black-Scholes gamma × open interest × 100 shares × spot² × 1%; calls positive, puts negative as a dealer-position proxy",
+  "limitations": "Yahoo open interest/IV can be delayed; dealer sign is assumed, zero-DTE intraday changes and customer positioning are not observable",
+  "source": "Yahoo Finance options via yfinance",
+  "fetched_at": "2026-10-07T08:45:54+00:00",
+  "last_success_at": "2026-10-07T08:45:54+00:00",
   "expected_delay": "provider dependent; not exchange-certified real time",
   "expiration_count": 3
  }
