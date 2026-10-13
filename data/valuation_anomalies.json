@@ -1,7 +1,7 @@
 {
  "schema": "stock-radar-valuation-anomalies",
  "schema_version": 1,
- "generated_at": "2026-10-13T04:10:40+00:00",
+ "generated_at": "2026-10-13T09:39:08+00:00",
  "anomalies": [
   {
    "symbol": "NVDA",
@@ -123,7 +123,7 @@
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 56.72,
-    "observed_width_factor": 2.1707,
+    "observed_width_factor": 2.2134,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
@@ -133,7 +133,7 @@
     "reason": "Der faire Bereich ist breiter als Faktor 1.5. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 103.6813,
+    "lower": 101.6828,
     "upper": 225.0653,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
@@ -157,9 +157,9 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 172.274874
+      "implied_price": 175.255334
      },
      {
       "metric": "price_to_fcf",
@@ -171,16 +171,16 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 103.681275
+      "implied_price": 101.682784
      },
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 71.692188
+      "implied_price": 72.326535
      }
     ]
    },
@@ -194,32 +194,32 @@
     "forward_pe": {
      "current": 23.1852,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 1.2549,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 24.313,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": 58.8778,
      "own_5y_average": 32.2087,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 9.675,
      "own_5y_average": null,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -267,9 +267,9 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 479.829734
+      "implied_price": 488.797247
      },
      {
       "metric": "price_to_fcf",
@@ -281,9 +281,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 310.028389
+      "implied_price": 304.052491
      },
      {
       "metric": "price_to_sales",
@@ -295,9 +295,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 153.535213
+      "implied_price": 154.893725
      }
     ]
    },
@@ -311,32 +311,32 @@
     "forward_pe": {
      "current": 21.5068,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 0.9846,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 17.462,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": 41.0483,
      "own_5y_average": 25.3878,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 9.418,
      "own_5y_average": 7.0711,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -2597,7 +2597,7 @@
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 0.0,
-    "observed_width_factor": 1.5595,
+    "observed_width_factor": 1.5901,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
@@ -2607,7 +2607,7 @@
     "reason": "Der faire Bereich ist breiter als Faktor 1.5."
    },
    "raw_fair_value_range": {
-    "lower": 200.977,
+    "lower": 197.1031,
     "upper": 313.4187,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
@@ -2631,9 +2631,9 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 180.183707
+      "implied_price": 183.516858
      },
      {
       "metric": "price_to_fcf",
@@ -2645,9 +2645,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 200.977048
+      "implied_price": 197.103149
      },
      {
       "metric": "price_to_sales",
@@ -2659,9 +2659,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 31.516887
+      "implied_price": 31.795755
      }
     ]
    },
@@ -2675,32 +2675,32 @@
     "forward_pe": {
      "current": 13.0368,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 0.6831,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 16.826,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": 22.8267,
      "own_5y_average": 44.92,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 16.5392,
      "own_5y_average": 19.5558,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -2748,9 +2748,9 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 18.343064
+      "implied_price": 18.640754
      },
      {
       "metric": "price_to_fcf",
@@ -2762,9 +2762,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 27.902755
+      "implied_price": 27.36492
      },
      {
       "metric": "price_to_sales",
@@ -2776,9 +2776,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 11.539927
+      "implied_price": 11.642035
      }
     ]
    },
@@ -2792,32 +2792,32 @@
     "forward_pe": {
      "current": 11.9172,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 0.9107,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 6.532,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": 7.0945,
      "own_5y_average": 74.0358,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 1.9491,
      "own_5y_average": 20.2962,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -2830,8 +2830,8 @@
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 909.2,
-    "observed_width_factor": 411.3792,
+    "observed_deviation_pct": 903.92,
+    "observed_width_factor": 404.7752,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -2841,8 +2841,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 0.0506,
-    "upper": 20.8144,
+    "lower": 0.0517,
+    "upper": 20.9241,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -2858,16 +2858,16 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 3.248712
+      "implied_price": 3.467983
      },
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 4.206444
+      "implied_price": 4.243663
      }
     ]
    },
@@ -2881,32 +2881,32 @@
     "forward_pe": {
      "current": -59.0386,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 0.511,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 231.517,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 100.6679,
      "own_5y_average": null,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -2919,8 +2919,8 @@
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 150.38,
-    "observed_width_factor": 1.2966,
+    "observed_deviation_pct": 152.62,
+    "observed_width_factor": 1.3001,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -2930,8 +2930,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 49.2619,
-    "upper": 63.8741,
+    "lower": 48.6973,
+    "upper": 63.3095,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -2947,23 +2947,23 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 59.148984
+      "implied_price": 59.983782
      },
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 58.587402
+      "implied_price": 57.45811
      },
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 21.430268
+      "implied_price": 21.619887
      }
     ]
    },
@@ -2977,32 +2977,32 @@
     "forward_pe": {
      "current": 16.5089,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 0.7581,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 34.939,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": 44.9742,
      "own_5y_average": null,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 13.9704,
      "own_5y_average": null,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -6492,8 +6492,8 @@
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 198.29,
-    "observed_width_factor": 1.7067,
+    "observed_deviation_pct": 195.67,
+    "observed_width_factor": 1.6864,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -6503,8 +6503,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 41.0173,
-    "upper": 70.0063,
+    "lower": 41.8802,
+    "upper": 70.6257,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -6513,23 +6513,23 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 41.017332
+      "implied_price": 41.880247
      },
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 42.716909
+      "implied_price": 41.893527
      },
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 70.006309
+      "implied_price": 70.625739
      }
     ]
    },
@@ -6543,32 +6543,32 @@
     "forward_pe": {
      "current": 20.2892,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 2.8155,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 52.398,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": 84.6051,
      "own_5y_average": null,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 5.8658,
      "own_5y_average": null,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -6582,7 +6582,7 @@
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 207.25,
-    "observed_width_factor": 1.3065,
+    "observed_width_factor": 1.337,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
@@ -6593,7 +6593,7 @@
    },
    "raw_fair_value_range": {
     "lower": 63.5395,
-    "upper": 83.017,
+    "upper": 84.9507,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 2,
@@ -6616,9 +6616,9 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 83.016961
+      "implied_price": 84.950734
      },
      {
       "metric": "price_to_fcf",
@@ -6630,9 +6630,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 102.158086
+      "implied_price": 100.188955
      },
      {
       "metric": "price_to_sales",
@@ -6644,9 +6644,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 65.589058
+      "implied_price": 66.169403
      }
     ]
    },
@@ -6660,32 +6660,32 @@
     "forward_pe": {
      "current": 5.7604,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 4.587,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": 3.352,
      "own_5y_average": 7.8198,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 0.5932,
      "own_5y_average": 1.0224,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -6698,8 +6698,8 @@
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 127.32,
-    "observed_width_factor": 1.238,
+    "observed_deviation_pct": 133.18,
+    "observed_width_factor": 1.2069,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -6709,7 +6709,7 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 51.1237,
+    "lower": 52.4414,
     "upper": 63.2931,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
@@ -6726,23 +6726,23 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 51.123721
+      "implied_price": 52.441406
      },
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 97.116481
+      "implied_price": 95.244529
      },
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 34.417996
+      "implied_price": 34.722533
      }
     ]
    },
@@ -6756,32 +6756,32 @@
     "forward_pe": {
      "current": 8.7559,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 1.5352,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 7.127,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": 3.8256,
      "own_5y_average": null,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 1.2265,
      "own_5y_average": null,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -6829,9 +6829,9 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 93.070094
+      "implied_price": 95.611517
      },
      {
       "metric": "price_to_fcf",
@@ -6843,9 +6843,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 151.910606
+      "implied_price": 148.982479
      },
      {
       "metric": "price_to_sales",
@@ -6857,9 +6857,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 64.22893
+      "implied_price": 64.797241
      }
     ]
    },
@@ -6873,32 +6873,32 @@
     "forward_pe": {
      "current": 8.1058,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 0.8273,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 7.26,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": 4.7861,
      "own_5y_average": 3.8459,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 1.2862,
      "own_5y_average": 1.0687,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -8123,8 +8123,8 @@
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 171.61,
-    "observed_width_factor": 1.218,
+    "observed_deviation_pct": 168.66,
+    "observed_width_factor": 1.2152,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -8134,8 +8134,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 159.8374,
-    "upper": 194.6877,
+    "lower": 161.9771,
+    "upper": 196.8274,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -8151,23 +8151,23 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 181.296776
+      "implied_price": 184.043451
      },
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 129.737977
+      "implied_price": 127.237236
      },
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 173.228299
+      "implied_price": 174.761059
      }
     ]
    },
@@ -8181,32 +8181,32 @@
     "forward_pe": {
      "current": 30.8555,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 1.4439,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 38.089,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 6.003,
      "own_5y_average": null,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -9588,8 +9588,8 @@
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 56.62,
-    "observed_width_factor": 8.8598,
+    "observed_deviation_pct": 58.0,
+    "observed_width_factor": 8.9166,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -9599,8 +9599,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 132.0294,
-    "upper": 1169.7501,
+    "lower": 133.1976,
+    "upper": 1187.6645,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -9609,16 +9609,16 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 1169.75005
+      "implied_price": 1187.664533
      },
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 132.029389
+      "implied_price": 133.197612
      }
     ]
    },
@@ -9632,32 +9632,32 @@
     "forward_pe": {
      "current": 11.2115,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 0.8185,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": -0.051,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 1.5548,
      "own_5y_average": null,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -10511,8 +10511,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 221.9191,
-    "upper": 234.2018,
+    "lower": 221.926,
+    "upper": 234.195,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -10692,8 +10692,8 @@
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 105.13,
-    "observed_width_factor": 1.2423,
+    "observed_deviation_pct": 106.95,
+    "observed_width_factor": 1.2077,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -10703,8 +10703,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 50.6677,
-    "upper": 62.9469,
+    "lower": 51.116,
+    "upper": 61.7336,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -10720,23 +10720,23 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 72.680157
+      "implied_price": 74.557426
      },
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 62.946903
+      "implied_price": 61.733581
      },
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 50.667713
+      "implied_price": 51.116031
      }
     ]
    },
@@ -10750,32 +10750,32 @@
     "forward_pe": {
      "current": 9.7568,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 2.1022,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 6.803,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 0.9695,
      "own_5y_average": null,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -10884,8 +10884,8 @@
     "status": "withheld_sector_model",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 84.07,
-    "observed_width_factor": 1.0748,
+    "observed_deviation_pct": 84.08,
+    "observed_width_factor": 1.0747,
     "checks": {
      "sector_model_supported": false,
      "basis_broad": false,
@@ -10895,8 +10895,8 @@
     "reason": "Bewertung sektorbedingt nicht möglich: Für dieses Finanzgeschäft ist noch kein fachlich passendes Bewertungsmodell zugeordnet. Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 149.6159,
-    "upper": 160.8074,
+    "lower": 149.6221,
+    "upper": 160.8012,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -11153,8 +11153,8 @@
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 9.1,
-    "observed_width_factor": 1.0571,
+    "observed_deviation_pct": 9.11,
+    "observed_width_factor": 1.057,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -11164,8 +11164,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 380.6566,
-    "upper": 402.3967,
+    "lower": 380.6688,
+    "upper": 402.3846,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -13505,8 +13505,8 @@
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 237.21,
-    "observed_width_factor": 2.6978,
+    "observed_deviation_pct": 247.54,
+    "observed_width_factor": 2.6408,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -13516,8 +13516,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 11.0335,
-    "upper": 29.7663,
+    "lower": 11.3716,
+    "upper": 30.0297,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -13526,16 +13526,16 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 11.033476
+      "implied_price": 11.371633
      },
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 29.766306
+      "implied_price": 30.029685
      }
     ]
    },
@@ -13549,32 +13549,32 @@
     "forward_pe": {
      "current": 4.9969,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 6.651,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 0.2146,
      "own_5y_average": null,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -13587,8 +13587,8 @@
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 5.24,
-    "observed_width_factor": 1.8972,
+    "observed_deviation_pct": 7.78,
+    "observed_width_factor": 1.8168,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -13598,8 +13598,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5."
    },
    "raw_fair_value_range": {
-    "lower": 30.9942,
-    "upper": 58.8008,
+    "lower": 31.7406,
+    "upper": 57.6674,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -13615,23 +13615,23 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 30.994235
+      "implied_price": 31.740624
      },
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 58.800817
+      "implied_price": 57.667412
      },
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 79.854817
+      "implied_price": 80.561389
      }
     ]
    },
@@ -13645,32 +13645,32 @@
     "forward_pe": {
      "current": 9.9817,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 12.38,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 0.7203,
      "own_5y_average": null,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -15047,7 +15047,7 @@
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 14.58,
-    "observed_width_factor": 1.1191,
+    "observed_width_factor": 1.119,
     "checks": {
      "sector_model_supported": false,
      "basis_broad": false,
@@ -15057,8 +15057,8 @@
     "reason": "Bewertung sektorbedingt nicht möglich: Für dieses Finanzgeschäft ist noch kein fachlich passendes Bewertungsmodell zugeordnet. Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 52.7211,
-    "upper": 59.0003,
+    "lower": 52.7246,
+    "upper": 58.9968,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -15423,8 +15423,8 @@
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 190.59,
-    "observed_width_factor": 1.0329,
+    "observed_deviation_pct": 196.12,
+    "observed_width_factor": 1.0226,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -15434,8 +15434,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 8.9649,
-    "upper": 9.2601,
+    "lower": 9.1355,
+    "upper": 9.342,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -15444,16 +15444,16 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 8.964852
+      "implied_price": 9.135453
      },
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 9.260056
+      "implied_price": 9.341991
      }
     ]
    },
@@ -15467,32 +15467,32 @@
     "forward_pe": {
      "current": 30.9,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 4.216,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 0.6562,
      "own_5y_average": null,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -15772,8 +15772,8 @@
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 36.38,
-    "observed_width_factor": 1.0666,
+    "observed_deviation_pct": 36.39,
+    "observed_width_factor": 1.0665,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -15783,8 +15783,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 199.3948,
-    "upper": 212.678,
+    "lower": 199.4022,
+    "upper": 212.6706,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -15951,7 +15951,7 @@
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 35.26,
-    "observed_width_factor": 1.0589,
+    "observed_width_factor": 1.0588,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -15961,8 +15961,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 26.8889,
-    "upper": 28.4728,
+    "lower": 26.8898,
+    "upper": 28.4719,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -16777,7 +16777,7 @@
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 0.74,
+    "observed_deviation_pct": 0.75,
     "observed_width_factor": 1.061,
     "checks": {
      "sector_model_supported": true,
@@ -16788,8 +16788,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 147.4367,
-    "upper": 156.4341,
+    "lower": 147.4417,
+    "upper": 156.4291,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -17346,8 +17346,8 @@
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 293.66,
-    "observed_width_factor": 2.0351,
+    "observed_deviation_pct": 297.15,
+    "observed_width_factor": 1.9784,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -17357,8 +17357,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 19.7462,
-    "upper": 40.1857,
+    "lower": 19.9209,
+    "upper": 39.4111,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -17367,23 +17367,23 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 28.068969
+      "implied_price": 28.643695
      },
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 40.185656
+      "implied_price": 39.411064
      },
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 19.746191
+      "implied_price": 19.92091
      }
     ]
    },
@@ -17397,32 +17397,32 @@
     "forward_pe": {
      "current": 250.91,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 2.73,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 0.4943,
      "own_5y_average": null,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -17435,8 +17435,8 @@
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 143.99,
-    "observed_width_factor": 1.2838,
+    "observed_deviation_pct": 144.02,
+    "observed_width_factor": 1.2834,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -17446,8 +17446,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 2.4167,
-    "upper": 3.1025,
+    "lower": 2.4171,
+    "upper": 3.1021,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -17996,8 +17996,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 77.6222,
-    "upper": 80.3265,
+    "lower": 77.6237,
+    "upper": 80.325,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -18081,8 +18081,8 @@
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 6.28,
-    "observed_width_factor": 1.2428,
+    "observed_deviation_pct": 5.35,
+    "observed_width_factor": 1.2258,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -18092,8 +18092,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 11.2805,
-    "upper": 14.0198,
+    "lower": 11.5387,
+    "upper": 14.1438,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -18109,23 +18109,23 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 11.280485
+      "implied_price": 11.538722
      },
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 17.242513
+      "implied_price": 16.910158
      },
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 14.019787
+      "implied_price": 14.143837
      }
     ]
    },
@@ -18139,32 +18139,32 @@
     "forward_pe": {
      "current": 13.6833,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 2.2996,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 14.53,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 2.0914,
      "own_5y_average": null,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -19853,7 +19853,7 @@
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 13624.25,
+    "observed_deviation_pct": 13624.24,
     "observed_width_factor": 1.1082,
     "checks": {
      "sector_model_supported": true,
@@ -21489,13 +21489,13 @@
   {
    "symbol": "7203.T",
    "name": "Toyota Motor Corporation",
-   "price_local": 2910.5,
+   "price_local": 2984.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 2.57,
+    "observed_deviation_pct": 0.05,
     "observed_width_factor": 2.2102,
     "checks": {
      "sector_model_supported": true,
@@ -21578,14 +21578,14 @@
   {
    "symbol": "6301.T",
    "name": "Komatsu Ltd.",
-   "price_local": 7298.0,
+   "price_local": 7416.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 48.89,
-    "observed_width_factor": 1.0521,
+    "observed_deviation_pct": 46.52,
+    "observed_width_factor": 1.0522,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -21595,8 +21595,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 10866.0116,
-    "upper": 11432.619,
+    "lower": 10865.9212,
+    "upper": 11432.7094,
     "currency": "JPY",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -21667,13 +21667,13 @@
   {
    "symbol": "6326.T",
    "name": "Kubota Corporation",
-   "price_local": 2626.5,
+   "price_local": 2690.5,
    "currency": "JPY",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 63.09,
+    "observed_deviation_pct": 59.21,
     "observed_width_factor": 1.5492,
     "checks": {
      "sector_model_supported": true,
@@ -21756,7 +21756,7 @@
   {
    "symbol": "6506.T",
    "name": "YASKAWA Electric Corporation",
-   "price_local": 4783.0,
+   "price_local": 4840.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -21845,13 +21845,13 @@
   {
    "symbol": "6586.T",
    "name": "Makita Corporation",
-   "price_local": 5202.0,
+   "price_local": 5217.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 36.68,
+    "observed_deviation_pct": 36.29,
     "observed_width_factor": 1.1811,
     "checks": {
      "sector_model_supported": true,
@@ -21941,13 +21941,13 @@
   {
    "symbol": "6724.T",
    "name": "Seiko Epson Corporation",
-   "price_local": 3372.0,
+   "price_local": 3373.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 15.43,
+    "observed_deviation_pct": 15.4,
     "observed_width_factor": 2.5962,
     "checks": {
      "sector_model_supported": true,
@@ -22037,7 +22037,7 @@
   {
    "symbol": "6869.T",
    "name": "Sysmex Corporation",
-   "price_local": 1855.0,
+   "price_local": 1869.5,
    "currency": "JPY",
    "gate": {
     "status": "withheld_wide_range",
@@ -22133,13 +22133,13 @@
   {
    "symbol": "7309.T",
    "name": "Shimano Inc.",
-   "price_local": 17700.0,
+   "price_local": 17845.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 42.4,
+    "observed_deviation_pct": 43.56,
     "observed_width_factor": 1.8818,
     "checks": {
      "sector_model_supported": true,
@@ -22229,14 +22229,14 @@
   {
    "symbol": "8113.T",
    "name": "Unicharm Corporation",
-   "price_local": 957.5999755859375,
+   "price_local": 981.7000122070312,
    "currency": "JPY",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 17.53,
-    "observed_width_factor": 1.0355,
+    "observed_deviation_pct": 20.48,
+    "observed_width_factor": 1.0356,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -22246,8 +22246,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 786.8439,
-    "upper": 814.7842,
+    "lower": 786.7941,
+    "upper": 814.834,
     "currency": "JPY",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -22325,13 +22325,13 @@
   {
    "symbol": "2897.T",
    "name": "Nissin Foods Holdings Co.,Ltd.",
-   "price_local": 2939.0,
+   "price_local": 2984.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 5.11,
+    "observed_deviation_pct": 3.53,
     "observed_width_factor": 1.3006,
     "checks": {
      "sector_model_supported": true,
@@ -22420,8 +22420,8 @@
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 12.76,
-    "observed_width_factor": 1.6546,
+    "observed_deviation_pct": 10.72,
+    "observed_width_factor": 1.7182,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -22431,8 +22431,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5."
    },
    "raw_fair_value_range": {
-    "lower": 227.6752,
-    "upper": 376.7163,
+    "lower": 223.2867,
+    "upper": 383.6596,
     "currency": "HKD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -22448,23 +22448,23 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 376.716335
+      "implied_price": 383.659584
      },
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 227.675221
+      "implied_price": 223.286707
      },
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 172.177987
+      "implied_price": 173.701453
      }
     ]
    },
@@ -22478,32 +22478,32 @@
     "forward_pe": {
      "current": 11.6951,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 1.3534,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 13.239,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 4.8198,
      "own_5y_average": null,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -23236,7 +23236,7 @@
   {
    "symbol": "000660.KS",
    "name": "SK hynix Inc.",
-   "price_local": 1681000.0,
+   "price_local": 1443000.0,
    "currency": "KRW",
    "gate": {
     "status": "withheld_wide_range",
@@ -23325,13 +23325,13 @@
   {
    "symbol": "LYC.AX",
    "name": "Lynas Rare Earths Limited",
-   "price_local": 12.40999984741211,
+   "price_local": 11.670000076293945,
    "currency": "AUD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 163.18,
+    "observed_deviation_pct": 147.49,
     "observed_width_factor": 1.9029,
     "checks": {
      "sector_model_supported": true,
@@ -23414,13 +23414,13 @@
   {
    "symbol": "FMG.AX",
    "name": "Fortescue Ltd",
-   "price_local": 15.34000015258789,
+   "price_local": 15.319999694824219,
    "currency": "AUD",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 42.07,
+    "observed_deviation_pct": 42.25,
     "observed_width_factor": 1.2485,
     "checks": {
      "sector_model_supported": true,
@@ -25303,9 +25303,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 42.9706,
+      "reference_multiple": 42.9705,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 78.636198
+      "implied_price": 78.636015
      },
      {
       "metric": "pe",
@@ -25354,7 +25354,7 @@
    "metrics": {
     "pe": {
      "current": 67.5596,
-     "own_5y_average": 42.9706,
+     "own_5y_average": 42.9705,
      "sector_median": 36.0851,
      "sector_peer_count": 221
     },
@@ -26147,7 +26147,7 @@
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 4.55,
-    "observed_width_factor": 2.6637,
+    "observed_width_factor": 2.7161,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
@@ -26157,7 +26157,7 @@
     "reason": "Der faire Bereich ist breiter als Faktor 1.5."
    },
    "raw_fair_value_range": {
-    "lower": 54.8689,
+    "lower": 53.8113,
     "upper": 146.1556,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
@@ -26174,9 +26174,9 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 57.788534
+      "implied_price": 58.596148
      },
      {
       "metric": "price_to_fcf",
@@ -26188,9 +26188,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 54.868893
+      "implied_price": 53.811277
      },
      {
       "metric": "price_to_sales",
@@ -26202,9 +26202,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 61.730042
+      "implied_price": 62.276242
      }
     ]
    },
@@ -26218,32 +26218,32 @@
     "forward_pe": {
      "current": 38.6676,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 0.5976,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 35.573,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": 47.4041,
      "own_5y_average": 82.8831,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 4.7876,
      "own_5y_average": 4.656,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -26448,8 +26448,8 @@
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 121.58,
-    "observed_width_factor": 1.1016,
+    "observed_deviation_pct": 121.59,
+    "observed_width_factor": 1.1015,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -26459,8 +26459,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 37.7898,
-    "upper": 41.6286,
+    "lower": 37.7919,
+    "upper": 41.6265,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -27033,7 +27033,7 @@
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 49.53,
-    "observed_width_factor": 1.0591,
+    "observed_width_factor": 1.059,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -27043,8 +27043,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 48.0145,
-    "upper": 50.8524,
+    "lower": 48.0158,
+    "upper": 50.8511,
     "currency": "CHF",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -29615,7 +29615,7 @@
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 0.0,
-    "observed_width_factor": 17.1093,
+    "observed_width_factor": 16.7981,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
@@ -29625,7 +29625,7 @@
     "reason": "Der faire Bereich ist breiter als Faktor 1.5."
    },
    "raw_fair_value_range": {
-    "lower": 8.1336,
+    "lower": 8.2843,
     "upper": 139.1609,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
@@ -29635,9 +29635,9 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 8.133618
+      "implied_price": 8.284317
      },
      {
       "metric": "price_to_fcf",
@@ -29649,9 +29649,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 84.878616
+      "implied_price": 83.242553
      },
      {
       "metric": "price_to_sales",
@@ -29663,9 +29663,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 4.235087
+      "implied_price": 4.27256
      }
     ]
    },
@@ -29679,32 +29679,32 @@
     "forward_pe": {
      "current": 337.1498,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 118.663,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": 17.3071,
      "own_5y_average": 67.932,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 39.4121,
      "own_5y_average": 64.6173,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -29718,7 +29718,7 @@
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 0.0,
-    "observed_width_factor": 1.5792,
+    "observed_width_factor": 1.5245,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
@@ -29728,8 +29728,8 @@
     "reason": "Der faire Bereich ist breiter als Faktor 1.5."
    },
    "raw_fair_value_range": {
-    "lower": 30.1256,
-    "upper": 47.5756,
+    "lower": 30.952,
+    "upper": 47.1873,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 2,
@@ -29738,9 +29738,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 263.7035,
+      "reference_multiple": 263.7036,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 279.52571
+      "implied_price": 279.525816
      },
      {
       "metric": "pe",
@@ -29752,9 +29752,9 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 30.125573
+      "implied_price": 30.951984
      },
      {
       "metric": "price_to_fcf",
@@ -29766,9 +29766,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 48.114723
+      "implied_price": 47.187296
      },
      {
       "metric": "price_to_sales",
@@ -29780,48 +29780,48 @@
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 15.895448
+      "implied_price": 16.036094
      }
     ]
    },
    "metrics": {
     "pe": {
      "current": 53.4886,
-     "own_5y_average": 263.7035,
+     "own_5y_average": 263.7036,
      "sector_median": 20.8201,
      "sector_peer_count": 47
     },
     "forward_pe": {
      "current": 27.4461,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 1.886,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 15.572,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": 16.64,
      "own_5y_average": 16.0253,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 5.7231,
      "own_5y_average": 5.8858,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -32673,9 +32673,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 90.6708,
+      "reference_multiple": 90.6707,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 1247.630208
+      "implied_price": 1247.628832
      },
      {
       "metric": "pe",
@@ -32724,7 +32724,7 @@
    "metrics": {
     "pe": {
      "current": 66.4479,
-     "own_5y_average": 90.6708,
+     "own_5y_average": 90.6707,
      "sector_median": 27.8187,
      "sector_peer_count": 66
     },
@@ -36657,8 +36657,8 @@
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 3.18,
-    "observed_width_factor": 1.7564,
+    "observed_deviation_pct": 5.21,
+    "observed_width_factor": 1.7226,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -36669,7 +36669,7 @@
    },
    "raw_fair_value_range": {
     "lower": 996.0336,
-    "upper": 1749.4794,
+    "upper": 1715.7576,
     "currency": "INR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -36685,23 +36685,23 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 1879.145026
+      "implied_price": 1917.859225
      },
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 1749.479412
+      "implied_price": 1715.757626
      },
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 693.694124
+      "implied_price": 699.832074
      }
     ]
    },
@@ -36715,32 +36715,32 @@
     "forward_pe": {
      "current": 21.5852,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 11.254,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 5.0326,
      "own_5y_average": null,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -37401,7 +37401,7 @@
     "annual_calculation": [
      {
       "period_end": "2022-12-31",
-      "price": 7439.6421,
+      "price": 7439.6416,
       "book_value_per_share": 1792.89,
       "price_to_book": 4.1495,
       "roe_pct": 18.4309,
@@ -37409,7 +37409,7 @@
      },
      {
       "period_end": "2023-12-31",
-      "price": 8382.5488,
+      "price": 8382.5498,
       "book_value_per_share": 1965.9798,
       "price_to_book": 4.2638,
       "roe_pct": 20.0693,
@@ -37425,7 +37425,7 @@
      },
      {
       "period_end": "2025-12-31",
-      "price": 7681.9004,
+      "price": 7681.8999,
       "book_value_per_share": 2288.1029,
       "price_to_book": 3.3573,
       "roe_pct": 20.442,
@@ -37444,7 +37444,7 @@
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 55.32,
-    "observed_width_factor": 1.9993,
+    "observed_width_factor": 2.0373,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -37455,7 +37455,7 @@
    },
    "raw_fair_value_range": {
     "lower": 3603.3347,
-    "upper": 7204.2051,
+    "upper": 7341.0266,
     "currency": "IDR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -37471,23 +37471,23 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 7204.205064
+      "implied_price": 7341.026624
      },
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 10065.405254
+      "implied_price": 9871.391284
      },
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 2984.551345
+      "implied_price": 3010.959274
      }
     ]
    },
@@ -37501,32 +37501,32 @@
     "forward_pe": {
      "current": 8.5405,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 2.923,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 4.146,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 1.4693,
      "own_5y_average": null,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -37687,8 +37687,8 @@
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 2839.21,
-    "observed_width_factor": 1.4111,
+    "observed_deviation_pct": 2865.22,
+    "observed_width_factor": 1.3718,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -37698,8 +37698,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 629.2851,
-    "upper": 887.9958,
+    "lower": 634.8531,
+    "upper": 870.8793,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -37715,23 +37715,23 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 1008.405367
+      "implied_price": 1030.70621
      },
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 887.995757
+      "implied_price": 870.879349
      },
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 629.285061
+      "implied_price": 634.853106
      }
     ]
    },
@@ -37745,32 +37745,32 @@
     "forward_pe": {
      "current": 10.3183,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 0.7443,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 2.347,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 0.0669,
      "own_5y_average": null,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -38744,7 +38744,7 @@
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 0.0,
-    "observed_width_factor": 2.7813,
+    "observed_width_factor": 2.836,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
@@ -38754,7 +38754,7 @@
     "reason": "Der faire Bereich ist breiter als Faktor 1.5."
    },
    "raw_fair_value_range": {
-    "lower": 34.0158,
+    "lower": 33.3601,
     "upper": 94.6088,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
@@ -38771,9 +38771,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 34.01579
+      "implied_price": 33.360125
      },
      {
       "metric": "price_to_sales",
@@ -38785,9 +38785,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 13.945912
+      "implied_price": 14.069309
      }
     ]
    },
@@ -38801,32 +38801,32 @@
     "forward_pe": {
      "current": -39.6846,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": -40.565,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": 26.132,
      "own_5y_average": 99.1751,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 7.2423,
      "own_5y_average": 13.3407,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -40592,7 +40592,7 @@
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 52.36,
+    "observed_deviation_pct": 52.37,
     "observed_width_factor": 1.3717,
     "checks": {
      "sector_model_supported": true,
@@ -40604,7 +40604,7 @@
    },
    "raw_fair_value_range": {
     "lower": 134.8068,
-    "upper": 184.9114,
+    "upper": 184.9111,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 2,
@@ -40634,9 +40634,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 64.8575,
+      "reference_multiple": 64.8574,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 184.911361
+      "implied_price": 184.911076
      },
      {
       "metric": "price_to_fcf",
@@ -40688,7 +40688,7 @@
     },
     "price_to_fcf": {
      "current": 98.8469,
-     "own_5y_average": 64.8575,
+     "own_5y_average": 64.8574,
      "sector_median": 29.6423,
      "sector_peer_count": 206
     },
@@ -40730,9 +40730,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 42.5648,
+      "reference_multiple": 42.5647,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 194.095488
+      "implied_price": 194.095032
      },
      {
       "metric": "pe",
@@ -40781,7 +40781,7 @@
    "metrics": {
     "pe": {
      "current": 48.2476,
-     "own_5y_average": 42.5648,
+     "own_5y_average": 42.5647,
      "sector_median": 36.0851,
      "sector_peer_count": 221
     },
@@ -42450,8 +42450,8 @@
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 119.28,
-    "observed_width_factor": 1.3401,
+    "observed_deviation_pct": 119.31,
+    "observed_width_factor": 1.3397,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -42461,8 +42461,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 61.067,
-    "upper": 81.8359,
+    "lower": 61.0786,
+    "upper": 81.8243,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -46030,7 +46030,7 @@
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 0.42,
-    "observed_width_factor": 3.2691,
+    "observed_width_factor": 3.3333,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
@@ -46040,7 +46040,7 @@
     "reason": "Der faire Bereich ist breiter als Faktor 1.5."
    },
    "raw_fair_value_range": {
-    "lower": 38.2013,
+    "lower": 37.4649,
     "upper": 124.8828,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
@@ -46064,9 +46064,9 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 204.79101
+      "implied_price": 207.622406
      },
      {
       "metric": "price_to_fcf",
@@ -46078,9 +46078,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 38.201276
+      "implied_price": 37.464934
      },
      {
       "metric": "price_to_sales",
@@ -46092,9 +46092,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 9.841303
+      "implied_price": 9.928381
      }
     ]
    },
@@ -46108,32 +46108,32 @@
     "forward_pe": {
      "current": 11.6397,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 1.1595,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 5.622,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": 11.3051,
      "own_5y_average": 63.4393,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 4.9862,
      "own_5y_average": 20.6907,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -46146,8 +46146,8 @@
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 69.1,
-    "observed_width_factor": 1.924,
+    "observed_deviation_pct": 70.6,
+    "observed_width_factor": 1.8703,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -46157,8 +46157,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 25.6869,
-    "upper": 49.4205,
+    "lower": 25.9142,
+    "upper": 48.4679,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -46174,23 +46174,23 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 195.070144
+      "implied_price": 197.834702
      },
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 49.420512
+      "implied_price": 48.467916
      },
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 25.68691
+      "implied_price": 25.914193
      }
     ]
    },
@@ -46204,32 +46204,32 @@
     "forward_pe": {
      "current": 11.7691,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 0.3208,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": -1.94,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": 6.5957,
      "own_5y_average": null,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 1.4419,
      "own_5y_average": null,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -46242,8 +46242,8 @@
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 218.49,
-    "observed_width_factor": 1.3223,
+    "observed_deviation_pct": 221.31,
+    "observed_width_factor": 1.2855,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -46253,8 +46253,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 172.178,
-    "upper": 227.6752,
+    "lower": 173.7015,
+    "upper": 223.2867,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -46270,23 +46270,23 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 376.716335
+      "implied_price": 383.659584
      },
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 227.675221
+      "implied_price": 223.286707
      },
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 172.177987
+      "implied_price": 173.701453
      }
     ]
    },
@@ -46300,32 +46300,32 @@
     "forward_pe": {
      "current": 12.9385,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 1.3462,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 1.974,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 0.6174,
      "own_5y_average": null,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -46729,8 +46729,8 @@
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 890.44,
-    "observed_width_factor": 1.8508,
+    "observed_deviation_pct": 899.21,
+    "observed_width_factor": 1.7992,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -46740,8 +46740,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 83.6926,
-    "upper": 154.8958,
+    "lower": 84.4331,
+    "upper": 151.9102,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -46757,23 +46757,23 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 179.412284
+      "implied_price": 182.389365
      },
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 154.895843
+      "implied_price": 151.910175
      },
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 83.692555
+      "implied_price": 84.433084
      }
     ]
    },
@@ -46787,32 +46787,32 @@
     "forward_pe": {
      "current": 8.3777,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 1.8755,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 0.264,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 0.4059,
      "own_5y_average": null,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -47908,7 +47908,7 @@
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 12.33,
-    "observed_width_factor": 1.0561,
+    "observed_width_factor": 1.056,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -47918,8 +47918,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 52.5804,
-    "upper": 55.5303,
+    "lower": 52.5821,
+    "upper": 55.5287,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -48110,8 +48110,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 307.5042,
-    "upper": 321.3502,
+    "lower": 307.5119,
+    "upper": 321.3425,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -49151,9 +49151,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 15.2557,
+      "reference_multiple": 15.2558,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 117.46889
+      "implied_price": 117.46966
      },
      {
       "metric": "pe",
@@ -49202,7 +49202,7 @@
    "metrics": {
     "pe": {
      "current": 15.5251,
-     "own_5y_average": 15.2557,
+     "own_5y_average": 15.2558,
      "sector_median": 36.0851,
      "sector_peer_count": 221
     },
@@ -50143,7 +50143,7 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 148.4397,
+    "lower": 148.4396,
     "upper": 160.3106,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
@@ -53392,13 +53392,13 @@
   {
    "symbol": "HUBB",
    "name": "Hubbell Incorporated",
-   "price_local": 474.1099853515625,
+   "price_local": 474.04998779296875,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 6.43,
+    "observed_deviation_pct": 6.42,
     "observed_width_factor": 1.3655,
     "checks": {
      "sector_model_supported": true,
@@ -57009,7 +57009,7 @@
      },
      {
       "period_end": "2023-12-31",
-      "price": 126.1538,
+      "price": 126.1539,
       "book_value_per_share": 408.3213,
       "price_to_book": 0.309,
       "roe_pct": 14.9893,
@@ -57376,21 +57376,21 @@
   {
    "symbol": "005930.KS",
    "name": "Samsung Electronics Co., Ltd.",
-   "price_local": 262000.0,
+   "price_local": 232000.0,
    "currency": "KRW",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 36.51,
+    "observed_deviation_pct": 54.17,
     "observed_width_factor": 2.4729,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
      "width_within_limit": false,
-     "deviation_within_limit": true
+     "deviation_within_limit": false
     },
-    "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5."
+    "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
     "lower": 357664.4342,
@@ -62135,7 +62135,7 @@
       "book_value_per_share": 26.3243,
       "price_to_book": 4.4919,
       "roe_pct": 4.5138,
-      "pb_to_roe": 99.5141
+      "pb_to_roe": 99.514
      },
      {
       "period_end": "2023-12-31",
@@ -62201,7 +62201,7 @@
     "annual_calculation": [
      {
       "period_end": "2024-12-31",
-      "price": 186.3652,
+      "price": 186.3653,
       "book_value_per_share": 73.3707,
       "price_to_book": 2.5401,
       "roe_pct": 23.4041,
@@ -62325,7 +62325,7 @@
      },
      {
       "period_end": "2023-12-31",
-      "price": 63.7131,
+      "price": 63.7132,
       "book_value_per_share": 65.1327,
       "price_to_book": 0.9782,
       "roe_pct": 8.0551,
@@ -62423,7 +62423,7 @@
     "annual_calculation": [
      {
       "period_end": "2022-12-31",
-      "price": 181.7058,
+      "price": 181.7057,
       "book_value_per_share": 43.1505,
       "price_to_book": 4.211,
       "roe_pct": 12.1856,
@@ -66419,7 +66419,7 @@
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 0.0,
-    "observed_width_factor": 3.4042,
+    "observed_width_factor": 3.3743,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
@@ -66429,7 +66429,7 @@
     "reason": "Der faire Bereich ist breiter als Faktor 1.5."
    },
    "raw_fair_value_range": {
-    "lower": 12.071,
+    "lower": 12.1778,
     "upper": 41.0918,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
@@ -66446,9 +66446,9 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 5.390489
+      "implied_price": 5.487375
      },
      {
       "metric": "price_to_fcf",
@@ -66460,9 +66460,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 31.50259
+      "implied_price": 30.895368
      },
      {
       "metric": "price_to_sales",
@@ -66474,9 +66474,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 12.071031
+      "implied_price": 12.177838
      }
     ]
    },
@@ -66490,32 +66490,32 @@
     "forward_pe": {
      "current": 8.9176,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 0.2384,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 38.073,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": 9.5844,
      "own_5y_average": 29.4382,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 2.8421,
      "own_5y_average": 6.6943,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -66528,8 +66528,8 @@
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 5.41,
-    "observed_width_factor": 3.3056,
+    "observed_deviation_pct": 6.34,
+    "observed_width_factor": 3.2766,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
@@ -66539,7 +66539,7 @@
     "reason": "Der faire Bereich ist breiter als Faktor 1.5."
    },
    "raw_fair_value_range": {
-    "lower": 6.8832,
+    "lower": 6.9441,
     "upper": 22.7528,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
@@ -66556,9 +66556,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 4.465055
+      "implied_price": 4.37899
      },
      {
       "metric": "price_to_sales",
@@ -66570,9 +66570,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 6.883161
+      "implied_price": 6.944064
      }
     ]
    },
@@ -66586,32 +66586,32 @@
     "forward_pe": {
      "current": 8.4208,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": -86.202,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": 25.2603,
      "own_5y_average": 297.33,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 1.8619,
      "own_5y_average": 6.5004,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -66624,8 +66624,8 @@
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 536.06,
-    "observed_width_factor": 1.6278,
+    "observed_deviation_pct": 549.08,
+    "observed_width_factor": 1.5644,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
@@ -66635,8 +66635,8 @@
     "reason": "Der faire Bereich ist breiter als Faktor 1.5. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 24.1704,
-    "upper": 39.3449,
+    "lower": 24.6652,
+    "upper": 38.5865,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 2,
@@ -66645,9 +66645,9 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 24.170405
+      "implied_price": 24.665191
      },
      {
       "metric": "price_to_fcf",
@@ -66659,9 +66659,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 39.344885
+      "implied_price": 38.586499
      },
      {
       "metric": "price_to_sales",
@@ -66673,9 +66673,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 17.242726
+      "implied_price": 17.395293
      }
     ]
    },
@@ -66689,32 +66689,32 @@
     "forward_pe": {
      "current": 4.0426,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 3.507,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": 2.3255,
      "own_5y_average": 20.6367,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 0.6029,
      "own_5y_average": 2.961,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -66728,7 +66728,7 @@
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 0.0,
-    "observed_width_factor": 5.4219,
+    "observed_width_factor": 5.3304,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
@@ -66738,7 +66738,7 @@
     "reason": "Der faire Bereich ist breiter als Faktor 1.5."
    },
    "raw_fair_value_range": {
-    "lower": 8.4461,
+    "lower": 8.591,
     "upper": 45.7938,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
@@ -66755,9 +66755,9 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 8.44606
+      "implied_price": 8.591023
      },
      {
       "metric": "price_to_fcf",
@@ -66769,9 +66769,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 16.005102
+      "implied_price": 15.696598
      },
      {
       "metric": "price_to_sales",
@@ -66783,9 +66783,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 19.988704
+      "implied_price": 20.165568
      }
     ]
    },
@@ -66799,32 +66799,32 @@
     "forward_pe": {
      "current": 9.9796,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 34.974,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": 26.6405,
      "own_5y_average": 49.5191,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 2.4237,
      "own_5y_average": 6.6474,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -66837,8 +66837,8 @@
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 7.53,
-    "observed_width_factor": 3.2349,
+    "observed_deviation_pct": 9.54,
+    "observed_width_factor": 3.1754,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
@@ -66848,7 +66848,7 @@
     "reason": "Der faire Bereich ist breiter als Faktor 1.5."
    },
    "raw_fair_value_range": {
-    "lower": 30.5271,
+    "lower": 31.0991,
     "upper": 98.7522,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
@@ -66872,16 +66872,16 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 30.527068
+      "implied_price": 31.099098
      },
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 49.795384
+      "implied_price": 48.835561
      },
      {
       "metric": "price_to_sales",
@@ -66893,9 +66893,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 17.762881
+      "implied_price": 17.920051
      }
     ]
    },
@@ -66909,32 +66909,32 @@
     "forward_pe": {
      "current": 9.3909,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 0.6569,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 9.499,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": 8.7533,
      "own_5y_average": null,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 2.7881,
      "own_5y_average": 10.9327,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -66948,7 +66948,7 @@
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 0.0,
-    "observed_width_factor": 2.6408,
+    "observed_width_factor": 2.5959,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
@@ -66958,7 +66958,7 @@
     "reason": "Der faire Bereich ist breiter als Faktor 1.5."
    },
    "raw_fair_value_range": {
-    "lower": 10.4649,
+    "lower": 10.6462,
     "upper": 27.6361,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
@@ -66982,9 +66982,9 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 10.464857
+      "implied_price": 10.64617
      },
      {
       "metric": "price_to_fcf",
@@ -66996,9 +66996,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 17.927083
+      "implied_price": 17.581533
      },
      {
       "metric": "price_to_sales",
@@ -67010,9 +67010,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 8.82822
+      "implied_price": 8.906334
      }
     ]
    },
@@ -67026,32 +67026,32 @@
     "forward_pe": {
      "current": 11.665,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 0.537,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 13.91,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": 12.2302,
      "own_5y_average": 47.911,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 2.8219,
      "own_5y_average": 8.6255,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -70973,7 +70973,7 @@
      {
       "metric": "price_to_sales",
       "reference_type": "issuer_history",
-      "reference_multiple": 15171.9046,
+      "reference_multiple": 15171.9048,
       "fundamental_input": "Umsatz je Aktie",
       "implied_price": 38.427068
      },
@@ -71019,7 +71019,7 @@
     },
     "price_to_sales": {
      "current": 14560.4638,
-     "own_5y_average": 15171.9046,
+     "own_5y_average": 15171.9048,
      "sector_median": 7.2322,
      "sector_peer_count": 71
     }
@@ -71626,9 +71626,9 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 1117.271299
+      "implied_price": 1150.608999
      },
      {
       "metric": "price_to_fcf",
@@ -71640,9 +71640,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 555.109098
+      "implied_price": 544.409189
      },
      {
       "metric": "price_to_sales",
@@ -71654,9 +71654,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 781.981969
+      "implied_price": 788.901108
      }
     ]
    },
@@ -71670,32 +71670,32 @@
     "forward_pe": {
      "current": 2.1786,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 0.6601,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 5.197,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": 3.0145,
      "own_5y_average": 12.9499,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 0.2431,
      "own_5y_average": 1.1957,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -71709,7 +71709,7 @@
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 0.0,
-    "observed_width_factor": 1.5256,
+    "observed_width_factor": 1.5391,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
@@ -71720,7 +71720,7 @@
    },
    "raw_fair_value_range": {
     "lower": 50.2857,
-    "upper": 76.7159,
+    "upper": 77.3947,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 2,
@@ -71743,9 +71743,9 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 93.717967
+      "implied_price": 95.579381
      },
      {
       "metric": "price_to_fcf",
@@ -71757,9 +71757,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 57.874312
+      "implied_price": 56.758765
      },
      {
       "metric": "price_to_sales",
@@ -71771,9 +71771,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 76.715897
+      "implied_price": 77.394696
      }
     ]
    },
@@ -71787,32 +71787,32 @@
     "forward_pe": {
      "current": 10.7217,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 1.1458,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 7.68,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": 17.9786,
      "own_5y_average": 11.5559,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 1.5411,
      "own_5y_average": 1.289,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -71826,7 +71826,7 @@
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 0.0,
-    "observed_width_factor": 8.5833,
+    "observed_width_factor": 8.8294,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -71836,8 +71836,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5."
    },
    "raw_fair_value_range": {
-    "lower": 24.9039,
-    "upper": 213.758,
+    "lower": 24.4239,
+    "upper": 215.6493,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -71846,23 +71846,23 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 67.149675
+      "implied_price": 68.557694
      },
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 24.90395
+      "implied_price": 24.423919
      },
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 213.757961
+      "implied_price": 215.649336
      }
     ]
    },
@@ -71876,32 +71876,32 @@
     "forward_pe": {
      "current": 87.7895,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 4.4087,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 28.029,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": 118.4591,
      "own_5y_average": null,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 1.5681,
      "own_5y_average": null,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -74940,9 +74940,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 25.3379,
+      "reference_multiple": 25.338,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 194.088314
+      "implied_price": 194.08908
      },
      {
       "metric": "pe",
@@ -74991,7 +74991,7 @@
    "metrics": {
     "pe": {
      "current": 15.99,
-     "own_5y_average": 25.3379,
+     "own_5y_average": 25.338,
      "sector_median": 26.9329,
      "sector_peer_count": 240
     },
@@ -75353,7 +75353,7 @@
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 10.36,
-    "observed_width_factor": 1.0467,
+    "observed_width_factor": 1.0466,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -75363,8 +75363,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 131.4374,
-    "upper": 137.5699,
+    "lower": 131.4402,
+    "upper": 137.5671,
     "currency": "CHF",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -76338,14 +76338,14 @@
   {
    "symbol": "9984.T",
    "name": "SoftBank Group Corp.",
-   "price_local": 5803.0,
+   "price_local": 5310.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 0.0,
-    "observed_width_factor": 6.4816,
+    "observed_width_factor": 6.4248,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -76355,7 +76355,7 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5."
    },
    "raw_fair_value_range": {
-    "lower": 2759.7358,
+    "lower": 2784.1545,
     "upper": 17887.5889,
     "currency": "JPY",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
@@ -76372,9 +76372,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 2759.735819
+      "implied_price": 2784.154534
      }
     ]
    },
@@ -76388,45 +76388,45 @@
     "forward_pe": {
      "current": 18.067,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 1244.7685,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 113.368,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 3.8016,
      "own_5y_average": null,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
   {
    "symbol": "8035.T",
    "name": "Tokyo Electron Limited",
-   "price_local": 12445.0,
+   "price_local": 11555.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 63.34,
+    "observed_deviation_pct": 51.66,
     "observed_width_factor": 1.3353,
     "checks": {
      "sector_model_supported": true,
@@ -76516,7 +76516,7 @@
   {
    "symbol": "6501.T",
    "name": "Hitachi, Ltd.",
-   "price_local": 5669.0,
+   "price_local": 5764.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -76605,13 +76605,13 @@
   {
    "symbol": "4063.T",
    "name": "Shin-Etsu Chemical Co., Ltd.",
-   "price_local": 6085.0,
+   "price_local": 6072.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 12.44,
+    "observed_deviation_pct": 12.2,
     "observed_width_factor": 1.4774,
     "checks": {
      "sector_model_supported": true,
@@ -76701,14 +76701,14 @@
   {
    "symbol": "7974.T",
    "name": "Nintendo Co., Ltd.",
-   "price_local": 8146.0,
+   "price_local": 8172.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 0.0,
-    "observed_width_factor": 2.2137,
+    "observed_width_factor": 2.1943,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -76718,7 +76718,7 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5."
    },
    "raw_fair_value_range": {
-    "lower": 3852.4119,
+    "lower": 3886.4988,
     "upper": 8528.1212,
     "currency": "JPY",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
@@ -76735,16 +76735,16 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 6298.855345
+      "implied_price": 6383.167268
      },
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 3852.411878
+      "implied_price": 3886.498817
      }
     ]
    },
@@ -76758,39 +76758,39 @@
     "forward_pe": {
      "current": 24.009,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 2.1061,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 16.078,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 4.171,
      "own_5y_average": null,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
   {
    "symbol": "000270.KS",
    "name": "Kia Corporation",
-   "price_local": 106800.0,
+   "price_local": 108300.0,
    "currency": "KRW",
    "gate": {
     "status": "withheld_wide_range",
@@ -76879,14 +76879,14 @@
   {
    "symbol": "035420.KS",
    "name": "NAVER Corporation",
-   "price_local": 183800.0,
+   "price_local": 178000.0,
    "currency": "KRW",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 0.0,
-    "observed_width_factor": 2.4356,
+    "observed_width_factor": 2.525,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -76896,8 +76896,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5."
    },
    "raw_fair_value_range": {
-    "lower": 104237.4344,
-    "upper": 253875.5342,
+    "lower": 102228.2238,
+    "upper": 258125.515,
     "currency": "KRW",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -76906,23 +76906,23 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 253875.534186
+      "implied_price": 258125.514952
      },
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 104237.434374
+      "implied_price": 102228.223813
      },
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 170166.309513
+      "implied_price": 171671.976325
      }
     ]
    },
@@ -76936,45 +76936,45 @@
     "forward_pe": {
      "current": 12.0752,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 25.8203,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 8.323,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 2.0189,
      "own_5y_average": null,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
   {
    "symbol": "WDS.AX",
    "name": "Woodside Energy Group Ltd",
-   "price_local": 32.31999969482422,
+   "price_local": 32.779998779296875,
    "currency": "AUD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 11.19,
+    "observed_deviation_pct": 12.77,
     "observed_width_factor": 1.7135,
     "checks": {
      "sector_model_supported": true,
@@ -77994,7 +77994,7 @@
   {
    "symbol": "2330.TW",
    "name": "Taiwan Semiconductor Manufacturing Company Limited",
-   "price_local": 2550.0,
+   "price_local": 2490.0,
    "currency": "TWD",
    "gate": {
     "status": "withheld_wide_range",
@@ -78090,13 +78090,13 @@
   {
    "symbol": "2317.TW",
    "name": "Hon Hai Precision Industry Co., Ltd.",
-   "price_local": 249.0,
+   "price_local": 240.0,
    "currency": "TWD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 118.1,
+    "observed_deviation_pct": 126.28,
     "observed_width_factor": 6.0319,
     "checks": {
      "sector_model_supported": true,
@@ -78179,14 +78179,14 @@
   {
    "symbol": "9432.T",
    "name": "NTT, Inc.",
-   "price_local": 172.89999389648438,
+   "price_local": 173.3000030517578,
    "currency": "JPY",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 98.55,
-    "observed_width_factor": 1.045,
+    "observed_deviation_pct": 103.7,
+    "observed_width_factor": 1.0252,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -78196,8 +78196,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 343.3007,
-    "upper": 358.753,
+    "lower": 353.0157,
+    "upper": 361.9273,
     "currency": "JPY",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -78213,23 +78213,23 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 343.300709
+      "implied_price": 353.015748
      },
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 2408.076756
+      "implied_price": 2361.660291
      },
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 358.752961
+      "implied_price": 361.927282
      }
     ]
    },
@@ -78243,46 +78243,46 @@
     "forward_pe": {
      "current": 11.8832,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 3.9357,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 7.926,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 0.9477,
      "own_5y_average": null,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
   {
    "symbol": "6098.T",
    "name": "Recruit Holdings Co., Ltd.",
-   "price_local": 17755.0,
+   "price_local": 18020.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 150.2,
-    "observed_width_factor": 1.1535,
+    "observed_deviation_pct": 149.67,
+    "observed_width_factor": 1.1963,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -78292,8 +78292,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 6151.747,
-    "upper": 7096.187,
+    "lower": 6033.1701,
+    "upper": 7217.567,
     "currency": "JPY",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -78309,23 +78309,23 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 7096.18697
+      "implied_price": 7217.566996
      },
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 6151.747005
+      "implied_price": 6033.170074
      },
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 5470.840838
+      "implied_price": 5519.247973
      }
     ]
    },
@@ -78339,39 +78339,39 @@
     "forward_pe": {
      "current": 59.4125,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 1.615,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 30.039,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 6.4629,
      "own_5y_average": null,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
   {
    "symbol": "4519.T",
    "name": "Chugai Pharmaceutical Co., Ltd.",
-   "price_local": 6019.0,
+   "price_local": 6170.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -78474,7 +78474,7 @@
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 0.0,
-    "observed_width_factor": 1.0548,
+    "observed_width_factor": 1.0547,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -78484,8 +78484,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 147.6801,
-    "upper": 155.7736,
+    "lower": 147.6846,
+    "upper": 155.7691,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -78843,8 +78843,8 @@
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 45.03,
-    "observed_width_factor": 1.102,
+    "observed_deviation_pct": 45.04,
+    "observed_width_factor": 1.1019,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -78854,8 +78854,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 39.7323,
-    "upper": 43.7832,
+    "lower": 39.7342,
+    "upper": 43.7813,
     "currency": "CHF",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -82681,7 +82681,7 @@
   {
    "symbol": "BTC-USD",
    "name": "Bitcoin USD",
-   "price_local": 83679.46875,
+   "price_local": 81762.5625,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -82740,7 +82740,7 @@
   {
    "symbol": "ETH-USD",
    "name": "Ethereum USD",
-   "price_local": 2534.69921875,
+   "price_local": 2444.357421875,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -82799,7 +82799,7 @@
   {
    "symbol": "SOL-USD",
    "name": "Solana USD",
-   "price_local": 111.24126434326172,
+   "price_local": 105.55936431884766,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -82858,7 +82858,7 @@
   {
    "symbol": "XRP-USD",
    "name": "XRP USD",
-   "price_local": 1.4092060327529907,
+   "price_local": 1.339508056640625,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -82917,7 +82917,7 @@
   {
    "symbol": "BNB-USD",
    "name": "BNB USD",
-   "price_local": 753.5376586914062,
+   "price_local": 732.1296997070312,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -82976,7 +82976,7 @@
   {
    "symbol": "ADA-USD",
    "name": "Cardano USD",
-   "price_local": 0.2519710063934326,
+   "price_local": 0.23312999308109283,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -83035,7 +83035,7 @@
   {
    "symbol": "DOGE-USD",
    "name": "Dogecoin USD",
-   "price_local": 0.08672100305557251,
+   "price_local": 0.08217299729585648,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -83094,7 +83094,7 @@
   {
    "symbol": "AVAX-USD",
    "name": "Avalanche USD",
-   "price_local": 10.958768844604492,
+   "price_local": 10.141085624694824,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -83153,7 +83153,7 @@
   {
    "symbol": "LINK-USD",
    "name": "Chainlink USD",
-   "price_local": 13.338029861450195,
+   "price_local": 12.619959831237793,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -83212,7 +83212,7 @@
   {
    "symbol": "DOT-USD",
    "name": "Polkadot USD",
-   "price_local": 1.2564799785614014,
+   "price_local": 1.1774749755859375,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -83271,7 +83271,7 @@
   {
    "symbol": "LTC-USD",
    "name": "Litecoin USD",
-   "price_local": 64.59812927246094,
+   "price_local": 60.98486328125,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -83330,7 +83330,7 @@
   {
    "symbol": "TRX-USD",
    "name": "TRON USD",
-   "price_local": 0.329910010099411,
+   "price_local": 0.32872799038887024,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -83389,7 +83389,7 @@
   {
    "symbol": "ATOM-USD",
    "name": "Cosmos USD",
-   "price_local": 1.9202289581298828,
+   "price_local": 1.8091930150985718,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -83448,7 +83448,7 @@
   {
    "symbol": "XLM-USD",
    "name": "Stellar USD",
-   "price_local": 0.20294000208377838,
+   "price_local": 0.19064399600028992,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -83507,7 +83507,7 @@
   {
    "symbol": "AAVE-USD",
    "name": "Aave USD",
-   "price_local": 171.4445343017578,
+   "price_local": 156.74252319335938,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -83566,7 +83566,7 @@
   {
    "symbol": "NEAR-USD",
    "name": "NEAR Protocol USD",
-   "price_local": 5.8727898597717285,
+   "price_local": 5.073493957519531,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -83684,7 +83684,7 @@
   {
    "symbol": "OP-USD",
    "name": "Optimism USD",
-   "price_local": 0.1437239944934845,
+   "price_local": 0.13077199459075928,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -84308,7 +84308,7 @@
    "metrics": {
     "pe": {
      "current": null,
-     "own_5y_average": 83.6502,
+     "own_5y_average": 83.6501,
      "sector_median": 27.8187,
      "sector_peer_count": 66
     },
@@ -86383,9 +86383,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "issuer_history",
-      "reference_multiple": 1771.4341,
+      "reference_multiple": 1771.4339,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 211.835642
+      "implied_price": 211.835618
      },
      {
       "metric": "price_to_sales",
@@ -86429,7 +86429,7 @@
     },
     "price_to_sales": {
      "current": 756.7395,
-     "own_5y_average": 1771.4341,
+     "own_5y_average": 1771.4339,
      "sector_median": 7.2322,
      "sector_peer_count": 71
     }
@@ -87023,7 +87023,7 @@
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 0.0,
-    "observed_width_factor": 5.1546,
+    "observed_width_factor": 4.8458,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -87033,8 +87033,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5."
    },
    "raw_fair_value_range": {
-    "lower": 19.9049,
-    "upper": 102.6024,
+    "lower": 21.3608,
+    "upper": 103.5102,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -87043,16 +87043,16 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 19.904903
+      "implied_price": 21.360783
      },
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 102.602363
+      "implied_price": 103.51021
      }
     ]
    },
@@ -87066,32 +87066,32 @@
     "forward_pe": {
      "current": 4.1839,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 22.499,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 1.8432,
      "own_5y_average": null,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -87462,9 +87462,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 33.1358,
+      "reference_multiple": 33.1359,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 109.679498
+      "implied_price": 109.679829
      },
      {
       "metric": "pe",
@@ -87506,7 +87506,7 @@
    "metrics": {
     "pe": {
      "current": 12.348,
-     "own_5y_average": 33.1358,
+     "own_5y_average": 33.1359,
      "sector_median": 16.1952,
      "sector_peer_count": 64
     },
@@ -88364,7 +88364,7 @@
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 0.0,
-    "observed_width_factor": 1.6592,
+    "observed_width_factor": 1.6739,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
@@ -88375,7 +88375,7 @@
    },
    "raw_fair_value_range": {
     "lower": 46.2363,
-    "upper": 76.7159,
+    "upper": 77.3947,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 2,
@@ -88398,9 +88398,9 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 93.717967
+      "implied_price": 95.579381
      },
      {
       "metric": "price_to_fcf",
@@ -88412,9 +88412,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 57.874312
+      "implied_price": 56.758765
      },
      {
       "metric": "price_to_sales",
@@ -88426,9 +88426,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 76.715897
+      "implied_price": 77.394696
      }
     ]
    },
@@ -88442,32 +88442,32 @@
     "forward_pe": {
      "current": 9.7441,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 1.0209,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 6.966,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": 16.0799,
      "own_5y_average": 10.6144,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 1.3783,
      "own_5y_average": 1.1852,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -88811,7 +88811,7 @@
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 55.05,
-    "observed_width_factor": 2.1707,
+    "observed_width_factor": 2.2134,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
@@ -88821,7 +88821,7 @@
     "reason": "Der faire Bereich ist breiter als Faktor 1.5. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 103.6813,
+    "lower": 101.6828,
     "upper": 225.0653,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
@@ -88845,9 +88845,9 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 172.274874
+      "implied_price": 175.255334
      },
      {
       "metric": "price_to_fcf",
@@ -88859,16 +88859,16 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 103.681275
+      "implied_price": 101.682784
      },
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 71.692188
+      "implied_price": 72.326535
      }
     ]
    },
@@ -88882,32 +88882,32 @@
     "forward_pe": {
      "current": 22.9387,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 1.1971,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 24.048,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": 58.2519,
      "own_5y_average": 32.3743,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 9.5721,
      "own_5y_average": null,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -90893,7 +90893,7 @@
      },
      {
       "period_end": "2023-12-31",
-      "price": 179.8665,
+      "price": 179.8664,
       "book_value_per_share": 24.7781,
       "price_to_book": 7.2591,
       "roe_pct": 30.8096,
@@ -91154,8 +91154,8 @@
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 1.84,
-    "observed_width_factor": 1.2222,
+    "observed_deviation_pct": 1.93,
+    "observed_width_factor": 1.198,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -91165,8 +91165,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 26.0127,
-    "upper": 31.7936,
+    "lower": 26.5171,
+    "upper": 31.7683,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -91182,23 +91182,23 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 26.012716
+      "implied_price": 26.517102
      },
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 32.392698
+      "implied_price": 31.768319
      },
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 31.793628
+      "implied_price": 32.074945
      }
     ]
    },
@@ -91212,32 +91212,32 @@
     "forward_pe": {
      "current": 21.4193,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 2.8049,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 14.233,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 1.9325,
      "own_5y_average": null,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -91251,7 +91251,7 @@
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 0.0,
-    "observed_width_factor": 1.2222,
+    "observed_width_factor": 1.198,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -91261,8 +91261,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 26.0127,
-    "upper": 31.7936,
+    "lower": 26.5171,
+    "upper": 31.7683,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -91278,23 +91278,23 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 26.012716
+      "implied_price": 26.517102
      },
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 32.392698
+      "implied_price": 31.768319
      },
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 31.793628
+      "implied_price": 32.074945
      }
     ]
    },
@@ -91308,32 +91308,32 @@
     "forward_pe": {
      "current": 19.4348,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 2.5251,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 13.02,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 1.7535,
      "own_5y_average": null,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -91347,7 +91347,7 @@
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 95.78,
-    "observed_width_factor": 1.1021,
+    "observed_width_factor": 1.1271,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
@@ -91358,7 +91358,7 @@
    },
    "raw_fair_value_range": {
     "lower": 150.8907,
-    "upper": 166.2969,
+    "upper": 170.0739,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 2,
@@ -91367,9 +91367,9 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 166.296895
+      "implied_price": 170.073875
      },
      {
       "metric": "price_to_fcf",
@@ -91381,9 +91381,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 235.52522
+      "implied_price": 230.985395
      },
      {
       "metric": "price_to_sales",
@@ -91395,9 +91395,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 165.764721
+      "implied_price": 167.231442
      }
     ]
    },
@@ -91411,32 +91411,32 @@
     "forward_pe": {
      "current": 6.6375,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": null,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 8.2,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": 7.8774,
      "own_5y_average": 11.0879,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 1.2717,
      "own_5y_average": 0.9986,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -91554,109 +91554,6 @@
      "own_5y_average": 1.1617,
      "sector_median": 3.5659,
      "sector_peer_count": 199
-    }
-   }
-  },
-  {
-   "symbol": "PSKY",
-   "name": "Paramount Skydance Corp",
-   "price_local": 9.15999984741211,
-   "currency": "USD",
-   "gate": {
-    "status": "withheld_wide_range",
-    "max_deviation_pct": 50.0,
-    "max_width_factor": 1.5,
-    "observed_deviation_pct": 0.0,
-    "observed_width_factor": 3.6329,
-    "checks": {
-     "sector_model_supported": true,
-     "basis_broad": true,
-     "width_within_limit": false,
-     "deviation_within_limit": true
-    },
-    "reason": "Der faire Bereich ist breiter als Faktor 1.5."
-   },
-   "raw_fair_value_range": {
-    "lower": 6.0265,
-    "upper": 21.8938,
-    "currency": "USD",
-    "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
-    "input_count": 2,
-    "implied_price_count": 5,
-    "components": [
-     {
-      "metric": "ev_ebitda",
-      "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
-      "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 21.209162
-     },
-     {
-      "metric": "price_to_fcf",
-      "reference_type": "issuer_history",
-      "reference_multiple": 91.0602,
-      "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 26.690059
-     },
-     {
-      "metric": "price_to_fcf",
-      "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
-      "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 5.072771
-     },
-     {
-      "metric": "price_to_sales",
-      "reference_type": "issuer_history",
-      "reference_multiple": 0.5413,
-      "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 6.026506
-     },
-     {
-      "metric": "price_to_sales",
-      "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
-      "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 21.893819
-     }
-    ]
-   },
-   "metrics": {
-    "pe": {
-     "current": null,
-     "own_5y_average": null,
-     "sector_median": 20.8201,
-     "sector_peer_count": 47
-    },
-    "forward_pe": {
-     "current": 11.7458,
-     "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
-    },
-    "peg": {
-     "current": 0.7634,
-     "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
-    },
-    "ev_ebitda": {
-     "current": 7.947,
-     "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
-    },
-    "price_to_fcf": {
-     "current": 34.0315,
-     "own_5y_average": 91.0602,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
-    },
-    "price_to_sales": {
-     "current": 0.8959,
-     "own_5y_average": 0.5413,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
     }
    }
   },
@@ -92768,8 +92665,8 @@
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 136.77,
-    "observed_width_factor": 1.5263,
+    "observed_deviation_pct": 131.22,
+    "observed_width_factor": 1.5493,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -92779,8 +92676,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 47.9956,
-    "upper": 73.258,
+    "lower": 48.4203,
+    "upper": 75.0158,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -92796,23 +92693,23 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 73.258012
+      "implied_price": 75.015834
      },
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 114.695367
+      "implied_price": 112.484577
      },
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 47.995583
+      "implied_price": 48.420258
      }
     ]
    },
@@ -92826,32 +92723,32 @@
     "forward_pe": {
      "current": 37.052,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 1.5863,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 13.586,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": 25.5333,
      "own_5y_average": null,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 6.933,
      "own_5y_average": null,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -93250,9 +93147,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "issuer_history",
-      "reference_multiple": 1761.7984,
+      "reference_multiple": 1761.7985,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 60.460988
+      "implied_price": 60.460992
      },
      {
       "metric": "price_to_sales",
@@ -93296,7 +93193,7 @@
     },
     "price_to_sales": {
      "current": 1109.4923,
-     "own_5y_average": 1761.7984,
+     "own_5y_average": 1761.7985,
      "sector_median": 7.2322,
      "sector_peer_count": 71
     }
@@ -96642,7 +96539,7 @@
     "reason": "Der faire Bereich ist breiter als Faktor 1.5."
    },
    "raw_fair_value_range": {
-    "lower": 136.2462,
+    "lower": 136.2468,
     "upper": 220.7868,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
@@ -96652,9 +96549,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 23.0535,
+      "reference_multiple": 23.0536,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 136.246185
+      "implied_price": 136.246776
      },
      {
       "metric": "pe",
@@ -96696,7 +96593,7 @@
    "metrics": {
     "pe": {
      "current": 17.1203,
-     "own_5y_average": 23.0535,
+     "own_5y_average": 23.0536,
      "sector_median": 36.0851,
      "sector_peer_count": 221
     },
@@ -103369,9 +103266,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 44.5495,
+      "reference_multiple": 44.5496,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 74.168265
+      "implied_price": 74.168431
      },
      {
       "metric": "price_to_fcf",
@@ -103423,7 +103320,7 @@
     },
     "price_to_fcf": {
      "current": 95.5288,
-     "own_5y_average": 44.5495,
+     "own_5y_average": 44.5496,
      "sector_median": 13.9481,
      "sector_peer_count": 128
     },
@@ -105052,7 +104949,7 @@
     "annual_calculation": [
      {
       "period_end": "2022-12-31",
-      "price": 259.784,
+      "price": 259.7841,
       "book_value_per_share": 32.2838,
       "price_to_book": 8.0469,
       "roe_pct": 21.3447,
@@ -105150,9 +105047,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "issuer_history",
-      "reference_multiple": 419.4936,
+      "reference_multiple": 419.4935,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 67.355052
+      "implied_price": 67.355036
      },
      {
       "metric": "price_to_sales",
@@ -105196,7 +105093,7 @@
     },
     "price_to_sales": {
      "current": 214.2034,
-     "own_5y_average": 419.4936,
+     "own_5y_average": 419.4935,
      "sector_median": 7.2322,
      "sector_peer_count": 71
     }
@@ -107275,9 +107172,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 1823.2091,
+      "reference_multiple": 1823.2089,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 3741.369475
+      "implied_price": 3741.369065
      },
      {
       "metric": "price_to_fcf",
@@ -107329,7 +107226,7 @@
     },
     "price_to_fcf": {
      "current": 40.469,
-     "own_5y_average": 1823.2091,
+     "own_5y_average": 1823.2089,
      "sector_median": 12.4266,
      "sector_peer_count": 43
     },
@@ -107557,7 +107454,7 @@
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 0.0,
-    "observed_width_factor": 1.7869,
+    "observed_width_factor": 1.8708,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
@@ -107568,7 +107465,7 @@
    },
    "raw_fair_value_range": {
     "lower": 138.7158,
-    "upper": 247.8649,
+    "upper": 259.5117,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 2,
@@ -107591,9 +107488,9 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 247.864853
+      "implied_price": 259.511693
      },
      {
       "metric": "price_to_fcf",
@@ -107605,9 +107502,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 418.77016
+      "implied_price": 410.698228
      },
      {
       "metric": "price_to_sales",
@@ -107619,9 +107516,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 316.937783
+      "implied_price": 319.742114
      }
     ]
    },
@@ -107635,32 +107532,32 @@
     "forward_pe": {
      "current": 6.8894,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 0.2827,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 9.895,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": 6.6572,
      "own_5y_average": 5.7329,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 0.9994,
      "own_5y_average": 1.1051,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -108712,9 +108609,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 207.8751,
+      "reference_multiple": 207.875,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 2038.929584
+      "implied_price": 2038.928603
      },
      {
       "metric": "price_to_fcf",
@@ -108766,7 +108663,7 @@
     },
     "price_to_fcf": {
      "current": 5.2224,
-     "own_5y_average": 207.8751,
+     "own_5y_average": 207.875,
      "sector_median": 13.9481,
      "sector_peer_count": 128
     },
@@ -110501,9 +110398,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 8.6188,
+      "reference_multiple": 8.6187,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 87.480914
+      "implied_price": 87.479899
      },
      {
       "metric": "price_to_fcf",
@@ -110555,7 +110452,7 @@
     },
     "price_to_fcf": {
      "current": 9.4681,
-     "own_5y_average": 8.6188,
+     "own_5y_average": 8.6187,
      "sector_median": 11.3815,
      "sector_peer_count": 140
     },
@@ -110611,7 +110508,7 @@
     "annual_calculation": [
      {
       "period_end": "2022-12-31",
-      "price": 83.3617,
+      "price": 83.3616,
       "book_value_per_share": 38.5748,
       "price_to_book": 2.161,
       "roe_pct": 9.2666,
@@ -110653,8 +110550,8 @@
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 105.25,
-    "observed_width_factor": 2.1264,
+    "observed_deviation_pct": 110.85,
+    "observed_width_factor": 2.07,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
@@ -110664,7 +110561,7 @@
     "reason": "Der faire Bereich ist breiter als Faktor 1.5. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 54.617,
+    "lower": 56.1076,
     "upper": 116.1402,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
@@ -110688,9 +110585,9 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 54.616963
+      "implied_price": 56.107562
      },
      {
       "metric": "price_to_fcf",
@@ -110702,9 +110599,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 60.356693
+      "implied_price": 59.193298
      },
      {
       "metric": "price_to_sales",
@@ -110716,9 +110613,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 47.140916
+      "implied_price": 47.558029
      }
     ]
    },
@@ -110732,32 +110629,32 @@
     "forward_pe": {
      "current": 7.9788,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 1.0469,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 7.3,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": 7.2043,
      "own_5y_average": 35.0652,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 1.0481,
      "own_5y_average": 6.1612,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -112170,7 +112067,7 @@
       "book_value_per_share": 68.8715,
       "price_to_book": 1.6596,
       "roe_pct": 1.4317,
-      "pb_to_roe": 115.9155
+      "pb_to_roe": 115.9154
      },
      {
       "period_end": "2024-12-31",
@@ -114585,8 +114482,8 @@
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 120.4,
-    "observed_width_factor": 1.4139,
+    "observed_deviation_pct": 116.16,
+    "observed_width_factor": 1.4544,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -114596,8 +114493,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 63.146,
-    "upper": 89.2802,
+    "lower": 61.9289,
+    "upper": 90.0702,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -114613,23 +114510,23 @@
      {
       "metric": "ev_ebitda",
       "reference_type": "sector_peers",
-      "reference_multiple": 11.4645,
+      "reference_multiple": 11.675,
       "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 100.641025
+      "implied_price": 103.023462
      },
      {
       "metric": "price_to_fcf",
       "reference_type": "sector_peers",
-      "reference_multiple": 17.3071,
+      "reference_multiple": 16.9735,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 63.146018
+      "implied_price": 61.928858
      },
      {
       "metric": "price_to_sales",
       "reference_type": "sector_peers",
-      "reference_multiple": 1.9665,
+      "reference_multiple": 1.9839,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 89.280201
+      "implied_price": 90.070171
      }
     ]
    },
@@ -114643,32 +114540,32 @@
     "forward_pe": {
      "current": 14.5513,
      "own_5y_average": null,
-     "sector_median": 11.8261,
-     "sector_peer_count": 58
+     "sector_median": 11.8832,
+     "sector_peer_count": 57
     },
     "peg": {
      "current": 0.4866,
      "own_5y_average": null,
-     "sector_median": 1.1783,
-     "sector_peer_count": 46
+     "sector_median": 1.1971,
+     "sector_peer_count": 45
     },
     "ev_ebitda": {
      "current": 11.675,
      "own_5y_average": null,
-     "sector_median": 11.4645,
-     "sector_peer_count": 56
+     "sector_median": 11.675,
+     "sector_peer_count": 55
     },
     "price_to_fcf": {
      "current": 27.8054,
      "own_5y_average": null,
-     "sector_median": 17.3071,
-     "sector_peer_count": 37
+     "sector_median": 16.9735,
+     "sector_peer_count": 36
     },
     "price_to_sales": {
      "current": 2.2345,
      "own_5y_average": null,
-     "sector_median": 1.9665,
-     "sector_peer_count": 60
+     "sector_median": 1.9839,
+     "sector_peer_count": 59
     }
    }
   },
@@ -115946,7 +115843,7 @@
   {
    "symbol": "ADEA",
    "name": "Adeia Inc.",
-   "price_local": 23.895000457763672,
+   "price_local": 23.209999084472656,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
@@ -119772,7 +119669,7 @@
      },
      {
       "period_end": "2025-12-31",
-      "price": 18.9143,
+      "price": 18.9144,
       "book_value_per_share": 19.5729,
       "price_to_book": 0.9664,
       "roe_pct": 6.2175,
