@@ -95,7 +95,7 @@
  "_meta": {
   "schema": "stock-radar-earnings-tone-cache",
   "schema_version": 2,
-  "written_at": "2026-10-13T22:59:50+00:00",
+  "written_at": "2026-10-14T02:06:25+00:00",
   "refreshed": 3
  },
  "EIX": {
@@ -3675,35 +3675,35 @@
   "last_success_at": "2026-09-13T10:26:01+00:00"
  },
  "LH": {
-  "score": 71.0,
-  "direction": "positive",
+  "score": 23.0,
+  "direction": "negative",
   "transcript_status": "prepared-only",
   "analysis_method": "free_financial_lexicon_v1",
-  "current_tone": 79,
-  "previous_tone": 59,
-  "tone_shift": 20,
-  "hedging_shift": -1,
+  "current_tone": 53,
+  "previous_tone": 79,
+  "tone_shift": -26,
+  "hedging_shift": 1,
   "qa_evasiveness_shift": null,
   "qa_status": "not_available",
   "cfo_tone_shift": null,
   "cfo_weight": null,
-  "reason": "Free lexicon: positive/negative 88/12 vs 31/19; Q&A/CFO unavailable.",
+  "reason": "Free lexicon: positive/negative 16/7 vs 88/12; Q&A/CFO unavailable.",
   "current_period": {
+   "period": "2026-09-22",
+   "filing_date": "2026-09-22",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/920148/000092014826000205/0000920148-26-000205.txt"
+  },
+  "previous_period": {
    "period": "2026-09-10",
    "filing_date": "2026-09-10",
    "source": "SEC EDGAR 8-K exhibit",
    "source_url": "https://www.sec.gov/Archives/edgar/data/920148/000092014826000201/formprex992investordaypr.htm"
   },
-  "previous_period": {
-   "period": "2026-07-30",
-   "filing_date": "2026-07-30",
-   "source": "SEC EDGAR 8-K exhibit",
-   "source_url": "https://www.sec.gov/Archives/edgar/data/920148/000092014826000162/form8-kexhibit9912q26.htm"
-  },
   "source": "free earnings text + transparent financial lexicon",
   "expected_delay": "source publication time",
-  "fetched_at": "2026-09-13T10:26:04+00:00",
-  "last_success_at": "2026-09-13T10:26:04+00:00"
+  "fetched_at": "2026-10-14T02:06:25+00:00",
+  "last_success_at": "2026-10-14T02:06:25+00:00"
  },
  "DGX": {
   "score": 53.0,
@@ -6743,7 +6743,7 @@
  },
  "TECK": {
   "_refresh_failure": {
-   "at": "2026-10-13T22:59:42+00:00",
+   "at": "2026-10-14T02:06:23+00:00",
    "error": "fewer than two free quarterly earnings texts"
   }
  },
@@ -7251,7 +7251,7 @@
  },
  "ERO": {
   "_refresh_failure": {
-   "at": "2026-10-13T22:59:42+00:00",
+   "at": "2026-10-14T02:06:23+00:00",
    "error": "fewer than two free quarterly earnings texts"
   }
  },
