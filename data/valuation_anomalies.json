@@ -1,7 +1,7 @@
 {
  "schema": "stock-radar-valuation-anomalies",
  "schema_version": 1,
- "generated_at": "2026-10-15T01:42:35+00:00",
+ "generated_at": "2026-10-15T07:39:46+00:00",
  "anomalies": [
   {
    "symbol": "NVDA",
@@ -224,123 +224,6 @@
    }
   },
   {
-   "symbol": "META",
-   "name": "Meta Platforms, Inc.",
-   "price_local": 762.5,
-   "currency": "USD",
-   "gate": {
-    "status": "withheld_extreme_deviation",
-    "max_deviation_pct": 50.0,
-    "max_width_factor": 1.5,
-    "observed_deviation_pct": 53.79,
-    "observed_width_factor": 1.1066,
-    "checks": {
-     "sector_model_supported": true,
-     "basis_broad": true,
-     "width_within_limit": true,
-     "deviation_within_limit": false
-    },
-    "reason": "Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
-   },
-   "raw_fair_value_range": {
-    "lower": 448.0395,
-    "upper": 495.8055,
-    "currency": "USD",
-    "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
-    "input_count": 2,
-    "implied_price_count": 7,
-    "components": [
-     {
-      "metric": "pe",
-      "reference_type": "issuer_history",
-      "reference_multiple": 22.8154,
-      "fundamental_input": "EPS je Aktie",
-      "implied_price": 535.933746
-     },
-     {
-      "metric": "pe",
-      "reference_type": "sector_peers",
-      "reference_multiple": 20.8201,
-      "fundamental_input": "EPS je Aktie",
-      "implied_price": 489.064149
-     },
-     {
-      "metric": "ev_ebitda",
-      "reference_type": "sector_peers",
-      "reference_multiple": 11.675,
-      "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 488.797247
-     },
-     {
-      "metric": "price_to_fcf",
-      "reference_type": "issuer_history",
-      "reference_multiple": 25.3878,
-      "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 454.780913
-     },
-     {
-      "metric": "price_to_fcf",
-      "reference_type": "sector_peers",
-      "reference_multiple": 16.9735,
-      "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 304.052491
-     },
-     {
-      "metric": "price_to_sales",
-      "reference_type": "issuer_history",
-      "reference_multiple": 7.0711,
-      "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 552.078742
-     },
-     {
-      "metric": "price_to_sales",
-      "reference_type": "sector_peers",
-      "reference_multiple": 1.9839,
-      "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 154.893725
-     }
-    ]
-   },
-   "metrics": {
-    "pe": {
-     "current": 27.994,
-     "own_5y_average": 22.8154,
-     "sector_median": 20.8201,
-     "sector_peer_count": 47
-    },
-    "forward_pe": {
-     "current": 21.5068,
-     "own_5y_average": null,
-     "sector_median": 11.8832,
-     "sector_peer_count": 57
-    },
-    "peg": {
-     "current": 0.9846,
-     "own_5y_average": null,
-     "sector_median": 1.1971,
-     "sector_peer_count": 45
-    },
-    "ev_ebitda": {
-     "current": 17.462,
-     "own_5y_average": null,
-     "sector_median": 11.675,
-     "sector_peer_count": 55
-    },
-    "price_to_fcf": {
-     "current": 41.0483,
-     "own_5y_average": 25.3878,
-     "sector_median": 16.9735,
-     "sector_peer_count": 36
-    },
-    "price_to_sales": {
-     "current": 9.418,
-     "own_5y_average": 7.0711,
-     "sector_median": 1.9839,
-     "sector_peer_count": 59
-    }
-   }
-  },
-  {
    "symbol": "TSLA",
    "name": "Tesla, Inc.",
    "price_local": 367.1600036621094,
@@ -556,13 +439,13 @@
   {
    "symbol": "NOW",
    "name": "ServiceNow, Inc.",
-   "price_local": 138.61000061035156,
+   "price_local": 139.97999572753906,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 0.0,
+    "observed_deviation_pct": 0.25,
     "observed_width_factor": 2.2304,
     "checks": {
      "sector_model_supported": true,
@@ -1030,9 +913,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 57.7755,
+      "reference_multiple": 57.7756,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 92.764986
+      "implied_price": 92.765146
      },
      {
       "metric": "price_to_fcf",
@@ -1084,7 +967,7 @@
     },
     "price_to_fcf": {
      "current": 171.104,
-     "own_5y_average": 57.7755,
+     "own_5y_average": 57.7756,
      "sector_median": 29.6423,
      "sector_peer_count": 206
     },
@@ -1202,13 +1085,13 @@
   {
    "symbol": "DELL",
    "name": "Dell Technologies Inc.",
-   "price_local": 572.469970703125,
+   "price_local": 507.92999267578125,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 8.44,
+    "observed_deviation_pct": 0.0,
     "observed_width_factor": 1.4245,
     "checks": {
      "sector_model_supported": true,
@@ -1635,14 +1518,14 @@
   {
    "symbol": "ANET",
    "name": "Arista Networks, Inc.",
-   "price_local": 204.52000427246094,
+   "price_local": 195.4199981689453,
    "currency": "USD",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 99.87,
-    "observed_width_factor": 1.1691,
+    "observed_deviation_pct": 90.47,
+    "observed_width_factor": 1.1759,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
@@ -1652,8 +1535,8 @@
     "reason": "Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 87.5264,
-    "upper": 102.3252,
+    "lower": 87.2535,
+    "upper": 102.5981,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 2,
@@ -1752,13 +1635,13 @@
   {
    "symbol": "PANW",
    "name": "Palo Alto Networks, Inc.",
-   "price_local": 397.0299987792969,
+   "price_local": 375.0400085449219,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 124.75,
+    "observed_deviation_pct": 112.31,
     "observed_width_factor": 2.3821,
     "checks": {
      "sector_model_supported": true,
@@ -1986,7 +1869,7 @@
   {
    "symbol": "ZS",
    "name": "Zscaler, Inc.",
-   "price_local": 228.66000366210938,
+   "price_local": 220.7899932861328,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
@@ -2089,13 +1972,13 @@
   {
    "symbol": "CRWD",
    "name": "CrowdStrike Holdings, Inc.",
-   "price_local": 261.2099914550781,
+   "price_local": 249.2899932861328,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 68.53,
+    "observed_deviation_pct": 60.84,
     "observed_width_factor": 5.9627,
     "checks": {
      "sector_model_supported": true,
@@ -2178,21 +2061,21 @@
   {
    "symbol": "OKTA",
    "name": "Okta, Inc.",
-   "price_local": 226.52999877929688,
+   "price_local": 211.9149932861328,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 50.32,
+    "observed_deviation_pct": 40.62,
     "observed_width_factor": 2.9321,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
      "width_within_limit": false,
-     "deviation_within_limit": false
+     "deviation_within_limit": true
     },
-    "reason": "Der faire Bereich ist breiter als Faktor 1.5. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
+    "reason": "Der faire Bereich ist breiter als Faktor 1.5."
    },
    "raw_fair_value_range": {
     "lower": 51.3958,
@@ -2288,7 +2171,7 @@
   {
    "symbol": "SNOW",
    "name": "Snowflake Inc.",
-   "price_local": 357.760009765625,
+   "price_local": 335.0799865722656,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
@@ -2384,13 +2267,13 @@
   {
    "symbol": "PLTR",
    "name": "Palantir Technologies Inc.",
-   "price_local": 208.6699981689453,
+   "price_local": 200.97000122070312,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 179.49,
+    "observed_deviation_pct": 169.18,
     "observed_width_factor": 3.2842,
     "checks": {
      "sector_model_supported": true,
@@ -2494,13 +2377,13 @@
   {
    "symbol": "PATH",
    "name": "UiPath, Inc.",
-   "price_local": 13.25,
+   "price_local": 13.0600004196167,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 10.1,
+    "observed_deviation_pct": 11.7,
     "observed_width_factor": 1.2863,
     "checks": {
      "sector_model_supported": true,
@@ -2590,7 +2473,7 @@
   {
    "symbol": "APP",
    "name": "AppLovin Corporation",
-   "price_local": 272.2799987792969,
+   "price_local": 262.19000244140625,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
@@ -2707,13 +2590,13 @@
   {
    "symbol": "TTD",
    "name": "The Trade Desk, Inc.",
-   "price_local": 12.170000076293945,
+   "price_local": 12.180000305175781,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 53.97,
+    "observed_deviation_pct": 53.84,
     "observed_width_factor": 6.3562,
     "checks": {
      "sector_model_supported": true,
@@ -2824,14 +2707,14 @@
   {
    "symbol": "NBIS",
    "name": "Nebius Group",
-   "price_local": 206.86000061035156,
+   "price_local": 186.00999450683594,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 899.87,
-    "observed_width_factor": 400.2226,
+    "observed_deviation_pct": 774.25,
+    "observed_width_factor": 411.5954,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -2842,7 +2725,7 @@
    },
    "raw_fair_value_range": {
     "lower": 0.0517,
-    "upper": 20.6887,
+    "upper": 21.2766,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -2913,14 +2796,14 @@
   {
    "symbol": "RDDT",
    "name": "Reddit, Inc.",
-   "price_local": 155.2899932861328,
+   "price_local": 148.60000610351562,
    "currency": "USD",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 144.77,
-    "observed_width_factor": 1.3064,
+    "observed_deviation_pct": 134.1,
+    "observed_width_factor": 1.308,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -2930,8 +2813,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 48.5627,
-    "upper": 63.4441,
+    "lower": 48.5292,
+    "upper": 63.4776,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -3009,14 +2892,14 @@
   {
    "symbol": "HOOD",
    "name": "Robinhood Markets, Inc.",
-   "price_local": 110.5199966430664,
+   "price_local": 101.08000183105469,
    "currency": "USD",
    "gate": {
     "status": "withheld_sector_model",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 301.18,
-    "observed_width_factor": 1.5989,
+    "observed_deviation_pct": 262.29,
+    "observed_width_factor": 1.653,
     "checks": {
      "sector_model_supported": false,
      "basis_broad": false,
@@ -3026,8 +2909,8 @@
     "reason": "Bewertung sektorbedingt nicht möglich: Für dieses Finanzgeschäft ist noch kein fachlich passendes Bewertungsmodell zugeordnet. Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 17.23,
-    "upper": 27.549,
+    "lower": 16.8785,
+    "upper": 27.9005,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -3098,13 +2981,13 @@
   {
    "symbol": "SE",
    "name": "Sea Limited",
-   "price_local": 95.93000030517578,
+   "price_local": 95.30999755859375,
    "currency": "USD",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 67.43,
+    "observed_deviation_pct": 66.35,
     "observed_width_factor": 1.2108,
     "checks": {
      "sector_model_supported": true,
@@ -3194,13 +3077,13 @@
   {
    "symbol": "ALRM",
    "name": "Alarm.com Holdings, Inc.",
-   "price_local": 56.290000915527344,
+   "price_local": 56.68000030517578,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 22.48,
+    "observed_deviation_pct": 21.64,
     "observed_width_factor": 1.2284,
     "checks": {
      "sector_model_supported": true,
@@ -3290,7 +3173,7 @@
   {
    "symbol": "LZ",
    "name": "LegalZoom.com, Inc.",
-   "price_local": 6.050000190734863,
+   "price_local": 5.989999771118164,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
@@ -3400,7 +3283,7 @@
   {
    "symbol": "NU",
    "name": "Nu Holdings Ltd.",
-   "price_local": 15.579999923706055,
+   "price_local": 14.930000305175781,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -3462,7 +3345,7 @@
   {
    "symbol": "KSPI",
    "name": "Joint Stock Company Kaspi.kz",
-   "price_local": 96.06999969482422,
+   "price_local": 94.91000366210938,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -3521,13 +3404,13 @@
   {
    "symbol": "PYPL",
    "name": "PayPal Holdings, Inc.",
-   "price_local": 56.16999816894531,
+   "price_local": 56.099998474121094,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 24.73,
+    "observed_deviation_pct": 24.89,
     "observed_width_factor": 1.7944,
     "checks": {
      "sector_model_supported": true,
@@ -3851,13 +3734,13 @@
   {
    "symbol": "DKNG",
    "name": "DraftKings Inc.",
-   "price_local": 19.719999313354492,
+   "price_local": 18.899999618530273,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 8.28,
+    "observed_deviation_pct": 3.78,
     "observed_width_factor": 17.5571,
     "checks": {
      "sector_model_supported": true,
@@ -3940,7 +3823,7 @@
   {
    "symbol": "BALY",
    "name": "Bally's Corporation",
-   "price_local": 13.760000228881836,
+   "price_local": 13.600000381469727,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -3999,7 +3882,7 @@
   {
    "symbol": "QBTS",
    "name": "D-Wave Quantum Inc.",
-   "price_local": 13.380000114440918,
+   "price_local": 12.029999732971191,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -4793,7 +4676,7 @@
   {
    "symbol": "CNH",
    "name": "CNH Industrial N.V.",
-   "price_local": 12.170000076293945,
+   "price_local": 11.979999542236328,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
@@ -4985,13 +4868,13 @@
   {
    "symbol": "BLBD",
    "name": "Blue Bird Corporation",
-   "price_local": 56.40999984741211,
+   "price_local": 56.7599983215332,
    "currency": "USD",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 79.29,
+    "observed_deviation_pct": 78.18,
     "observed_width_factor": 1.0556,
     "checks": {
      "sector_model_supported": true,
@@ -5002,8 +4885,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 101.1349,
-    "upper": 106.7538,
+    "lower": 101.135,
+    "upper": 106.7537,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -5294,14 +5177,14 @@
   {
    "symbol": "MP",
    "name": "MP Materials Corp.",
-   "price_local": 42.43000030517578,
+   "price_local": 39.95000076293945,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 542.14,
-    "observed_width_factor": 3.2974,
+    "observed_deviation_pct": 497.64,
+    "observed_width_factor": 3.4691,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -5311,8 +5194,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 2.0039,
-    "upper": 6.6076,
+    "lower": 1.9269,
+    "upper": 6.6846,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -5589,13 +5472,13 @@
   {
    "symbol": "ELF",
    "name": "e.l.f. Beauty, Inc.",
-   "price_local": 108.16000366210938,
+   "price_local": 108.12999725341797,
    "currency": "USD",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 174.05,
+    "observed_deviation_pct": 173.97,
     "observed_width_factor": 1.334,
     "checks": {
      "sector_model_supported": true,
@@ -5685,13 +5568,13 @@
   {
    "symbol": "RH",
    "name": "RH",
-   "price_local": 115.87999725341797,
+   "price_local": 110.98999786376953,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 2.25,
+    "observed_deviation_pct": 6.76,
     "observed_width_factor": 1.5013,
     "checks": {
      "sector_model_supported": true,
@@ -6214,7 +6097,7 @@
   {
    "symbol": "BYND",
    "name": "Beyond Meat, Inc.",
-   "price_local": 7.210000038146973,
+   "price_local": 6.78000020980835,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -7022,7 +6905,7 @@
   {
    "symbol": "MRNA",
    "name": "Moderna, Inc.",
-   "price_local": 216.25,
+   "price_local": 226.3000030517578,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -7163,7 +7046,7 @@
   {
    "symbol": "BNTX",
    "name": "BioNTech SE",
-   "price_local": 89.01000213623047,
+   "price_local": 88.66000366210938,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -7222,7 +7105,7 @@
   {
    "symbol": "NTLA",
    "name": "Intellia Therapeutics, Inc.",
-   "price_local": 11.90999984741211,
+   "price_local": 11.430000305175781,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -7281,7 +7164,7 @@
   {
    "symbol": "NVCR",
    "name": "NovoCure Limited",
-   "price_local": 14.300000190734863,
+   "price_local": 13.84000015258789,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -7574,7 +7457,7 @@
   {
    "symbol": "HIMS",
    "name": "Hims & Hers Health, Inc.",
-   "price_local": 29.709999084472656,
+   "price_local": 27.719999313354492,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
@@ -7780,13 +7663,13 @@
   {
    "symbol": "UBER",
    "name": "Uber Technologies, Inc.",
-   "price_local": 71.31999969482422,
+   "price_local": 69.29000091552734,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 8.86,
+    "observed_deviation_pct": 12.05,
     "observed_width_factor": 2.1983,
     "checks": {
      "sector_model_supported": true,
@@ -7890,7 +7773,7 @@
   {
    "symbol": "ABNB",
    "name": "Airbnb, Inc.",
-   "price_local": 165.5800018310547,
+   "price_local": 167.05999755859375,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
@@ -8117,14 +8000,14 @@
   {
    "symbol": "SPOT",
    "name": "Spotify Technology S.A.",
-   "price_local": 527.4500122070312,
+   "price_local": 523.9600219726562,
    "currency": "USD",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 168.4,
-    "observed_width_factor": 1.2109,
+    "observed_deviation_pct": 166.22,
+    "observed_width_factor": 1.215,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -8134,8 +8017,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 162.2917,
-    "upper": 196.5128,
+    "lower": 161.9882,
+    "upper": 196.8163,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -8213,13 +8096,13 @@
   {
    "symbol": "NTNX",
    "name": "Nutanix, Inc.",
-   "price_local": 72.87999725341797,
+   "price_local": 69.8499984741211,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 125.03,
+    "observed_deviation_pct": 134.79,
     "observed_width_factor": 293.8911,
     "checks": {
      "sector_model_supported": true,
@@ -8323,13 +8206,13 @@
   {
    "symbol": "CEG",
    "name": "Constellation Energy Corporation",
-   "price_local": 295.7900085449219,
+   "price_local": 279.5400085449219,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 42.89,
+    "observed_deviation_pct": 35.04,
     "observed_width_factor": 1.3732,
     "checks": {
      "sector_model_supported": true,
@@ -8529,13 +8412,13 @@
   {
    "symbol": "ENPH",
    "name": "Enphase Energy, Inc.",
-   "price_local": 32.029998779296875,
+   "price_local": 29.350000381469727,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 6.27,
+    "observed_deviation_pct": 15.97,
     "observed_width_factor": 1.5833,
     "checks": {
      "sector_model_supported": true,
@@ -8646,13 +8529,13 @@
   {
    "symbol": "SEDG",
    "name": "SolarEdge Technologies, Inc.",
-   "price_local": 32.529998779296875,
+   "price_local": 30.520000457763672,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 24.88,
+    "observed_deviation_pct": 33.1,
     "observed_width_factor": 2.4408,
     "checks": {
      "sector_model_supported": true,
@@ -8728,14 +8611,14 @@
   {
    "symbol": "BE",
    "name": "Bloom Energy Corporation",
-   "price_local": 263.45001220703125,
+   "price_local": 239.33999633789062,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 660.8,
-    "observed_width_factor": 222.2763,
+    "observed_deviation_pct": 578.99,
+    "observed_width_factor": 226.2656,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -8746,7 +8629,7 @@
    },
    "raw_fair_value_range": {
     "lower": 0.1558,
-    "upper": 34.6281,
+    "upper": 35.2495,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -8817,13 +8700,13 @@
   {
    "symbol": "STEM",
    "name": "Stem, Inc.",
-   "price_local": 4.0,
+   "price_local": 3.5899999141693115,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 126.83,
+    "observed_deviation_pct": 152.73,
     "observed_width_factor": 5.8184,
     "checks": {
      "sector_model_supported": true,
@@ -9017,7 +8900,7 @@
   {
    "symbol": "RIOT",
    "name": "Riot Platforms, Inc.",
-   "price_local": 16.670000076293945,
+   "price_local": 15.100000381469727,
    "currency": "USD",
    "gate": {
     "status": "withheld_sector_model",
@@ -9193,7 +9076,7 @@
   {
    "symbol": "SLI",
    "name": "Standard Lithium Ltd.",
-   "price_local": 1.4299999475479126,
+   "price_local": 1.399999976158142,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -9348,13 +9231,13 @@
   {
    "symbol": "BABA",
    "name": "Alibaba Group Holding Limited",
-   "price_local": 110.8499984741211,
+   "price_local": 111.16999816894531,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 65.15,
+    "observed_deviation_pct": 65.63,
     "observed_width_factor": 4.4681,
     "checks": {
      "sector_model_supported": true,
@@ -9465,7 +9348,7 @@
   {
    "symbol": "PDD",
    "name": "PDD Holdings Inc.",
-   "price_local": 81.95999908447266,
+   "price_local": 81.44999694824219,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
@@ -9664,7 +9547,7 @@
   {
    "symbol": "NIO",
    "name": "NIO Inc.",
-   "price_local": 3.559999942779541,
+   "price_local": 3.4100000858306885,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
@@ -9753,7 +9636,7 @@
   {
    "symbol": "LI",
    "name": "Li Auto Inc.",
-   "price_local": 11.75,
+   "price_local": 11.260000228881836,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
@@ -9842,7 +9725,7 @@
   {
    "symbol": "XPEV",
    "name": "XPeng Inc.",
-   "price_local": 9.75,
+   "price_local": 9.420000076293945,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -10065,13 +9948,13 @@
   {
    "symbol": "STG",
    "name": "Sunlands Technology Group",
-   "price_local": 2.619999885559082,
+   "price_local": 2.5969998836517334,
    "currency": "USD",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 1616.41,
+    "observed_deviation_pct": 1631.61,
     "observed_width_factor": 1.3648,
     "checks": {
      "sector_model_supported": true,
@@ -10182,7 +10065,7 @@
   {
    "symbol": "TLRY",
    "name": "Tilray Brands, Inc.",
-   "price_local": 3.2699999809265137,
+   "price_local": 3.140000104904175,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
@@ -10353,7 +10236,7 @@
   {
    "symbol": "PSNY",
    "name": "Polestar Automotive Holding UK PLC",
-   "price_local": 4.440000057220459,
+   "price_local": 4.199999809265137,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -10412,7 +10295,7 @@
   {
    "symbol": "TE",
    "name": "T1 Energy Inc.",
-   "price_local": 3.1600000858306885,
+   "price_local": 2.9000000953674316,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
@@ -20498,14 +20381,14 @@
   {
    "symbol": "ARM",
    "name": "Arm Holdings plc",
-   "price_local": 255.38999938964844,
+   "price_local": 238.00999450683594,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 490.74,
-    "observed_width_factor": 4.9418,
+    "observed_deviation_pct": 449.97,
+    "observed_width_factor": 4.9724,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -20515,8 +20398,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 8.7483,
-    "upper": 43.2323,
+    "lower": 8.7034,
+    "upper": 43.2771,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -23325,13 +23208,13 @@
   {
    "symbol": "LYC.AX",
    "name": "Lynas Rare Earths Limited",
-   "price_local": 11.569999694824219,
+   "price_local": 10.8100004196167,
    "currency": "AUD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 145.37,
+    "observed_deviation_pct": 129.25,
     "observed_width_factor": 1.9029,
     "checks": {
      "sector_model_supported": true,
@@ -23414,13 +23297,13 @@
   {
    "symbol": "FMG.AX",
    "name": "Fortescue Ltd",
-   "price_local": 15.319999694824219,
+   "price_local": 15.020000457763672,
    "currency": "AUD",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 42.25,
+    "observed_deviation_pct": 45.09,
     "observed_width_factor": 1.2485,
     "checks": {
      "sector_model_supported": true,
@@ -23606,21 +23489,21 @@
   {
    "symbol": "GOLD",
    "name": "Gold.com, Inc.",
-   "price_local": 40.20000076293945,
+   "price_local": 38.720001220703125,
    "currency": "USD",
    "gate": {
-    "status": "withheld_narrow_basis",
+    "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 48.79,
+    "observed_deviation_pct": 54.48,
     "observed_width_factor": 1.3514,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
      "width_within_limit": true,
-     "deviation_within_limit": true
+     "deviation_within_limit": false
     },
-    "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
+    "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
     "lower": 59.8137,
@@ -23998,13 +23881,13 @@
   {
    "symbol": "SNDK",
    "name": "Sandisk Corporation",
-   "price_local": 1482.3299560546875,
+   "price_local": 1403.3399658203125,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 21.2,
+    "observed_deviation_pct": 28.02,
     "observed_width_factor": 1.2235,
     "checks": {
      "sector_model_supported": true,
@@ -24190,7 +24073,7 @@
   {
    "symbol": "CRWV",
    "name": "CoreWeave, Inc.",
-   "price_local": 77.80999755859375,
+   "price_local": 65.77999877929688,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -24272,7 +24155,7 @@
   {
    "symbol": "IREN",
    "name": "IREN Limited",
-   "price_local": 34.79999923706055,
+   "price_local": 30.559999465942383,
    "currency": "USD",
    "gate": {
     "status": "withheld_sector_model",
@@ -24331,7 +24214,7 @@
   {
    "symbol": "CORZ",
    "name": "Core Scientific, Inc.",
-   "price_local": 15.430000305175781,
+   "price_local": 13.510000228881836,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -24390,13 +24273,13 @@
   {
    "symbol": "APLD",
    "name": "Applied Digital Corporation",
-   "price_local": 22.440000534057617,
+   "price_local": 20.325000762939453,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 43.46,
+    "observed_deviation_pct": 29.93,
     "observed_width_factor": 1.6193,
     "checks": {
      "sector_model_supported": true,
@@ -24472,7 +24355,7 @@
   {
    "symbol": "CLSK",
    "name": "CleanSpark, Inc.",
-   "price_local": 10.149999618530273,
+   "price_local": 9.225000381469727,
    "currency": "USD",
    "gate": {
     "status": "withheld_sector_model",
@@ -24531,13 +24414,13 @@
   {
    "symbol": "SEI",
    "name": "Solaris Energy Infrastructure, Inc.",
-   "price_local": 77.83000183105469,
+   "price_local": 69.37000274658203,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 191.2,
+    "observed_deviation_pct": 159.55,
     "observed_width_factor": 2.8788,
     "checks": {
      "sector_model_supported": true,
@@ -24620,7 +24503,7 @@
   {
    "symbol": "BTDR",
    "name": "Bitdeer Technologies Group",
-   "price_local": 9.210000038146973,
+   "price_local": 8.180000305175781,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
@@ -24709,7 +24592,7 @@
   {
    "symbol": "PSIX",
    "name": "Power Solutions International, Inc.",
-   "price_local": 53.13999938964844,
+   "price_local": 46.61000061035156,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
@@ -24819,7 +24702,7 @@
   {
    "symbol": "WYFI",
    "name": "WhiteFiber, Inc.",
-   "price_local": 14.539999961853027,
+   "price_local": 12.729999542236328,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -24878,7 +24761,7 @@
   {
    "symbol": "BW",
    "name": "Babcock & Wilcox Enterprises, Inc.",
-   "price_local": 4.980000019073486,
+   "price_local": 4.849999904632568,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
@@ -24960,7 +24843,7 @@
   {
    "symbol": "PUMP",
    "name": "ProPetro Holding Corp.",
-   "price_local": 8.8100004196167,
+   "price_local": 8.220000267028809,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
@@ -25393,7 +25276,7 @@
   {
    "symbol": "BTBT",
    "name": "Bit Digital, Inc.",
-   "price_local": 1.2100000381469727,
+   "price_local": 1.0750000476837158,
    "currency": "USD",
    "gate": {
     "status": "withheld_sector_model",
@@ -26030,7 +25913,7 @@
   {
    "symbol": "FANG",
    "name": "Diamondback Energy, Inc.",
-   "price_local": 198.17999267578125,
+   "price_local": 197.50999450683594,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
@@ -26140,13 +26023,13 @@
   {
    "symbol": "ROKU",
    "name": "Roku, Inc.",
-   "price_local": 152.66000366210938,
+   "price_local": 152.57000732421875,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 4.45,
+    "observed_deviation_pct": 4.39,
     "observed_width_factor": 2.7161,
     "checks": {
      "sector_model_supported": true,
@@ -26250,7 +26133,7 @@
   {
    "symbol": "DAVE",
    "name": "Dave Inc.",
-   "price_local": 362.8699951171875,
+   "price_local": 356.79998779296875,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -27328,7 +27211,7 @@
   {
    "symbol": "RHHBY",
    "name": "Roche Holding AG",
-   "price_local": 55.66999816894531,
+   "price_local": 55.689998626708984,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -27773,7 +27656,7 @@
   {
    "symbol": "DUOL",
    "name": "Duolingo, Inc.",
-   "price_local": 140.10000610351562,
+   "price_local": 139.72999572753906,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
@@ -28356,13 +28239,13 @@
   {
    "symbol": "VLTO",
    "name": "Veralto Corporation",
-   "price_local": 98.98999786376953,
+   "price_local": 100.66000366210938,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 4.01,
+    "observed_deviation_pct": 5.77,
     "observed_width_factor": 1.2363,
     "checks": {
      "sector_model_supported": true,
@@ -28795,7 +28678,7 @@
   {
    "symbol": "IONQ",
    "name": "IonQ, Inc.",
-   "price_local": 34.72999954223633,
+   "price_local": 31.420000076293945,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -28854,7 +28737,7 @@
   {
    "symbol": "RGTI",
    "name": "Rigetti Computing, Inc.",
-   "price_local": 12.779999732971191,
+   "price_local": 11.680000305175781,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -28913,7 +28796,7 @@
   {
    "symbol": "QUBT",
    "name": "Quantum Computing Inc.",
-   "price_local": 6.869999885559082,
+   "price_local": 6.309999942779541,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -28972,7 +28855,7 @@
   {
    "symbol": "ARQQ",
    "name": "Arqit Quantum Inc.",
-   "price_local": 16.84000015258789,
+   "price_local": 15.369999885559082,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -29031,7 +28914,7 @@
   {
    "symbol": "LAES",
    "name": "SEALSQ Corp",
-   "price_local": 1.9299999475479126,
+   "price_local": 1.840000033378601,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -29090,7 +28973,7 @@
   {
    "symbol": "RKLB",
    "name": "Rocket Lab Corporation",
-   "price_local": 64.22000122070312,
+   "price_local": 59.18000030517578,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -29149,7 +29032,7 @@
   {
    "symbol": "FLY",
    "name": "Firefly Aerospace Inc.",
-   "price_local": 18.34000015258789,
+   "price_local": 17.020000457763672,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -29208,7 +29091,7 @@
   {
    "symbol": "ASTS",
    "name": "AST SpaceMobile, Inc.",
-   "price_local": 47.064998626708984,
+   "price_local": 42.13999938964844,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -29267,13 +29150,13 @@
   {
    "symbol": "PL",
    "name": "Planet Labs PBC",
-   "price_local": 15.15999984741211,
+   "price_local": 14.130000114440918,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 244.55,
+    "observed_deviation_pct": 221.14,
     "observed_width_factor": 1.916,
     "checks": {
      "sector_model_supported": true,
@@ -29349,7 +29232,7 @@
   {
    "symbol": "BKSY",
    "name": "BlackSky Technology Inc.",
-   "price_local": 19.719999313354492,
+   "price_local": 17.649999618530273,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -29408,7 +29291,7 @@
   {
    "symbol": "RDW",
    "name": "Redwire Corporation",
-   "price_local": 9.15999984741211,
+   "price_local": 8.619999885559082,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -29467,7 +29350,7 @@
   {
    "symbol": "LUNR",
    "name": "Intuitive Machines, Inc.",
-   "price_local": 12.180000305175781,
+   "price_local": 11.020000457763672,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -29526,7 +29409,7 @@
   {
    "symbol": "SPIR",
    "name": "Spire Global, Inc.",
-   "price_local": 9.539999961853027,
+   "price_local": 9.25,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
@@ -30006,7 +29889,7 @@
   {
    "symbol": "VOYG",
    "name": "Voyager Technologies, Inc.",
-   "price_local": 26.360000610351562,
+   "price_local": 25.81999969482422,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -30065,13 +29948,13 @@
   {
    "symbol": "KRMN",
    "name": "Karman Holdings Inc.",
-   "price_local": 30.149999618530273,
+   "price_local": 30.139999389648438,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 170.75,
+    "observed_deviation_pct": 170.66,
     "observed_width_factor": 3.1805,
     "checks": {
      "sector_model_supported": true,
@@ -30243,7 +30126,7 @@
   {
    "symbol": "SMR",
    "name": "NuScale Power Corporation",
-   "price_local": 6.489999771118164,
+   "price_local": 5.829999923706055,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -30302,7 +30185,7 @@
   {
    "symbol": "OKLO",
    "name": "Oklo Inc.",
-   "price_local": 31.780000686645508,
+   "price_local": 29.040000915527344,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -30751,7 +30634,7 @@
   {
    "symbol": "NNE",
    "name": "NANO Nuclear Energy Inc.",
-   "price_local": 14.350000381469727,
+   "price_local": 13.010000228881836,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -30810,13 +30693,13 @@
   {
    "symbol": "VST",
    "name": "Vistra Corp.",
-   "price_local": 162.36000061035156,
+   "price_local": 151.7899932861328,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 11.27,
+    "observed_deviation_pct": 4.02,
     "observed_width_factor": 3.2859,
     "checks": {
      "sector_model_supported": true,
@@ -30906,14 +30789,14 @@
   {
    "symbol": "TLN",
    "name": "Talen Energy Corporation",
-   "price_local": 382.1400146484375,
+   "price_local": 358.4200134277344,
    "currency": "USD",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 123.62,
-    "observed_width_factor": 1.2559,
+    "observed_deviation_pct": 108.95,
+    "observed_width_factor": 1.2666,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -30923,8 +30806,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 136.067,
-    "upper": 170.8918,
+    "lower": 135.425,
+    "upper": 171.5337,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -30988,13 +30871,13 @@
   {
    "symbol": "GEV",
    "name": "GE Vernova Inc.",
-   "price_local": 1004.0399780273438,
+   "price_local": 941.780029296875,
    "currency": "USD",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 136.53,
+    "observed_deviation_pct": 121.86,
     "observed_width_factor": 1.3398,
     "checks": {
      "sector_model_supported": true,
@@ -31084,7 +30967,7 @@
   {
    "symbol": "NXE",
    "name": "NexGen Energy Ltd.",
-   "price_local": 8.470000267028809,
+   "price_local": 8.079999923706055,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -31298,7 +31181,7 @@
   {
    "symbol": "ASPI",
    "name": "ASP Isotopes Inc.",
-   "price_local": 2.2799999713897705,
+   "price_local": 2.069999933242798,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -31357,13 +31240,13 @@
   {
    "symbol": "ARRY",
    "name": "Array Technologies, Inc.",
-   "price_local": 3.569999933242798,
+   "price_local": 3.380000114440918,
    "currency": "USD",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 264.42,
+    "observed_deviation_pct": 284.9,
     "observed_width_factor": 1.1922,
     "checks": {
      "sector_model_supported": true,
@@ -31460,13 +31343,13 @@
   {
    "symbol": "SHLS",
    "name": "Shoals Technologies Group, Inc.",
-   "price_local": 8.649999618530273,
+   "price_local": 7.840000152587891,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 1.6,
+    "observed_deviation_pct": 12.1,
     "observed_width_factor": 1.5852,
     "checks": {
      "sector_model_supported": true,
@@ -31563,13 +31446,13 @@
   {
    "symbol": "RUN",
    "name": "Sunrun Inc.",
-   "price_local": 7.789999961853027,
+   "price_local": 7.295000076293945,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 81.66,
+    "observed_deviation_pct": 93.99,
     "observed_width_factor": 4.3604,
     "checks": {
      "sector_model_supported": true,
@@ -31652,7 +31535,7 @@
   {
    "symbol": "FLNC",
    "name": "Fluence Energy, Inc.",
-   "price_local": 6.78000020980835,
+   "price_local": 6.210000038146973,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -31711,7 +31594,7 @@
   {
    "symbol": "EOSE",
    "name": "Eos Energy Enterprises, Inc.",
-   "price_local": 2.319999933242798,
+   "price_local": 1.9500000476837158,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -32316,14 +32199,14 @@
   {
    "symbol": "VRT",
    "name": "Vertiv Holdings Co",
-   "price_local": 237.2899932861328,
+   "price_local": 222.8300018310547,
    "currency": "USD",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 108.35,
-    "observed_width_factor": 1.2401,
+    "observed_deviation_pct": 95.35,
+    "observed_width_factor": 1.2445,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
@@ -32333,8 +32216,8 @@
     "reason": "Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 91.8412,
-    "upper": 113.888,
+    "lower": 91.6611,
+    "upper": 114.0681,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 2,
@@ -32646,14 +32529,14 @@
   {
    "symbol": "ALAB",
    "name": "Astera Labs, Inc.",
-   "price_local": 325.4100036621094,
+   "price_local": 300.2799987792969,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 384.33,
-    "observed_width_factor": 3.7174,
+    "observed_deviation_pct": 346.14,
+    "observed_width_factor": 3.7486,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -32663,8 +32546,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 18.074,
-    "upper": 67.1879,
+    "lower": 17.9553,
+    "upper": 67.3067,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -32742,14 +32625,14 @@
   {
    "symbol": "CRDO",
    "name": "Credo Technology Group Holding Ltd",
-   "price_local": 198.30999755859375,
+   "price_local": 179.22500610351562,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 146.91,
-    "observed_width_factor": 1.5952,
+    "observed_deviation_pct": 122.29,
+    "observed_width_factor": 1.6112,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -32759,8 +32642,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 50.3506,
-    "upper": 80.3176,
+    "lower": 50.0416,
+    "upper": 80.6267,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -33168,14 +33051,14 @@
   {
    "symbol": "LITE",
    "name": "Lumentum Holdings Inc.",
-   "price_local": 987.989990234375,
+   "price_local": 896.3300170898438,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 291.54,
-    "observed_width_factor": 2.2091,
+    "observed_deviation_pct": 252.71,
+    "observed_width_factor": 2.2602,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -33185,8 +33068,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 114.227,
-    "upper": 252.3367,
+    "lower": 112.437,
+    "upper": 254.1267,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -33367,7 +33250,7 @@
   {
    "symbol": "AI",
    "name": "C3.ai, Inc.",
-   "price_local": 12.010000228881836,
+   "price_local": 11.670000076293945,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -33426,7 +33309,7 @@
   {
    "symbol": "TEM",
    "name": "Tempus AI, Inc.",
-   "price_local": 68.22000122070312,
+   "price_local": 68.31999969482422,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -33485,7 +33368,7 @@
   {
    "symbol": "RXRX",
    "name": "Recursion Pharmaceuticals, Inc.",
-   "price_local": 3.8350000381469727,
+   "price_local": 3.740000009536743,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -33544,7 +33427,7 @@
   {
    "symbol": "SOUN",
    "name": "SoundHound AI, Inc.",
-   "price_local": 4.880000114440918,
+   "price_local": 4.53000020980835,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -33603,7 +33486,7 @@
   {
    "symbol": "BBAI",
    "name": "BigBear.ai Holdings, Inc.",
-   "price_local": 2.390000104904175,
+   "price_local": 2.180000066757202,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -33662,13 +33545,13 @@
   {
    "symbol": "S",
    "name": "SentinelOne, Inc.",
-   "price_local": 24.010000228881836,
+   "price_local": 22.81999969482422,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 60.4,
+    "observed_deviation_pct": 52.45,
     "observed_width_factor": 2.1963,
     "checks": {
      "sector_model_supported": true,
@@ -33744,14 +33627,14 @@
   {
    "symbol": "NET",
    "name": "Cloudflare, Inc.",
-   "price_local": 347.70001220703125,
+   "price_local": 324.3299865722656,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 699.7,
-    "observed_width_factor": 3.72,
+    "observed_deviation_pct": 635.31,
+    "observed_width_factor": 3.9884,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -33761,8 +33644,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 11.6879,
-    "upper": 43.4789,
+    "lower": 11.059,
+    "upper": 44.1078,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -33826,13 +33709,13 @@
   {
    "symbol": "DDOG",
    "name": "Datadog, Inc.",
-   "price_local": 283.3399963378906,
+   "price_local": 269.3299865722656,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 24.34,
+    "observed_deviation_pct": 18.2,
     "observed_width_factor": 15.0389,
     "checks": {
      "sector_model_supported": true,
@@ -33936,13 +33819,13 @@
   {
    "symbol": "MDB",
    "name": "MongoDB, Inc.",
-   "price_local": 373.07000732421875,
+   "price_local": 356.2900085449219,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 104.43,
+    "observed_deviation_pct": 95.24,
     "observed_width_factor": 5.5802,
     "checks": {
      "sector_model_supported": true,
@@ -34025,13 +33908,13 @@
   {
    "symbol": "GTLB",
    "name": "GitLab Inc.",
-   "price_local": 51.95000076293945,
+   "price_local": 53.15999984741211,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 31.66,
+    "observed_deviation_pct": 34.72,
     "observed_width_factor": 1.3961,
     "checks": {
      "sector_model_supported": true,
@@ -34107,13 +33990,13 @@
   {
    "symbol": "CRNC",
    "name": "Cerence Inc.",
-   "price_local": 8.890000343322754,
+   "price_local": 8.71500015258789,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 131.62,
+    "observed_deviation_pct": 136.27,
     "observed_width_factor": 1.5608,
     "checks": {
      "sector_model_supported": true,
@@ -34196,7 +34079,7 @@
   {
    "symbol": "SYM",
    "name": "Symbotic Inc.",
-   "price_local": 40.88999938964844,
+   "price_local": 37.900001525878906,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
@@ -34512,7 +34395,7 @@
   {
    "symbol": "SERV",
    "name": "Serve Robotics Inc.",
-   "price_local": 3.7850000858306885,
+   "price_local": 3.440000057220459,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -34571,7 +34454,7 @@
   {
    "symbol": "NNDM",
    "name": "Nano Dimension Ltd.",
-   "price_local": 1.4500000476837158,
+   "price_local": 1.409999966621399,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -34806,7 +34689,7 @@
   {
    "symbol": "FANUY",
    "name": "Fanuc Corporation",
-   "price_local": 19.25,
+   "price_local": 19.219999313354492,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
@@ -34895,7 +34778,7 @@
   {
    "symbol": "USAR",
    "name": "USA Rare Earth, Inc.",
-   "price_local": 11.279999732971191,
+   "price_local": 10.319999694824219,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -34954,7 +34837,7 @@
   {
    "symbol": "TMC",
    "name": "TMC the metals company Inc.",
-   "price_local": 2.815000057220459,
+   "price_local": 2.630000114440918,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -35353,7 +35236,7 @@
   {
    "symbol": "LAC",
    "name": "Lithium Americas Corp.",
-   "price_local": 2.200000047683716,
+   "price_local": 2.069999933242798,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -35412,13 +35295,13 @@
   {
    "symbol": "SGML",
    "name": "Sigma Lithium Corporation",
-   "price_local": 8.699999809265137,
+   "price_local": 8.489999771118164,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 4.87,
+    "observed_deviation_pct": 2.34,
     "observed_width_factor": 5.4721,
     "checks": {
      "sector_model_supported": true,
@@ -35501,7 +35384,7 @@
   {
    "symbol": "CRML",
    "name": "Critical Metals Corp.",
-   "price_local": 6.539999961853027,
+   "price_local": 6.260000228881836,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
@@ -35583,7 +35466,7 @@
   {
    "symbol": "NB",
    "name": "NioCorp Developments Ltd.",
-   "price_local": 3.3399999141693115,
+   "price_local": 3.140000104904175,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -35759,7 +35642,7 @@
   {
    "symbol": "IPX",
    "name": "IperionX Limited",
-   "price_local": 14.680000305175781,
+   "price_local": 13.979999542236328,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -37065,13 +36948,13 @@
   {
    "symbol": "STNE",
    "name": "StoneCo Ltd.",
-   "price_local": 11.8100004196167,
+   "price_local": 11.479999542236328,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 2521.93,
+    "observed_deviation_pct": 2597.3,
     "observed_width_factor": 2.0774,
     "checks": {
      "sector_model_supported": true,
@@ -37161,7 +37044,7 @@
   {
    "symbol": "XP",
    "name": "XP Inc.",
-   "price_local": 31.3799991607666,
+   "price_local": 30.489999771118164,
    "currency": "USD",
    "gate": {
     "status": "withheld_sector_model",
@@ -37284,7 +37167,7 @@
     "annual_calculation": [
      {
       "period_end": "2022-12-31",
-      "price": 7439.6416,
+      "price": 7439.6426,
       "book_value_per_share": 1792.89,
       "price_to_book": 4.1495,
       "roe_pct": 18.4309,
@@ -37292,7 +37175,7 @@
      },
      {
       "period_end": "2023-12-31",
-      "price": 8382.5488,
+      "price": 8382.5498,
       "book_value_per_share": 1965.9798,
       "price_to_book": 4.2638,
       "roe_pct": 20.0693,
@@ -37505,7 +37388,7 @@
   {
    "symbol": "VFS",
    "name": "VinFast Auto Ltd.",
-   "price_local": 3.0299999713897705,
+   "price_local": 3.015000104904175,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -37852,14 +37735,14 @@
   {
    "symbol": "GRAB",
    "name": "Grab Holdings Limited",
-   "price_local": 2.9800000190734863,
+   "price_local": 2.9100000858306885,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 25.37,
-    "observed_width_factor": 1.066,
+    "observed_deviation_pct": 28.32,
+    "observed_width_factor": 1.0671,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -37869,8 +37752,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 3.7361,
-    "upper": 3.9828,
+    "lower": 3.7342,
+    "upper": 3.9847,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -37948,7 +37831,7 @@
   {
    "symbol": "CPNG",
    "name": "Coupang, Inc.",
-   "price_local": 15.119999885559082,
+   "price_local": 14.399999618530273,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
@@ -38147,13 +38030,13 @@
   {
    "symbol": "MNSO",
    "name": "MINISO Group Holding Limited",
-   "price_local": 9.920000076293945,
+   "price_local": 10.220000267028809,
    "currency": "USD",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 848.05,
+    "observed_deviation_pct": 820.22,
     "observed_width_factor": 1.1619,
     "checks": {
      "sector_model_supported": true,
@@ -38435,13 +38318,13 @@
   {
    "symbol": "TWLO",
    "name": "Twilio Inc.",
-   "price_local": 281.5899963378906,
+   "price_local": 271.1199951171875,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 79.92,
+    "observed_deviation_pct": 73.23,
     "observed_width_factor": 2.01,
     "checks": {
      "sector_model_supported": true,
@@ -38531,21 +38414,21 @@
   {
    "symbol": "U",
    "name": "Unity Software Inc.",
-   "price_local": 46.630001068115234,
+   "price_local": 41.400001525878906,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 63.92,
+    "observed_deviation_pct": 45.54,
     "observed_width_factor": 3.7358,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
      "width_within_limit": false,
-     "deviation_within_limit": false
+     "deviation_within_limit": true
     },
-    "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
+    "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5."
    },
    "raw_fair_value_range": {
     "lower": 7.6144,
@@ -38620,7 +38503,7 @@
   {
    "symbol": "RBLX",
    "name": "Roblox Corporation",
-   "price_local": 49.5099983215332,
+   "price_local": 47.540000915527344,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
@@ -38716,13 +38599,13 @@
   {
    "symbol": "ASAN",
    "name": "Asana, Inc.",
-   "price_local": 9.859999656677246,
+   "price_local": 9.8100004196167,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 9.89,
+    "observed_deviation_pct": 10.45,
     "observed_width_factor": 1.5209,
     "checks": {
      "sector_model_supported": true,
@@ -38798,7 +38681,7 @@
   {
    "symbol": "MNDY",
    "name": "monday.com Ltd.",
-   "price_local": 84.69000244140625,
+   "price_local": 87.47000122070312,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
@@ -38908,7 +38791,7 @@
   {
    "symbol": "HUBS",
    "name": "HubSpot, Inc.",
-   "price_local": 221.27999877929688,
+   "price_local": 226.22999572753906,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
@@ -39018,13 +38901,13 @@
   {
    "symbol": "TEAM",
    "name": "Atlassian Corporation",
-   "price_local": 208.0399932861328,
+   "price_local": 204.66000366210938,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 2.78,
+    "observed_deviation_pct": 1.11,
     "observed_width_factor": 1.6235,
     "checks": {
      "sector_model_supported": true,
@@ -39121,7 +39004,7 @@
   {
    "symbol": "WDAY",
    "name": "Workday, Inc.",
-   "price_local": 186.02000427246094,
+   "price_local": 188.77000427246094,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
@@ -39699,13 +39582,13 @@
   {
    "symbol": "BILL",
    "name": "BILL Holdings, Inc.",
-   "price_local": 43.97999954223633,
+   "price_local": 44.18000030517578,
    "currency": "USD",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 85.66,
+    "observed_deviation_pct": 84.82,
     "observed_width_factor": 1.4987,
     "checks": {
      "sector_model_supported": true,
@@ -39802,13 +39685,13 @@
   {
    "symbol": "DOCN",
    "name": "DigitalOcean Holdings, Inc.",
-   "price_local": 128.2100067138672,
+   "price_local": 109.29000091552734,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 11.9,
+    "observed_deviation_pct": 0.0,
     "observed_width_factor": 2.2557,
     "checks": {
      "sector_model_supported": true,
@@ -39912,13 +39795,13 @@
   {
    "symbol": "FROG",
    "name": "JFrog Ltd.",
-   "price_local": 99.27999877929688,
+   "price_local": 91.95999908447266,
    "currency": "USD",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 106.29,
+    "observed_deviation_pct": 91.08,
     "observed_width_factor": 1.3261,
     "checks": {
      "sector_model_supported": true,
@@ -40008,13 +39891,13 @@
   {
    "symbol": "AVPT",
    "name": "AvePoint, Inc.",
-   "price_local": 14.529999732971191,
+   "price_local": 14.0,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 31.77,
+    "observed_deviation_pct": 26.97,
     "observed_width_factor": 1.6508,
     "checks": {
      "sector_model_supported": true,
@@ -40487,7 +40370,7 @@
    },
    "raw_fair_value_range": {
     "lower": 134.8068,
-    "upper": 184.9111,
+    "upper": 184.9114,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 2,
@@ -40517,9 +40400,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 64.8574,
+      "reference_multiple": 64.8575,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 184.911076
+      "implied_price": 184.911361
      },
      {
       "metric": "price_to_fcf",
@@ -40571,7 +40454,7 @@
     },
     "price_to_fcf": {
      "current": 98.8469,
-     "own_5y_average": 64.8574,
+     "own_5y_average": 64.8575,
      "sector_median": 29.6423,
      "sector_peer_count": 206
     },
@@ -40613,9 +40496,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 42.5647,
+      "reference_multiple": 42.5648,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 194.095032
+      "implied_price": 194.095488
      },
      {
       "metric": "pe",
@@ -40664,7 +40547,7 @@
    "metrics": {
     "pe": {
      "current": 48.2476,
-     "own_5y_average": 42.5647,
+     "own_5y_average": 42.5648,
      "sector_median": 36.0851,
      "sector_peer_count": 221
     },
@@ -41026,14 +40909,14 @@
   {
    "symbol": "ONTO",
    "name": "Onto Innovation Inc.",
-   "price_local": 263.54998779296875,
+   "price_local": 241.41000366210938,
    "currency": "USD",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 77.66,
-    "observed_width_factor": 1.2725,
+    "observed_deviation_pct": 61.95,
+    "observed_width_factor": 1.2867,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
@@ -41043,8 +40926,8 @@
     "reason": "Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 116.5742,
-    "upper": 148.3446,
+    "lower": 115.8506,
+    "upper": 149.0681,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 2,
@@ -41319,14 +41202,14 @@
   {
    "symbol": "SITM",
    "name": "SiTime Corporation",
-   "price_local": 579.6599731445312,
+   "price_local": 524.9299926757812,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 517.58,
-    "observed_width_factor": 7.5605,
+    "observed_deviation_pct": 449.89,
+    "observed_width_factor": 8.8288,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -41336,8 +41219,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 12.4145,
-    "upper": 93.8597,
+    "lower": 10.8126,
+    "upper": 95.4616,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -41408,13 +41291,13 @@
   {
    "symbol": "ALGM",
    "name": "Allegro MicroSystems, Inc.",
-   "price_local": 33.650001525878906,
+   "price_local": 32.220001220703125,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 1.3,
+    "observed_deviation_pct": 0.0,
     "observed_width_factor": 1.6603,
     "checks": {
      "sector_model_supported": true,
@@ -41511,7 +41394,7 @@
   {
    "symbol": "INDI",
    "name": "indie Semiconductor, Inc.",
-   "price_local": 2.2149999141693115,
+   "price_local": 2.005000114440918,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -41570,7 +41453,7 @@
   {
    "symbol": "NVTS",
    "name": "Navitas Semiconductor Corporation",
-   "price_local": 10.449999809265137,
+   "price_local": 9.354999542236328,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -41746,7 +41629,7 @@
   {
    "symbol": "WOLF",
    "name": "Wolfspeed, Inc.",
-   "price_local": 28.56999969482422,
+   "price_local": 24.579999923706055,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -41805,7 +41688,7 @@
   {
    "symbol": "GFS",
    "name": "GLOBALFOUNDRIES Inc.",
-   "price_local": 46.70000076293945,
+   "price_local": 48.939998626708984,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -42636,7 +42519,7 @@
   {
    "symbol": "VKTX",
    "name": "Viking Therapeutics, Inc.",
-   "price_local": 26.649999618530273,
+   "price_local": 25.469999313354492,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -42695,7 +42578,7 @@
   {
    "symbol": "CRSP",
    "name": "CRISPR Therapeutics AG",
-   "price_local": 50.099998474121094,
+   "price_local": 50.220001220703125,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -42754,7 +42637,7 @@
   {
    "symbol": "BEAM",
    "name": "Beam Therapeutics Inc.",
-   "price_local": 24.43000030517578,
+   "price_local": 23.649999618530273,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -42813,7 +42696,7 @@
   {
    "symbol": "EDIT",
    "name": "Editas Medicine, Inc.",
-   "price_local": 2.444999933242798,
+   "price_local": 2.2699999809265137,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -42872,7 +42755,7 @@
   {
    "symbol": "RARE",
    "name": "Ultragenyx Pharmaceutical Inc.",
-   "price_local": 14.920000076293945,
+   "price_local": 14.899999618530273,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -43286,7 +43169,7 @@
   {
    "symbol": "ROIV",
    "name": "Roivant Sciences Ltd.",
-   "price_local": 33.349998474121094,
+   "price_local": 33.619998931884766,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -43493,14 +43376,14 @@
   {
    "symbol": "KRYS",
    "name": "Krystal Biotech, Inc.",
-   "price_local": 321.1600036621094,
+   "price_local": 330.69000244140625,
    "currency": "USD",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 131.13,
-    "observed_width_factor": 1.1864,
+    "observed_deviation_pct": 137.86,
+    "observed_width_factor": 1.1878,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -43510,8 +43393,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 117.1216,
-    "upper": 138.9532,
+    "lower": 117.0474,
+    "upper": 139.0275,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -43648,7 +43531,7 @@
   {
    "symbol": "DNA",
    "name": "Ginkgo Bioworks Holdings, Inc.",
-   "price_local": 11.760000228881836,
+   "price_local": 11.529999732971191,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -43789,7 +43672,7 @@
   {
    "symbol": "TWST",
    "name": "Twist Bioscience Corporation",
-   "price_local": 151.3300018310547,
+   "price_local": 148.16000366210938,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -43958,13 +43841,13 @@
   {
    "symbol": "NTRA",
    "name": "Natera, Inc.",
-   "price_local": 395.6549987792969,
+   "price_local": 394.75,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 584.45,
+    "observed_deviation_pct": 582.89,
     "observed_width_factor": 3.4137,
     "checks": {
      "sector_model_supported": true,
@@ -44040,7 +43923,7 @@
   {
    "symbol": "GH",
    "name": "Guardant Health, Inc.",
-   "price_local": 162.08999633789062,
+   "price_local": 162.99000549316406,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -44099,14 +43982,14 @@
   {
    "symbol": "TXG",
    "name": "10x Genomics, Inc.",
-   "price_local": 71.79000091552734,
+   "price_local": 73.0999984741211,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 169.38,
-    "observed_width_factor": 2.0281,
+    "observed_deviation_pct": 174.94,
+    "observed_width_factor": 2.0138,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -44116,8 +43999,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 13.14,
-    "upper": 26.6498,
+    "lower": 13.2025,
+    "upper": 26.5873,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -44181,13 +44064,13 @@
   {
    "symbol": "SDGR",
    "name": "Schrödinger, Inc.",
-   "price_local": 25.889999389648438,
+   "price_local": 25.049999237060547,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 116.84,
+    "observed_deviation_pct": 109.8,
     "observed_width_factor": 3.3177,
     "checks": {
      "sector_model_supported": true,
@@ -44263,13 +44146,13 @@
   {
    "symbol": "TENB",
    "name": "Tenable Holdings, Inc.",
-   "price_local": 41.290000915527344,
+   "price_local": 38.119998931884766,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 0.0,
+    "observed_deviation_pct": 7.71,
     "observed_width_factor": 1.5304,
     "checks": {
      "sector_model_supported": true,
@@ -53371,13 +53254,13 @@
   {
    "symbol": "HUBB",
    "name": "Hubbell Incorporated",
-   "price_local": 477.92999267578125,
+   "price_local": 473.3699951171875,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 7.29,
+    "observed_deviation_pct": 6.26,
     "observed_width_factor": 1.3655,
     "checks": {
      "sector_model_supported": true,
@@ -62187,7 +62070,7 @@
     "annual_calculation": [
      {
       "period_end": "2024-12-31",
-      "price": 186.3653,
+      "price": 186.3652,
       "book_value_per_share": 73.3707,
       "price_to_book": 2.5401,
       "roe_pct": 23.4041,
@@ -62433,7 +62316,7 @@
      },
      {
       "period_end": "2025-12-31",
-      "price": 256.4601,
+      "price": 256.46,
       "book_value_per_share": 90.7432,
       "price_to_book": 2.8262,
       "roe_pct": 6.4062,
@@ -64756,9 +64639,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 139.5348,
+      "reference_multiple": 139.5349,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 1188.977203
+      "implied_price": 1188.978055
      },
      {
       "metric": "price_to_fcf",
@@ -64810,7 +64693,7 @@
     },
     "price_to_fcf": {
      "current": 36.35,
-     "own_5y_average": 139.5348,
+     "own_5y_average": 139.5349,
      "sector_median": 13.9481,
      "sector_peer_count": 128
     },
@@ -71076,9 +70959,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "issuer_history",
-      "reference_multiple": 15171.9046,
+      "reference_multiple": 15171.9044,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 38.427068
+      "implied_price": 38.427067
      },
      {
       "metric": "price_to_sales",
@@ -71122,7 +71005,7 @@
     },
     "price_to_sales": {
      "current": 14560.4638,
-     "own_5y_average": 15171.9046,
+     "own_5y_average": 15171.9044,
      "sector_median": 7.2322,
      "sector_peer_count": 71
     }
@@ -77071,13 +76954,13 @@
   {
    "symbol": "WDS.AX",
    "name": "Woodside Energy Group Ltd",
-   "price_local": 33.20000076293945,
+   "price_local": 33.36000061035156,
    "currency": "AUD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 7.08,
+    "observed_deviation_pct": 7.6,
     "observed_width_factor": 1.8449,
     "checks": {
      "sector_model_supported": true,
@@ -78097,7 +77980,7 @@
   {
    "symbol": "2330.TW",
    "name": "Taiwan Semiconductor Manufacturing Company Limited",
-   "price_local": 2490.0,
+   "price_local": 2440.0,
    "currency": "TWD",
    "gate": {
     "status": "withheld_wide_range",
@@ -78193,13 +78076,13 @@
   {
    "symbol": "2317.TW",
    "name": "Hon Hai Precision Industry Co., Ltd.",
-   "price_local": 243.0,
+   "price_local": 239.5,
    "currency": "TWD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 123.49,
+    "observed_deviation_pct": 126.76,
     "observed_width_factor": 6.0319,
     "checks": {
      "sector_model_supported": true,
@@ -82784,7 +82667,7 @@
   {
    "symbol": "BTC-USD",
    "name": "Bitcoin USD",
-   "price_local": 83095.125,
+   "price_local": 81562.4921875,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -82843,7 +82726,7 @@
   {
    "symbol": "ETH-USD",
    "name": "Ethereum USD",
-   "price_local": 2496.62548828125,
+   "price_local": 2418.20703125,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -82902,7 +82785,7 @@
   {
    "symbol": "SOL-USD",
    "name": "Solana USD",
-   "price_local": 106.72801208496094,
+   "price_local": 104.07444763183594,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -82961,7 +82844,7 @@
   {
    "symbol": "XRP-USD",
    "name": "XRP USD",
-   "price_local": 1.3646210432052612,
+   "price_local": 1.3298020362854004,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -83020,7 +82903,7 @@
   {
    "symbol": "BNB-USD",
    "name": "BNB USD",
-   "price_local": 741.0621948242188,
+   "price_local": 729.2614135742188,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -83079,7 +82962,7 @@
   {
    "symbol": "ADA-USD",
    "name": "Cardano USD",
-   "price_local": 0.2355860024690628,
+   "price_local": 0.22980600595474243,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -83138,7 +83021,7 @@
   {
    "symbol": "DOGE-USD",
    "name": "Dogecoin USD",
-   "price_local": 0.08426900207996368,
+   "price_local": 0.08169399946928024,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -83197,7 +83080,7 @@
   {
    "symbol": "AVAX-USD",
    "name": "Avalanche USD",
-   "price_local": 10.222501754760742,
+   "price_local": 9.993754386901855,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -83256,7 +83139,7 @@
   {
    "symbol": "LINK-USD",
    "name": "Chainlink USD",
-   "price_local": 12.874810218811035,
+   "price_local": 12.418885231018066,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -83315,7 +83198,7 @@
   {
    "symbol": "DOT-USD",
    "name": "Polkadot USD",
-   "price_local": 1.1595779657363892,
+   "price_local": 1.146373987197876,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -83374,7 +83257,7 @@
   {
    "symbol": "LTC-USD",
    "name": "Litecoin USD",
-   "price_local": 61.115440368652344,
+   "price_local": 59.19709777832031,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -83433,7 +83316,7 @@
   {
    "symbol": "TRX-USD",
    "name": "TRON USD",
-   "price_local": 0.32710298895835876,
+   "price_local": 0.33220499753952026,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -83492,7 +83375,7 @@
   {
    "symbol": "ATOM-USD",
    "name": "Cosmos USD",
-   "price_local": 1.8400919437408447,
+   "price_local": 1.7602980136871338,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -83551,7 +83434,7 @@
   {
    "symbol": "XLM-USD",
    "name": "Stellar USD",
-   "price_local": 0.19015799462795258,
+   "price_local": 0.18233099579811096,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -83610,7 +83493,7 @@
   {
    "symbol": "AAVE-USD",
    "name": "Aave USD",
-   "price_local": 160.23898315429688,
+   "price_local": 154.09519958496094,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -83669,7 +83552,7 @@
   {
    "symbol": "NEAR-USD",
    "name": "NEAR Protocol USD",
-   "price_local": 5.0356340408325195,
+   "price_local": 4.875114917755127,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -83787,7 +83670,7 @@
   {
    "symbol": "OP-USD",
    "name": "Optimism USD",
-   "price_local": 0.1588049978017807,
+   "price_local": 0.14043700695037842,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -86486,9 +86369,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "issuer_history",
-      "reference_multiple": 1771.434,
+      "reference_multiple": 1771.4339,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 211.83563
+      "implied_price": 211.835618
      },
      {
       "metric": "price_to_sales",
@@ -86532,7 +86415,7 @@
     },
     "price_to_sales": {
      "current": 756.7395,
-     "own_5y_average": 1771.434,
+     "own_5y_average": 1771.4339,
      "sector_median": 7.2322,
      "sector_peer_count": 71
     }
@@ -87565,9 +87448,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 33.1358,
+      "reference_multiple": 33.1359,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 109.679498
+      "implied_price": 109.679829
      },
      {
       "metric": "pe",
@@ -87609,7 +87492,7 @@
    "metrics": {
     "pe": {
      "current": 12.348,
-     "own_5y_average": 33.1358,
+     "own_5y_average": 33.1359,
      "sector_median": 16.084,
      "sector_peer_count": 65
     },
@@ -87787,9 +87670,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "issuer_history",
-      "reference_multiple": 1570.0079,
+      "reference_multiple": 1570.008,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 228.701364
+      "implied_price": 228.701379
      },
      {
       "metric": "price_to_sales",
@@ -87833,7 +87716,7 @@
     },
     "price_to_sales": {
      "current": 1986.6702,
-     "own_5y_average": 1570.0079,
+     "own_5y_average": 1570.008,
      "sector_median": 7.2322,
      "sector_peer_count": 71
     }
@@ -90996,7 +90879,7 @@
      },
      {
       "period_end": "2023-12-31",
-      "price": 179.8664,
+      "price": 179.8665,
       "book_value_per_share": 24.7781,
       "price_to_book": 7.2591,
       "roe_pct": 30.8096,
@@ -93250,9 +93133,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "issuer_history",
-      "reference_multiple": 1761.7985,
+      "reference_multiple": 1761.7984,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 60.460992
+      "implied_price": 60.460988
      },
      {
       "metric": "price_to_sales",
@@ -93296,7 +93179,7 @@
     },
     "price_to_sales": {
      "current": 1109.4923,
-     "own_5y_average": 1761.7985,
+     "own_5y_average": 1761.7984,
      "sector_median": 7.2322,
      "sector_peer_count": 71
     }
@@ -103369,9 +103252,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 44.5496,
+      "reference_multiple": 44.5495,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 74.168431
+      "implied_price": 74.168265
      },
      {
       "metric": "price_to_fcf",
@@ -103423,7 +103306,7 @@
     },
     "price_to_fcf": {
      "current": 95.5288,
-     "own_5y_average": 44.5496,
+     "own_5y_average": 44.5495,
      "sector_median": 13.9481,
      "sector_peer_count": 128
     },
@@ -105052,7 +104935,7 @@
     "annual_calculation": [
      {
       "period_end": "2022-12-31",
-      "price": 259.784,
+      "price": 259.7841,
       "book_value_per_share": 32.2838,
       "price_to_book": 8.0469,
       "roe_pct": 21.3447,
@@ -105150,9 +105033,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "issuer_history",
-      "reference_multiple": 419.4936,
+      "reference_multiple": 419.4935,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 67.355052
+      "implied_price": 67.355036
      },
      {
       "metric": "price_to_sales",
@@ -105196,7 +105079,7 @@
     },
     "price_to_sales": {
      "current": 214.2034,
-     "own_5y_average": 419.4936,
+     "own_5y_average": 419.4935,
      "sector_median": 7.2322,
      "sector_peer_count": 71
     }
@@ -107275,9 +107158,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 1823.2091,
+      "reference_multiple": 1823.2092,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 3741.369475
+      "implied_price": 3741.36968
      },
      {
       "metric": "price_to_fcf",
@@ -107329,7 +107212,7 @@
     },
     "price_to_fcf": {
      "current": 40.469,
-     "own_5y_average": 1823.2091,
+     "own_5y_average": 1823.2092,
      "sector_median": 12.3125,
      "sector_peer_count": 44
     },
@@ -107577,9 +107460,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 20.0722,
+      "reference_multiple": 20.0721,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 60.2166
+      "implied_price": 60.2163
      },
      {
       "metric": "pe",
@@ -107628,7 +107511,7 @@
    "metrics": {
     "pe": {
      "current": 30.4072,
-     "own_5y_average": 20.0722,
+     "own_5y_average": 20.0721,
      "sector_median": 20.8201,
      "sector_peer_count": 47
     },
@@ -108712,9 +108595,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 207.8751,
+      "reference_multiple": 207.875,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 2038.929584
+      "implied_price": 2038.928603
      },
      {
       "metric": "price_to_fcf",
@@ -108766,7 +108649,7 @@
     },
     "price_to_fcf": {
      "current": 5.2224,
-     "own_5y_average": 207.8751,
+     "own_5y_average": 207.875,
      "sector_median": 13.9481,
      "sector_peer_count": 128
     },
@@ -110728,7 +110611,7 @@
     "annual_calculation": [
      {
       "period_end": "2022-12-31",
-      "price": 83.3616,
+      "price": 83.3617,
       "book_value_per_share": 38.5748,
       "price_to_book": 2.161,
       "roe_pct": 9.2666,
@@ -112287,7 +112170,7 @@
       "book_value_per_share": 68.8715,
       "price_to_book": 1.6596,
       "roe_pct": 1.4317,
-      "pb_to_roe": 115.9155
+      "pb_to_roe": 115.9154
      },
      {
       "period_end": "2024-12-31",
@@ -112299,7 +112182,7 @@
      },
      {
       "period_end": "2025-12-31",
-      "price": 180.1259,
+      "price": 180.1258,
       "book_value_per_share": 100.907,
       "price_to_book": 1.7851,
       "roe_pct": 18.5496,
@@ -116063,7 +115946,7 @@
   {
    "symbol": "ADEA",
    "name": "Adeia Inc.",
-   "price_local": 23.139999389648438,
+   "price_local": 21.614999771118164,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
@@ -119912,7 +119795,7 @@
      },
      {
       "period_end": "2025-12-31",
-      "price": 18.9143,
+      "price": 18.9144,
       "book_value_per_share": 19.5729,
       "price_to_book": 0.9664,
       "roe_pct": 6.2175,
