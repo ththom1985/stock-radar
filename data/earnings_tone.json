@@ -95,7 +95,7 @@
  "_meta": {
   "schema": "stock-radar-earnings-tone-cache",
   "schema_version": 2,
-  "written_at": "2026-10-17T01:33:29+00:00",
+  "written_at": "2026-10-17T07:10:40+00:00",
   "refreshed": 3
  },
  "EIX": {
@@ -3516,8 +3516,8 @@
   },
   "source": "free earnings text + transparent financial lexicon",
   "expected_delay": "source publication time",
-  "fetched_at": "2026-09-12T07:27:41+00:00",
-  "last_success_at": "2026-09-12T07:27:41+00:00"
+  "fetched_at": "2026-10-17T07:10:40+00:00",
+  "last_success_at": "2026-10-17T07:10:40+00:00"
  },
  "MTB": {
   "score": 27.0,
@@ -4105,8 +4105,8 @@
   },
   "source": "free earnings text + transparent financial lexicon",
   "expected_delay": "source publication time",
-  "fetched_at": "2026-09-15T14:33:43+00:00",
-  "last_success_at": "2026-09-15T14:33:43+00:00"
+  "fetched_at": "2026-10-17T07:10:39+00:00",
+  "last_success_at": "2026-10-17T07:10:39+00:00"
  },
  "GHC": {
   "score": 45.0,
@@ -8047,5 +8047,36 @@
   "expected_delay": "source publication time",
   "fetched_at": "2026-10-17T01:33:29+00:00",
   "last_success_at": "2026-10-17T01:33:29+00:00"
+ },
+ "DLB": {
+  "score": 52.0,
+  "direction": "neutral",
+  "transcript_status": "prepared-only",
+  "analysis_method": "free_financial_lexicon_v1",
+  "current_tone": 53,
+  "previous_tone": 52,
+  "tone_shift": 1,
+  "hedging_shift": -1,
+  "qa_evasiveness_shift": null,
+  "qa_status": "not_available",
+  "cfo_tone_shift": null,
+  "cfo_weight": null,
+  "reason": "Free lexicon: positive/negative 10/6 vs 9/6; Q&A/CFO unavailable.",
+  "current_period": {
+   "period": "2026-07-30",
+   "filing_date": "2026-07-30",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1308547/000119312526326149/d165402dex991.htm"
+  },
+  "previous_period": {
+   "period": "2026-04-30",
+   "filing_date": "2026-04-30",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1308547/000119312526197338/d16309dex991.htm"
+  },
+  "source": "free earnings text + transparent financial lexicon",
+  "expected_delay": "source publication time",
+  "fetched_at": "2026-10-17T07:10:35+00:00",
+  "last_success_at": "2026-10-17T07:10:35+00:00"
  }
 }

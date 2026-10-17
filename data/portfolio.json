@@ -15,9 +15,9 @@
    "entry_price": 124.83072123199796,
    "cost_basis": 988.7169170010206,
    "entry_bar_date": "2026-09-28",
-   "last_price": 148.502810477442,
+   "last_price": 147.9250103983763,
    "high_watermark": 148.502810477442,
-   "last_mark_bar_date": "2026-10-15",
+   "last_mark_bar_date": "2026-10-16",
    "last_action_bar_date": "2026-09-28",
    "processed_actions": {},
    "legacy": false,
@@ -62,7 +62,7 @@
      "Einstieg jetzt möglich."
     ]
    },
-   "last_base_fx_usd": 1.1195074319839478
+   "last_base_fx_usd": 1.1243535280227661
   },
   "PAYC": {
    "symbol": "PAYC",
@@ -71,9 +71,9 @@
    "entry_price": 190.5417492528166,
    "cost_basis": 988.7169170010206,
    "entry_bar_date": "2026-09-28",
-   "last_price": 225.87612006207146,
+   "last_price": 223.8086092300261,
    "high_watermark": 225.87612006207146,
-   "last_mark_bar_date": "2026-10-15",
+   "last_mark_bar_date": "2026-10-16",
    "last_action_bar_date": "2026-09-28",
    "processed_actions": {},
    "legacy": false,
@@ -119,7 +119,7 @@
      "Einstieg jetzt möglich."
     ]
    },
-   "last_base_fx_usd": 1.1195074319839478
+   "last_base_fx_usd": 1.1243535280227661
   },
   "EXLS": {
    "symbol": "EXLS",
@@ -128,9 +128,9 @@
    "entry_price": 32.076877390478714,
    "cost_basis": 993.9144455678812,
    "entry_bar_date": "2026-10-06",
-   "last_price": 34.92607316132738,
-   "high_watermark": 34.92607316132738,
-   "last_mark_bar_date": "2026-10-15",
+   "last_price": 35.149087429166194,
+   "high_watermark": 35.149087429166194,
+   "last_mark_bar_date": "2026-10-16",
    "last_action_bar_date": "2026-10-06",
    "processed_actions": {},
    "legacy": false,
@@ -175,10 +175,37 @@
      "Einstieg jetzt möglich."
     ]
    },
-   "last_base_fx_usd": 1.1195074319839478
+   "last_base_fx_usd": 1.1243535280227661
   }
  },
- "pending_orders": [],
+ "pending_orders": [
+  {
+   "order_id": "fee7e22e-912e-4641-9e60-b024694da0e2",
+   "strategy_version": 3,
+   "action": "SELL",
+   "symbol": "PAYC",
+   "name": "Paycom",
+   "signal_bar_date": "2026-10-16",
+   "signal_timestamp": "2026-10-16T00:00:00",
+   "signal_constraints": {
+    "radar_score": 45,
+    "avg_dollar_volume_20_usd": 131311945.56983948,
+    "atr_pct": 2.867801936778238,
+    "vol_annual_pct": 46.56335553365197,
+    "daily_signal_direction": "NEGATIVE"
+   },
+   "created_at": "2026-10-17T07:11:12+00:00",
+   "observed_at": "2026-10-17T07:11:12+00:00",
+   "not_before_bar_date": "2026-10-17",
+   "expected_fill_bar_date": "2026-10-19",
+   "status": "pending",
+   "reason": "Kernsignal ist klar gebrochen",
+   "quantity": 5.1863846609648645,
+   "exit_trigger": "signal_break",
+   "return_pct": 17.46,
+   "drawdown_from_peak_pct": -0.92
+  }
+ ],
  "ledger": [
   {
    "transaction_id": "55c2072f-345a-42e1-90ea-b07d9eef7684",
@@ -3044,6 +3071,34 @@
    "signal_drawdown_from_peak_pct": -0.86,
    "realized_pnl": -34.76907328786535,
    "timestamp": "2026-10-08T23:33:00+00:00"
+  },
+  {
+   "order_id": "fee7e22e-912e-4641-9e60-b024694da0e2",
+   "strategy_version": 3,
+   "action": "SELL",
+   "symbol": "PAYC",
+   "name": "Paycom",
+   "signal_bar_date": "2026-10-16",
+   "signal_timestamp": "2026-10-16T00:00:00",
+   "signal_constraints": {
+    "radar_score": 45,
+    "avg_dollar_volume_20_usd": 131311945.56983948,
+    "atr_pct": 2.867801936778238,
+    "vol_annual_pct": 46.56335553365197,
+    "daily_signal_direction": "NEGATIVE"
+   },
+   "created_at": "2026-10-17T07:11:12+00:00",
+   "observed_at": "2026-10-17T07:11:12+00:00",
+   "not_before_bar_date": "2026-10-17",
+   "expected_fill_bar_date": "2026-10-19",
+   "status": "pending",
+   "reason": "Kernsignal ist klar gebrochen",
+   "quantity": 5.1863846609648645,
+   "exit_trigger": "signal_break",
+   "return_pct": 17.46,
+   "drawdown_from_peak_pct": -0.92,
+   "type": "ORDER_CREATED",
+   "timestamp": "2026-10-17T07:11:12+00:00"
   }
  ],
  "equity_curve": [
@@ -4654,36 +4709,42 @@
   },
   {
    "date": "2026-10-17",
-   "as_of_bar_date": null,
-   "valuation_status": "mixed_or_stale",
+   "as_of_bar_date": "2026-10-16",
+   "valuation_status": "aligned_completed_bar",
    "position_valuation_dates": {
-    "PCTY": null,
-    "PAYC": null,
-    "EXLS": null
+    "PCTY": "2026-10-16",
+    "PAYC": "2026-10-16",
+    "EXLS": "2026-10-16"
    },
-   "equity": 10261.974111981468,
+   "equity": 10253.583779266228,
    "cash": 6833.2136420802535,
-   "invested": 3428.7604699012136,
+   "invested": 3420.370137185975,
    "n_positions": 3,
+   "bench_sp500": 6812.305694344885,
+   "bench_sp500_bar_date": "2026-10-16",
+   "bench_ndx": 25959.406942563535,
+   "bench_ndx_bar_date": "2026-10-16",
+   "bench_world": 183.51878763679446,
+   "bench_world_bar_date": "2026-10-16",
    "benchmark_status": {
     "sp500": {
-     "portfolio_bar_date": null,
+     "portfolio_bar_date": "2026-10-16",
      "benchmark_bar_date": "2026-10-16",
-     "aligned": false,
-     "currency": "USD",
+     "aligned": true,
+     "currency": "EUR",
      "comparison_status": "descriptive_only_not_comparable_total_return"
     },
     "ndx": {
-     "portfolio_bar_date": null,
+     "portfolio_bar_date": "2026-10-16",
      "benchmark_bar_date": "2026-10-16",
-     "aligned": false,
-     "currency": "USD",
+     "aligned": true,
+     "currency": "EUR",
      "comparison_status": "descriptive_only_not_comparable_total_return"
     },
     "world": {
-     "portfolio_bar_date": null,
-     "benchmark_bar_date": "2026-10-15",
-     "aligned": false,
+     "portfolio_bar_date": "2026-10-16",
+     "benchmark_bar_date": "2026-10-16",
+     "aligned": true,
      "currency": "EUR",
      "comparison_status": "descriptive_only_not_comparable_total_return"
     }
@@ -4715,7 +4776,7 @@
  "_meta": {
   "schema": "stock-radar-paper-portfolio",
   "schema_version": 2,
-  "written_at": "2026-10-17T01:33:51+00:00"
+  "written_at": "2026-10-17T07:11:12+00:00"
  },
  "legacy_archive": {
   "schema": "stock-radar-paper-portfolio",
