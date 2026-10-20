@@ -6,64 +6,8 @@
  "created": "2026-09-03",
  "base_currency": "EUR",
  "starting_cash": 10000.0,
- "cash": 7986.642542127713,
+ "cash": 9170.98327139638,
  "positions": {
-  "PCTY": {
-   "symbol": "PCTY",
-   "name": "PCTY",
-   "quantity": 7.916503212070761,
-   "entry_price": 124.83072123199796,
-   "cost_basis": 988.7169170010206,
-   "entry_bar_date": "2026-09-28",
-   "last_price": 148.0292109027219,
-   "high_watermark": 148.502810477442,
-   "last_mark_bar_date": "2026-10-19",
-   "last_action_bar_date": "2026-09-28",
-   "processed_actions": {},
-   "legacy": false,
-   "issuer_key": "name:pcty",
-   "sector": "Technology",
-   "country": "us",
-   "instrument_currency": "USD",
-   "base_currency": "EUR",
-   "entry_thesis": {
-    "situation": {
-     "code": "ideal",
-     "label": "Idealfall: günstig UND am Einstiegspunkt"
-    },
-    "deal_quality": {
-     "score": 62.7,
-     "stars": 4,
-     "label": "Deal-Qualität 4 von 5",
-     "historical_percentile": null,
-     "comparison": "Noch keine Vergleichshistorie; Einordnung nach festen Schwellen.",
-     "comparison_basis": "feste Schwellen; Historie baut sich ab jetzt auf",
-     "history_reliable": false,
-     "reference_ready": false,
-     "history_observation_count": 0,
-     "history_calendar_days": 0,
-     "history_requirement": "mindestens 100 Gelegenheiten über mindestens 30 Kalendertage",
-     "components": {
-      "valuation_discount": 36.7,
-      "timing": 92.0,
-      "signals": 50.0,
-      "risk": 100.0
-     }
-    },
-    "discount_pct": 18.4,
-    "potential_score": 94.7,
-    "quality_score": 95.0,
-    "growth_score": 94.2,
-    "potential_driver": "Umsatzwachstum von +12.2%",
-    "residual_risk": null,
-    "sentences": [
-     "Der Kurs liegt rund 18% unter der unteren plausiblen fairen Grenze.",
-     "Dafür spricht Umsatzwachstum von +12.2%.",
-     "Einstieg jetzt möglich."
-    ]
-   },
-   "last_base_fx_usd": 1.1225486993789673
-  },
   "EXLS": {
    "symbol": "EXLS",
    "name": "EXL Service",
@@ -123,30 +67,68 @@
  },
  "pending_orders": [
   {
-   "order_id": "71651e07-c11f-47d0-80b1-6b7a784de69d",
+   "order_id": "a9173d7b-ef7e-47a2-9060-1fe063ec5f14",
    "strategy_version": 3,
-   "action": "SELL",
-   "symbol": "PCTY",
-   "name": "PCTY",
-   "signal_bar_date": "2026-10-19",
-   "signal_timestamp": "2026-10-19T00:00:00",
+   "action": "BUY",
+   "symbol": "INCY",
+   "name": "Incyte",
+   "signal_bar_date": "2026-10-20",
+   "signal_timestamp": "2026-10-20T00:00:00",
    "signal_constraints": {
-    "radar_score": 45,
-    "avg_dollar_volume_20_usd": 92507790.12799759,
-    "atr_pct": 2.562882008462565,
-    "vol_annual_pct": 41.55076023653294,
-    "daily_signal_direction": "NEGATIVE"
+    "radar_score": 75,
+    "avg_dollar_volume_20_usd": 197539958.56181145,
+    "atr_pct": 2.7954365057376958,
+    "vol_annual_pct": 33.271629982651994,
+    "daily_signal_direction": "POSITIVE"
    },
-   "created_at": "2026-10-19T22:39:52+00:00",
-   "observed_at": "2026-10-19T22:39:52+00:00",
-   "not_before_bar_date": "2026-10-19",
-   "expected_fill_bar_date": "2026-10-20",
+   "created_at": "2026-10-20T21:51:27+00:00",
+   "observed_at": "2026-10-20T21:51:27+00:00",
+   "not_before_bar_date": "2026-10-20",
+   "expected_fill_bar_date": "2026-10-21",
    "status": "pending",
-   "reason": "Kernsignal ist klar gebrochen",
-   "quantity": 7.916503212070761,
-   "exit_trigger": "signal_break",
-   "return_pct": 18.82,
-   "drawdown_from_peak_pct": -0.12
+   "reason": "Strikter Fundamental-plus-Timing-Idealfall",
+   "target_notional": 1026.7918519429506,
+   "issuer_key": "name:incyte",
+   "sector": "Healthcare",
+   "country": "us",
+   "currency": "USD",
+   "thesis": {
+    "situation": {
+     "code": "ideal",
+     "label": "Idealfall: günstig UND am Einstiegspunkt"
+    },
+    "deal_quality": {
+     "score": 68.3,
+     "stars": 4,
+     "label": "Deal-Qualität 4 von 5",
+     "historical_percentile": null,
+     "comparison": "Noch keine Vergleichshistorie; Einordnung nach festen Schwellen.",
+     "comparison_basis": "feste Schwellen; Historie baut sich ab jetzt auf",
+     "history_reliable": false,
+     "reference_ready": false,
+     "history_observation_count": 0,
+     "history_calendar_days": 0,
+     "history_requirement": "mindestens 100 Gelegenheiten über mindestens 30 Kalendertage",
+     "components": {
+      "valuation_discount": 46.5,
+      "timing": 99.0,
+      "signals": 50.0,
+      "risk": 100.0
+     }
+    },
+    "discount_pct": 23.2,
+    "potential_score": 88.7,
+    "quality_score": 83.3,
+    "growth_score": 96.7,
+    "potential_driver": "Umsatzwachstum von +21.2%",
+    "residual_risk": "Der nächste Ergebnistermin ist bereits in 9 Tagen.",
+    "sentences": [
+     "Der Kurs liegt rund 23% unter der unteren plausiblen fairen Grenze.",
+     "Dafür spricht Umsatzwachstum von +21.2%.",
+     "Der nächste Ergebnistermin ist bereits in 9 Tagen.",
+     "Einstieg jetzt möglich."
+    ]
+   }
   }
  ],
  "ledger": [
@@ -3139,6 +3121,140 @@
    "drawdown_from_peak_pct": -0.12,
    "type": "ORDER_CREATED",
    "timestamp": "2026-10-19T22:39:52+00:00"
+  },
+  {
+   "transaction_id": "86300b14-ec9a-47c5-aab1-e4f490da4237",
+   "type": "FILL",
+   "order_id": "71651e07-c11f-47d0-80b1-6b7a784de69d",
+   "action": "SELL",
+   "symbol": "PCTY",
+   "signal_bar_date": "2026-10-19",
+   "signal_timestamp": "2026-10-19T00:00:00",
+   "created_at": "2026-10-19T22:39:52+00:00",
+   "not_before_bar_date": "2026-10-19",
+   "fill_bar_date": "2026-10-20",
+   "fill_timestamp": "2026-10-20T13:30:00+00:00",
+   "fill_session_open_timestamp": "2026-10-20T13:30:00+00:00",
+   "fill_observed_at": "2026-10-20T21:51:27+00:00",
+   "quantity": 7.916503212070761,
+   "raw_fill_price": 149.82869120462638,
+   "raw_fill_price_usd": 168.19000244140625,
+   "execution_price": 149.67886251342176,
+   "gross_value": 1184.9331958666012,
+   "commission": 0.5924665979333006,
+   "slippage_bps": 10.0,
+   "base_fx_usd": 1.1225486993789673,
+   "fx_bar_date": "2026-10-19",
+   "fx_convention": "preceding daily close, not synchronous execution FX",
+   "strategy_version": 3,
+   "reason": "Kernsignal ist klar gebrochen",
+   "exit_trigger": "signal_break",
+   "thesis": {
+    "situation": {
+     "code": "ideal",
+     "label": "Idealfall: günstig UND am Einstiegspunkt"
+    },
+    "deal_quality": {
+     "score": 62.7,
+     "stars": 4,
+     "label": "Deal-Qualität 4 von 5",
+     "historical_percentile": null,
+     "comparison": "Noch keine Vergleichshistorie; Einordnung nach festen Schwellen.",
+     "comparison_basis": "feste Schwellen; Historie baut sich ab jetzt auf",
+     "history_reliable": false,
+     "reference_ready": false,
+     "history_observation_count": 0,
+     "history_calendar_days": 0,
+     "history_requirement": "mindestens 100 Gelegenheiten über mindestens 30 Kalendertage",
+     "components": {
+      "valuation_discount": 36.7,
+      "timing": 92.0,
+      "signals": 50.0,
+      "risk": 100.0
+     }
+    },
+    "discount_pct": 18.4,
+    "potential_score": 94.7,
+    "quality_score": 95.0,
+    "growth_score": 94.2,
+    "potential_driver": "Umsatzwachstum von +12.2%",
+    "residual_risk": null,
+    "sentences": [
+     "Der Kurs liegt rund 18% unter der unteren plausiblen fairen Grenze.",
+     "Dafür spricht Umsatzwachstum von +12.2%.",
+     "Einstieg jetzt möglich."
+    ]
+   },
+   "signal_return_pct": 18.82,
+   "signal_drawdown_from_peak_pct": -0.12,
+   "realized_pnl": 195.62381226764728,
+   "timestamp": "2026-10-20T21:51:27+00:00"
+  },
+  {
+   "order_id": "a9173d7b-ef7e-47a2-9060-1fe063ec5f14",
+   "strategy_version": 3,
+   "action": "BUY",
+   "symbol": "INCY",
+   "name": "Incyte",
+   "signal_bar_date": "2026-10-20",
+   "signal_timestamp": "2026-10-20T00:00:00",
+   "signal_constraints": {
+    "radar_score": 75,
+    "avg_dollar_volume_20_usd": 197539958.56181145,
+    "atr_pct": 2.7954365057376958,
+    "vol_annual_pct": 33.271629982651994,
+    "daily_signal_direction": "POSITIVE"
+   },
+   "created_at": "2026-10-20T21:51:27+00:00",
+   "observed_at": "2026-10-20T21:51:27+00:00",
+   "not_before_bar_date": "2026-10-20",
+   "expected_fill_bar_date": "2026-10-21",
+   "status": "pending",
+   "reason": "Strikter Fundamental-plus-Timing-Idealfall",
+   "target_notional": 1026.7918519429506,
+   "issuer_key": "name:incyte",
+   "sector": "Healthcare",
+   "country": "us",
+   "currency": "USD",
+   "thesis": {
+    "situation": {
+     "code": "ideal",
+     "label": "Idealfall: günstig UND am Einstiegspunkt"
+    },
+    "deal_quality": {
+     "score": 68.3,
+     "stars": 4,
+     "label": "Deal-Qualität 4 von 5",
+     "historical_percentile": null,
+     "comparison": "Noch keine Vergleichshistorie; Einordnung nach festen Schwellen.",
+     "comparison_basis": "feste Schwellen; Historie baut sich ab jetzt auf",
+     "history_reliable": false,
+     "reference_ready": false,
+     "history_observation_count": 0,
+     "history_calendar_days": 0,
+     "history_requirement": "mindestens 100 Gelegenheiten über mindestens 30 Kalendertage",
+     "components": {
+      "valuation_discount": 46.5,
+      "timing": 99.0,
+      "signals": 50.0,
+      "risk": 100.0
+     }
+    },
+    "discount_pct": 23.2,
+    "potential_score": 88.7,
+    "quality_score": 83.3,
+    "growth_score": 96.7,
+    "potential_driver": "Umsatzwachstum von +21.2%",
+    "residual_risk": "Der nächste Ergebnistermin ist bereits in 9 Tagen.",
+    "sentences": [
+     "Der Kurs liegt rund 23% unter der unteren plausiblen fairen Grenze.",
+     "Dafür spricht Umsatzwachstum von +21.2%.",
+     "Der nächste Ergebnistermin ist bereits in 9 Tagen.",
+     "Einstieg jetzt möglich."
+    ]
+   },
+   "type": "ORDER_CREATED",
+   "timestamp": "2026-10-20T21:51:27+00:00"
   }
  ],
  "equity_curve": [
@@ -4871,42 +4987,35 @@
   },
   {
    "date": "2026-10-20",
-   "as_of_bar_date": "2026-10-19",
-   "valuation_status": "aligned_completed_bar",
+   "as_of_bar_date": null,
+   "valuation_status": "mixed_or_stale",
    "position_valuation_dates": {
-    "PCTY": "2026-10-19",
-    "EXLS": "2026-10-19"
+    "EXLS": null
    },
-   "equity": 10255.451513752534,
-   "cash": 7986.642542127713,
-   "invested": 2268.8089716248223,
-   "n_positions": 2,
-   "bench_sp500": 6851.132592041243,
-   "bench_sp500_bar_date": "2026-10-19",
-   "bench_ndx": 26305.62899027156,
-   "bench_ndx_bar_date": "2026-10-19",
-   "bench_world": 184.09000340992804,
-   "bench_world_bar_date": "2026-10-19",
+   "equity": 10267.918519429506,
+   "cash": 9170.98327139638,
+   "invested": 1096.9352480331245,
+   "n_positions": 1,
    "benchmark_status": {
     "sp500": {
-     "portfolio_bar_date": "2026-10-19",
-     "benchmark_bar_date": "2026-10-19",
-     "aligned": true,
-     "currency": "EUR",
+     "portfolio_bar_date": null,
+     "benchmark_bar_date": "2026-10-20",
+     "aligned": false,
+     "currency": "USD",
      "comparison_status": "descriptive_only_not_comparable_total_return"
     },
     "ndx": {
-     "portfolio_bar_date": "2026-10-19",
-     "benchmark_bar_date": "2026-10-19",
-     "aligned": true,
-     "currency": "EUR",
+     "portfolio_bar_date": null,
+     "benchmark_bar_date": "2026-10-20",
+     "aligned": false,
+     "currency": "USD",
      "comparison_status": "descriptive_only_not_comparable_total_return"
     },
     "world": {
-     "portfolio_bar_date": "2026-10-19",
-     "benchmark_bar_date": "2026-10-19",
-     "aligned": true,
-     "currency": "EUR",
+     "portfolio_bar_date": null,
+     "benchmark_bar_date": "2026-10-20",
+     "aligned": false,
+     "currency": "USD",
      "comparison_status": "descriptive_only_not_comparable_total_return"
     }
    }
@@ -4937,7 +5046,7 @@
  "_meta": {
   "schema": "stock-radar-paper-portfolio",
   "schema_version": 2,
-  "written_at": "2026-10-20T14:32:59+00:00"
+  "written_at": "2026-10-20T21:51:27+00:00"
  },
  "legacy_archive": {
   "schema": "stock-radar-paper-portfolio",
