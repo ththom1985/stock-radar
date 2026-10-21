@@ -95,7 +95,7 @@
  "_meta": {
   "schema": "stock-radar-earnings-tone-cache",
   "schema_version": 2,
-  "written_at": "2026-10-21T14:39:00+00:00",
+  "written_at": "2026-10-21T22:00:35+00:00",
   "refreshed": 3
  },
  "EIX": {
@@ -1675,8 +1675,8 @@
   },
   "source": "free earnings text + transparent financial lexicon",
   "expected_delay": "source publication time",
-  "fetched_at": "2026-09-03T06:49:34+00:00",
-  "last_success_at": "2026-09-03T06:49:34+00:00"
+  "fetched_at": "2026-10-21T22:00:33+00:00",
+  "last_success_at": "2026-10-21T22:00:33+00:00"
  },
  "CARG": {
   "score": 52.0,
@@ -8143,7 +8143,7 @@
  },
  "WIX": {
   "_refresh_failure": {
-   "at": "2026-10-21T14:38:54+00:00",
+   "at": "2026-10-21T22:00:33+00:00",
    "error": "fewer than two free quarterly earnings texts"
   }
  },
@@ -8363,5 +8363,36 @@
   "expected_delay": "source publication time",
   "fetched_at": "2026-10-21T01:45:51+00:00",
   "last_success_at": "2026-10-21T01:45:51+00:00"
+ },
+ "AMD": {
+  "score": 44.0,
+  "direction": "negative",
+  "transcript_status": "prepared-only",
+  "analysis_method": "free_financial_lexicon_v1",
+  "current_tone": 48,
+  "previous_tone": 54,
+  "tone_shift": -6,
+  "hedging_shift": 0,
+  "qa_evasiveness_shift": null,
+  "qa_status": "not_available",
+  "cfo_tone_shift": null,
+  "cfo_weight": null,
+  "reason": "Free lexicon: positive/negative 9/23 vs 31/24; Q&A/CFO unavailable.",
+  "current_period": {
+   "period": "2026-08-13",
+   "filing_date": "2026-08-17",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/2488/000119312526354029/d142696dex11.htm"
+  },
+  "previous_period": {
+   "period": "2026-08-04",
+   "filing_date": "2026-08-04",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/2488/000000248826000121/q22026991.htm"
+  },
+  "source": "free earnings text + transparent financial lexicon",
+  "expected_delay": "source publication time",
+  "fetched_at": "2026-10-21T22:00:35+00:00",
+  "last_success_at": "2026-10-21T22:00:35+00:00"
  }
 }
