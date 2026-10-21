@@ -1,7 +1,7 @@
 {
  "schema": "stock-radar-valuation-anomalies",
  "schema_version": 1,
- "generated_at": "2026-10-21T01:46:25+00:00",
+ "generated_at": "2026-10-21T07:47:48+00:00",
  "anomalies": [
   {
    "symbol": "NVDA",
@@ -1524,109 +1524,6 @@
     "price_to_sales": {
      "current": 5.8818,
      "own_5y_average": 2.7237,
-     "sector_median": 4.8052,
-     "sector_peer_count": 287
-    }
-   }
-  },
-  {
-   "symbol": "SYNA",
-   "name": "Synaptics Incorporated",
-   "price_local": 117.4800033569336,
-   "currency": "USD",
-   "gate": {
-    "status": "withheld_extreme_deviation",
-    "max_deviation_pct": 50.0,
-    "max_width_factor": 1.5,
-    "observed_deviation_pct": 54.43,
-    "observed_width_factor": 1.2845,
-    "checks": {
-     "sector_model_supported": true,
-     "basis_broad": true,
-     "width_within_limit": true,
-     "deviation_within_limit": false
-    },
-    "reason": "Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
-   },
-   "raw_fair_value_range": {
-    "lower": 59.2228,
-    "upper": 76.073,
-    "currency": "USD",
-    "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
-    "input_count": 2,
-    "implied_price_count": 5,
-    "components": [
-     {
-      "metric": "ev_ebitda",
-      "reference_type": "sector_peers",
-      "reference_multiple": 21.1675,
-      "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
-      "implied_price": 39.332751
-     },
-     {
-      "metric": "price_to_fcf",
-      "reference_type": "issuer_history",
-      "reference_multiple": 22.7196,
-      "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 59.222813
-     },
-     {
-      "metric": "price_to_fcf",
-      "reference_type": "sector_peers",
-      "reference_multiple": 28.099,
-      "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 73.245208
-     },
-     {
-      "metric": "price_to_sales",
-      "reference_type": "issuer_history",
-      "reference_multiple": 2.4718,
-      "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 76.072981
-     },
-     {
-      "metric": "price_to_sales",
-      "reference_type": "sector_peers",
-      "reference_multiple": 4.8052,
-      "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 147.886515
-     }
-    ]
-   },
-   "metrics": {
-    "pe": {
-     "current": null,
-     "own_5y_average": null,
-     "sector_median": 33.8568,
-     "sector_peer_count": 221
-    },
-    "forward_pe": {
-     "current": 17.796,
-     "own_5y_average": null,
-     "sector_median": 17.9319,
-     "sector_peer_count": 267
-    },
-    "peg": {
-     "current": null,
-     "own_5y_average": null,
-     "sector_median": 0.9812,
-     "sector_peer_count": 151
-    },
-    "ev_ebitda": {
-     "current": 54.006,
-     "own_5y_average": null,
-     "sector_median": 21.1675,
-     "sector_peer_count": 244
-    },
-    "price_to_fcf": {
-     "current": 45.8289,
-     "own_5y_average": 22.7196,
-     "sector_median": 28.099,
-     "sector_peer_count": 206
-    },
-    "price_to_sales": {
-     "current": 3.8816,
-     "own_5y_average": 2.4718,
      "sector_median": 4.8052,
      "sector_peer_count": 287
     }
@@ -7279,6 +7176,109 @@
    }
   },
   {
+   "symbol": "SYNA",
+   "name": "Synaptics Incorporated",
+   "price_local": 117.4800033569336,
+   "currency": "USD",
+   "gate": {
+    "status": "withheld_extreme_deviation",
+    "max_deviation_pct": 50.0,
+    "max_width_factor": 1.5,
+    "observed_deviation_pct": 54.43,
+    "observed_width_factor": 1.2845,
+    "checks": {
+     "sector_model_supported": true,
+     "basis_broad": true,
+     "width_within_limit": true,
+     "deviation_within_limit": false
+    },
+    "reason": "Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
+   },
+   "raw_fair_value_range": {
+    "lower": 59.2228,
+    "upper": 76.073,
+    "currency": "USD",
+    "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
+    "input_count": 2,
+    "implied_price_count": 5,
+    "components": [
+     {
+      "metric": "ev_ebitda",
+      "reference_type": "sector_peers",
+      "reference_multiple": 21.1675,
+      "fundamental_input": "EBITDA, Nettoverschuldung und Aktienzahl",
+      "implied_price": 39.332751
+     },
+     {
+      "metric": "price_to_fcf",
+      "reference_type": "issuer_history",
+      "reference_multiple": 22.7196,
+      "fundamental_input": "Free Cashflow je Aktie",
+      "implied_price": 59.222813
+     },
+     {
+      "metric": "price_to_fcf",
+      "reference_type": "sector_peers",
+      "reference_multiple": 28.099,
+      "fundamental_input": "Free Cashflow je Aktie",
+      "implied_price": 73.245208
+     },
+     {
+      "metric": "price_to_sales",
+      "reference_type": "issuer_history",
+      "reference_multiple": 2.4718,
+      "fundamental_input": "Umsatz je Aktie",
+      "implied_price": 76.072981
+     },
+     {
+      "metric": "price_to_sales",
+      "reference_type": "sector_peers",
+      "reference_multiple": 4.8052,
+      "fundamental_input": "Umsatz je Aktie",
+      "implied_price": 147.886515
+     }
+    ]
+   },
+   "metrics": {
+    "pe": {
+     "current": null,
+     "own_5y_average": null,
+     "sector_median": 33.8568,
+     "sector_peer_count": 221
+    },
+    "forward_pe": {
+     "current": 17.796,
+     "own_5y_average": null,
+     "sector_median": 17.9319,
+     "sector_peer_count": 267
+    },
+    "peg": {
+     "current": null,
+     "own_5y_average": null,
+     "sector_median": 0.9812,
+     "sector_peer_count": 151
+    },
+    "ev_ebitda": {
+     "current": 54.006,
+     "own_5y_average": null,
+     "sector_median": 21.1675,
+     "sector_peer_count": 244
+    },
+    "price_to_fcf": {
+     "current": 45.8289,
+     "own_5y_average": 22.7196,
+     "sector_median": 28.099,
+     "sector_peer_count": 206
+    },
+    "price_to_sales": {
+     "current": 3.8816,
+     "own_5y_average": 2.4718,
+     "sector_median": 4.8052,
+     "sector_peer_count": 287
+    }
+   }
+  },
+  {
    "symbol": "NVCR",
    "name": "NovoCure Limited",
    "price_local": 15.710000038146973,
@@ -7690,9 +7690,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 59.9799,
+      "reference_multiple": 59.9798,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 406.663722
+      "implied_price": 406.663044
      },
      {
       "metric": "pe",
@@ -7741,7 +7741,7 @@
    "metrics": {
     "pe": {
      "current": null,
-     "own_5y_average": 59.9799,
+     "own_5y_average": 59.9798,
      "sector_median": 26.3714,
      "sector_peer_count": 113
     },
@@ -23325,13 +23325,13 @@
   {
    "symbol": "LYC.AX",
    "name": "Lynas Rare Earths Limited",
-   "price_local": 11.350000381469727,
+   "price_local": 11.550000190734863,
    "currency": "AUD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 146.8,
+    "observed_deviation_pct": 151.15,
     "observed_width_factor": 1.8563,
     "checks": {
      "sector_model_supported": true,
@@ -25685,7 +25685,7 @@
     "annual_calculation": [
      {
       "period_end": "2022-12-31",
-      "price": 9.3552,
+      "price": 9.3551,
       "book_value_per_share": 33.856,
       "price_to_book": 0.2763,
       "roe_pct": 7.1537,
@@ -27211,13 +27211,13 @@
   {
    "symbol": "RHHBY",
    "name": "Roche Holding AG",
-   "price_local": 59.119998931884766,
+   "price_local": 59.11000061035156,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 0.41,
+    "observed_deviation_pct": 0.39,
     "observed_width_factor": 1.4605,
     "checks": {
      "sector_model_supported": true,
@@ -34462,7 +34462,7 @@
   {
    "symbol": "FANUY",
    "name": "Fanuc Corporation",
-   "price_local": 18.459999084472656,
+   "price_local": 18.5,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
@@ -35346,9 +35346,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 64.5533,
+      "reference_multiple": 64.5532,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 318.70105
+      "implied_price": 318.700556
      },
      {
       "metric": "price_to_fcf",
@@ -35400,7 +35400,7 @@
     },
     "price_to_fcf": {
      "current": 49.1326,
-     "own_5y_average": 64.5533,
+     "own_5y_average": 64.5532,
      "sector_median": 22.1885,
      "sector_peer_count": 42
     },
@@ -36940,7 +36940,7 @@
     "annual_calculation": [
      {
       "period_end": "2022-12-31",
-      "price": 7439.6416,
+      "price": 7439.6426,
       "book_value_per_share": 1792.89,
       "price_to_book": 4.1495,
       "roe_pct": 18.4309,
@@ -36948,7 +36948,7 @@
      },
      {
       "period_end": "2023-12-31",
-      "price": 8382.5498,
+      "price": 8382.5488,
       "book_value_per_share": 1965.9798,
       "price_to_book": 4.2638,
       "roe_pct": 20.0693,
@@ -40056,9 +40056,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 64.8574,
+      "reference_multiple": 64.8575,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 184.911076
+      "implied_price": 184.911361
      },
      {
       "metric": "price_to_fcf",
@@ -40110,7 +40110,7 @@
     },
     "price_to_fcf": {
      "current": 96.8856,
-     "own_5y_average": 64.8574,
+     "own_5y_average": 64.8575,
      "sector_median": 28.099,
      "sector_peer_count": 206
     },
@@ -40152,9 +40152,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 42.5648,
+      "reference_multiple": 42.5647,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 194.095488
+      "implied_price": 194.095032
      },
      {
       "metric": "pe",
@@ -40203,7 +40203,7 @@
    "metrics": {
     "pe": {
      "current": 46.8349,
-     "own_5y_average": 42.5648,
+     "own_5y_average": 42.5647,
      "sector_median": 33.8568,
      "sector_peer_count": 221
     },
@@ -45438,13 +45438,13 @@
   {
    "symbol": "TCEHY",
    "name": "Tencent Holdings Limited",
-   "price_local": 52.470001220703125,
+   "price_local": 52.5,
    "currency": "USD",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 234.42,
+    "observed_deviation_pct": 234.23,
     "observed_width_factor": 1.2786,
     "checks": {
      "sector_model_supported": true,
@@ -45534,7 +45534,7 @@
   {
    "symbol": "BYDDY",
    "name": "BYD Company Limited",
-   "price_local": 9.319999694824219,
+   "price_local": 9.3100004196167,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
@@ -48353,9 +48353,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 15.2558,
+      "reference_multiple": 15.2557,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 117.46966
+      "implied_price": 117.46889
      },
      {
       "metric": "pe",
@@ -48404,7 +48404,7 @@
    "metrics": {
     "pe": {
      "current": 15.5344,
-     "own_5y_average": 15.2558,
+     "own_5y_average": 15.2557,
      "sector_median": 33.8568,
      "sector_peer_count": 221
     },
@@ -49935,8 +49935,8 @@
     "reason": "Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 87.4306,
-    "upper": 102.5204,
+    "lower": 87.4308,
+    "upper": 102.5206,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 2,
@@ -49945,9 +49945,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 19.1989,
+      "reference_multiple": 19.199,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 100.602236
+      "implied_price": 100.60276
      },
      {
       "metric": "pe",
@@ -49996,7 +49996,7 @@
    "metrics": {
     "pe": {
      "current": 29.9377,
-     "own_5y_average": 19.1989,
+     "own_5y_average": 19.199,
      "sector_median": 20.9039,
      "sector_peer_count": 70
     },
@@ -52690,13 +52690,13 @@
   {
    "symbol": "HUBB",
    "name": "Hubbell Incorporated",
-   "price_local": 464.9200134277344,
+   "price_local": 459.32000732421875,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 4.57,
+    "observed_deviation_pct": 3.31,
     "observed_width_factor": 1.3774,
     "checks": {
      "sector_model_supported": true,
@@ -56307,7 +56307,7 @@
      },
      {
       "period_end": "2023-12-31",
-      "price": 126.1539,
+      "price": 126.1538,
       "book_value_per_share": 408.3213,
       "price_to_book": 0.309,
       "roe_pct": 14.9893,
@@ -61200,7 +61200,7 @@
    },
    "raw_fair_value_range": {
     "lower": 142.1774,
-    "upper": 234.0944,
+    "upper": 234.0926,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 2,
@@ -61244,9 +61244,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "issuer_history",
-      "reference_multiple": 12.9354,
+      "reference_multiple": 12.9353,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 234.094444
+      "implied_price": 234.092635
      },
      {
       "metric": "price_to_sales",
@@ -61290,7 +61290,7 @@
     },
     "price_to_sales": {
      "current": 16.1867,
-     "own_5y_average": 12.9354,
+     "own_5y_average": 12.9353,
      "sector_median": 3.489,
      "sector_peer_count": 199
     }
@@ -61670,7 +61670,7 @@
      },
      {
       "period_end": "2023-12-31",
-      "price": 63.7132,
+      "price": 63.7131,
       "book_value_per_share": 65.1327,
       "price_to_book": 0.9782,
       "roe_pct": 8.0551,
@@ -61792,7 +61792,7 @@
      },
      {
       "period_end": "2025-12-31",
-      "price": 256.46,
+      "price": 256.4601,
       "book_value_per_share": 90.7432,
       "price_to_book": 2.8262,
       "roe_pct": 6.4062,
@@ -62952,7 +62952,7 @@
    },
    "raw_fair_value_range": {
     "lower": 179.0618,
-    "upper": 294.6833,
+    "upper": 294.6826,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 2,
@@ -62961,9 +62961,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 43.3996,
+      "reference_multiple": 43.3995,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 294.683284
+      "implied_price": 294.682605
      },
      {
       "metric": "pe",
@@ -63012,7 +63012,7 @@
    "metrics": {
     "pe": {
      "current": 49.1562,
-     "own_5y_average": 43.3996,
+     "own_5y_average": 43.3995,
      "sector_median": 26.3714,
      "sector_peer_count": 113
     },
@@ -70669,9 +70669,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "issuer_history",
-      "reference_multiple": 15171.9053,
+      "reference_multiple": 15171.905,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 38.42707
+      "implied_price": 38.427069
      },
      {
       "metric": "price_to_sales",
@@ -70715,7 +70715,7 @@
     },
     "price_to_sales": {
      "current": 14117.9436,
-     "own_5y_average": 15171.9053,
+     "own_5y_average": 15171.905,
      "sector_median": 7.1201,
      "sector_peer_count": 71
     }
@@ -76664,13 +76664,13 @@
   {
    "symbol": "WDS.AX",
    "name": "Woodside Energy Group Ltd",
-   "price_local": 33.81999969482422,
+   "price_local": 33.959999084472656,
    "currency": "AUD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 8.88,
+    "observed_deviation_pct": 9.33,
     "observed_width_factor": 1.7473,
     "checks": {
      "sector_model_supported": true,
@@ -77288,9 +77288,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 53.5,
+      "reference_multiple": 53.4999,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 173.280643
+      "implied_price": 173.280319
      },
      {
       "metric": "price_to_fcf",
@@ -77342,7 +77342,7 @@
     },
     "price_to_fcf": {
      "current": 23.8947,
-     "own_5y_average": 53.5,
+     "own_5y_average": 53.4999,
      "sector_median": 28.099,
      "sector_peer_count": 206
     },
@@ -77690,7 +77690,7 @@
   {
    "symbol": "2330.TW",
    "name": "Taiwan Semiconductor Manufacturing Company Limited",
-   "price_local": 2405.0,
+   "price_local": 2420.0,
    "currency": "TWD",
    "gate": {
     "status": "withheld_wide_range",
@@ -77786,13 +77786,13 @@
   {
    "symbol": "2317.TW",
    "name": "Hon Hai Precision Industry Co., Ltd.",
-   "price_local": 241.5,
+   "price_local": 250.0,
    "currency": "TWD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 107.07,
+    "observed_deviation_pct": 100.03,
     "observed_width_factor": 6.3569,
     "checks": {
      "sector_model_supported": true,
@@ -82377,7 +82377,7 @@
   {
    "symbol": "BTC-USD",
    "name": "Bitcoin USD",
-   "price_local": 81853.5390625,
+   "price_local": 82941.0,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -82436,7 +82436,7 @@
   {
    "symbol": "ETH-USD",
    "name": "Ethereum USD",
-   "price_local": 2404.815185546875,
+   "price_local": 2446.730712890625,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -82495,7 +82495,7 @@
   {
    "symbol": "SOL-USD",
    "name": "Solana USD",
-   "price_local": 104.92623138427734,
+   "price_local": 106.4223403930664,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -82554,7 +82554,7 @@
   {
    "symbol": "XRP-USD",
    "name": "XRP USD",
-   "price_local": 1.3027130365371704,
+   "price_local": 1.3344520330429077,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -82613,7 +82613,7 @@
   {
    "symbol": "BNB-USD",
    "name": "BNB USD",
-   "price_local": 730.9553833007812,
+   "price_local": 740.8236083984375,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -82672,7 +82672,7 @@
   {
    "symbol": "ADA-USD",
    "name": "Cardano USD",
-   "price_local": 0.21799500286579132,
+   "price_local": 0.2237820029258728,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -82731,7 +82731,7 @@
   {
    "symbol": "DOGE-USD",
    "name": "Dogecoin USD",
-   "price_local": 0.07967499643564224,
+   "price_local": 0.08180899918079376,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -82790,7 +82790,7 @@
   {
    "symbol": "AVAX-USD",
    "name": "Avalanche USD",
-   "price_local": 9.598261833190918,
+   "price_local": 9.743240356445312,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -82849,7 +82849,7 @@
   {
    "symbol": "LINK-USD",
    "name": "Chainlink USD",
-   "price_local": 12.043903350830078,
+   "price_local": 12.320926666259766,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -82908,7 +82908,7 @@
   {
    "symbol": "DOT-USD",
    "name": "Polkadot USD",
-   "price_local": 1.1531260013580322,
+   "price_local": 1.149770975112915,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -82967,7 +82967,7 @@
   {
    "symbol": "LTC-USD",
    "name": "Litecoin USD",
-   "price_local": 59.6541748046875,
+   "price_local": 61.531612396240234,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -83026,7 +83026,7 @@
   {
    "symbol": "TRX-USD",
    "name": "TRON USD",
-   "price_local": 0.33172500133514404,
+   "price_local": 0.331028014421463,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -83085,7 +83085,7 @@
   {
    "symbol": "ATOM-USD",
    "name": "Cosmos USD",
-   "price_local": 1.7441380023956299,
+   "price_local": 1.7488399744033813,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -83144,7 +83144,7 @@
   {
    "symbol": "XLM-USD",
    "name": "Stellar USD",
-   "price_local": 0.17757099866867065,
+   "price_local": 0.18196000158786774,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -83203,7 +83203,7 @@
   {
    "symbol": "AAVE-USD",
    "name": "Aave USD",
-   "price_local": 149.25521850585938,
+   "price_local": 154.4821319580078,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -83262,7 +83262,7 @@
   {
    "symbol": "NEAR-USD",
    "name": "NEAR Protocol USD",
-   "price_local": 4.89860200881958,
+   "price_local": 4.924736022949219,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -83380,7 +83380,7 @@
   {
    "symbol": "OP-USD",
    "name": "Optimism USD",
-   "price_local": 0.12431299686431885,
+   "price_local": 0.12966999411582947,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -84689,7 +84689,7 @@
      },
      {
       "period_end": "2023-12-31",
-      "price": 69.707,
+      "price": 69.7069,
       "book_value_per_share": 19.603,
       "price_to_book": 3.5559,
       "roe_pct": 15.3791,
@@ -84744,9 +84744,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 177.1547,
+      "reference_multiple": 177.1546,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 308.249178
+      "implied_price": 308.249004
      },
      {
       "metric": "pe",
@@ -84795,7 +84795,7 @@
    "metrics": {
     "pe": {
      "current": 31.1505,
-     "own_5y_average": 177.1547,
+     "own_5y_average": 177.1546,
      "sector_median": 27.5685,
      "sector_peer_count": 66
     },
@@ -85845,9 +85845,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "issuer_history",
-      "reference_multiple": 1771.4339,
+      "reference_multiple": 1771.434,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 211.835618
+      "implied_price": 211.83563
      },
      {
       "metric": "price_to_sales",
@@ -85891,7 +85891,7 @@
     },
     "price_to_sales": {
      "current": 758.6779,
-     "own_5y_average": 1771.4339,
+     "own_5y_average": 1771.434,
      "sector_median": 7.1201,
      "sector_peer_count": 71
     }
@@ -87056,7 +87056,7 @@
      },
      {
       "period_end": "2023-12-31",
-      "price": 318.1855,
+      "price": 318.1856,
       "book_value_per_share": 31.8003,
       "price_to_book": 10.0057,
       "roe_pct": 26.8253,
@@ -90347,7 +90347,7 @@
     "annual_calculation": [
      {
       "period_end": "2022-12-31",
-      "price": 154.8602,
+      "price": 154.8603,
       "book_value_per_share": 21.2617,
       "price_to_book": 7.2835,
       "roe_pct": 28.9924,
@@ -92609,9 +92609,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "issuer_history",
-      "reference_multiple": 1754.3419,
+      "reference_multiple": 1754.3418,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 60.205098
+      "implied_price": 60.205095
      },
      {
       "metric": "price_to_sales",
@@ -92655,7 +92655,7 @@
     },
     "price_to_sales": {
      "current": 1103.622,
-     "own_5y_average": 1754.3419,
+     "own_5y_average": 1754.3418,
      "sector_median": 7.1201,
      "sector_peer_count": 71
     }
@@ -93475,15 +93475,15 @@
     "annual_calculation": [
      {
       "period_end": "2022-12-31",
-      "price": 232.9697,
+      "price": 232.9696,
       "book_value_per_share": 93.8211,
       "price_to_book": 2.4831,
       "roe_pct": 10.0739,
-      "pb_to_roe": 24.6492
+      "pb_to_roe": 24.6491
      },
      {
       "period_end": "2023-12-31",
-      "price": 233.167,
+      "price": 233.1669,
       "book_value_per_share": 92.8436,
       "price_to_book": 2.5114,
       "roe_pct": 11.0819,
@@ -101010,7 +101010,7 @@
       "period_end": "2024-12-31",
       "price": 34.5832,
       "book_value_per_share": 11.3126,
-      "price_to_book": 3.057,
+      "price_to_book": 3.0571,
       "roe_pct": 13.9124,
       "pb_to_roe": 21.9736
      },
@@ -104418,7 +104418,7 @@
     "annual_calculation": [
      {
       "period_end": "2022-12-31",
-      "price": 259.784,
+      "price": 259.7841,
       "book_value_per_share": 32.2838,
       "price_to_book": 8.0469,
       "roe_pct": 21.3447,
@@ -106524,9 +106524,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 1823.2089,
+      "reference_multiple": 1823.2091,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 3741.369065
+      "implied_price": 3741.369475
      },
      {
       "metric": "price_to_fcf",
@@ -106578,7 +106578,7 @@
     },
     "price_to_fcf": {
      "current": 39.677,
-     "own_5y_average": 1823.2089,
+     "own_5y_average": 1823.2091,
      "sector_median": 12.9203,
      "sector_peer_count": 44
     },
@@ -109359,7 +109359,7 @@
       "period_end": "2022-12-31",
       "price": 40.2944,
       "book_value_per_share": 4.2548,
-      "price_to_book": 9.4702,
+      "price_to_book": 9.4703,
       "roe_pct": 12.93,
       "pb_to_roe": 73.2422
      },
@@ -109867,9 +109867,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 8.6188,
+      "reference_multiple": 8.6187,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 87.480914
+      "implied_price": 87.479899
      },
      {
       "metric": "price_to_fcf",
@@ -109921,7 +109921,7 @@
     },
     "price_to_fcf": {
      "current": 8.9301,
-     "own_5y_average": 8.6188,
+     "own_5y_average": 8.6187,
      "sector_median": 11.3797,
      "sector_peer_count": 140
     },
@@ -111992,9 +111992,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 398.7832,
+      "reference_multiple": 398.7831,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 370.868376
+      "implied_price": 370.868283
      },
      {
       "metric": "pe",
@@ -112036,7 +112036,7 @@
    "metrics": {
     "pe": {
      "current": 20.8614,
-     "own_5y_average": 398.7832,
+     "own_5y_average": 398.7831,
      "sector_median": 26.8803,
      "sector_peer_count": 240
     },
@@ -115312,7 +115312,7 @@
   {
    "symbol": "ADEA",
    "name": "Adeia Inc.",
-   "price_local": 21.049999237060547,
+   "price_local": 21.28499984741211,
    "currency": "USD",
    "gate": {
     "status": "withheld_wide_range",
