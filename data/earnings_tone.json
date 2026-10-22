@@ -95,7 +95,7 @@
  "_meta": {
   "schema": "stock-radar-earnings-tone-cache",
   "schema_version": 2,
-  "written_at": "2026-10-21T22:00:35+00:00",
+  "written_at": "2026-10-22T01:59:33+00:00",
   "refreshed": 3
  },
  "EIX": {
@@ -1326,35 +1326,35 @@
   "last_success_at": "2026-08-31T10:57:12+00:00"
  },
  "WMB": {
-  "score": 58.0,
-  "direction": "positive",
+  "score": 42.0,
+  "direction": "negative",
   "transcript_status": "prepared-only",
   "analysis_method": "free_financial_lexicon_v1",
-  "current_tone": 51,
-  "previous_tone": 49,
-  "tone_shift": 2,
-  "hedging_shift": -6,
+  "current_tone": 45,
+  "previous_tone": 51,
+  "tone_shift": -6,
+  "hedging_shift": 2,
   "qa_evasiveness_shift": null,
   "qa_status": "not_available",
   "cfo_tone_shift": null,
   "cfo_weight": null,
-  "reason": "Free lexicon: positive/negative 51/48 vs 8/9; Q&A/CFO unavailable.",
+  "reason": "Free lexicon: positive/negative 6/39 vs 51/48; Q&A/CFO unavailable.",
   "current_period": {
+   "period": "2026-09-08",
+   "filing_date": "2026-09-10",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/107263/000119312526387359/d113424dex11.htm"
+  },
+  "previous_period": {
    "period": "2026-08-03",
    "filing_date": "2026-08-03",
    "source": "SEC EDGAR 8-K exhibit",
    "source_url": "https://www.sec.gov/Archives/edgar/data/107263/000010726326000024/wmb_20260630xer.htm"
   },
-  "previous_period": {
-   "period": "2026-07-10",
-   "filing_date": "2026-07-13",
-   "source": "SEC EDGAR 8-K exhibit",
-   "source_url": "https://www.sec.gov/Archives/edgar/data/107263/000119312526301533/d152507dex992.htm"
-  },
   "source": "free earnings text + transparent financial lexicon",
   "expected_delay": "source publication time",
-  "fetched_at": "2026-08-31T11:07:06+00:00",
-  "last_success_at": "2026-08-31T11:07:06+00:00"
+  "fetched_at": "2026-10-22T01:59:32+00:00",
+  "last_success_at": "2026-10-22T01:59:32+00:00"
  },
  "IBN": {
   "_refresh_failure": {
@@ -6111,7 +6111,7 @@
  },
  "BEKE": {
   "_refresh_failure": {
-   "at": "2026-10-08T16:42:38+00:00",
+   "at": "2026-10-22T01:59:33+00:00",
    "error": "fewer than two free quarterly earnings texts"
   }
  },
@@ -8143,7 +8143,7 @@
  },
  "WIX": {
   "_refresh_failure": {
-   "at": "2026-10-21T22:00:33+00:00",
+   "at": "2026-10-22T01:59:19+00:00",
    "error": "fewer than two free quarterly earnings texts"
   }
  },
