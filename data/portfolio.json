@@ -6,7 +6,7 @@
  "created": "2026-09-03",
  "base_currency": "EUR",
  "starting_cash": 10000.0,
- "cash": 8144.19141945343,
+ "cash": 7114.318648404749,
  "positions": {
   "EXLS": {
    "symbol": "EXLS",
@@ -120,36 +120,26 @@
     ]
    },
    "last_base_fx_usd": 1.122674584388733
-  }
- },
- "pending_orders": [
-  {
-   "order_id": "76c22f1d-60b5-4c97-ba2a-096a92aa12bf",
-   "strategy_version": 3,
-   "action": "BUY",
+  },
+  "PAYX": {
    "symbol": "PAYX",
    "name": "PAYX",
-   "signal_bar_date": "2026-10-21",
-   "signal_timestamp": "2026-10-21T00:00:00",
-   "signal_constraints": {
-    "radar_score": 70,
-    "avg_dollar_volume_20_usd": 322254677.20680237,
-    "atr_pct": 2.298249283092088,
-    "vol_annual_pct": 30.067252134648896,
-    "daily_signal_direction": "NEUTRAL"
-   },
-   "created_at": "2026-10-21T22:01:01+00:00",
-   "observed_at": "2026-10-21T22:01:01+00:00",
-   "not_before_bar_date": "2026-10-21",
-   "expected_fill_bar_date": "2026-10-22",
-   "status": "pending",
-   "reason": "Strikter Fundamental-plus-Timing-Idealfall",
-   "target_notional": 1029.8727710486805,
+   "quantity": 10.149271986266807,
+   "entry_price": 101.42186487814351,
+   "cost_basis": 1029.8727710486808,
+   "entry_bar_date": "2026-10-22",
+   "last_price": 101.42186487814351,
+   "high_watermark": 101.42186487814351,
+   "last_mark_bar_date": "2026-10-22",
+   "last_action_bar_date": "2026-10-22",
+   "processed_actions": {},
+   "legacy": false,
    "issuer_key": "name:payx",
    "sector": "Technology",
    "country": "us",
-   "currency": "USD",
-   "thesis": {
+   "instrument_currency": "USD",
+   "base_currency": "EUR",
+   "entry_thesis": {
     "situation": {
      "code": "ideal",
      "label": "Idealfall: günstig UND am Einstiegspunkt"
@@ -186,7 +176,8 @@
     ]
    }
   }
- ],
+ },
+ "pending_orders": [],
  "ledger": [
   {
    "transaction_id": "55c2072f-345a-42e1-90ea-b07d9eef7684",
@@ -3445,6 +3436,74 @@
    },
    "type": "ORDER_CREATED",
    "timestamp": "2026-10-21T22:01:01+00:00"
+  },
+  {
+   "transaction_id": "9eec792c-0f8f-4fe2-998d-ae1f7cb845cb",
+   "type": "FILL",
+   "order_id": "76c22f1d-60b5-4c97-ba2a-096a92aa12bf",
+   "action": "BUY",
+   "symbol": "PAYX",
+   "signal_bar_date": "2026-10-21",
+   "signal_timestamp": "2026-10-21T00:00:00",
+   "created_at": "2026-10-21T22:01:01+00:00",
+   "not_before_bar_date": "2026-10-21",
+   "fill_bar_date": "2026-10-22",
+   "fill_timestamp": "2026-10-22T13:30:00+00:00",
+   "fill_session_open_timestamp": "2026-10-22T13:30:00+00:00",
+   "fill_observed_at": "2026-10-22T21:47:09+00:00",
+   "quantity": 10.149271986266807,
+   "raw_fill_price": 101.3205443338097,
+   "raw_fill_price_usd": 113.75,
+   "execution_price": 101.42186487814351,
+   "gross_value": 1029.3580920026793,
+   "commission": 0.5146790460013397,
+   "slippage_bps": 10.0,
+   "base_fx_usd": 1.122674584388733,
+   "fx_bar_date": "2026-10-21",
+   "fx_convention": "preceding daily close, not synchronous execution FX",
+   "strategy_version": 3,
+   "reason": "Strikter Fundamental-plus-Timing-Idealfall",
+   "exit_trigger": null,
+   "thesis": {
+    "situation": {
+     "code": "ideal",
+     "label": "Idealfall: günstig UND am Einstiegspunkt"
+    },
+    "deal_quality": {
+     "score": 61.9,
+     "stars": 4,
+     "label": "Deal-Qualität 4 von 5",
+     "historical_percentile": null,
+     "comparison": "Noch keine Vergleichshistorie; Einordnung nach festen Schwellen.",
+     "comparison_basis": "feste Schwellen; Historie baut sich ab jetzt auf",
+     "history_reliable": false,
+     "reference_ready": false,
+     "history_observation_count": 0,
+     "history_calendar_days": 0,
+     "history_requirement": "mindestens 100 Gelegenheiten über mindestens 30 Kalendertage",
+     "components": {
+      "valuation_discount": 34.8,
+      "timing": 72.0,
+      "signals": 75.0,
+      "risk": 100.0
+     }
+    },
+    "discount_pct": 17.4,
+    "potential_score": 89.5,
+    "quality_score": 97.5,
+    "growth_score": 77.5,
+    "potential_driver": "Umsatzwachstum von +16.5%",
+    "residual_risk": null,
+    "sentences": [
+     "Der Kurs liegt rund 17% unter der unteren plausiblen fairen Grenze.",
+     "Dafür spricht Umsatzwachstum von +16.5%.",
+     "Einstieg jetzt möglich."
+    ]
+   },
+   "signal_return_pct": null,
+   "signal_drawdown_from_peak_pct": null,
+   "realized_pnl": null,
+   "timestamp": "2026-10-22T21:47:09+00:00"
   }
  ],
  "equity_curve": [
@@ -5248,42 +5307,37 @@
   },
   {
    "date": "2026-10-22",
-   "as_of_bar_date": "2026-10-21",
-   "valuation_status": "aligned_completed_bar",
+   "as_of_bar_date": null,
+   "valuation_status": "mixed_or_stale",
    "position_valuation_dates": {
-    "EXLS": "2026-10-21",
-    "INCY": "2026-10-21"
+    "EXLS": null,
+    "INCY": null,
+    "PAYX": null
    },
-   "equity": 10277.583478286655,
-   "cash": 8144.19141945343,
-   "invested": 2133.392058833224,
-   "n_positions": 2,
-   "bench_sp500": 6909.544430542691,
-   "bench_sp500_bar_date": "2026-10-21",
-   "bench_ndx": 26563.814613731178,
-   "bench_ndx_bar_date": "2026-10-21",
-   "bench_world": 185.70831511847348,
-   "bench_world_bar_date": "2026-10-21",
+   "equity": 10277.068799240653,
+   "cash": 7114.318648404749,
+   "invested": 3162.7501508359032,
+   "n_positions": 3,
    "benchmark_status": {
     "sp500": {
-     "portfolio_bar_date": "2026-10-21",
-     "benchmark_bar_date": "2026-10-21",
-     "aligned": true,
-     "currency": "EUR",
+     "portfolio_bar_date": null,
+     "benchmark_bar_date": "2026-10-22",
+     "aligned": false,
+     "currency": "USD",
      "comparison_status": "descriptive_only_not_comparable_total_return"
     },
     "ndx": {
-     "portfolio_bar_date": "2026-10-21",
-     "benchmark_bar_date": "2026-10-21",
-     "aligned": true,
-     "currency": "EUR",
+     "portfolio_bar_date": null,
+     "benchmark_bar_date": "2026-10-22",
+     "aligned": false,
+     "currency": "USD",
      "comparison_status": "descriptive_only_not_comparable_total_return"
     },
     "world": {
-     "portfolio_bar_date": "2026-10-21",
-     "benchmark_bar_date": "2026-10-21",
-     "aligned": true,
-     "currency": "EUR",
+     "portfolio_bar_date": null,
+     "benchmark_bar_date": "2026-10-22",
+     "aligned": false,
+     "currency": "USD",
      "comparison_status": "descriptive_only_not_comparable_total_return"
     }
    }
@@ -5314,7 +5368,7 @@
  "_meta": {
   "schema": "stock-radar-paper-portfolio",
   "schema_version": 2,
-  "written_at": "2026-10-22T14:42:43+00:00"
+  "written_at": "2026-10-22T21:47:09+00:00"
  },
  "legacy_archive": {
   "schema": "stock-radar-paper-portfolio",
