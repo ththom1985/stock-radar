@@ -1337,7 +1337,7 @@
  "_meta": {
   "schema": "stock-radar-finra-short-interest-cache",
   "schema_version": 1,
-  "written_at": "2026-10-25T13:55:49+00:00",
+  "written_at": "2026-10-25T20:59:36+00:00",
   "refreshed": 15
  },
  "ELV": {
@@ -10241,24 +10241,15 @@
   "last_success_at": "2026-10-24T07:27:32+00:00"
  },
  "KMI": {
-  "score": 46.6,
-  "direction": "neutral",
-  "settlement_date": "2026-09-15",
-  "short_position": 46516397.0,
-  "days_to_cover": 4.09,
-  "change_percent": -4.36,
-  "period_trend_pct": 3.8,
+  "score": 44.6,
+  "direction": "negative",
+  "settlement_date": "2026-09-30",
+  "short_position": 46209208.0,
+  "days_to_cover": 3.37,
+  "change_percent": -0.66,
+  "period_trend_pct": 14.6,
   "period_count": 8,
   "periods": [
-   {
-    "settlement_date": "2026-05-29",
-    "short_position": 44813126.0,
-    "previous_short_position": 43287767.0,
-    "average_daily_volume": 10608816.0,
-    "days_to_cover": 4.22,
-    "change_percent": 3.52,
-    "revision": false
-   },
    {
     "settlement_date": "2026-06-15",
     "short_position": 40323374.0,
@@ -10321,13 +10312,22 @@
     "days_to_cover": 4.09,
     "change_percent": -4.36,
     "revision": false
+   },
+   {
+    "settlement_date": "2026-09-30",
+    "short_position": 46209208.0,
+    "previous_short_position": 46516397.0,
+    "average_daily_volume": 13724178.0,
+    "days_to_cover": 3.37,
+    "change_percent": -0.66,
+    "revision": false
    }
   ],
   "source": "FINRA consolidatedShortInterest",
   "expected_delay": "twice monthly; publication follows FINRA schedule",
   "limitations": "Short interest is reported twice monthly and is not real-time. Days-to-cover is FINRA-reported and capped by source conventions.",
-  "fetched_at": "2026-10-02T16:00:21+00:00",
-  "last_success_at": "2026-10-02T16:00:21+00:00"
+  "fetched_at": "2026-10-25T20:59:29+00:00",
+  "last_success_at": "2026-10-25T20:59:29+00:00"
  },
  "TENB": {
   "score": 42.8,
@@ -32042,8 +32042,8 @@
   "source": "FINRA consolidatedShortInterest",
   "expected_delay": "twice monthly; publication follows FINRA schedule",
   "limitations": "Short interest is reported twice monthly and is not real-time. Days-to-cover is FINRA-reported and capped by source conventions.",
-  "fetched_at": "2026-10-15T14:18:46+00:00",
-  "last_success_at": "2026-10-15T14:18:46+00:00"
+  "fetched_at": "2026-10-25T20:58:46+00:00",
+  "last_success_at": "2026-10-25T20:58:46+00:00"
  },
  "EXR": {
   "score": 46.7,
@@ -36136,8 +36136,8 @@
   "source": "FINRA consolidatedShortInterest",
   "expected_delay": "twice monthly; publication follows FINRA schedule",
   "limitations": "Short interest is reported twice monthly and is not real-time. Days-to-cover is FINRA-reported and capped by source conventions.",
-  "fetched_at": "2026-10-15T14:19:25+00:00",
-  "last_success_at": "2026-10-15T14:19:25+00:00"
+  "fetched_at": "2026-10-25T20:59:11+00:00",
+  "last_success_at": "2026-10-25T20:59:11+00:00"
  },
  "CRSP": {
   "score": 36.8,
@@ -36848,8 +36848,8 @@
   "source": "FINRA consolidatedShortInterest",
   "expected_delay": "twice monthly; publication follows FINRA schedule",
   "limitations": "Short interest is reported twice monthly and is not real-time. Days-to-cover is FINRA-reported and capped by source conventions.",
-  "fetched_at": "2026-10-15T14:19:21+00:00",
-  "last_success_at": "2026-10-15T14:19:21+00:00"
+  "fetched_at": "2026-10-25T20:58:49+00:00",
+  "last_success_at": "2026-10-25T20:58:49+00:00"
  },
  "CLF": {
   "score": 45.1,
@@ -37738,8 +37738,8 @@
   "source": "FINRA consolidatedShortInterest",
   "expected_delay": "twice monthly; publication follows FINRA schedule",
   "limitations": "Short interest is reported twice monthly and is not real-time. Days-to-cover is FINRA-reported and capped by source conventions.",
-  "fetched_at": "2026-10-15T14:19:36+00:00",
-  "last_success_at": "2026-10-15T14:19:36+00:00"
+  "fetched_at": "2026-10-25T20:59:07+00:00",
+  "last_success_at": "2026-10-25T20:59:07+00:00"
  },
  "MNDY": {
   "score": 55.1,
@@ -38717,8 +38717,8 @@
   "source": "FINRA consolidatedShortInterest",
   "expected_delay": "twice monthly; publication follows FINRA schedule",
   "limitations": "Short interest is reported twice monthly and is not real-time. Days-to-cover is FINRA-reported and capped by source conventions.",
-  "fetched_at": "2026-10-15T14:18:53+00:00",
-  "last_success_at": "2026-10-15T14:18:53+00:00"
+  "fetched_at": "2026-10-25T20:59:00+00:00",
+  "last_success_at": "2026-10-25T20:59:00+00:00"
  },
  "WDAY": {
   "score": 59.1,
@@ -38899,42 +38899,15 @@
   "last_success_at": "2026-10-23T21:32:25+00:00"
  },
  "ADBE": {
-  "score": 47.3,
+  "score": 51.6,
   "direction": "neutral",
-  "settlement_date": "2026-08-14",
-  "short_position": 17970237.0,
-  "days_to_cover": 4.25,
-  "change_percent": -7.12,
-  "period_trend_pct": 3.33,
+  "settlement_date": "2026-09-30",
+  "short_position": 17705400.0,
+  "days_to_cover": 3.48,
+  "change_percent": -4.28,
+  "period_trend_pct": -15.25,
   "period_count": 8,
   "periods": [
-   {
-    "settlement_date": "2026-04-30",
-    "short_position": 17391686.0,
-    "previous_short_position": 14737592.0,
-    "average_daily_volume": 5624484.0,
-    "days_to_cover": 3.09,
-    "change_percent": 18.01,
-    "revision": false
-   },
-   {
-    "settlement_date": "2026-05-15",
-    "short_position": 18979957.0,
-    "previous_short_position": 17391686.0,
-    "average_daily_volume": 4385418.0,
-    "days_to_cover": 4.33,
-    "change_percent": 9.13,
-    "revision": false
-   },
-   {
-    "settlement_date": "2026-05-29",
-    "short_position": 18663125.0,
-    "previous_short_position": 18979957.0,
-    "average_daily_volume": 4927189.0,
-    "days_to_cover": 3.79,
-    "change_percent": -1.67,
-    "revision": false
-   },
    {
     "settlement_date": "2026-06-15",
     "short_position": 20892296.0,
@@ -38979,13 +38952,40 @@
     "days_to_cover": 4.25,
     "change_percent": -7.12,
     "revision": false
+   },
+   {
+    "settlement_date": "2026-08-31",
+    "short_position": 17369986.0,
+    "previous_short_position": 17970237.0,
+    "average_daily_volume": 4179269.0,
+    "days_to_cover": 4.16,
+    "change_percent": -3.34,
+    "revision": false
+   },
+   {
+    "settlement_date": "2026-09-15",
+    "short_position": 18496677.0,
+    "previous_short_position": 17369986.0,
+    "average_daily_volume": 5830839.0,
+    "days_to_cover": 3.17,
+    "change_percent": 6.49,
+    "revision": false
+   },
+   {
+    "settlement_date": "2026-09-30",
+    "short_position": 17705400.0,
+    "previous_short_position": 18496677.0,
+    "average_daily_volume": 5089375.0,
+    "days_to_cover": 3.48,
+    "change_percent": -4.28,
+    "revision": false
    }
   ],
   "source": "FINRA consolidatedShortInterest",
   "expected_delay": "twice monthly; publication follows FINRA schedule",
   "limitations": "Short interest is reported twice monthly and is not real-time. Days-to-cover is FINRA-reported and capped by source conventions.",
-  "fetched_at": "2026-08-31T11:05:39+00:00",
-  "last_success_at": "2026-08-31T11:05:39+00:00"
+  "fetched_at": "2026-10-25T20:59:36+00:00",
+  "last_success_at": "2026-10-25T20:59:36+00:00"
  },
  "SPOT": {
   "score": 59.2,
@@ -58519,8 +58519,8 @@
   "source": "FINRA consolidatedShortInterest",
   "expected_delay": "twice monthly; publication follows FINRA schedule",
   "limitations": "Short interest is reported twice monthly and is not real-time. Days-to-cover is FINRA-reported and capped by source conventions.",
-  "fetched_at": "2026-10-15T14:18:56+00:00",
-  "last_success_at": "2026-10-15T14:18:56+00:00"
+  "fetched_at": "2026-10-25T20:59:03+00:00",
+  "last_success_at": "2026-10-25T20:59:03+00:00"
  },
  "CNP": {
   "score": 42.8,
@@ -62435,8 +62435,8 @@
   "source": "FINRA consolidatedShortInterest",
   "expected_delay": "twice monthly; publication follows FINRA schedule",
   "limitations": "Short interest is reported twice monthly and is not real-time. Days-to-cover is FINRA-reported and capped by source conventions.",
-  "fetched_at": "2026-10-15T14:18:49+00:00",
-  "last_success_at": "2026-10-15T14:18:49+00:00"
+  "fetched_at": "2026-10-25T20:58:56+00:00",
+  "last_success_at": "2026-10-25T20:58:56+00:00"
  },
  "CART": {
   "score": 26.5,
@@ -63147,8 +63147,8 @@
   "source": "FINRA consolidatedShortInterest",
   "expected_delay": "twice monthly; publication follows FINRA schedule",
   "limitations": "Short interest is reported twice monthly and is not real-time. Days-to-cover is FINRA-reported and capped by source conventions.",
-  "fetched_at": "2026-10-15T01:41:26+00:00",
-  "last_success_at": "2026-10-15T01:41:26+00:00"
+  "fetched_at": "2026-10-25T20:59:25+00:00",
+  "last_success_at": "2026-10-25T20:59:25+00:00"
  },
  "VNO": {
   "score": 30.0,
@@ -64126,8 +64126,8 @@
   "source": "FINRA consolidatedShortInterest",
   "expected_delay": "twice monthly; publication follows FINRA schedule",
   "limitations": "Short interest is reported twice monthly and is not real-time. Days-to-cover is FINRA-reported and capped by source conventions.",
-  "fetched_at": "2026-10-15T14:19:14+00:00",
-  "last_success_at": "2026-10-15T14:19:14+00:00"
+  "fetched_at": "2026-10-25T20:59:14+00:00",
+  "last_success_at": "2026-10-25T20:59:14+00:00"
  },
  "LH": {
   "score": 48.2,
@@ -73386,24 +73386,15 @@
   "last_success_at": "2026-10-15T14:19:00+00:00"
  },
  "BJ": {
-  "score": 37.3,
+  "score": 36.7,
   "direction": "negative",
-  "settlement_date": "2026-09-15",
-  "short_position": 9796907.0,
-  "days_to_cover": 6.39,
-  "change_percent": 7.24,
-  "period_trend_pct": 6.7,
+  "settlement_date": "2026-09-30",
+  "short_position": 10568168.0,
+  "days_to_cover": 5.82,
+  "change_percent": 7.87,
+  "period_trend_pct": 14.54,
   "period_count": 8,
   "periods": [
-   {
-    "settlement_date": "2026-05-29",
-    "short_position": 9181410.0,
-    "previous_short_position": 8083333.0,
-    "average_daily_volume": 3358400.0,
-    "days_to_cover": 2.73,
-    "change_percent": 13.58,
-    "revision": false
-   },
    {
     "settlement_date": "2026-06-15",
     "short_position": 9226946.0,
@@ -73466,13 +73457,22 @@
     "days_to_cover": 6.39,
     "change_percent": 7.24,
     "revision": false
+   },
+   {
+    "settlement_date": "2026-09-30",
+    "short_position": 10568168.0,
+    "previous_short_position": 9796907.0,
+    "average_daily_volume": 1816185.0,
+    "days_to_cover": 5.82,
+    "change_percent": 7.87,
+    "revision": false
    }
   ],
   "source": "FINRA consolidatedShortInterest",
   "expected_delay": "twice monthly; publication follows FINRA schedule",
   "limitations": "Short interest is reported twice monthly and is not real-time. Days-to-cover is FINRA-reported and capped by source conventions.",
-  "fetched_at": "2026-10-05T09:16:04+00:00",
-  "last_success_at": "2026-10-05T09:16:04+00:00"
+  "fetched_at": "2026-10-25T20:59:32+00:00",
+  "last_success_at": "2026-10-25T20:59:32+00:00"
  },
  "EXPO": {
   "score": 49.4,
@@ -76052,8 +76052,8 @@
   "source": "FINRA consolidatedShortInterest",
   "expected_delay": "twice monthly; publication follows FINRA schedule",
   "limitations": "Short interest is reported twice monthly and is not real-time. Days-to-cover is FINRA-reported and capped by source conventions.",
-  "fetched_at": "2026-10-15T14:19:11+00:00",
-  "last_success_at": "2026-10-15T14:19:11+00:00"
+  "fetched_at": "2026-10-25T20:59:21+00:00",
+  "last_success_at": "2026-10-25T20:59:21+00:00"
  },
  "BR": {
   "score": 54.2,
@@ -76141,8 +76141,8 @@
   "source": "FINRA consolidatedShortInterest",
   "expected_delay": "twice monthly; publication follows FINRA schedule",
   "limitations": "Short interest is reported twice monthly and is not real-time. Days-to-cover is FINRA-reported and capped by source conventions.",
-  "fetched_at": "2026-10-15T14:19:18+00:00",
-  "last_success_at": "2026-10-15T14:19:18+00:00"
+  "fetched_at": "2026-10-25T20:59:18+00:00",
+  "last_success_at": "2026-10-25T20:59:18+00:00"
  },
  "ITUB": {
   "score": 48.5,
@@ -76230,8 +76230,8 @@
   "source": "FINRA consolidatedShortInterest",
   "expected_delay": "twice monthly; publication follows FINRA schedule",
   "limitations": "Short interest is reported twice monthly and is not real-time. Days-to-cover is FINRA-reported and capped by source conventions.",
-  "fetched_at": "2026-10-15T14:19:32+00:00",
-  "last_success_at": "2026-10-15T14:19:32+00:00"
+  "fetched_at": "2026-10-25T20:58:53+00:00",
+  "last_success_at": "2026-10-25T20:58:53+00:00"
  },
  "TXNM": {
   "score": 46.6,
