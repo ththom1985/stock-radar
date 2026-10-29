@@ -1,7 +1,7 @@
 {
  "schema": "stock-radar-valuation-anomalies",
  "schema_version": 1,
- "generated_at": "2026-10-29T08:37:50+00:00",
+ "generated_at": "2026-10-29T16:22:57+00:00",
  "anomalies": [
   {
    "symbol": "AAPL",
@@ -150,9 +150,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 52.6069,
+      "reference_multiple": 52.607,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 257.77381
+      "implied_price": 257.7743
      },
      {
       "metric": "pe",
@@ -194,7 +194,7 @@
    "metrics": {
     "pe": {
      "current": 27.3072,
-     "own_5y_average": 52.6069,
+     "own_5y_average": 52.607,
      "sector_median": 33.5201,
      "sector_peer_count": 221
     },
@@ -10714,13 +10714,13 @@
   {
    "symbol": "SAP.DE",
    "name": "SAP SE",
-   "price_local": 213.14999389648438,
+   "price_local": 211.1999969482422,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 1.4,
+    "observed_deviation_pct": 2.33,
     "observed_width_factor": 1.0717,
     "checks": {
      "sector_model_supported": true,
@@ -10810,13 +10810,13 @@
   {
    "symbol": "SIE.DE",
    "name": "Siemens Aktiengesellschaft",
-   "price_local": 266.20001220703125,
+   "price_local": 270.04998779296875,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 9.62,
+    "observed_deviation_pct": 11.21,
     "observed_width_factor": 1.2038,
     "checks": {
      "sector_model_supported": true,
@@ -11002,13 +11002,13 @@
   {
    "symbol": "RHM.DE",
    "name": "Rheinmetall AG",
-   "price_local": 1025.199951171875,
+   "price_local": 1012.0,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 49.1,
+    "observed_deviation_pct": 47.18,
     "observed_width_factor": 1.2289,
     "checks": {
      "sector_model_supported": true,
@@ -11098,14 +11098,14 @@
   {
    "symbol": "DB1.DE",
    "name": "Deutsche Börse AG",
-   "price_local": 312.70001220703125,
+   "price_local": 313.3999938964844,
    "currency": "EUR",
    "gate": {
     "status": "withheld_sector_model",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 86.03,
-    "observed_width_factor": 1.0887,
+    "observed_deviation_pct": 86.63,
+    "observed_width_factor": 1.0865,
     "checks": {
      "sector_model_supported": false,
      "basis_broad": false,
@@ -11115,8 +11115,8 @@
     "reason": "Bewertung sektorbedingt nicht möglich: Für dieses Finanzgeschäft ist noch kein fachlich passendes Bewertungsmodell zugeordnet. Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 154.3995,
-    "upper": 168.0891,
+    "lower": 154.5619,
+    "upper": 167.9267,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -11180,14 +11180,14 @@
   {
    "symbol": "BAS.DE",
    "name": "BASF SE",
-   "price_local": 52.119998931884766,
+   "price_local": 52.84000015258789,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 0.0,
-    "observed_width_factor": 1.0427,
+    "observed_deviation_pct": 0.57,
+    "observed_width_factor": 1.0451,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -11197,8 +11197,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 50.3307,
-    "upper": 52.4806,
+    "lower": 50.2714,
+    "upper": 52.54,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -11276,7 +11276,7 @@
   {
    "symbol": "CBK.DE",
    "name": "Commerzbank AG",
-   "price_local": 37.70000076293945,
+   "price_local": 37.959999084472656,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
@@ -11353,14 +11353,14 @@
   {
    "symbol": "MTX.DE",
    "name": "MTU Aero Engines AG",
-   "price_local": 329.70001220703125,
+   "price_local": 332.0,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 16.48,
-    "observed_width_factor": 1.0617,
+    "observed_deviation_pct": 15.75,
+    "observed_width_factor": 1.0604,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -11370,8 +11370,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 384.0355,
-    "upper": 407.7228,
+    "lower": 384.2825,
+    "upper": 407.4758,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -11449,13 +11449,13 @@
   {
    "symbol": "HEI.DE",
    "name": "Heidelberg Materials AG",
-   "price_local": 148.39999389648438,
+   "price_local": 147.0500030517578,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 25.39,
+    "observed_deviation_pct": 26.54,
     "observed_width_factor": 1.2914,
     "checks": {
      "sector_model_supported": true,
@@ -11545,13 +11545,13 @@
   {
    "symbol": "ENR.DE",
    "name": "Siemens Energy AG",
-   "price_local": 128.5800018310547,
+   "price_local": 133.25999450683594,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 14.28,
+    "observed_deviation_pct": 18.44,
     "observed_width_factor": 1.2168,
     "checks": {
      "sector_model_supported": true,
@@ -11641,13 +11641,13 @@
   {
    "symbol": "SHL.DE",
    "name": "Siemens Healthineers AG",
-   "price_local": 41.869998931884766,
+   "price_local": 42.59000015258789,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 2.71,
+    "observed_deviation_pct": 0.97,
     "observed_width_factor": 1.2191,
     "checks": {
      "sector_model_supported": true,
@@ -11737,13 +11737,13 @@
   {
    "symbol": "SHA0.DE",
    "name": "Schaeffler AG",
-   "price_local": 5.820000171661377,
+   "price_local": 5.929999828338623,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 1.92,
+    "observed_deviation_pct": 0.03,
     "observed_width_factor": 5.2155,
     "checks": {
      "sector_model_supported": true,
@@ -11826,13 +11826,13 @@
   {
    "symbol": "VNA.DE",
    "name": "Vonovia SE",
-   "price_local": 16.540000915527344,
+   "price_local": 16.469999313354492,
    "currency": "EUR",
    "gate": {
     "status": "withheld_sector_model",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 57.67,
+    "observed_deviation_pct": 58.34,
     "observed_width_factor": 2.0804,
     "checks": {
      "sector_model_supported": false,
@@ -11922,7 +11922,7 @@
   {
    "symbol": "RWE.DE",
    "name": "RWE Aktiengesellschaft",
-   "price_local": 57.560001373291016,
+   "price_local": 58.2599983215332,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
@@ -12011,13 +12011,13 @@
   {
    "symbol": "EOAN.DE",
    "name": "E.ON SE",
-   "price_local": 18.565000534057617,
+   "price_local": 18.78499984741211,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 49.6,
+    "observed_deviation_pct": 47.85,
     "observed_width_factor": 3.0356,
     "checks": {
      "sector_model_supported": true,
@@ -12100,7 +12100,7 @@
   {
    "symbol": "DHER.DE",
    "name": "Delivery Hero SE",
-   "price_local": 37.29999923706055,
+   "price_local": 37.5,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
@@ -12182,13 +12182,13 @@
   {
    "symbol": "ZAL.DE",
    "name": "Zalando SE",
-   "price_local": 26.559999465942383,
+   "price_local": 26.09000015258789,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 23.64,
+    "observed_deviation_pct": 25.87,
     "observed_width_factor": 2.1124,
     "checks": {
      "sector_model_supported": true,
@@ -12278,13 +12278,13 @@
   {
    "symbol": "PUM.DE",
    "name": "PUMA SE",
-   "price_local": 24.809999465942383,
+   "price_local": 25.1200008392334,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 12.13,
+    "observed_deviation_pct": 10.74,
     "observed_width_factor": 2.1399,
     "checks": {
      "sector_model_supported": true,
@@ -12360,14 +12360,14 @@
   {
    "symbol": "BOSS.DE",
    "name": "Hugo Boss AG",
-   "price_local": 38.68000030517578,
+   "price_local": 38.61000061035156,
    "currency": "EUR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 89.37,
-    "observed_width_factor": 1.024,
+    "observed_deviation_pct": 89.72,
+    "observed_width_factor": 1.0239,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -12377,8 +12377,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 73.2466,
-    "upper": 75.0051,
+    "lower": 73.2505,
+    "upper": 75.0011,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -12456,13 +12456,13 @@
   {
    "symbol": "LHA.DE",
    "name": "Deutsche Lufthansa AG",
-   "price_local": 7.150000095367432,
+   "price_local": 7.113999843597412,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 109.13,
+    "observed_deviation_pct": 110.19,
     "observed_width_factor": 5.2316,
     "checks": {
      "sector_model_supported": true,
@@ -12545,13 +12545,13 @@
   {
    "symbol": "FRE.DE",
    "name": "Fresenius SE & Co. KGaA",
-   "price_local": 46.255001068115234,
+   "price_local": 46.334999084472656,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 46.68,
+    "observed_deviation_pct": 46.43,
     "observed_width_factor": 1.0865,
     "checks": {
      "sector_model_supported": true,
@@ -12641,13 +12641,13 @@
   {
    "symbol": "FME.DE",
    "name": "Fresenius Medical Care AG",
-   "price_local": 40.56999969482422,
+   "price_local": 40.599998474121094,
    "currency": "EUR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 186.43,
+    "observed_deviation_pct": 186.21,
     "observed_width_factor": 1.4481,
     "checks": {
      "sector_model_supported": true,
@@ -12737,13 +12737,13 @@
   {
    "symbol": "DTG.DE",
    "name": "Daimler Truck Holding AG",
-   "price_local": 40.2400016784668,
+   "price_local": 40.61000061035156,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 26.58,
+    "observed_deviation_pct": 25.43,
     "observed_width_factor": 2.6365,
     "checks": {
      "sector_model_supported": true,
@@ -12833,13 +12833,13 @@
   {
    "symbol": "TKA.DE",
    "name": "thyssenkrupp AG",
-   "price_local": 13.285002708435059,
+   "price_local": 12.1899995803833,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 0.0,
+    "observed_deviation_pct": 2.95,
     "observed_width_factor": 9.5554,
     "checks": {
      "sector_model_supported": true,
@@ -12922,7 +12922,7 @@
   {
    "symbol": "NCH2.DE",
    "name": "thyssenkrupp nucera AG & Co. KGaA",
-   "price_local": 7.929999828338623,
+   "price_local": 7.764999866485596,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -12981,13 +12981,13 @@
   {
    "symbol": "VOW3.DE",
    "name": "Volkswagen AG",
-   "price_local": 68.80000305175781,
+   "price_local": 69.04000091552734,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 202.9,
+    "observed_deviation_pct": 201.85,
     "observed_width_factor": 4.9815,
     "checks": {
      "sector_model_supported": true,
@@ -13077,7 +13077,7 @@
   {
    "symbol": "PAH3.DE",
    "name": "Porsche Automobil Holding SE",
-   "price_local": 24.84000015258789,
+   "price_local": 25.15999984741211,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -13136,13 +13136,13 @@
   {
    "symbol": "P911.DE",
    "name": "Dr. Ing. h.c. F. Porsche AG",
-   "price_local": 42.900001525878906,
+   "price_local": 44.68000030517578,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 3.65,
+    "observed_deviation_pct": 0.0,
     "observed_width_factor": 1.9477,
     "checks": {
      "sector_model_supported": true,
@@ -13232,13 +13232,13 @@
   {
    "symbol": "KGX.DE",
    "name": "KION GROUP AG",
-   "price_local": 33.90999984741211,
+   "price_local": 33.599998474121094,
    "currency": "EUR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 330.0,
+    "observed_deviation_pct": 333.97,
     "observed_width_factor": 1.3384,
     "checks": {
      "sector_model_supported": true,
@@ -13328,14 +13328,14 @@
   {
    "symbol": "8TRA.DE",
    "name": "Traton SE",
-   "price_local": 32.65999984741211,
+   "price_local": 32.0,
    "currency": "EUR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 181.5,
-    "observed_width_factor": 1.0415,
+    "observed_deviation_pct": 187.31,
+    "observed_width_factor": 1.0414,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -13345,8 +13345,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 91.9376,
-    "upper": 95.7525,
+    "lower": 91.9399,
+    "upper": 95.7502,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -13424,13 +13424,13 @@
   {
    "symbol": "NEM.DE",
    "name": "Nemetschek SE",
-   "price_local": 74.05000305175781,
+   "price_local": 72.94999694824219,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 3.71,
+    "observed_deviation_pct": 2.17,
     "observed_width_factor": 1.1683,
     "checks": {
      "sector_model_supported": true,
@@ -13520,13 +13520,13 @@
   {
    "symbol": "TMV.DE",
    "name": "TeamViewer SE",
-   "price_local": 7.625,
+   "price_local": 7.510000228881836,
    "currency": "EUR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 242.89,
+    "observed_deviation_pct": 248.14,
     "observed_width_factor": 1.1324,
     "checks": {
      "sector_model_supported": true,
@@ -13616,13 +13616,13 @@
   {
    "symbol": "CEC.DE",
    "name": "Ceconomy AG",
-   "price_local": 4.400000095367432,
+   "price_local": 4.434999942779541,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 116.68,
+    "observed_deviation_pct": 114.97,
     "observed_width_factor": 6.4469,
     "checks": {
      "sector_model_supported": true,
@@ -13705,13 +13705,13 @@
   {
    "symbol": "PSM.DE",
    "name": "ProSiebenSat.1 Media SE",
-   "price_local": 3.186000108718872,
+   "price_local": 3.1500000953674316,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 275.58,
+    "observed_deviation_pct": 279.87,
     "observed_width_factor": 2.5537,
     "checks": {
      "sector_model_supported": true,
@@ -13787,13 +13787,13 @@
   {
    "symbol": "RRTL.DE",
    "name": "RTL Group S.A.",
-   "price_local": 31.200000762939453,
+   "price_local": 30.899999618530273,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 5.94,
+    "observed_deviation_pct": 6.97,
     "observed_width_factor": 1.7463,
     "checks": {
      "sector_model_supported": true,
@@ -13883,7 +13883,7 @@
   {
    "symbol": "HOT.DE",
    "name": "HOCHTIEF Aktiengesellschaft",
-   "price_local": 381.20001220703125,
+   "price_local": 378.6000061035156,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
@@ -13979,13 +13979,13 @@
   {
    "symbol": "GBF.DE",
    "name": "Bilfinger SE",
-   "price_local": 56.29999923706055,
+   "price_local": 57.04999923706055,
    "currency": "EUR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 138.09,
+    "observed_deviation_pct": 134.96,
     "observed_width_factor": 1.0921,
     "checks": {
      "sector_model_supported": true,
@@ -14075,13 +14075,13 @@
   {
    "symbol": "SZU.DE",
    "name": "Südzucker AG",
-   "price_local": 11.079999923706055,
+   "price_local": 11.15999984741211,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 38.05,
+    "observed_deviation_pct": 37.06,
     "observed_width_factor": 3.9259,
     "checks": {
      "sector_model_supported": true,
@@ -14164,13 +14164,13 @@
   {
    "symbol": "AG1.DE",
    "name": "AUTO1 Group SE",
-   "price_local": 17.579999923706055,
+   "price_local": 17.600000381469727,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 138.03,
+    "observed_deviation_pct": 138.3,
     "observed_width_factor": 1.9875,
     "checks": {
      "sector_model_supported": true,
@@ -14260,13 +14260,13 @@
   {
    "symbol": "WEW.DE",
    "name": "Westwing Group SE",
-   "price_local": 13.0,
+   "price_local": 12.899999618530273,
    "currency": "EUR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 90.4,
+    "observed_deviation_pct": 91.88,
     "observed_width_factor": 1.2778,
     "checks": {
      "sector_model_supported": true,
@@ -14356,7 +14356,7 @@
   {
    "symbol": "RDC.DE",
    "name": "Redcare Pharmacy NV",
-   "price_local": 77.94999694824219,
+   "price_local": 79.25,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
@@ -14438,13 +14438,13 @@
   {
    "symbol": "MRX.DE",
    "name": "Mister Spex SE",
-   "price_local": 1.0399999618530273,
+   "price_local": 1.0149999856948853,
    "currency": "EUR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 410.28,
+    "observed_deviation_pct": 422.85,
     "observed_width_factor": 1.1946,
     "checks": {
      "sector_model_supported": true,
@@ -14520,13 +14520,13 @@
   {
    "symbol": "JEN.DE",
    "name": "Jenoptik AG",
-   "price_local": 39.880001068115234,
+   "price_local": 40.84000015258789,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 26.92,
+    "observed_deviation_pct": 23.94,
     "observed_width_factor": 1.2782,
     "checks": {
      "sector_model_supported": true,
@@ -14616,7 +14616,7 @@
   {
    "symbol": "AFX.DE",
    "name": "Carl Zeiss Meditec AG",
-   "price_local": 35.279998779296875,
+   "price_local": 34.720001220703125,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
@@ -14705,13 +14705,13 @@
   {
    "symbol": "NDX1.DE",
    "name": "Nordex SE",
-   "price_local": 37.599998474121094,
+   "price_local": 38.29999923706055,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 19.92,
+    "observed_deviation_pct": 17.72,
     "observed_width_factor": 1.2803,
     "checks": {
      "sector_model_supported": true,
@@ -14890,13 +14890,13 @@
   {
    "symbol": "S92.DE",
    "name": "SMA Solar Technology AG",
-   "price_local": 49.68000030517578,
+   "price_local": 49.5,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 123.84,
+    "observed_deviation_pct": 124.66,
     "observed_width_factor": 2.0691,
     "checks": {
      "sector_model_supported": true,
@@ -14972,13 +14972,13 @@
   {
    "symbol": "PNE3.DE",
    "name": "PNE AG",
-   "price_local": 5.489999771118164,
+   "price_local": 5.590000152587891,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 0.64,
+    "observed_deviation_pct": 0.0,
     "observed_width_factor": 2.3534,
     "checks": {
      "sector_model_supported": true,
@@ -15061,14 +15061,14 @@
   {
    "symbol": "VH2.DE",
    "name": "Friedrich Vorwerk Group SE",
-   "price_local": 73.69999694824219,
+   "price_local": 72.0,
    "currency": "EUR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 80.24,
-    "observed_width_factor": 1.0639,
+    "observed_deviation_pct": 84.5,
+    "observed_width_factor": 1.064,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -15078,8 +15078,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 132.8388,
-    "upper": 141.332,
+    "lower": 132.837,
+    "upper": 141.3338,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -15157,7 +15157,7 @@
   {
    "symbol": "EKT.DE",
    "name": "Energiekontor AG",
-   "price_local": 23.200000762939453,
+   "price_local": 22.75,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
@@ -15246,14 +15246,14 @@
   {
    "symbol": "HYQ.DE",
    "name": "Hypoport SE",
-   "price_local": 81.30000305175781,
+   "price_local": 79.19999694824219,
    "currency": "EUR",
    "gate": {
     "status": "withheld_sector_model",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 34.68,
-    "observed_width_factor": 1.1443,
+    "observed_deviation_pct": 31.09,
+    "observed_width_factor": 1.1464,
     "checks": {
      "sector_model_supported": false,
      "basis_broad": false,
@@ -15263,8 +15263,8 @@
     "reason": "Bewertung sektorbedingt nicht möglich: Für dieses Finanzgeschäft ist noch kein fachlich passendes Bewertungsmodell zugeordnet. Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 52.7512,
-    "upper": 60.3643,
+    "lower": 52.699,
+    "upper": 60.4165,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -15342,13 +15342,13 @@
   {
    "symbol": "SIX2.DE",
    "name": "Sixt SE",
-   "price_local": 73.05000305175781,
+   "price_local": 74.05000305175781,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 178.51,
+    "observed_deviation_pct": 174.75,
     "observed_width_factor": 1.6588,
     "checks": {
      "sector_model_supported": true,
@@ -15438,7 +15438,7 @@
   {
    "symbol": "TEG.DE",
    "name": "TAG Immobilien AG",
-   "price_local": 11.210000038146973,
+   "price_local": 11.140000343322754,
    "currency": "EUR",
    "gate": {
     "status": "withheld_sector_model",
@@ -15534,13 +15534,13 @@
   {
    "symbol": "NDA.DE",
    "name": "Aurubis AG",
-   "price_local": 136.89999389648438,
+   "price_local": 136.0,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 278.28,
+    "observed_deviation_pct": 280.79,
     "observed_width_factor": 2.2423,
     "checks": {
      "sector_model_supported": true,
@@ -15623,13 +15623,13 @@
   {
    "symbol": "BVB.DE",
    "name": "Borussia Dortmund GmbH & Co. Kommanditgesellschaft auf Aktien",
-   "price_local": 3.0950000286102295,
+   "price_local": 3.055000066757202,
    "currency": "EUR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 202.77,
+    "observed_deviation_pct": 206.73,
     "observed_width_factor": 1.0214,
     "checks": {
      "sector_model_supported": true,
@@ -15640,8 +15640,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 9.3707,
-    "upper": 9.5709,
+    "lower": 9.3705,
+    "upper": 9.5712,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -15705,13 +15705,13 @@
   {
    "symbol": "TUI1.DE",
    "name": "TUI AG",
-   "price_local": 6.811999797821045,
+   "price_local": 6.802000045776367,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 222.34,
+    "observed_deviation_pct": 222.81,
     "observed_width_factor": 2.6767,
     "checks": {
      "sector_model_supported": true,
@@ -15794,13 +15794,13 @@
   {
    "symbol": "BFSA.DE",
    "name": "Befesa S.A.",
-   "price_local": 33.25,
+   "price_local": 34.849998474121094,
    "currency": "EUR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 101.35,
+    "observed_deviation_pct": 92.11,
     "observed_width_factor": 1.1449,
     "checks": {
      "sector_model_supported": true,
@@ -15890,7 +15890,7 @@
   {
    "symbol": "LPK.DE",
    "name": "LPKF Laser & Electronics SE",
-   "price_local": 11.699999809265137,
+   "price_local": 11.649999618530273,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
@@ -15972,14 +15972,14 @@
   {
    "symbol": "ELG.DE",
    "name": "Elmos Semiconductor SE",
-   "price_local": 127.80000305175781,
+   "price_local": 128.60000610351562,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 49.71,
-    "observed_width_factor": 1.0701,
+    "observed_deviation_pct": 48.93,
+    "observed_width_factor": 1.0679,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -15989,8 +15989,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 191.3233,
-    "upper": 204.736,
+    "lower": 191.5241,
+    "upper": 204.5352,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -16068,13 +16068,13 @@
   {
    "symbol": "TNIE.DE",
    "name": "tonies SE",
-   "price_local": 13.819999694824219,
+   "price_local": 13.4399995803833,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 83.93,
+    "observed_deviation_pct": 78.87,
     "observed_width_factor": 1.8662,
     "checks": {
      "sector_model_supported": true,
@@ -16246,7 +16246,7 @@
   {
    "symbol": "HLAG.DE",
    "name": "Hapag-Lloyd Aktiengesellschaft",
-   "price_local": 132.8000030517578,
+   "price_local": 134.5,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
@@ -16342,13 +16342,13 @@
   {
    "symbol": "KRN.DE",
    "name": "Krones AG",
-   "price_local": 112.80000305175781,
+   "price_local": 113.80000305175781,
    "currency": "EUR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 118.73,
+    "observed_deviation_pct": 116.81,
     "observed_width_factor": 1.0975,
     "checks": {
      "sector_model_supported": true,
@@ -16438,7 +16438,7 @@
   {
    "symbol": "F3C.DE",
    "name": "SFC Energy AG",
-   "price_local": 17.899999618530273,
+   "price_local": 18.020000457763672,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
@@ -16630,7 +16630,7 @@
   {
    "symbol": "HPUR.OL",
    "name": "Hexagon Purus ASA",
-   "price_local": 4.5,
+   "price_local": 4.519999980926514,
    "currency": "NOK",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -16689,7 +16689,7 @@
   {
    "symbol": "AIR.PA",
    "name": "Airbus SE",
-   "price_local": 192.74000549316406,
+   "price_local": 191.9199981689453,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -16785,7 +16785,7 @@
   {
    "symbol": "MC.PA",
    "name": "LVMH Moët Hennessy - Louis Vuitton, Société Européenne",
-   "price_local": 388.25,
+   "price_local": 385.0,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -16881,7 +16881,7 @@
   {
    "symbol": "HO.PA",
    "name": "Thales S.A.",
-   "price_local": 234.1999969482422,
+   "price_local": 233.89999389648438,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -16977,14 +16977,14 @@
   {
    "symbol": "EL.PA",
    "name": "EssilorLuxottica Société anonyme",
-   "price_local": 181.8000030517578,
+   "price_local": 177.6999969482422,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 7.71,
-    "observed_width_factor": 1.0878,
+    "observed_deviation_pct": 5.34,
+    "observed_width_factor": 1.0867,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -16994,8 +16994,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 155.15,
-    "upper": 168.7791,
+    "lower": 155.2345,
+    "upper": 168.6946,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -17073,7 +17073,7 @@
   {
    "symbol": "KER.PA",
    "name": "Kering SA",
-   "price_local": 179.5,
+   "price_local": 176.60000610351562,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
@@ -17162,13 +17162,13 @@
   {
    "symbol": "RMS.PA",
    "name": "Hermès International Société en commandite par actions",
-   "price_local": 1268.5,
+   "price_local": 1259.5,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 47.78,
+    "observed_deviation_pct": 46.74,
     "observed_width_factor": 1.2056,
     "checks": {
      "sector_model_supported": true,
@@ -17258,13 +17258,13 @@
   {
    "symbol": "TTE.PA",
    "name": "TotalEnergies SE",
-   "price_local": 83.0,
+   "price_local": 83.5999984741211,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 36.17,
+    "observed_deviation_pct": 35.2,
     "observed_width_factor": 1.2402,
     "checks": {
      "sector_model_supported": true,
@@ -17354,13 +17354,13 @@
   {
    "symbol": "SU.PA",
    "name": "Schneider Electric S.E.",
-   "price_local": 242.6999969482422,
+   "price_local": 246.1999969482422,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 12.07,
+    "observed_deviation_pct": 13.69,
     "observed_width_factor": 1.1155,
     "checks": {
      "sector_model_supported": true,
@@ -17450,13 +17450,13 @@
   {
    "symbol": "DG.PA",
    "name": "Vinci SA",
-   "price_local": 108.6500015258789,
+   "price_local": 108.30000305175781,
    "currency": "EUR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 182.28,
+    "observed_deviation_pct": 183.19,
     "observed_width_factor": 1.03,
     "checks": {
      "sector_model_supported": true,
@@ -17467,8 +17467,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 306.6938,
-    "upper": 315.8908,
+    "lower": 306.6942,
+    "upper": 315.8904,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -17546,13 +17546,13 @@
   {
    "symbol": "UBI.PA",
    "name": "Ubisoft Entertainment SA",
-   "price_local": 4.329999923706055,
+   "price_local": 4.361000061035156,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 368.16,
+    "observed_deviation_pct": 364.83,
     "observed_width_factor": 1.9459,
     "checks": {
      "sector_model_supported": true,
@@ -17635,14 +17635,14 @@
   {
    "symbol": "PARRO.PA",
    "name": "Parrot S.A.",
-   "price_local": 7.829999923706055,
+   "price_local": 7.800000190734863,
    "currency": "EUR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 167.73,
-    "observed_width_factor": 1.3006,
+    "observed_deviation_pct": 165.1,
+    "observed_width_factor": 1.3188,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -17652,8 +17652,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 2.2487,
-    "upper": 2.9245,
+    "lower": 2.231,
+    "upper": 2.9422,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -17731,14 +17731,14 @@
   {
    "symbol": "ASML.AS",
    "name": "ASML Holding N.V.",
-   "price_local": 1470.0,
+   "price_local": 1489.5999755859375,
    "currency": "EUR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 66.37,
-    "observed_width_factor": 1.152,
+    "observed_deviation_pct": 68.83,
+    "observed_width_factor": 1.1484,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -17748,8 +17748,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 767.0035,
-    "upper": 883.5649,
+    "lower": 768.2866,
+    "upper": 882.2818,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -17827,21 +17827,21 @@
   {
    "symbol": "ASM.AS",
    "name": "ASM International NV",
-   "price_local": 743.2000122070312,
+   "price_local": 773.5999755859375,
    "currency": "EUR",
    "gate": {
-    "status": "withheld_narrow_basis",
+    "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 47.6,
+    "observed_deviation_pct": 53.64,
     "observed_width_factor": 1.389,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
      "width_within_limit": true,
-     "deviation_within_limit": true
+     "deviation_within_limit": false
     },
-    "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
+    "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
     "lower": 362.503,
@@ -17923,7 +17923,7 @@
   {
    "symbol": "ADYEN.AS",
    "name": "Adyen N.V.",
-   "price_local": 944.0,
+   "price_local": 818.0,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
@@ -18012,7 +18012,7 @@
   {
    "symbol": "INGA.AS",
    "name": "ING Groep N.V.",
-   "price_local": 29.25,
+   "price_local": 29.44499969482422,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
@@ -18089,13 +18089,13 @@
   {
    "symbol": "PHIA.AS",
    "name": "Koninklijke Philips N.V.",
-   "price_local": 23.780000686645508,
+   "price_local": 24.239999771118164,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 32.64,
+    "observed_deviation_pct": 30.13,
     "observed_width_factor": 1.1071,
     "checks": {
      "sector_model_supported": true,
@@ -18185,14 +18185,14 @@
   {
    "symbol": "HEIA.AS",
    "name": "Heineken N.V.",
-   "price_local": 76.77999877929688,
+   "price_local": 78.0,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 7.52,
-    "observed_width_factor": 1.0336,
+    "observed_deviation_pct": 5.77,
+    "observed_width_factor": 1.035,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -18202,8 +18202,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 82.555,
-    "upper": 85.3291,
+    "lower": 82.4993,
+    "upper": 85.3848,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -18281,13 +18281,13 @@
   {
    "symbol": "UMG.AS",
    "name": "Universal Music Group N.V.",
-   "price_local": 16.450000762939453,
+   "price_local": 15.739999771118164,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 14.29,
+    "observed_deviation_pct": 9.36,
     "observed_width_factor": 1.2001,
     "checks": {
      "sector_model_supported": true,
@@ -18377,7 +18377,7 @@
   {
    "symbol": "MT.AS",
    "name": "ArcelorMittal S.A.",
-   "price_local": 54.540000915527344,
+   "price_local": 53.5,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
@@ -18466,13 +18466,13 @@
   {
    "symbol": "ITX.MC",
    "name": "Industria de Diseño Textil, S.A.",
-   "price_local": 57.0,
+   "price_local": 56.20500183105469,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 44.8,
+    "observed_deviation_pct": 42.78,
     "observed_width_factor": 1.2457,
     "checks": {
      "sector_model_supported": true,
@@ -18562,13 +18562,13 @@
   {
    "symbol": "RACE.MI",
    "name": "Ferrari N.V.",
-   "price_local": 349.3999938964844,
+   "price_local": 352.1499938964844,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 117.18,
+    "observed_deviation_pct": 118.89,
     "observed_width_factor": 1.8553,
     "checks": {
      "sector_model_supported": true,
@@ -18658,7 +18658,7 @@
   {
    "symbol": "UCG.MI",
    "name": "UniCredit S.p.A.",
-   "price_local": 74.33999633789062,
+   "price_local": 74.55999755859375,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
@@ -18735,7 +18735,7 @@
   {
    "symbol": "PRY.MI",
    "name": "Prysmian S.p.A.",
-   "price_local": 106.30000305175781,
+   "price_local": 107.75,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -18831,14 +18831,14 @@
   {
    "symbol": "MONC.MI",
    "name": "Moncler S.p.A.",
-   "price_local": 42.119998931884766,
+   "price_local": 42.470001220703125,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 3.77,
-    "observed_width_factor": 1.0682,
+    "observed_deviation_pct": 4.73,
+    "observed_width_factor": 1.0662,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -18848,8 +18848,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 37.9973,
-    "upper": 40.588,
+    "lower": 38.0343,
+    "upper": 40.5509,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -18927,13 +18927,13 @@
   {
    "symbol": "PIRC.MI",
    "name": "Pirelli & C. S.p.A.",
-   "price_local": 6.644999980926514,
+   "price_local": 6.625,
    "currency": "EUR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 50.2,
+    "observed_deviation_pct": 50.65,
     "observed_width_factor": 1.3414,
     "checks": {
      "sector_model_supported": true,
@@ -19023,13 +19023,13 @@
   {
    "symbol": "AVIO.MI",
    "name": "Avio S.p.A.",
-   "price_local": 32.060001373291016,
+   "price_local": 32.310001373291016,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 14.57,
+    "observed_deviation_pct": 15.46,
     "observed_width_factor": 1.5369,
     "checks": {
      "sector_model_supported": true,
@@ -19119,13 +19119,13 @@
   {
    "symbol": "OMV.VI",
    "name": "OMV Aktiengesellschaft",
-   "price_local": 71.8499984741211,
+   "price_local": 72.75,
    "currency": "EUR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 98.44,
+    "observed_deviation_pct": 95.99,
     "observed_width_factor": 1.386,
     "checks": {
      "sector_model_supported": true,
@@ -19215,13 +19215,13 @@
   {
    "symbol": "POS.VI",
    "name": "PORR AG",
-   "price_local": 32.099998474121094,
+   "price_local": 31.649999618530273,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 119.16,
+    "observed_deviation_pct": 122.28,
     "observed_width_factor": 5.1879,
     "checks": {
      "sector_model_supported": true,
@@ -19304,13 +19304,13 @@
   {
    "symbol": "STR.VI",
    "name": "Strabag SE",
-   "price_local": 101.5999984741211,
+   "price_local": 100.5999984741211,
    "currency": "EUR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 122.39,
+    "observed_deviation_pct": 124.6,
     "observed_width_factor": 1.0551,
     "checks": {
      "sector_model_supported": true,
@@ -19400,7 +19400,7 @@
   {
    "symbol": "RBI.VI",
    "name": "Raiffeisen Bank International AG",
-   "price_local": 56.45000076293945,
+   "price_local": 56.95000076293945,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
@@ -19477,13 +19477,13 @@
   {
    "symbol": "WIE.VI",
    "name": "Wienerberger AG",
-   "price_local": 16.43000030517578,
+   "price_local": 16.18000030517578,
    "currency": "EUR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 52.0,
+    "observed_deviation_pct": 54.35,
     "observed_width_factor": 1.3515,
     "checks": {
      "sector_model_supported": true,
@@ -19573,13 +19573,13 @@
   {
    "symbol": "ABBN.SW",
    "name": "ABB Ltd",
-   "price_local": 71.5,
+   "price_local": 72.87999725341797,
    "currency": "CHF",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 21.71,
+    "observed_deviation_pct": 24.06,
     "observed_width_factor": 1.2551,
     "checks": {
      "sector_model_supported": true,
@@ -19669,13 +19669,13 @@
   {
    "symbol": "AZN.L",
    "name": "AstraZeneca PLC",
-   "price_local": 12822.0,
+   "price_local": 12764.0,
    "currency": "GBp",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 8773.98,
+    "observed_deviation_pct": 8733.83,
     "observed_width_factor": 1.1241,
     "checks": {
      "sector_model_supported": true,
@@ -19765,13 +19765,13 @@
   {
    "symbol": "SHEL.L",
    "name": "Shell plc",
-   "price_local": 3927.5,
+   "price_local": 3956.5,
    "currency": "GBp",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 4829.6,
+    "observed_deviation_pct": 4866.0,
     "observed_width_factor": 1.4286,
     "checks": {
      "sector_model_supported": true,
@@ -19861,13 +19861,13 @@
   {
    "symbol": "BP.L",
    "name": "BP p.l.c.",
-   "price_local": 612.7000122070312,
+   "price_local": 619.9000244140625,
    "currency": "GBp",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 3046.59,
+    "observed_deviation_pct": 3083.57,
     "observed_width_factor": 1.6883,
     "checks": {
      "sector_model_supported": true,
@@ -19957,14 +19957,14 @@
   {
    "symbol": "ULVR.L",
    "name": "Unilever PLC",
-   "price_local": 4892.5,
+   "price_local": 4792.0,
    "currency": "GBp",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 9968.31,
-    "observed_width_factor": 1.0528,
+    "observed_deviation_pct": 9740.77,
+    "observed_width_factor": 1.0573,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -19974,8 +19974,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 46.1565,
-    "upper": 48.5931,
+    "lower": 46.0542,
+    "upper": 48.6954,
     "currency": "GBp",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -20053,14 +20053,14 @@
   {
    "symbol": "RR.L",
    "name": "Rolls-Royce Holdings plc",
-   "price_local": 1242.4000244140625,
+   "price_local": 1263.0,
    "currency": "GBp",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 12170.2,
-    "observed_width_factor": 1.1612,
+    "observed_deviation_pct": 12391.58,
+    "observed_width_factor": 1.1576,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -20070,8 +20070,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 8.7194,
-    "upper": 10.1253,
+    "lower": 8.7339,
+    "upper": 10.1108,
     "currency": "GBp",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -20149,13 +20149,13 @@
   {
    "symbol": "REL.L",
    "name": "RELX PLC",
-   "price_local": 2939.0,
+   "price_local": 2891.0,
    "currency": "GBp",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 9541.29,
+    "observed_deviation_pct": 9383.83,
     "observed_width_factor": 1.2679,
     "checks": {
      "sector_model_supported": true,
@@ -20245,13 +20245,13 @@
   {
    "symbol": "BATS.L",
    "name": "British American Tobacco p.l.c.",
-   "price_local": 4506.0,
+   "price_local": 4509.0,
    "currency": "GBp",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 9720.02,
+    "observed_deviation_pct": 9726.56,
     "observed_width_factor": 1.8321,
     "checks": {
      "sector_model_supported": true,
@@ -20341,13 +20341,13 @@
   {
    "symbol": "BRBY.L",
    "name": "Burberry Group plc",
-   "price_local": 1045.5,
+   "price_local": 1037.5,
    "currency": "GBp",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 12243.14,
+    "observed_deviation_pct": 12148.69,
     "observed_width_factor": 1.2414,
     "checks": {
      "sector_model_supported": true,
@@ -20437,14 +20437,14 @@
   {
    "symbol": "KLR.L",
    "name": "Keller Group plc",
-   "price_local": 3158.0,
+   "price_local": 3162.0,
    "currency": "GBp",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 4476.99,
-    "observed_width_factor": 1.0488,
+    "observed_deviation_pct": 4478.51,
+    "observed_width_factor": 1.0508,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -20454,8 +20454,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 65.7894,
-    "upper": 68.9973,
+    "lower": 65.7249,
+    "upper": 69.0618,
     "currency": "GBp",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -20533,13 +20533,13 @@
   {
    "symbol": "EZJ.L",
    "name": "easyJet plc",
-   "price_local": 680.0,
+   "price_local": 679.5999755859375,
    "currency": "GBp",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 2010.74,
+    "observed_deviation_pct": 2009.5,
     "observed_width_factor": 2.2343,
     "checks": {
      "sector_model_supported": true,
@@ -20622,13 +20622,13 @@
   {
    "symbol": "AML.L",
    "name": "Aston Martin Lagonda Global Holdings plc",
-   "price_local": 38.02000045776367,
+   "price_local": 38.220001220703125,
    "currency": "GBp",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 2049.33,
+    "observed_deviation_pct": 2060.64,
     "observed_width_factor": 4.7928,
     "checks": {
      "sector_model_supported": true,
@@ -20800,13 +20800,13 @@
   {
    "symbol": "KAP.L",
    "name": "National Atomic Company Kazatomprom JSC",
-   "price_local": 62.900001525878906,
+   "price_local": 65.80000305175781,
    "currency": "GBp",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 1.78,
+    "observed_deviation_pct": 0.0,
     "observed_width_factor": 261.4872,
     "checks": {
      "sector_model_supported": true,
@@ -20882,13 +20882,13 @@
   {
    "symbol": "ORSTED.CO",
    "name": "Ørsted A/S",
-   "price_local": 132.4499969482422,
+   "price_local": 131.10000610351562,
    "currency": "DKK",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 40.11,
+    "observed_deviation_pct": 41.55,
     "observed_width_factor": 1.2367,
     "checks": {
      "sector_model_supported": true,
@@ -20964,13 +20964,13 @@
   {
    "symbol": "VWS.CO",
    "name": "Vestas Wind Systems A/S",
-   "price_local": 187.6999969482422,
+   "price_local": 192.64999389648438,
    "currency": "DKK",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 293.11,
+    "observed_deviation_pct": 303.47,
     "observed_width_factor": 1.4494,
     "checks": {
      "sector_model_supported": true,
@@ -21060,7 +21060,7 @@
   {
    "symbol": "NESTE.HE",
    "name": "Neste Oyj",
-   "price_local": 30.0,
+   "price_local": 29.299999237060547,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -21156,7 +21156,7 @@
   {
    "symbol": "NEL.OL",
    "name": "Nel ASA",
-   "price_local": 1.9700000286102295,
+   "price_local": 1.965999960899353,
    "currency": "NOK",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -21215,13 +21215,13 @@
   {
    "symbol": "SALM.OL",
    "name": "SalMar ASA",
-   "price_local": 588.5,
+   "price_local": 579.5,
    "currency": "NOK",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 61.91,
+    "observed_deviation_pct": 59.43,
     "observed_width_factor": 1.1154,
     "checks": {
      "sector_model_supported": true,
@@ -21311,13 +21311,13 @@
   {
    "symbol": "AUSS.OL",
    "name": "Austevoll Seafood ASA",
-   "price_local": 82.4000015258789,
+   "price_local": 82.0999984741211,
    "currency": "NOK",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 97.5,
+    "observed_deviation_pct": 98.23,
     "observed_width_factor": 1.1635,
     "checks": {
      "sector_model_supported": true,
@@ -21407,13 +21407,13 @@
   {
    "symbol": "INVE-B.ST",
    "name": "Investor AB (publ)",
-   "price_local": 423.54998779296875,
+   "price_local": 427.20001220703125,
    "currency": "SEK",
    "gate": {
     "status": "withheld_sector_model",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 113.93,
+    "observed_deviation_pct": 112.1,
     "observed_width_factor": 1.0216,
     "checks": {
      "sector_model_supported": false,
@@ -21424,8 +21424,8 @@
     "reason": "Bewertung sektorbedingt nicht möglich: Für dieses Finanzgeschäft ist noch kein fachlich passendes Bewertungsmodell zugeordnet. Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 906.0925,
-    "upper": 925.6417,
+    "lower": 906.0899,
+    "upper": 925.6442,
     "currency": "SEK",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -21695,13 +21695,13 @@
   {
    "symbol": "7203.T",
    "name": "Toyota Motor Corporation",
-   "price_local": 3077.0,
+   "price_local": 3051.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 2.83,
+    "observed_deviation_pct": 3.71,
     "observed_width_factor": 2.2167,
     "checks": {
      "sector_model_supported": true,
@@ -21784,13 +21784,13 @@
   {
    "symbol": "6301.T",
    "name": "Komatsu Ltd.",
-   "price_local": 6300.0,
+   "price_local": 6815.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 74.83,
+    "observed_deviation_pct": 61.62,
     "observed_width_factor": 1.0536,
     "checks": {
      "sector_model_supported": true,
@@ -21873,13 +21873,13 @@
   {
    "symbol": "6326.T",
    "name": "Kubota Corporation",
-   "price_local": 2618.5,
+   "price_local": 2629.5,
    "currency": "JPY",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 69.64,
+    "observed_deviation_pct": 68.93,
     "observed_width_factor": 1.488,
     "checks": {
      "sector_model_supported": true,
@@ -21962,7 +21962,7 @@
   {
    "symbol": "6506.T",
    "name": "YASKAWA Electric Corporation",
-   "price_local": 4159.0,
+   "price_local": 4186.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -22051,13 +22051,13 @@
   {
    "symbol": "6586.T",
    "name": "Makita Corporation",
-   "price_local": 5253.0,
+   "price_local": 5276.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 34.82,
+    "observed_deviation_pct": 34.23,
     "observed_width_factor": 1.1757,
     "checks": {
      "sector_model_supported": true,
@@ -22147,13 +22147,13 @@
   {
    "symbol": "6724.T",
    "name": "Seiko Epson Corporation",
-   "price_local": 3379.0,
+   "price_local": 3431.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 11.08,
+    "observed_deviation_pct": 9.4,
     "observed_width_factor": 2.523,
     "checks": {
      "sector_model_supported": true,
@@ -22243,7 +22243,7 @@
   {
    "symbol": "6869.T",
    "name": "Sysmex Corporation",
-   "price_local": 1929.0,
+   "price_local": 1935.5,
    "currency": "JPY",
    "gate": {
     "status": "withheld_wide_range",
@@ -22339,13 +22339,13 @@
   {
    "symbol": "7309.T",
    "name": "Shimano Inc.",
-   "price_local": 19815.0,
+   "price_local": 19660.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 49.96,
+    "observed_deviation_pct": 48.78,
     "observed_width_factor": 1.8625,
     "checks": {
      "sector_model_supported": true,
@@ -22435,13 +22435,13 @@
   {
    "symbol": "8113.T",
    "name": "Unicharm Corporation",
-   "price_local": 989.2999877929688,
+   "price_local": 996.7999877929688,
    "currency": "JPY",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 16.96,
+    "observed_deviation_pct": 17.85,
     "observed_width_factor": 1.0355,
     "checks": {
      "sector_model_supported": true,
@@ -22452,8 +22452,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 816.8549,
-    "upper": 845.8291,
+    "lower": 816.8605,
+    "upper": 845.8234,
     "currency": "JPY",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -22531,13 +22531,13 @@
   {
    "symbol": "2897.T",
    "name": "Nissin Foods Holdings Co.,Ltd.",
-   "price_local": 2951.5,
+   "price_local": 2935.5,
    "currency": "JPY",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 10.26,
+    "observed_deviation_pct": 10.86,
     "observed_width_factor": 1.268,
     "checks": {
      "sector_model_supported": true,
@@ -23442,7 +23442,7 @@
   {
    "symbol": "000660.KS",
    "name": "SK hynix Inc.",
-   "price_local": 1526000.0,
+   "price_local": 1487000.0,
    "currency": "KRW",
    "gate": {
     "status": "withheld_wide_range",
@@ -23716,13 +23716,13 @@
   {
    "symbol": "TBS.JO",
    "name": "Tiger Brands Limited",
-   "price_local": 27268.0,
+   "price_local": 26570.0,
    "currency": "ZAc",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 6887.8,
+    "observed_deviation_pct": 6708.92,
     "observed_width_factor": 1.1207,
     "checks": {
      "sector_model_supported": true,
@@ -25892,13 +25892,13 @@
   {
    "symbol": "BMW.DE",
    "name": "Bayerische Motoren Werke Aktiengesellschaft",
-   "price_local": 56.720001220703125,
+   "price_local": 57.380001068115234,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 94.41,
+    "observed_deviation_pct": 92.17,
     "observed_width_factor": 1.8809,
     "checks": {
      "sector_model_supported": true,
@@ -25988,7 +25988,7 @@
   {
    "symbol": "DBK.DE",
    "name": "Deutsche Bank Aktiengesellschaft",
-   "price_local": 28.875,
+   "price_local": 30.020000457763672,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
@@ -26065,13 +26065,13 @@
   {
    "symbol": "DHL.DE",
    "name": "DHL AG",
-   "price_local": 58.81999969482422,
+   "price_local": 58.0,
    "currency": "EUR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 59.38,
+    "observed_deviation_pct": 61.64,
     "observed_width_factor": 1.2256,
     "checks": {
      "sector_model_supported": true,
@@ -26161,13 +26161,13 @@
   {
    "symbol": "VIE.PA",
    "name": "Veolia Environnement SA",
-   "price_local": 32.619998931884766,
+   "price_local": 32.7400016784668,
    "currency": "EUR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 116.04,
+    "observed_deviation_pct": 115.25,
     "observed_width_factor": 1.2255,
     "checks": {
      "sector_model_supported": true,
@@ -26573,13 +26573,13 @@
   {
    "symbol": "OR.PA",
    "name": "L'Oréal S.A.",
-   "price_local": 430.1000061035156,
+   "price_local": 423.6499938964844,
    "currency": "EUR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 110.93,
+    "observed_deviation_pct": 107.77,
     "observed_width_factor": 1.1109,
     "checks": {
      "sector_model_supported": true,
@@ -26669,14 +26669,14 @@
   {
    "symbol": "SY1.DE",
    "name": "Symrise AG",
-   "price_local": 100.05000305175781,
+   "price_local": 89.80000305175781,
    "currency": "EUR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 146.14,
-    "observed_width_factor": 1.1084,
+    "observed_deviation_pct": 116.47,
+    "observed_width_factor": 1.1576,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -26686,8 +26686,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 36.6728,
-    "upper": 40.6471,
+    "lower": 35.8355,
+    "upper": 41.4844,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -26765,13 +26765,13 @@
   {
    "symbol": "KBX.DE",
    "name": "Knorr-Bremse AG",
-   "price_local": 97.5,
+   "price_local": 96.30000305175781,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 34.19,
+    "observed_deviation_pct": 32.54,
     "observed_width_factor": 1.1602,
     "checks": {
      "sector_model_supported": true,
@@ -27253,14 +27253,14 @@
   {
    "symbol": "NESN.SW",
    "name": "Nestlé S.A.",
-   "price_local": 83.25,
+   "price_local": 82.80999755859375,
    "currency": "CHF",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 56.02,
-    "observed_width_factor": 1.0612,
+    "observed_deviation_pct": 55.28,
+    "observed_width_factor": 1.0601,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -27270,8 +27270,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 50.2781,
-    "upper": 53.3571,
+    "lower": 50.3055,
+    "upper": 53.3297,
     "currency": "CHF",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -27864,13 +27864,13 @@
   {
    "symbol": "SWED-A.ST",
    "name": "Swedbank AB (publ)",
-   "price_local": 387.70001220703125,
+   "price_local": 391.29998779296875,
    "currency": "SEK",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 13.1,
+    "observed_deviation_pct": 14.15,
     "observed_width_factor": 2.0506,
     "checks": {
      "sector_model_supported": true,
@@ -27941,7 +27941,7 @@
   {
    "symbol": "SMT.L",
    "name": "Scottish Mortgage Ord",
-   "price_local": 1550.0,
+   "price_local": 1545.0,
    "currency": "GBp",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -28110,13 +28110,13 @@
   {
    "symbol": "HDD.DE",
    "name": "Heidelberger Druckmaschinen Aktiengesellschaft",
-   "price_local": 1.3170000314712524,
+   "price_local": 1.3420000076293945,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 195.97,
+    "observed_deviation_pct": 190.46,
     "observed_width_factor": 4.3028,
     "checks": {
      "sector_model_supported": true,
@@ -28309,13 +28309,13 @@
   {
    "symbol": "ITM.MI",
    "name": "Italmobiliare S.p.A.",
-   "price_local": 24.700000762939453,
+   "price_local": 24.850000381469727,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 13.87,
+    "observed_deviation_pct": 13.18,
     "observed_width_factor": 1.1713,
     "checks": {
      "sector_model_supported": true,
@@ -28398,14 +28398,14 @@
   {
    "symbol": "2GB.DE",
    "name": "2G Energy AG",
-   "price_local": 49.060001373291016,
+   "price_local": 48.380001068115234,
    "currency": "EUR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 70.74,
-    "observed_width_factor": 1.3173,
+    "observed_deviation_pct": 68.39,
+    "observed_width_factor": 1.317,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -28415,8 +28415,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 21.8129,
-    "upper": 28.7338,
+    "lower": 21.8153,
+    "upper": 28.7314,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -28494,7 +28494,7 @@
   {
    "symbol": "FHZN.SW",
    "name": "Flughafen Zürich AG",
-   "price_local": 199.8000030517578,
+   "price_local": 201.8000030517578,
    "currency": "CHF",
    "gate": {
     "status": "withheld_wide_range",
@@ -28686,13 +28686,13 @@
   {
    "symbol": "VOS.DE",
    "name": "Vossloh AG",
-   "price_local": 48.7599983215332,
+   "price_local": 49.18000030517578,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 0.76,
+    "observed_deviation_pct": 0.0,
     "observed_width_factor": 1.8729,
     "checks": {
      "sector_model_supported": true,
@@ -32673,9 +32673,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 90.6708,
+      "reference_multiple": 90.6707,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 1247.630208
+      "implied_price": 1247.628832
      },
      {
       "metric": "pe",
@@ -32724,7 +32724,7 @@
    "metrics": {
     "pe": {
      "current": 62.2683,
-     "own_5y_average": 90.6708,
+     "own_5y_average": 90.6707,
      "sector_median": 28.8045,
      "sector_peer_count": 66
     },
@@ -35924,9 +35924,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 64.5533,
+      "reference_multiple": 64.5532,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 318.70105
+      "implied_price": 318.700556
      },
      {
       "metric": "price_to_fcf",
@@ -35978,7 +35978,7 @@
     },
     "price_to_fcf": {
      "current": 45.7162,
-     "own_5y_average": 64.5533,
+     "own_5y_average": 64.5532,
      "sector_median": 23.7072,
      "sector_peer_count": 42
     },
@@ -36583,7 +36583,7 @@
   {
    "symbol": "RELIANCE.NS",
    "name": "Reliance Industries Limited",
-   "price_local": 1158.0,
+   "price_local": 1167.4000244140625,
    "currency": "INR",
    "gate": {
     "status": "withheld_wide_range",
@@ -36672,14 +36672,14 @@
   {
    "symbol": "TCS.NS",
    "name": "Tata Consultancy Services Limited",
-   "price_local": 2460.0,
+   "price_local": 2478.0,
    "currency": "INR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 65.9,
-    "observed_width_factor": 1.0384,
+    "observed_deviation_pct": 64.69,
+    "observed_width_factor": 1.0385,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -36689,8 +36689,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 4081.0315,
-    "upper": 4237.91,
+    "lower": 4081.0061,
+    "upper": 4237.9353,
     "currency": "INR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -36768,13 +36768,13 @@
   {
    "symbol": "BHARTIARTL.NS",
    "name": "Bharti Airtel Limited",
-   "price_local": 1948.0999755859375,
+   "price_local": 1972.0999755859375,
    "currency": "INR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 13.44,
+    "observed_deviation_pct": 14.84,
     "observed_width_factor": 1.7881,
     "checks": {
      "sector_model_supported": true,
@@ -37187,7 +37187,7 @@
       "book_value_per_share": 15.8645,
       "price_to_book": 0.1054,
       "roe_pct": 4.8784,
-      "pb_to_roe": 2.1605
+      "pb_to_roe": 2.1606
      },
      {
       "period_end": "2025-12-31",
@@ -37477,13 +37477,13 @@
   {
    "symbol": "BBCA.JK",
    "name": "PT Bank Central Asia Tbk",
-   "price_local": 5275.0,
+   "price_local": 4940.0,
    "currency": "IDR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 18.69,
+    "observed_deviation_pct": 26.74,
     "observed_width_factor": 1.5798,
     "checks": {
      "sector_model_supported": true,
@@ -37518,7 +37518,7 @@
     "annual_calculation": [
      {
       "period_end": "2022-12-31",
-      "price": 7439.6421,
+      "price": 7439.6411,
       "book_value_per_share": 1792.89,
       "price_to_book": 4.1495,
       "roe_pct": 18.4309,
@@ -37526,7 +37526,7 @@
      },
      {
       "period_end": "2023-12-31",
-      "price": 8382.5498,
+      "price": 8382.5488,
       "book_value_per_share": 1965.9798,
       "price_to_book": 4.2638,
       "roe_pct": 20.0693,
@@ -37554,13 +37554,13 @@
   {
    "symbol": "TLKM.JK",
    "name": "Perusahaan Perseroan (Persero) PT Telekomunikasi Indonesia Tbk",
-   "price_local": 2070.0,
+   "price_local": 1980.0,
    "currency": "IDR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 67.56,
+    "observed_deviation_pct": 75.18,
     "observed_width_factor": 2.1858,
     "checks": {
      "sector_model_supported": true,
@@ -37650,13 +37650,13 @@
   {
    "symbol": "GOTO.JK",
    "name": "PT GoTo Gojek Tokopedia Tbk",
-   "price_local": 24.0,
+   "price_local": 23.0,
    "currency": "IDR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 11.14,
+    "observed_deviation_pct": 15.97,
     "observed_width_factor": 3.8399,
     "checks": {
      "sector_model_supported": true,
@@ -38477,7 +38477,7 @@
   {
    "symbol": "2222.SR",
    "name": "Saudi Arabian Oil Company",
-   "price_local": 26.079999923706055,
+   "price_local": 25.920000076293945,
    "currency": "SAR",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -42444,13 +42444,13 @@
   {
    "symbol": "BESI.AS",
    "name": "BE Semiconductor Industries N.V.",
-   "price_local": 163.0500030517578,
+   "price_local": 161.5500030517578,
    "currency": "EUR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 66.0,
+    "observed_deviation_pct": 64.47,
     "observed_width_factor": 1.4394,
     "checks": {
      "sector_model_supported": true,
@@ -42540,7 +42540,7 @@
   {
    "symbol": "IFX.DE",
    "name": "Infineon Technologies AG",
-   "price_local": 52.59000015258789,
+   "price_local": 53.439998626708984,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
@@ -46812,13 +46812,13 @@
   {
    "symbol": "BAJFINANCE.NS",
    "name": "Bajaj Finance Limited",
-   "price_local": 917.25,
+   "price_local": 938.9000244140625,
    "currency": "INR",
    "gate": {
     "status": "withheld_sector_model",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 98.1,
+    "observed_deviation_pct": 102.78,
     "observed_width_factor": 1.6037,
     "checks": {
      "sector_model_supported": false,
@@ -46894,13 +46894,13 @@
   {
    "symbol": "MARUTI.NS",
    "name": "Maruti Suzuki India Limited",
-   "price_local": 11450.0,
+   "price_local": 11426.0,
    "currency": "INR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 25.7,
+    "observed_deviation_pct": 25.44,
     "observed_width_factor": 1.1584,
     "checks": {
      "sector_model_supported": true,
@@ -46983,7 +46983,7 @@
   {
    "symbol": "LT.NS",
    "name": "Larsen & Toubro Limited",
-   "price_local": 3801.300048828125,
+   "price_local": 3837.10009765625,
    "currency": "INR",
    "gate": {
     "status": "withheld_wide_range",
@@ -47072,13 +47072,13 @@
   {
    "symbol": "SUNPHARMA.NS",
    "name": "Sun Pharmaceutical Industries Limited",
-   "price_local": 1757.5,
+   "price_local": 1761.0,
    "currency": "INR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 30.44,
+    "observed_deviation_pct": 30.7,
     "observed_width_factor": 1.4777,
     "checks": {
      "sector_model_supported": true,
@@ -47161,13 +47161,13 @@
   {
    "symbol": "HAL.NS",
    "name": "Hindustan Aeronautics Limited",
-   "price_local": 4850.0,
+   "price_local": 4869.89990234375,
    "currency": "INR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 30.32,
+    "observed_deviation_pct": 30.85,
     "observed_width_factor": 3.2201,
     "checks": {
      "sector_model_supported": true,
@@ -47250,13 +47250,13 @@
   {
    "symbol": "BEL.NS",
    "name": "Bharat Electronics Limited",
-   "price_local": 363.3500061035156,
+   "price_local": 370.0,
    "currency": "INR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 62.0,
+    "observed_deviation_pct": 64.96,
     "observed_width_factor": 2.4954,
     "checks": {
      "sector_model_supported": true,
@@ -47339,13 +47339,13 @@
   {
    "symbol": "ADANIENT.NS",
    "name": "Adani Enterprises Limited",
-   "price_local": 2479.800048828125,
+   "price_local": 2607.89990234375,
    "currency": "INR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 19.69,
+    "observed_deviation_pct": 25.87,
     "observed_width_factor": 8.8935,
     "checks": {
      "sector_model_supported": true,
@@ -47428,13 +47428,13 @@
   {
    "symbol": "TITAN.NS",
    "name": "Titan Company Limited",
-   "price_local": 4365.89990234375,
+   "price_local": 4434.0,
    "currency": "INR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 234.33,
+    "observed_deviation_pct": 239.54,
     "observed_width_factor": 1.4309,
     "checks": {
      "sector_model_supported": true,
@@ -47517,13 +47517,13 @@
   {
    "symbol": "DMART.NS",
    "name": "Avenue Supermarts Limited",
-   "price_local": 3133.89990234375,
+   "price_local": 3175.0,
    "currency": "INR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 87.36,
+    "observed_deviation_pct": 89.82,
     "observed_width_factor": 1.878,
     "checks": {
      "sector_model_supported": true,
@@ -47606,13 +47606,13 @@
   {
    "symbol": "KOG.OL",
    "name": "Kongsberg Gruppen ASA",
-   "price_local": 311.29998779296875,
+   "price_local": 312.1000061035156,
    "currency": "NOK",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 162.05,
+    "observed_deviation_pct": 162.73,
     "observed_width_factor": 1.2784,
     "checks": {
      "sector_model_supported": true,
@@ -47702,13 +47702,13 @@
   {
    "symbol": "HAG.DE",
    "name": "Hensoldt AG",
-   "price_local": 86.22000122070312,
+   "price_local": 86.04000091552734,
    "currency": "EUR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 62.53,
+    "observed_deviation_pct": 62.19,
     "observed_width_factor": 1.4478,
     "checks": {
      "sector_model_supported": true,
@@ -47798,14 +47798,14 @@
   {
    "symbol": "LDO.MI",
    "name": "Leonardo S.p.a.",
-   "price_local": 49.95500183105469,
+   "price_local": 49.85499954223633,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 6.36,
-    "observed_width_factor": 1.0559,
+    "observed_deviation_pct": 6.69,
+    "observed_width_factor": 1.0537,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -47815,8 +47815,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 53.1339,
-    "upper": 56.1047,
+    "lower": 53.1902,
+    "upper": 56.0483,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -47894,13 +47894,13 @@
   {
    "symbol": "R3NK.DE",
    "name": "RENK Group AG",
-   "price_local": 36.9900016784668,
+   "price_local": 36.54999923706055,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 16.88,
+    "observed_deviation_pct": 15.49,
     "observed_width_factor": 1.1972,
     "checks": {
      "sector_model_supported": true,
@@ -47990,14 +47990,14 @@
   {
    "symbol": "AM.PA",
    "name": "Dassault Aviation société anonyme",
-   "price_local": 304.6000061035156,
+   "price_local": 301.3999938964844,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 2.28,
-    "observed_width_factor": 1.0431,
+    "observed_deviation_pct": 3.41,
+    "observed_width_factor": 1.0423,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -48007,8 +48007,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 311.5482,
-    "upper": 324.9741,
+    "lower": 311.6696,
+    "upper": 324.8526,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -49351,13 +49351,13 @@
   {
    "symbol": "SAAB-B.ST",
    "name": "Saab AB (publ)",
-   "price_local": 657.0,
+   "price_local": 655.2000122070312,
    "currency": "SEK",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 63.74,
+    "observed_deviation_pct": 63.29,
     "observed_width_factor": 1.0889,
     "checks": {
      "sector_model_supported": true,
@@ -49447,13 +49447,13 @@
   {
    "symbol": "BA.L",
    "name": "BAE Systems plc",
-   "price_local": 2037.0,
+   "price_local": 2025.0,
    "currency": "GBp",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 8765.83,
+    "observed_deviation_pct": 8713.6,
     "observed_width_factor": 1.2797,
     "checks": {
      "sector_model_supported": true,
@@ -53385,7 +53385,7 @@
   {
    "symbol": "HUBB",
    "name": "Hubbell Incorporated",
-   "price_local": 434.2799987792969,
+   "price_local": 437.3299865722656,
    "currency": "USD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -57002,7 +57002,7 @@
      },
      {
       "period_end": "2023-12-31",
-      "price": 126.1539,
+      "price": 126.1538,
       "book_value_per_share": 408.3213,
       "price_to_book": 0.309,
       "roe_pct": 14.9893,
@@ -57369,21 +57369,21 @@
   {
    "symbol": "005930.KS",
    "name": "Samsung Electronics Co., Ltd.",
-   "price_local": 232000.0,
+   "price_local": 242000.0,
    "currency": "KRW",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 50.08,
+    "observed_deviation_pct": 43.88,
     "observed_width_factor": 2.4063,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
      "width_within_limit": false,
-     "deviation_within_limit": false
+     "deviation_within_limit": true
     },
-    "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
+    "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5."
    },
    "raw_fair_value_range": {
     "lower": 348183.4332,
@@ -57458,13 +57458,13 @@
   {
    "symbol": "6758.T",
    "name": "Sony Group Corporation",
-   "price_local": 3936.0,
+   "price_local": 3957.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 85.15,
+    "observed_deviation_pct": 84.17,
     "observed_width_factor": 1.5693,
     "checks": {
      "sector_model_supported": true,
@@ -62482,7 +62482,7 @@
     "annual_calculation": [
      {
       "period_end": "2024-12-31",
-      "price": 186.3653,
+      "price": 186.3652,
       "book_value_per_share": 73.3707,
       "price_to_book": 2.5401,
       "roe_pct": 23.4041,
@@ -62728,7 +62728,7 @@
      },
      {
       "period_end": "2025-12-31",
-      "price": 256.46,
+      "price": 256.4601,
       "book_value_per_share": 90.7432,
       "price_to_book": 2.8262,
       "roe_pct": 6.4062,
@@ -64232,7 +64232,7 @@
    },
    "raw_fair_value_range": {
     "lower": 180.6962,
-    "upper": 294.6833,
+    "upper": 294.6826,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 2,
@@ -64241,9 +64241,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 43.3996,
+      "reference_multiple": 43.3995,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 294.683284
+      "implied_price": 294.682605
      },
      {
       "metric": "pe",
@@ -64292,7 +64292,7 @@
    "metrics": {
     "pe": {
      "current": 50.5416,
-     "own_5y_average": 43.3996,
+     "own_5y_average": 43.3995,
      "sector_median": 26.6121,
      "sector_peer_count": 112
     },
@@ -71708,9 +71708,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "issuer_history",
-      "reference_multiple": 15171.9052,
+      "reference_multiple": 15171.9042,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 38.427069
+      "implied_price": 38.427067
      },
      {
       "metric": "price_to_sales",
@@ -71754,7 +71754,7 @@
     },
     "price_to_sales": {
      "current": 14750.6696,
-     "own_5y_average": 15171.9052,
+     "own_5y_average": 15171.9042,
      "sector_median": 7.716,
      "sector_peer_count": 71
     }
@@ -76015,13 +76015,13 @@
   {
    "symbol": "MBG.DE",
    "name": "Mercedes-Benz Group AG",
-   "price_local": 39.775001525878906,
+   "price_local": 39.82500076293945,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 58.21,
+    "observed_deviation_pct": 58.01,
     "observed_width_factor": 2.7182,
     "checks": {
      "sector_model_supported": true,
@@ -76110,8 +76110,8 @@
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 6.14,
-    "observed_width_factor": 1.0445,
+    "observed_deviation_pct": 6.13,
+    "observed_width_factor": 1.0447,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -76121,8 +76121,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 137.1605,
-    "upper": 143.2582,
+    "lower": 137.1467,
+    "upper": 143.272,
     "currency": "CHF",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -76200,7 +76200,7 @@
   {
    "symbol": "ENEL.MI",
    "name": "Enel SpA",
-   "price_local": 9.305999755859375,
+   "price_local": 9.329999923706055,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
@@ -76289,7 +76289,7 @@
   {
    "symbol": "ISP.MI",
    "name": "Intesa Sanpaolo S.p.A.",
-   "price_local": 6.021999835968018,
+   "price_local": 5.989999771118164,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
@@ -76366,14 +76366,14 @@
   {
    "symbol": "SAN.MC",
    "name": "Banco Santander, S.A.",
-   "price_local": 11.267999649047852,
+   "price_local": 10.51099967956543,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 0.0,
-    "observed_width_factor": 2.6923,
+    "observed_width_factor": 2.7248,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": true,
@@ -76383,7 +76383,7 @@
     "reason": "Der faire Bereich ist breiter als Faktor 1.5."
    },
    "raw_fair_value_range": {
-    "lower": 4.8458,
+    "lower": 4.7881,
     "upper": 13.0466,
     "currency": "EUR",
     "method": "P/B relativ zum ROE, abgeleitet aus eigener Vierjahreshistorie und aktueller Sektor-Peergroup",
@@ -76396,46 +76396,46 @@
     "roe_pct": 13.109000000000002,
     "pb_to_roe": {
      "current": 11.1443,
-     "own_4y_median": 4.8416,
+     "own_4y_median": 4.7839,
      "peer_median": 13.0352,
      "peer_count": 73
     },
     "expected_price_to_book": {
-     "own_4y": 0.6347,
+     "own_4y": 0.6271,
      "peer": 1.7088
     },
     "annual_calculation": [
      {
       "period_end": "2022-12-31",
-      "price": 2.4724,
+      "price": 2.4428,
       "book_value_per_share": 5.3056,
-      "price_to_book": 0.466,
+      "price_to_book": 0.4604,
       "roe_pct": 10.1859,
-      "pb_to_roe": 4.5749
+      "pb_to_roe": 4.5203
      },
      {
       "period_end": "2023-12-31",
-      "price": 3.4744,
+      "price": 3.433,
       "book_value_per_share": 6.0066,
-      "price_to_book": 0.5784,
+      "price_to_book": 0.5715,
       "roe_pct": 12.1229,
-      "pb_to_roe": 4.7714
+      "pb_to_roe": 4.7145
      },
      {
       "period_end": "2024-12-31",
-      "price": 4.2814,
+      "price": 4.2303,
       "book_value_per_share": 6.5139,
-      "price_to_book": 0.6573,
+      "price_to_book": 0.6494,
       "roe_pct": 13.3812,
-      "pb_to_roe": 4.9119
+      "pb_to_roe": 4.8533
      },
      {
       "period_end": "2025-12-31",
-      "price": 9.9498,
+      "price": 9.831,
       "book_value_per_share": 7.0288,
-      "price_to_book": 1.4156,
+      "price_to_book": 1.3987,
       "roe_pct": 14.2706,
-      "pb_to_roe": 9.9196
+      "pb_to_roe": 9.8012
      }
     ]
    }
@@ -76443,7 +76443,7 @@
   {
    "symbol": "BBVA.MC",
    "name": "Banco Bilbao Vizcaya Argentaria, S.A.",
-   "price_local": 22.700000762939453,
+   "price_local": 22.450000762939453,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
@@ -76520,13 +76520,13 @@
   {
    "symbol": "IBE.MC",
    "name": "Iberdrola, S.A.",
-   "price_local": 21.969999313354492,
+   "price_local": 22.030000686645508,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 7.5,
+    "observed_deviation_pct": 7.79,
     "observed_width_factor": 1.2829,
     "checks": {
      "sector_model_supported": true,
@@ -76609,13 +76609,13 @@
   {
    "symbol": "BN.PA",
    "name": "Danone S.A.",
-   "price_local": 61.619998931884766,
+   "price_local": 63.2400016784668,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 1.79,
+    "observed_deviation_pct": 0.0,
     "observed_width_factor": 1.0753,
     "checks": {
      "sector_model_supported": true,
@@ -76705,13 +76705,13 @@
   {
    "symbol": "RI.PA",
    "name": "Pernod Ricard SA",
-   "price_local": 66.41999816894531,
+   "price_local": 66.27999877929688,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 5.27,
+    "observed_deviation_pct": 5.49,
     "observed_width_factor": 1.1388,
     "checks": {
      "sector_model_supported": true,
@@ -76801,14 +76801,14 @@
   {
    "symbol": "CAP.PA",
    "name": "Capgemini SE",
-   "price_local": 122.80000305175781,
+   "price_local": 122.44999694824219,
    "currency": "EUR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 160.95,
-    "observed_width_factor": 1.0512,
+    "observed_deviation_pct": 161.71,
+    "observed_width_factor": 1.0511,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -76818,8 +76818,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 320.4501,
-    "upper": 336.8495,
+    "lower": 320.4637,
+    "upper": 336.8359,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -76897,13 +76897,13 @@
   {
    "symbol": "SGO.PA",
    "name": "Compagnie de Saint-Gobain S.A.",
-   "price_local": 67.83999633789062,
+   "price_local": 66.63999938964844,
    "currency": "EUR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 122.04,
+    "observed_deviation_pct": 126.04,
     "observed_width_factor": 1.2141,
     "checks": {
      "sector_model_supported": true,
@@ -76993,13 +76993,13 @@
   {
    "symbol": "AI.PA",
    "name": "L'Air Liquide S.A.",
-   "price_local": 174.44000244140625,
+   "price_local": 174.24000549316406,
    "currency": "EUR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 59.44,
+    "observed_deviation_pct": 59.26,
     "observed_width_factor": 1.1548,
     "checks": {
      "sector_model_supported": true,
@@ -77089,7 +77089,7 @@
   {
    "symbol": "9984.T",
    "name": "SoftBank Group Corp.",
-   "price_local": 4765.0,
+   "price_local": 4682.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_wide_range",
@@ -77171,13 +77171,13 @@
   {
    "symbol": "8035.T",
    "name": "Tokyo Electron Limited",
-   "price_local": 10035.0,
+   "price_local": 9805.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 40.46,
+    "observed_deviation_pct": 37.24,
     "observed_width_factor": 1.1746,
     "checks": {
      "sector_model_supported": true,
@@ -77267,7 +77267,7 @@
   {
    "symbol": "6501.T",
    "name": "Hitachi, Ltd.",
-   "price_local": 5071.0,
+   "price_local": 5620.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -77356,13 +77356,13 @@
   {
    "symbol": "4063.T",
    "name": "Shin-Etsu Chemical Co., Ltd.",
-   "price_local": 6010.0,
+   "price_local": 6004.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 13.42,
+    "observed_deviation_pct": 13.3,
     "observed_width_factor": 1.4292,
     "checks": {
      "sector_model_supported": true,
@@ -77452,13 +77452,13 @@
   {
    "symbol": "7974.T",
    "name": "Nintendo Co., Ltd.",
-   "price_local": 8158.0,
+   "price_local": 8311.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 0.0,
+    "observed_deviation_pct": 1.24,
     "observed_width_factor": 2.0758,
     "checks": {
      "sector_model_supported": true,
@@ -77541,13 +77541,13 @@
   {
    "symbol": "000270.KS",
    "name": "Kia Corporation",
-   "price_local": 108300.0,
+   "price_local": 107900.0,
    "currency": "KRW",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 2.55,
+    "observed_deviation_pct": 2.93,
     "observed_width_factor": 3.6293,
     "checks": {
      "sector_model_supported": true,
@@ -77630,7 +77630,7 @@
   {
    "symbol": "035420.KS",
    "name": "NAVER Corporation",
-   "price_local": 174900.0,
+   "price_local": 178000.0,
    "currency": "KRW",
    "gate": {
     "status": "withheld_wide_range",
@@ -78628,7 +78628,7 @@
   {
    "symbol": "2330.TW",
    "name": "Taiwan Semiconductor Manufacturing Company Limited",
-   "price_local": 2415.0,
+   "price_local": 2425.0,
    "currency": "TWD",
    "gate": {
     "status": "withheld_wide_range",
@@ -78724,13 +78724,13 @@
   {
    "symbol": "2317.TW",
    "name": "Hon Hai Precision Industry Co., Ltd.",
-   "price_local": 248.0,
+   "price_local": 251.5,
    "currency": "TWD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 103.42,
+    "observed_deviation_pct": 100.59,
     "observed_width_factor": 6.8983,
     "checks": {
      "sector_model_supported": true,
@@ -78813,14 +78813,14 @@
   {
    "symbol": "9432.T",
    "name": "NTT, Inc.",
-   "price_local": 171.5,
+   "price_local": 171.89999389648438,
    "currency": "JPY",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 113.1,
-    "observed_width_factor": 1.0204,
+    "observed_deviation_pct": 112.6,
+    "observed_width_factor": 1.0205,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -78830,8 +78830,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 365.4585,
-    "upper": 372.9278,
+    "lower": 365.4545,
+    "upper": 372.9317,
     "currency": "JPY",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -78909,13 +78909,13 @@
   {
    "symbol": "6098.T",
    "name": "Recruit Holdings Co., Ltd.",
-   "price_local": 18890.0,
+   "price_local": 18800.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 154.21,
+    "observed_deviation_pct": 153.0,
     "observed_width_factor": 1.2306,
     "checks": {
      "sector_model_supported": true,
@@ -79005,7 +79005,7 @@
   {
    "symbol": "4519.T",
    "name": "Chugai Pharmaceutical Co., Ltd.",
-   "price_local": 6653.0,
+   "price_local": 6614.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_wide_range",
@@ -79101,14 +79101,14 @@
   {
    "symbol": "ADS.DE",
    "name": "adidas AG",
-   "price_local": 157.4499969482422,
+   "price_local": 158.0500030517578,
    "currency": "EUR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
     "observed_deviation_pct": 0.0,
-    "observed_width_factor": 1.0516,
+    "observed_width_factor": 1.0507,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -79118,8 +79118,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 153.4842,
-    "upper": 161.4022,
+    "lower": 153.554,
+    "upper": 161.3324,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -79197,13 +79197,13 @@
   {
    "symbol": "BAYN.DE",
    "name": "Bayer Aktiengesellschaft",
-   "price_local": 46.150001525878906,
+   "price_local": 46.029998779296875,
    "currency": "EUR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 164.16,
+    "observed_deviation_pct": 164.85,
     "observed_width_factor": 1.3835,
     "checks": {
      "sector_model_supported": true,
@@ -79286,7 +79286,7 @@
   {
    "symbol": "CON.DE",
    "name": "Continental Aktiengesellschaft",
-   "price_local": 67.12000274658203,
+   "price_local": 66.87999725341797,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
@@ -79375,13 +79375,13 @@
   {
    "symbol": "HEN3.DE",
    "name": "Henkel AG & Co. KGaA",
-   "price_local": 77.86000061035156,
+   "price_local": 77.87999725341797,
    "currency": "EUR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 81.58,
+    "observed_deviation_pct": 81.53,
     "observed_width_factor": 1.4035,
     "checks": {
      "sector_model_supported": true,
@@ -79471,13 +79471,13 @@
   {
    "symbol": "HOLN.SW",
    "name": "Holcim AG",
-   "price_local": 68.05999755859375,
+   "price_local": 68.0999984741211,
    "currency": "CHF",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 48.93,
+    "observed_deviation_pct": 49.02,
     "observed_width_factor": 1.1335,
     "checks": {
      "sector_model_supported": true,
@@ -79567,14 +79567,14 @@
   {
    "symbol": "FER.MC",
    "name": "Ferrovial N.V.",
-   "price_local": 48.84000015258789,
+   "price_local": 48.959999084472656,
    "currency": "EUR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 53.64,
-    "observed_width_factor": 1.0999,
+    "observed_deviation_pct": 54.09,
+    "observed_width_factor": 1.0988,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -79584,8 +79584,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 28.9014,
-    "upper": 31.788,
+    "lower": 28.9158,
+    "upper": 31.7736,
     "currency": "EUR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -79663,7 +79663,7 @@
   {
    "symbol": "BDX.WA",
    "name": "Budimex SA",
-   "price_local": 740.5999755859375,
+   "price_local": 700.2000122070312,
    "currency": "PLN",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -79752,13 +79752,13 @@
   {
    "symbol": "NEX.PA",
    "name": "Nexans S.A.",
-   "price_local": 122.0,
+   "price_local": 124.0999984741211,
    "currency": "EUR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 95.09,
+    "observed_deviation_pct": 91.79,
     "observed_width_factor": 1.8901,
     "checks": {
      "sector_model_supported": true,
@@ -85704,7 +85704,7 @@
      },
      {
       "period_end": "2023-12-31",
-      "price": 69.707,
+      "price": 69.7069,
       "book_value_per_share": 19.603,
       "price_to_book": 3.5559,
       "roe_pct": 15.3791,
@@ -86860,9 +86860,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "issuer_history",
-      "reference_multiple": 1771.4341,
+      "reference_multiple": 1771.434,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 211.835642
+      "implied_price": 211.83563
      },
      {
       "metric": "price_to_sales",
@@ -86906,7 +86906,7 @@
     },
     "price_to_sales": {
      "current": 790.8548,
-     "own_5y_average": 1771.4341,
+     "own_5y_average": 1771.434,
      "sector_median": 7.716,
      "sector_peer_count": 71
     }
@@ -88071,7 +88071,7 @@
      },
      {
       "period_end": "2023-12-31",
-      "price": 318.1855,
+      "price": 318.1856,
       "book_value_per_share": 31.8003,
       "price_to_book": 10.0057,
       "roe_pct": 26.8253,
@@ -91362,7 +91362,7 @@
     "annual_calculation": [
      {
       "period_end": "2022-12-31",
-      "price": 154.8603,
+      "price": 154.8602,
       "book_value_per_share": 21.2617,
       "price_to_book": 7.2835,
       "roe_pct": 28.9924,
@@ -91370,7 +91370,7 @@
      },
      {
       "period_end": "2023-12-31",
-      "price": 179.8665,
+      "price": 179.8664,
       "book_value_per_share": 24.7781,
       "price_to_book": 7.2591,
       "roe_pct": 30.8096,
@@ -94717,15 +94717,15 @@
     "annual_calculation": [
      {
       "period_end": "2022-12-31",
-      "price": 232.9697,
+      "price": 232.9696,
       "book_value_per_share": 93.8211,
       "price_to_book": 2.4831,
       "roe_pct": 10.0739,
-      "pb_to_roe": 24.6492
+      "pb_to_roe": 24.6491
      },
      {
       "period_end": "2023-12-31",
-      "price": 233.167,
+      "price": 233.1669,
       "book_value_per_share": 92.8436,
       "price_to_book": 2.5114,
       "roe_pct": 11.0819,
@@ -94733,7 +94733,7 @@
      },
      {
       "period_end": "2025-12-31",
-      "price": 325.2377,
+      "price": 325.2378,
       "book_value_per_share": 83.8874,
       "price_to_book": 3.8771,
       "roe_pct": 20.1229,
@@ -95233,9 +95233,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 2410.1673,
+      "reference_multiple": 2410.1671,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 15.486686
+      "implied_price": 15.486684
      },
      {
       "metric": "price_to_fcf",
@@ -95280,7 +95280,7 @@
     },
     "price_to_fcf": {
      "current": 10932.0562,
-     "own_5y_average": 2410.1673,
+     "own_5y_average": 2410.1671,
      "sector_median": 23.7042,
      "sector_peer_count": 173
     },
@@ -101296,9 +101296,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 22.4348,
+      "reference_multiple": 22.4349,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 123.459002
+      "implied_price": 123.459552
      },
      {
       "metric": "price_to_fcf",
@@ -101350,7 +101350,7 @@
     },
     "price_to_fcf": {
      "current": 10.2642,
-     "own_5y_average": 22.4348,
+     "own_5y_average": 22.4349,
      "sector_median": 15.0925,
      "sector_peer_count": 66
     },
@@ -105536,7 +105536,7 @@
     "annual_calculation": [
      {
       "period_end": "2022-12-31",
-      "price": 259.784,
+      "price": 259.7841,
       "book_value_per_share": 32.2838,
       "price_to_book": 8.0469,
       "roe_pct": 21.3447,
@@ -107759,9 +107759,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 1823.2088,
+      "reference_multiple": 1823.2092,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 3741.368859
+      "implied_price": 3741.36968
      },
      {
       "metric": "price_to_fcf",
@@ -107813,7 +107813,7 @@
     },
     "price_to_fcf": {
      "current": 41.4692,
-     "own_5y_average": 1823.2088,
+     "own_5y_average": 1823.2092,
      "sector_median": 13.8391,
      "sector_peer_count": 44
     },
@@ -108061,9 +108061,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 20.0722,
+      "reference_multiple": 20.0721,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 60.2166
+      "implied_price": 60.2163
      },
      {
       "metric": "pe",
@@ -108112,7 +108112,7 @@
    "metrics": {
     "pe": {
      "current": 31.6827,
-     "own_5y_average": 20.0722,
+     "own_5y_average": 20.0721,
      "sector_median": 20.0415,
      "sector_peer_count": 47
     },
@@ -112577,7 +112577,7 @@
       "book_value_per_share": 68.8715,
       "price_to_book": 1.6596,
       "roe_pct": 1.4317,
-      "pb_to_roe": 115.9155
+      "pb_to_roe": 115.9154
      },
      {
       "period_end": "2024-12-31",
@@ -113033,9 +113033,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 398.7831,
+      "reference_multiple": 398.7832,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 370.868283
+      "implied_price": 370.868376
      },
      {
       "metric": "pe",
@@ -113077,7 +113077,7 @@
    "metrics": {
     "pe": {
      "current": 22.3675,
-     "own_5y_average": 398.7831,
+     "own_5y_average": 398.7832,
      "sector_median": 26.702,
      "sector_peer_count": 240
     },
@@ -120195,7 +120195,7 @@
      },
      {
       "period_end": "2025-12-31",
-      "price": 18.9143,
+      "price": 18.9144,
       "book_value_per_share": 19.5729,
       "price_to_book": 0.9664,
       "roe_pct": 6.2175,
