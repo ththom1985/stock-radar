@@ -1,7 +1,7 @@
 {
  "schema": "stock-radar-valuation-anomalies",
  "schema_version": 1,
- "generated_at": "2026-10-30T08:52:39+00:00",
+ "generated_at": "2026-10-30T16:06:44+00:00",
  "anomalies": [
   {
    "symbol": "AAPL",
@@ -1147,9 +1147,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 57.7756,
+      "reference_multiple": 57.7755,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 92.765146
+      "implied_price": 92.764986
      },
      {
       "metric": "price_to_fcf",
@@ -1201,7 +1201,7 @@
     },
     "price_to_fcf": {
      "current": 150.4577,
-     "own_5y_average": 57.7756,
+     "own_5y_average": 57.7755,
      "sector_median": 28.583,
      "sector_peer_count": 206
     },
@@ -7573,9 +7573,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 59.9798,
+      "reference_multiple": 59.9799,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 406.663044
+      "implied_price": 406.663722
      },
      {
       "metric": "pe",
@@ -7624,7 +7624,7 @@
    "metrics": {
     "pe": {
      "current": null,
-     "own_5y_average": 59.9798,
+     "own_5y_average": 59.9799,
      "sector_median": 26.6121,
      "sector_peer_count": 112
     },
@@ -21358,13 +21358,13 @@
   {
    "symbol": "7203.T",
    "name": "Toyota Motor Corporation",
-   "price_local": 3070.0,
+   "price_local": 3077.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 3.07,
+    "observed_deviation_pct": 2.83,
     "observed_width_factor": 2.2167,
     "checks": {
      "sector_model_supported": true,
@@ -21447,13 +21447,13 @@
   {
    "symbol": "6301.T",
    "name": "Komatsu Ltd.",
-   "price_local": 6182.0,
+   "price_local": 6300.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 78.17,
+    "observed_deviation_pct": 74.83,
     "observed_width_factor": 1.0536,
     "checks": {
      "sector_model_supported": true,
@@ -21536,13 +21536,13 @@
   {
    "symbol": "6326.T",
    "name": "Kubota Corporation",
-   "price_local": 2611.0,
+   "price_local": 2618.5,
    "currency": "JPY",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 70.13,
+    "observed_deviation_pct": 69.64,
     "observed_width_factor": 1.488,
     "checks": {
      "sector_model_supported": true,
@@ -21625,7 +21625,7 @@
   {
    "symbol": "6506.T",
    "name": "YASKAWA Electric Corporation",
-   "price_local": 3992.0,
+   "price_local": 4159.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -21714,13 +21714,13 @@
   {
    "symbol": "6586.T",
    "name": "Makita Corporation",
-   "price_local": 5264.0,
+   "price_local": 5253.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 34.53,
+    "observed_deviation_pct": 34.82,
     "observed_width_factor": 1.1757,
     "checks": {
      "sector_model_supported": true,
@@ -21810,13 +21810,13 @@
   {
    "symbol": "6724.T",
    "name": "Seiko Epson Corporation",
-   "price_local": 3233.0,
+   "price_local": 3379.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 16.1,
+    "observed_deviation_pct": 11.08,
     "observed_width_factor": 2.523,
     "checks": {
      "sector_model_supported": true,
@@ -21906,7 +21906,7 @@
   {
    "symbol": "6869.T",
    "name": "Sysmex Corporation",
-   "price_local": 1941.5,
+   "price_local": 1929.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_wide_range",
@@ -22002,21 +22002,21 @@
   {
    "symbol": "7309.T",
    "name": "Shimano Inc.",
-   "price_local": 20570.0,
+   "price_local": 19815.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 55.67,
+    "observed_deviation_pct": 49.96,
     "observed_width_factor": 1.8625,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
      "width_within_limit": false,
-     "deviation_within_limit": false
+     "deviation_within_limit": true
     },
-    "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
+    "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich ist breiter als Faktor 1.5."
    },
    "raw_fair_value_range": {
     "lower": 7094.83,
@@ -22098,14 +22098,14 @@
   {
    "symbol": "8113.T",
    "name": "Unicharm Corporation",
-   "price_local": 1012.0,
+   "price_local": 989.2999877929688,
    "currency": "JPY",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 19.64,
-    "observed_width_factor": 1.0356,
+    "observed_deviation_pct": 16.96,
+    "observed_width_factor": 1.0355,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -22115,8 +22115,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien."
    },
    "raw_fair_value_range": {
-    "lower": 816.8094,
-    "upper": 845.8746,
+    "lower": 816.8549,
+    "upper": 845.8291,
     "currency": "JPY",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -22194,13 +22194,13 @@
   {
    "symbol": "2897.T",
    "name": "Nissin Foods Holdings Co.,Ltd.",
-   "price_local": 3040.0,
+   "price_local": 2951.5,
    "currency": "JPY",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 7.05,
+    "observed_deviation_pct": 10.26,
     "observed_width_factor": 1.268,
     "checks": {
      "sector_model_supported": true,
@@ -22283,7 +22283,7 @@
   {
    "symbol": "0700.HK",
    "name": "Tencent Holdings Limited",
-   "price_local": 377.6000061035156,
+   "price_local": 383.6000061035156,
    "currency": "HKD",
    "gate": {
     "status": "withheld_wide_range",
@@ -22379,13 +22379,13 @@
   {
    "symbol": "1810.HK",
    "name": "Xiaomi Corporation",
-   "price_local": 25.68000030517578,
+   "price_local": 26.479999542236328,
    "currency": "HKD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 18.95,
+    "observed_deviation_pct": 15.36,
     "observed_width_factor": 3.5407,
     "checks": {
      "sector_model_supported": true,
@@ -22468,13 +22468,13 @@
   {
    "symbol": "1211.HK",
    "name": "BYD Company Limited",
-   "price_local": 68.6500015258789,
+   "price_local": 68.25,
    "currency": "HKD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 4.39,
+    "observed_deviation_pct": 5.0,
     "observed_width_factor": 5.4201,
     "checks": {
      "sector_model_supported": true,
@@ -22557,7 +22557,7 @@
   {
    "symbol": "0992.HK",
    "name": "Lenovo Group Limited",
-   "price_local": 22.139999389648438,
+   "price_local": 20.5,
    "currency": "HKD",
    "gate": {
     "status": "withheld_wide_range",
@@ -22646,13 +22646,13 @@
   {
    "symbol": "0390.HK",
    "name": "China Railway Group Limited",
-   "price_local": 3.075000047683716,
+   "price_local": 3.0899999141693115,
    "currency": "HKD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 629.42,
+    "observed_deviation_pct": 625.88,
     "observed_width_factor": 25.5554,
     "checks": {
      "sector_model_supported": true,
@@ -22735,13 +22735,13 @@
   {
    "symbol": "1919.HK",
    "name": "COSCO SHIPPING Holdings Co., Ltd.",
-   "price_local": 16.6200008392334,
+   "price_local": 17.899999618530273,
    "currency": "HKD",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 144.71,
+    "observed_deviation_pct": 127.22,
     "observed_width_factor": 1.3535,
     "checks": {
      "sector_model_supported": true,
@@ -22824,13 +22824,13 @@
   {
    "symbol": "2208.HK",
    "name": "Goldwind Science&Technology Co., Ltd.",
-   "price_local": 7.03000020980835,
+   "price_local": 6.909999847412109,
    "currency": "HKD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 211.46,
+    "observed_deviation_pct": 216.87,
     "observed_width_factor": 5.8694,
     "checks": {
      "sector_model_supported": true,
@@ -22920,13 +22920,13 @@
   {
    "symbol": "1772.HK",
    "name": "Ganfeng Lithium Group Co., Ltd.",
-   "price_local": 22.34000015258789,
+   "price_local": 22.020000457763672,
    "currency": "HKD",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 244.77,
+    "observed_deviation_pct": 249.78,
     "observed_width_factor": 3.0953,
     "checks": {
      "sector_model_supported": true,
@@ -23009,13 +23009,13 @@
   {
    "symbol": "0968.HK",
    "name": "Xinyi Solar Holdings Limited",
-   "price_local": 1.8550000190734863,
+   "price_local": 1.8600000143051147,
    "currency": "HKD",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 388.1,
+    "observed_deviation_pct": 386.8,
     "observed_width_factor": 1.0565,
     "checks": {
      "sector_model_supported": true,
@@ -23026,8 +23026,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 9.0543,
-    "upper": 9.5663,
+    "lower": 9.0544,
+    "upper": 9.5662,
     "currency": "HKD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -23105,7 +23105,7 @@
   {
    "symbol": "000660.KS",
    "name": "SK hynix Inc.",
-   "price_local": 1418000.0,
+   "price_local": 1526000.0,
    "currency": "KRW",
    "gate": {
     "status": "withheld_wide_range",
@@ -24011,9 +24011,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 249.5846,
+      "reference_multiple": 249.5845,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 12875.115284
+      "implied_price": 12875.110126
      },
      {
       "metric": "price_to_fcf",
@@ -24065,7 +24065,7 @@
     },
     "price_to_fcf": {
      "current": 17.3408,
-     "own_5y_average": 249.5846,
+     "own_5y_average": 249.5845,
      "sector_median": 28.583,
      "sector_peer_count": 206
     },
@@ -25575,7 +25575,7 @@
     "annual_calculation": [
      {
       "period_end": "2022-12-31",
-      "price": 9.3552,
+      "price": 9.3551,
       "book_value_per_share": 33.856,
       "price_to_book": 0.2763,
       "roe_pct": 7.1537,
@@ -32219,9 +32219,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 90.6708,
+      "reference_multiple": 90.6707,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 1247.630208
+      "implied_price": 1247.628832
      },
      {
       "metric": "pe",
@@ -32270,7 +32270,7 @@
    "metrics": {
     "pe": {
      "current": 62.2683,
-     "own_5y_average": 90.6708,
+     "own_5y_average": 90.6707,
      "sector_median": 28.8045,
      "sector_peer_count": 66
     },
@@ -34520,7 +34520,7 @@
   {
    "symbol": "9880.HK",
    "name": "Ubtech Robotics Corp Ltd",
-   "price_local": 65.30000305175781,
+   "price_local": 63.45000076293945,
    "currency": "HKD",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -36122,7 +36122,7 @@
   {
    "symbol": "RELIANCE.NS",
    "name": "Reliance Industries Limited",
-   "price_local": 1167.4000244140625,
+   "price_local": 1164.9000244140625,
    "currency": "INR",
    "gate": {
     "status": "withheld_wide_range",
@@ -36211,14 +36211,14 @@
   {
    "symbol": "TCS.NS",
    "name": "Tata Consultancy Services Limited",
-   "price_local": 2478.0,
+   "price_local": 2502.60009765625,
    "currency": "INR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 64.69,
-    "observed_width_factor": 1.0385,
+    "observed_deviation_pct": 63.08,
+    "observed_width_factor": 1.0384,
     "checks": {
      "sector_model_supported": true,
      "basis_broad": false,
@@ -36228,8 +36228,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 4081.0061,
-    "upper": 4237.9353,
+    "lower": 4081.1802,
+    "upper": 4237.7612,
     "currency": "INR",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -36307,13 +36307,13 @@
   {
    "symbol": "BHARTIARTL.NS",
    "name": "Bharti Airtel Limited",
-   "price_local": 1972.0999755859375,
+   "price_local": 1973.699951171875,
    "currency": "INR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 14.84,
+    "observed_deviation_pct": 14.93,
     "observed_width_factor": 1.7881,
     "checks": {
      "sector_model_supported": true,
@@ -37016,13 +37016,13 @@
   {
    "symbol": "BBCA.JK",
    "name": "PT Bank Central Asia Tbk",
-   "price_local": 4940.0,
+   "price_local": 4980.0,
    "currency": "IDR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 26.74,
+    "observed_deviation_pct": 25.73,
     "observed_width_factor": 1.5798,
     "checks": {
      "sector_model_supported": true,
@@ -37065,7 +37065,7 @@
      },
      {
       "period_end": "2023-12-31",
-      "price": 8382.5479,
+      "price": 8382.5488,
       "book_value_per_share": 1965.9798,
       "price_to_book": 4.2638,
       "roe_pct": 20.0693,
@@ -37081,7 +37081,7 @@
      },
      {
       "period_end": "2025-12-31",
-      "price": 7681.9004,
+      "price": 7681.8999,
       "book_value_per_share": 2288.1029,
       "price_to_book": 3.3573,
       "roe_pct": 20.442,
@@ -37189,13 +37189,13 @@
   {
    "symbol": "GOTO.JK",
    "name": "PT GoTo Gojek Tokopedia Tbk",
-   "price_local": 23.0,
+   "price_local": 24.0,
    "currency": "IDR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 15.97,
+    "observed_deviation_pct": 11.14,
     "observed_width_factor": 3.8399,
     "checks": {
      "sector_model_supported": true,
@@ -46468,13 +46468,13 @@
   {
    "symbol": "BAJFINANCE.NS",
    "name": "Bajaj Finance Limited",
-   "price_local": 938.9000244140625,
+   "price_local": 939.0999755859375,
    "currency": "INR",
    "gate": {
     "status": "withheld_sector_model",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 102.78,
+    "observed_deviation_pct": 102.82,
     "observed_width_factor": 1.6037,
     "checks": {
      "sector_model_supported": false,
@@ -46550,13 +46550,13 @@
   {
    "symbol": "MARUTI.NS",
    "name": "Maruti Suzuki India Limited",
-   "price_local": 11426.0,
+   "price_local": 11397.0,
    "currency": "INR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 25.44,
+    "observed_deviation_pct": 25.12,
     "observed_width_factor": 1.1584,
     "checks": {
      "sector_model_supported": true,
@@ -46639,7 +46639,7 @@
   {
    "symbol": "LT.NS",
    "name": "Larsen & Toubro Limited",
-   "price_local": 3837.10009765625,
+   "price_local": 3871.699951171875,
    "currency": "INR",
    "gate": {
     "status": "withheld_wide_range",
@@ -46728,13 +46728,13 @@
   {
    "symbol": "SUNPHARMA.NS",
    "name": "Sun Pharmaceutical Industries Limited",
-   "price_local": 1761.0,
+   "price_local": 1777.699951171875,
    "currency": "INR",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 30.7,
+    "observed_deviation_pct": 31.94,
     "observed_width_factor": 1.4777,
     "checks": {
      "sector_model_supported": true,
@@ -46817,13 +46817,13 @@
   {
    "symbol": "HAL.NS",
    "name": "Hindustan Aeronautics Limited",
-   "price_local": 4869.89990234375,
+   "price_local": 4853.7001953125,
    "currency": "INR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 30.85,
+    "observed_deviation_pct": 30.42,
     "observed_width_factor": 3.2201,
     "checks": {
      "sector_model_supported": true,
@@ -46906,13 +46906,13 @@
   {
    "symbol": "BEL.NS",
    "name": "Bharat Electronics Limited",
-   "price_local": 370.0,
+   "price_local": 369.8999938964844,
    "currency": "INR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 64.96,
+    "observed_deviation_pct": 64.92,
     "observed_width_factor": 2.4954,
     "checks": {
      "sector_model_supported": true,
@@ -46995,13 +46995,13 @@
   {
    "symbol": "ADANIENT.NS",
    "name": "Adani Enterprises Limited",
-   "price_local": 2607.89990234375,
+   "price_local": 2579.39990234375,
    "currency": "INR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 25.87,
+    "observed_deviation_pct": 24.49,
     "observed_width_factor": 8.8935,
     "checks": {
      "sector_model_supported": true,
@@ -47084,13 +47084,13 @@
   {
    "symbol": "TITAN.NS",
    "name": "Titan Company Limited",
-   "price_local": 4434.0,
+   "price_local": 4436.5,
    "currency": "INR",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 239.54,
+    "observed_deviation_pct": 239.73,
     "observed_width_factor": 1.4309,
     "checks": {
      "sector_model_supported": true,
@@ -47173,13 +47173,13 @@
   {
    "symbol": "DMART.NS",
    "name": "Avenue Supermarts Limited",
-   "price_local": 3175.0,
+   "price_local": 3199.0,
    "currency": "INR",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 89.82,
+    "observed_deviation_pct": 91.25,
     "observed_width_factor": 1.878,
     "checks": {
      "sector_model_supported": true,
@@ -48704,9 +48704,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 15.2557,
+      "reference_multiple": 15.2558,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 117.46889
+      "implied_price": 117.46966
      },
      {
       "metric": "pe",
@@ -48755,7 +48755,7 @@
    "metrics": {
     "pe": {
      "current": 17.3291,
-     "own_5y_average": 15.2557,
+     "own_5y_average": 15.2558,
      "sector_median": 33.5201,
      "sector_peer_count": 221
     },
@@ -51706,37 +51706,37 @@
    },
    "metrics": {
     "pe": {
-     "current": 13.8322,
+     "current": 14.3048,
      "own_5y_average": null,
      "sector_median": 16.5,
      "sector_peer_count": 65
     },
     "forward_pe": {
-     "current": 11.582,
+     "current": 11.9777,
      "own_5y_average": null,
      "sector_median": 12.3168,
      "sector_peer_count": 68
     },
     "peg": {
-     "current": 0.622,
+     "current": 0.658,
      "own_5y_average": null,
      "sector_median": 1.2987,
      "sector_peer_count": 39
     },
     "ev_ebitda": {
-     "current": 9.156,
+     "current": 9.324,
      "own_5y_average": null,
      "sector_median": 8.5815,
      "sector_peer_count": 64
     },
     "price_to_fcf": {
-     "current": 6.8517,
+     "current": 7.0858,
      "own_5y_average": null,
      "sector_median": 13.8391,
      "sector_peer_count": 44
     },
     "price_to_sales": {
-     "current": 0.813,
+     "current": 0.8407,
      "own_5y_average": null,
      "sector_median": 2.5156,
      "sector_peer_count": 70
@@ -56658,7 +56658,7 @@
      },
      {
       "period_end": "2023-12-31",
-      "price": 126.1538,
+      "price": 126.1539,
       "book_value_per_share": 408.3213,
       "price_to_book": 0.309,
       "roe_pct": 14.9893,
@@ -57025,13 +57025,13 @@
   {
    "symbol": "005930.KS",
    "name": "Samsung Electronics Co., Ltd.",
-   "price_local": 225000.0,
+   "price_local": 232000.0,
    "currency": "KRW",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 54.75,
+    "observed_deviation_pct": 50.08,
     "observed_width_factor": 2.4063,
     "checks": {
      "sector_model_supported": true,
@@ -57114,13 +57114,13 @@
   {
    "symbol": "6758.T",
    "name": "Sony Group Corporation",
-   "price_local": 3958.0,
+   "price_local": 3936.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 84.12,
+    "observed_deviation_pct": 85.15,
     "observed_width_factor": 1.5693,
     "checks": {
      "sector_model_supported": true,
@@ -62138,7 +62138,7 @@
     "annual_calculation": [
      {
       "period_end": "2024-12-31",
-      "price": 186.3652,
+      "price": 186.3653,
       "book_value_per_share": 73.3707,
       "price_to_book": 2.5401,
       "roe_pct": 23.4041,
@@ -62384,7 +62384,7 @@
      },
      {
       "period_end": "2025-12-31",
-      "price": 256.46,
+      "price": 256.4601,
       "book_value_per_share": 90.7432,
       "price_to_book": 2.8262,
       "roe_pct": 6.4062,
@@ -71481,9 +71481,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "issuer_history",
-      "reference_multiple": 15171.905,
+      "reference_multiple": 15171.9048,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 38.427069
+      "implied_price": 38.427068
      },
      {
       "metric": "price_to_sales",
@@ -71527,7 +71527,7 @@
     },
     "price_to_sales": {
      "current": 14750.6696,
-     "own_5y_average": 15171.905,
+     "own_5y_average": 15171.9048,
      "sector_median": 7.716,
      "sector_peer_count": 71
     }
@@ -76862,7 +76862,7 @@
   {
    "symbol": "9984.T",
    "name": "SoftBank Group Corp.",
-   "price_local": 4481.0,
+   "price_local": 4765.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_wide_range",
@@ -76944,13 +76944,13 @@
   {
    "symbol": "8035.T",
    "name": "Tokyo Electron Limited",
-   "price_local": 9514.0,
+   "price_local": 10035.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 33.17,
+    "observed_deviation_pct": 40.46,
     "observed_width_factor": 1.1746,
     "checks": {
      "sector_model_supported": true,
@@ -77040,7 +77040,7 @@
   {
    "symbol": "6501.T",
    "name": "Hitachi, Ltd.",
-   "price_local": 5094.0,
+   "price_local": 5071.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_narrow_basis",
@@ -77129,13 +77129,13 @@
   {
    "symbol": "4063.T",
    "name": "Shin-Etsu Chemical Co., Ltd.",
-   "price_local": 5966.0,
+   "price_local": 6010.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_narrow_basis",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 12.59,
+    "observed_deviation_pct": 13.42,
     "observed_width_factor": 1.4292,
     "checks": {
      "sector_model_supported": true,
@@ -77225,13 +77225,13 @@
   {
    "symbol": "7974.T",
    "name": "Nintendo Co., Ltd.",
-   "price_local": 8289.0,
+   "price_local": 8158.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 0.97,
+    "observed_deviation_pct": 0.0,
     "observed_width_factor": 2.0758,
     "checks": {
      "sector_model_supported": true,
@@ -77314,13 +77314,13 @@
   {
    "symbol": "000270.KS",
    "name": "Kia Corporation",
-   "price_local": 95600.0,
+   "price_local": 108300.0,
    "currency": "KRW",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 16.18,
+    "observed_deviation_pct": 2.55,
     "observed_width_factor": 3.6293,
     "checks": {
      "sector_model_supported": true,
@@ -77403,7 +77403,7 @@
   {
    "symbol": "035420.KS",
    "name": "NAVER Corporation",
-   "price_local": 172300.0,
+   "price_local": 174900.0,
    "currency": "KRW",
    "gate": {
     "status": "withheld_wide_range",
@@ -78586,13 +78586,13 @@
   {
    "symbol": "9432.T",
    "name": "NTT, Inc.",
-   "price_local": 173.3000030517578,
+   "price_local": 171.5,
    "currency": "JPY",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 110.89,
+    "observed_deviation_pct": 113.1,
     "observed_width_factor": 1.0204,
     "checks": {
      "sector_model_supported": true,
@@ -78603,8 +78603,8 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 365.4691,
-    "upper": 372.9172,
+    "lower": 365.4585,
+    "upper": 372.9278,
     "currency": "JPY",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -78682,13 +78682,13 @@
   {
    "symbol": "6098.T",
    "name": "Recruit Holdings Co., Ltd.",
-   "price_local": 19200.0,
+   "price_local": 18890.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_extreme_deviation",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 158.38,
+    "observed_deviation_pct": 154.21,
     "observed_width_factor": 1.2306,
     "checks": {
      "sector_model_supported": true,
@@ -78778,13 +78778,13 @@
   {
    "symbol": "4519.T",
    "name": "Chugai Pharmaceutical Co., Ltd.",
-   "price_local": 6822.0,
+   "price_local": 6653.0,
    "currency": "JPY",
    "gate": {
     "status": "withheld_wide_range",
     "max_deviation_pct": 50.0,
     "max_width_factor": 1.5,
-    "observed_deviation_pct": 0.17,
+    "observed_deviation_pct": 0.0,
     "observed_width_factor": 1.5094,
     "checks": {
      "sector_model_supported": true,
@@ -85415,9 +85415,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 177.1547,
+      "reference_multiple": 177.1546,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 308.249178
+      "implied_price": 308.249004
      },
      {
       "metric": "pe",
@@ -85466,7 +85466,7 @@
    "metrics": {
     "pe": {
      "current": 33.4731,
-     "own_5y_average": 177.1547,
+     "own_5y_average": 177.1546,
      "sector_median": 28.8045,
      "sector_peer_count": 66
     },
@@ -87817,9 +87817,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "issuer_history",
-      "reference_multiple": 1570.0078,
+      "reference_multiple": 1570.008,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 228.701349
+      "implied_price": 228.701379
      },
      {
       "metric": "price_to_sales",
@@ -87863,7 +87863,7 @@
     },
     "price_to_sales": {
      "current": 2022.7459,
-     "own_5y_average": 1570.0078,
+     "own_5y_average": 1570.008,
      "sector_median": 7.716,
      "sector_peer_count": 71
     }
@@ -90362,7 +90362,7 @@
     "reason": "Die Bewertung besitzt noch nicht beide unabhängigen Referenzfamilien. Der faire Bereich liegt mehr als 50% vom aktuellen Kurs entfernt."
    },
    "raw_fair_value_range": {
-    "lower": 39.6862,
+    "lower": 39.6861,
     "upper": 41.1091,
     "currency": "USD",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
@@ -94381,7 +94381,7 @@
      },
      {
       "period_end": "2023-12-31",
-      "price": 233.1669,
+      "price": 233.167,
       "book_value_per_share": 92.8436,
       "price_to_book": 2.5114,
       "roe_pct": 11.0819,
@@ -94389,7 +94389,7 @@
      },
      {
       "period_end": "2025-12-31",
-      "price": 325.2377,
+      "price": 325.2378,
       "book_value_per_share": 83.8874,
       "price_to_book": 3.8771,
       "roe_pct": 20.1229,
@@ -101062,9 +101062,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 22.4348,
+      "reference_multiple": 22.4349,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 123.459002
+      "implied_price": 123.459552
      },
      {
       "metric": "price_to_fcf",
@@ -101116,7 +101116,7 @@
     },
     "price_to_fcf": {
      "current": 10.2642,
-     "own_5y_average": 22.4348,
+     "own_5y_average": 22.4349,
      "sector_median": 15.0925,
      "sector_peer_count": 66
     },
@@ -101784,7 +101784,7 @@
       "period_end": "2024-12-31",
       "price": 34.5832,
       "book_value_per_share": 11.3126,
-      "price_to_book": 3.057,
+      "price_to_book": 3.0571,
       "roe_pct": 13.9124,
       "pb_to_roe": 21.9736
      },
@@ -107408,9 +107408,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 1823.2089,
+      "reference_multiple": 1823.2091,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 3741.369065
+      "implied_price": 3741.369475
      },
      {
       "metric": "price_to_fcf",
@@ -107462,7 +107462,7 @@
     },
     "price_to_fcf": {
      "current": 41.4692,
-     "own_5y_average": 1823.2089,
+     "own_5y_average": 1823.2091,
      "sector_median": 13.8391,
      "sector_peer_count": 44
     },
@@ -108845,9 +108845,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 207.8751,
+      "reference_multiple": 207.875,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 2038.929584
+      "implied_price": 2038.928603
      },
      {
       "metric": "price_to_fcf",
@@ -108899,7 +108899,7 @@
     },
     "price_to_fcf": {
      "current": 5.6231,
-     "own_5y_average": 207.8751,
+     "own_5y_average": 207.875,
      "sector_median": 15.1724,
      "sector_peer_count": 128
     },
@@ -109953,7 +109953,7 @@
      },
      {
       "period_end": "2024-12-31",
-      "price": 246.5939,
+      "price": 246.5938,
       "book_value_per_share": 195.7716,
       "price_to_book": 1.2596,
       "roe_pct": 18.3989,
@@ -114463,9 +114463,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 44.3322,
+      "reference_multiple": 44.3321,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 262.889946
+      "implied_price": 262.889353
      },
      {
       "metric": "pe",
@@ -114507,7 +114507,7 @@
    "metrics": {
     "pe": {
      "current": 17.4753,
-     "own_5y_average": 44.3322,
+     "own_5y_average": 44.3321,
      "sector_median": 16.5,
      "sector_peer_count": 65
     },
