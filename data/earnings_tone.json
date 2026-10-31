@@ -95,7 +95,7 @@
  "_meta": {
   "schema": "stock-radar-earnings-tone-cache",
   "schema_version": 2,
-  "written_at": "2026-10-31T16:24:48+00:00",
+  "written_at": "2026-10-31T21:44:24+00:00",
   "refreshed": 3
  },
  "EIX": {
@@ -322,35 +322,35 @@
   "last_success_at": "2026-08-25T17:49:51+00:00"
  },
  "EQIX": {
-  "score": 43.0,
-  "direction": "negative",
+  "score": 50.0,
+  "direction": "neutral",
   "transcript_status": "prepared-only",
   "analysis_method": "free_financial_lexicon_v1",
-  "current_tone": 50,
-  "previous_tone": 55,
-  "tone_shift": -5,
-  "hedging_shift": 2,
+  "current_tone": 48,
+  "previous_tone": 50,
+  "tone_shift": -2,
+  "hedging_shift": -2,
   "qa_evasiveness_shift": null,
   "qa_status": "not_available",
   "cfo_tone_shift": null,
   "cfo_weight": null,
-  "reason": "Free lexicon: positive/negative 17/20 vs 48/40; Q&A/CFO unavailable.",
+  "reason": "Free lexicon: positive/negative 36/40 vs 17/20; Q&A/CFO unavailable.",
   "current_period": {
+   "period": "2026-10-28",
+   "filing_date": "2026-10-28",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1101239/000110123926000178/a991eqix-q326xpr.htm"
+  },
+  "previous_period": {
    "period": "2026-08-06",
    "filing_date": "2026-08-06",
    "source": "SEC EDGAR 8-K exhibit",
    "source_url": "https://www.sec.gov/Archives/edgar/data/1101239/000110465926092009/tm2622384d1_ex4-6.htm"
   },
-  "previous_period": {
-   "period": "2026-07-29",
-   "filing_date": "2026-07-29",
-   "source": "SEC EDGAR 8-K exhibit",
-   "source_url": "https://www.sec.gov/Archives/edgar/data/1101239/000110123926000145/a991eqix-q226xpr.htm"
-  },
   "source": "free earnings text + transparent financial lexicon",
   "expected_delay": "source publication time",
-  "fetched_at": "2026-08-25T17:49:52+00:00",
-  "last_success_at": "2026-08-25T17:49:52+00:00"
+  "fetched_at": "2026-10-31T21:44:24+00:00",
+  "last_success_at": "2026-10-31T21:44:24+00:00"
  },
  "HLT": {
   "score": 56.0,
@@ -8143,7 +8143,7 @@
  },
  "WIX": {
   "_refresh_failure": {
-   "at": "2026-10-31T16:24:40+00:00",
+   "at": "2026-10-31T21:44:22+00:00",
    "error": "fewer than two free quarterly earnings texts"
   }
  },
@@ -9609,5 +9609,36 @@
   "expected_delay": "source publication time",
   "fetched_at": "2026-10-31T16:24:48+00:00",
   "last_success_at": "2026-10-31T16:24:48+00:00"
+ },
+ "DAL": {
+  "score": 54.0,
+  "direction": "neutral",
+  "transcript_status": "prepared-only",
+  "analysis_method": "free_financial_lexicon_v1",
+  "current_tone": 68,
+  "previous_tone": 63,
+  "tone_shift": 5,
+  "hedging_shift": 1,
+  "qa_evasiveness_shift": null,
+  "qa_status": "not_available",
+  "cfo_tone_shift": null,
+  "cfo_weight": null,
+  "reason": "Free lexicon: positive/negative 50/9 vs 43/13; Q&A/CFO unavailable.",
+  "current_period": {
+   "period": "2026-10-09",
+   "filing_date": "2026-10-09",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/27904/000002790426000035/deltaairlinesannouncessept.htm"
+  },
+  "previous_period": {
+   "period": "2026-07-10",
+   "filing_date": "2026-07-10",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/27904/000002790426000029/deltaairlinesannouncesjune.htm"
+  },
+  "source": "free earnings text + transparent financial lexicon",
+  "expected_delay": "source publication time",
+  "fetched_at": "2026-10-31T21:44:23+00:00",
+  "last_success_at": "2026-10-31T21:44:23+00:00"
  }
 }
