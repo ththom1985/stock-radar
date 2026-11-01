@@ -1,17 +1,24 @@
 {
- "score": 75.1,
+ "score": 73.9,
  "regime": "risk_on",
- "report_date": "2026-10-20",
+ "report_date": "2026-10-27",
  "contracts": {
   "sp500": {
    "score": 78.0,
    "direction": "risk_on",
-   "report_date": "2026-10-20",
-   "asset_manager_net_pct_oi": 31.556,
-   "leveraged_money_net_pct_oi": -12.301,
-   "asset_manager_weekly_change": -0.807,
-   "leveraged_money_weekly_change": 1.562,
+   "report_date": "2026-10-27",
+   "asset_manager_net_pct_oi": 31.998,
+   "leveraged_money_net_pct_oi": -13.0,
+   "asset_manager_weekly_change": 0.443,
+   "leveraged_money_weekly_change": -0.699,
    "periods": [
+    {
+     "report_date": "2026-10-27",
+     "market": "S&P 500 Consolidated - CHICAGO MERCANTILE EXCHANGE",
+     "open_interest": 2867378.0,
+     "asset_manager_net_pct_oi": 31.998327391784407,
+     "leveraged_money_net_pct_oi": -12.999576616686046
+    },
     {
      "report_date": "2026-10-20",
      "market": "S&P 500 Consolidated - CHICAGO MERCANTILE EXCHANGE",
@@ -60,26 +67,26 @@
      "open_interest": 3077426.0,
      "asset_manager_net_pct_oi": 29.497703600346526,
      "leveraged_money_net_pct_oi": -10.939109502551808
-    },
-    {
-     "report_date": "2026-09-01",
-     "market": "S&P 500 Consolidated - CHICAGO MERCANTILE EXCHANGE",
-     "open_interest": 3050534.0,
-     "asset_manager_net_pct_oi": 30.403004850953963,
-     "leveraged_money_net_pct_oi": -10.082103657916942
     }
    ],
    "label": "S&P 500 Consolidated"
   },
   "nasdaq100": {
-   "score": 77.5,
+   "score": 73.9,
    "direction": "risk_on",
-   "report_date": "2026-10-20",
-   "asset_manager_net_pct_oi": 24.396,
-   "leveraged_money_net_pct_oi": -2.226,
-   "asset_manager_weekly_change": 1.403,
-   "leveraged_money_weekly_change": 3.093,
+   "report_date": "2026-10-27",
+   "asset_manager_net_pct_oi": 20.914,
+   "leveraged_money_net_pct_oi": -1.538,
+   "asset_manager_weekly_change": -3.482,
+   "leveraged_money_weekly_change": 0.688,
    "periods": [
+    {
+     "report_date": "2026-10-27",
+     "market": "NASDAQ-100 Consolidated - CHICAGO MERCANTILE EXCHANGE",
+     "open_interest": 320712.0,
+     "asset_manager_net_pct_oi": 20.914091147197485,
+     "leveraged_money_net_pct_oi": -1.537828331961386
+    },
     {
      "report_date": "2026-10-20",
      "market": "NASDAQ-100 Consolidated - CHICAGO MERCANTILE EXCHANGE",
@@ -128,13 +135,6 @@
      "open_interest": 351401.0,
      "asset_manager_net_pct_oi": 21.41029763717235,
      "leveraged_money_net_pct_oi": -9.324390084262708
-    },
-    {
-     "report_date": "2026-09-01",
-     "market": "NASDAQ-100 Consolidated - CHICAGO MERCANTILE EXCHANGE",
-     "open_interest": 355834.0,
-     "asset_manager_net_pct_oi": 20.13354541724512,
-     "leveraged_money_net_pct_oi": -4.084769864599785
     }
    ],
    "label": "NASDAQ-100 Consolidated"
@@ -142,12 +142,19 @@
   "vix": {
    "score": 69.7,
    "direction": "risk_on",
-   "report_date": "2026-10-20",
-   "asset_manager_net_pct_oi": -13.246,
-   "leveraged_money_net_pct_oi": -4.816,
-   "asset_manager_weekly_change": 3.989,
-   "leveraged_money_weekly_change": -5.062,
+   "report_date": "2026-10-27",
+   "asset_manager_net_pct_oi": -11.741,
+   "leveraged_money_net_pct_oi": -6.96,
+   "asset_manager_weekly_change": 1.505,
+   "leveraged_money_weekly_change": -2.144,
    "periods": [
+    {
+     "report_date": "2026-10-27",
+     "market": "VIX FUTURES - CBOE FUTURES EXCHANGE",
+     "open_interest": 378378.0,
+     "asset_manager_net_pct_oi": -11.740640312068884,
+     "leveraged_money_net_pct_oi": -6.95970695970696
+    },
     {
      "report_date": "2026-10-20",
      "market": "VIX FUTURES - CBOE FUTURES EXCHANGE",
@@ -196,13 +203,6 @@
      "open_interest": 431684.0,
      "asset_manager_net_pct_oi": -8.666756238359541,
      "leveraged_money_net_pct_oi": -5.39051713753579
-    },
-    {
-     "report_date": "2026-09-01",
-     "market": "VIX FUTURES - CBOE FUTURES EXCHANGE",
-     "open_interest": 410586.0,
-     "asset_manager_net_pct_oi": -7.556273228994656,
-     "leveraged_money_net_pct_oi": -6.395249716259201
     }
    ],
    "label": "VIX Futures"
@@ -220,11 +220,11 @@
   "official_commercial_channel": "Cboe DataShop",
   "substitute": "CFTC VIX Futures TFF positioning (official and free)"
  },
- "fetched_at": "2026-10-25T07:47:36+00:00",
- "last_success_at": "2026-10-25T07:47:36+00:00",
+ "fetched_at": "2026-11-01T09:30:26+00:00",
+ "last_success_at": "2026-11-01T09:30:26+00:00",
  "_meta": {
   "schema": "stock-radar-market-positioning-cache",
   "schema_version": 1,
-  "written_at": "2026-10-25T07:47:36+00:00"
+  "written_at": "2026-11-01T09:30:26+00:00"
  }
 }
