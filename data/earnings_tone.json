@@ -95,7 +95,7 @@
  "_meta": {
   "schema": "stock-radar-earnings-tone-cache",
   "schema_version": 2,
-  "written_at": "2026-11-01T22:14:04+00:00",
+  "written_at": "2026-11-02T10:31:42+00:00",
   "refreshed": 3
  },
  "EIX": {
@@ -6583,8 +6583,8 @@
   },
   "source": "free earnings text + transparent financial lexicon",
   "expected_delay": "source publication time",
-  "fetched_at": "2026-10-03T08:20:08+00:00",
-  "last_success_at": "2026-10-03T08:20:08+00:00"
+  "fetched_at": "2026-11-02T10:31:41+00:00",
+  "last_success_at": "2026-11-02T10:31:41+00:00"
  },
  "IQV": {
   "score": 48.0,
@@ -8143,7 +8143,7 @@
  },
  "WIX": {
   "_refresh_failure": {
-   "at": "2026-11-01T22:14:01+00:00",
+   "at": "2026-11-02T10:31:40+00:00",
    "error": "fewer than two free quarterly earnings texts"
   }
  },
@@ -9764,5 +9764,36 @@
   "expected_delay": "source publication time",
   "fetched_at": "2026-11-01T22:14:04+00:00",
   "last_success_at": "2026-11-01T22:14:04+00:00"
+ },
+ "PRI": {
+  "score": 47.0,
+  "direction": "neutral",
+  "transcript_status": "prepared-only",
+  "analysis_method": "free_financial_lexicon_v1",
+  "current_tone": 45,
+  "previous_tone": 50,
+  "tone_shift": -5,
+  "hedging_shift": -2,
+  "qa_evasiveness_shift": null,
+  "qa_status": "not_available",
+  "cfo_tone_shift": null,
+  "cfo_weight": null,
+  "reason": "Free lexicon: positive/negative 0/7 vs 73/76; Q&A/CFO unavailable.",
+  "current_period": {
+   "period": "2026-08-05",
+   "filing_date": "2026-08-05",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1475922/000119312526335260/pri-ex99_2.htm"
+  },
+  "previous_period": {
+   "period": "2026-06-02",
+   "filing_date": "2026-06-02",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1475922/000119312526253592/pri-ex10_1.htm"
+  },
+  "source": "free earnings text + transparent financial lexicon",
+  "expected_delay": "source publication time",
+  "fetched_at": "2026-11-02T10:31:42+00:00",
+  "last_success_at": "2026-11-02T10:31:42+00:00"
  }
 }
