@@ -95,7 +95,7 @@
  "_meta": {
   "schema": "stock-radar-earnings-tone-cache",
   "schema_version": 2,
-  "written_at": "2026-11-03T01:22:40+00:00",
+  "written_at": "2026-11-03T04:11:45+00:00",
   "refreshed": 3
  },
  "EIX": {
@@ -9857,5 +9857,98 @@
   "expected_delay": "source publication time",
   "fetched_at": "2026-11-03T01:22:40+00:00",
   "last_success_at": "2026-11-03T01:22:40+00:00"
+ },
+ "MPC": {
+  "score": 62.0,
+  "direction": "positive",
+  "transcript_status": "prepared-only",
+  "analysis_method": "free_financial_lexicon_v1",
+  "current_tone": 56,
+  "previous_tone": 45,
+  "tone_shift": 11,
+  "hedging_shift": -1,
+  "qa_evasiveness_shift": null,
+  "qa_status": "not_available",
+  "cfo_tone_shift": null,
+  "cfo_weight": null,
+  "reason": "Free lexicon: positive/negative 22/11 vs 14/23; Q&A/CFO unavailable.",
+  "current_period": {
+   "period": "2026-08-04",
+   "filing_date": "2026-08-04",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1510295/000151029526000060/mpcq22026earningsrelease.htm"
+  },
+  "previous_period": {
+   "period": "2026-05-05",
+   "filing_date": "2026-05-05",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1510295/000151029526000039/mpcq12026earningsrelease.htm"
+  },
+  "source": "free earnings text + transparent financial lexicon",
+  "expected_delay": "source publication time",
+  "fetched_at": "2026-11-03T04:11:40+00:00",
+  "last_success_at": "2026-11-03T04:11:40+00:00"
+ },
+ "MTDR": {
+  "score": 48.0,
+  "direction": "neutral",
+  "transcript_status": "prepared-only",
+  "analysis_method": "free_financial_lexicon_v1",
+  "current_tone": 47,
+  "previous_tone": 46,
+  "tone_shift": 1,
+  "hedging_shift": 3,
+  "qa_evasiveness_shift": null,
+  "qa_status": "not_available",
+  "cfo_tone_shift": null,
+  "cfo_weight": null,
+  "reason": "Free lexicon: positive/negative 3/5 vs 25/37; Q&A/CFO unavailable.",
+  "current_period": {
+   "period": "2026-10-01",
+   "filing_date": "2026-10-05",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1520006/000152000626000050/paloma_closingxpressxrelea.htm"
+  },
+  "previous_period": {
+   "period": "2026-08-05",
+   "filing_date": "2026-08-05",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1520006/000152000626000036/a20260630mtdr8ker-ex991.htm"
+  },
+  "source": "free earnings text + transparent financial lexicon",
+  "expected_delay": "source publication time",
+  "fetched_at": "2026-11-03T04:11:42+00:00",
+  "last_success_at": "2026-11-03T04:11:42+00:00"
+ },
+ "RNG": {
+  "score": 50.0,
+  "direction": "neutral",
+  "transcript_status": "prepared-only",
+  "analysis_method": "free_financial_lexicon_v1",
+  "current_tone": 48,
+  "previous_tone": 49,
+  "tone_shift": -1,
+  "hedging_shift": -1,
+  "qa_evasiveness_shift": null,
+  "qa_status": "not_available",
+  "cfo_tone_shift": null,
+  "cfo_weight": null,
+  "reason": "Free lexicon: positive/negative 19/22 vs 20/22; Q&A/CFO unavailable.",
+  "current_period": {
+   "period": "2026-10-22",
+   "filing_date": "2026-10-22",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1384905/000138490526000058/rng-20260930x8kxex991.htm"
+  },
+  "previous_period": {
+   "period": "2026-07-23",
+   "filing_date": "2026-07-23",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1384905/000138490526000043/rng-20260630x8kxex991.htm"
+  },
+  "source": "free earnings text + transparent financial lexicon",
+  "expected_delay": "source publication time",
+  "fetched_at": "2026-11-03T04:11:45+00:00",
+  "last_success_at": "2026-11-03T04:11:45+00:00"
  }
 }
