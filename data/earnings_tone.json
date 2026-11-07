@@ -95,7 +95,7 @@
  "_meta": {
   "schema": "stock-radar-earnings-tone-cache",
   "schema_version": 2,
-  "written_at": "2026-11-07T02:56:46+00:00",
+  "written_at": "2026-11-07T08:56:05+00:00",
   "refreshed": 3
  },
  "EIX": {
@@ -4326,35 +4326,35 @@
   "last_success_at": "2026-10-19T22:39:17+00:00"
  },
  "HOMB": {
-  "score": 69.0,
-  "direction": "positive",
+  "score": 53.0,
+  "direction": "neutral",
   "transcript_status": "prepared-only",
   "analysis_method": "free_financial_lexicon_v1",
-  "current_tone": 69,
-  "previous_tone": 52,
-  "tone_shift": 17,
-  "hedging_shift": -2,
+  "current_tone": 54,
+  "previous_tone": 50,
+  "tone_shift": 4,
+  "hedging_shift": 1,
   "qa_evasiveness_shift": null,
   "qa_status": "not_available",
   "cfo_tone_shift": null,
   "cfo_weight": null,
-  "reason": "Free lexicon: positive/negative 58/17 vs 31/27; Q&A/CFO unavailable.",
+  "reason": "Free lexicon: positive/negative 10/1 vs 28/29; Q&A/CFO unavailable.",
   "current_period": {
-   "period": "2026-07-15",
-   "filing_date": "2026-07-15",
+   "period": "2026-11-05",
+   "filing_date": "2026-11-05",
    "source": "SEC EDGAR 8-K exhibit",
-   "source_url": "https://www.sec.gov/Archives/edgar/data/1331520/000133152026000106/homb063026earningsrelease.htm"
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1331520/000133152026000120/0001331520-26-000120.txt"
   },
   "previous_period": {
-   "period": "2026-04-15",
-   "filing_date": "2026-04-15",
+   "period": "2026-10-14",
+   "filing_date": "2026-10-14",
    "source": "SEC EDGAR 8-K exhibit",
-   "source_url": "https://www.sec.gov/Archives/edgar/data/1331520/000133152026000088/homb033126earningsrelease.htm"
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1331520/000133152026000117/homb093026earningsrelease.htm"
   },
   "source": "free earnings text + transparent financial lexicon",
   "expected_delay": "source publication time",
-  "fetched_at": "2026-09-16T07:54:52+00:00",
-  "last_success_at": "2026-09-16T07:54:52+00:00"
+  "fetched_at": "2026-11-07T08:56:05+00:00",
+  "last_success_at": "2026-11-07T08:56:05+00:00"
  },
  "NUE": {
   "score": 50.0,
@@ -10486,7 +10486,7 @@
  },
  "NTR": {
   "_refresh_failure": {
-   "at": "2026-11-07T02:56:41+00:00",
+   "at": "2026-11-07T08:56:02+00:00",
    "error": "fewer than two free quarterly earnings texts"
   }
  },
@@ -10520,5 +10520,36 @@
   "expected_delay": "source publication time",
   "fetched_at": "2026-11-07T02:56:42+00:00",
   "last_success_at": "2026-11-07T02:56:42+00:00"
+ },
+ "FNB": {
+  "score": 50.0,
+  "direction": "neutral",
+  "transcript_status": "prepared-only",
+  "analysis_method": "free_financial_lexicon_v1",
+  "current_tone": 68,
+  "previous_tone": 68,
+  "tone_shift": 0,
+  "hedging_shift": 0,
+  "qa_evasiveness_shift": null,
+  "qa_status": "not_available",
+  "cfo_tone_shift": null,
+  "cfo_weight": null,
+  "reason": "Free lexicon: positive/negative 71/27 vs 65/24; Q&A/CFO unavailable.",
+  "current_period": {
+   "period": "2026-10-19",
+   "filing_date": "2026-10-20",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/37808/000003780826000027/fnbex991earningsreleaseq32.htm"
+  },
+  "previous_period": {
+   "period": "2026-07-16",
+   "filing_date": "2026-07-17",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/37808/000003780826000023/fnbex991earningsreleaseq22.htm"
+  },
+  "source": "free earnings text + transparent financial lexicon",
+  "expected_delay": "source publication time",
+  "fetched_at": "2026-11-07T08:56:04+00:00",
+  "last_success_at": "2026-11-07T08:56:04+00:00"
  }
 }
