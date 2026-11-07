@@ -95,7 +95,7 @@
  "_meta": {
   "schema": "stock-radar-earnings-tone-cache",
   "schema_version": 2,
-  "written_at": "2026-11-07T08:56:05+00:00",
+  "written_at": "2026-11-07T15:53:17+00:00",
   "refreshed": 3
  },
  "EIX": {
@@ -7154,7 +7154,11 @@
   "source": "free earnings text + transparent financial lexicon",
   "expected_delay": "source publication time",
   "fetched_at": "2026-10-08T09:08:25+00:00",
-  "last_success_at": "2026-10-08T09:08:25+00:00"
+  "last_success_at": "2026-10-08T09:08:25+00:00",
+  "_refresh_failure": {
+   "at": "2026-11-07T15:53:12+00:00",
+   "error": "HTTP Error 503: Service Unavailable"
+  }
  },
  "CNH": {
   "score": 50.0,
@@ -10486,7 +10490,7 @@
  },
  "NTR": {
   "_refresh_failure": {
-   "at": "2026-11-07T08:56:02+00:00",
+   "at": "2026-11-07T15:53:12+00:00",
    "error": "fewer than two free quarterly earnings texts"
   }
  },
@@ -10551,5 +10555,36 @@
   "expected_delay": "source publication time",
   "fetched_at": "2026-11-07T08:56:04+00:00",
   "last_success_at": "2026-11-07T08:56:04+00:00"
+ },
+ "KHC": {
+  "score": 35.0,
+  "direction": "negative",
+  "transcript_status": "prepared-only",
+  "analysis_method": "free_financial_lexicon_v1",
+  "current_tone": 37,
+  "previous_tone": 51,
+  "tone_shift": -14,
+  "hedging_shift": 1,
+  "qa_evasiveness_shift": null,
+  "qa_status": "not_available",
+  "cfo_tone_shift": null,
+  "cfo_weight": null,
+  "reason": "Free lexicon: positive/negative 41/67 vs 22/20; Q&A/CFO unavailable.",
+  "current_period": {
+   "period": "2026-11-04",
+   "filing_date": "2026-11-04",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1637459/000163745926000078/ex991-erq32026.htm"
+  },
+  "previous_period": {
+   "period": "2026-10-07",
+   "filing_date": "2026-10-07",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1637459/000163745926000069/exhibit991-2026segmentrest.htm"
+  },
+  "source": "free earnings text + transparent financial lexicon",
+  "expected_delay": "source publication time",
+  "fetched_at": "2026-11-07T15:53:17+00:00",
+  "last_success_at": "2026-11-07T15:53:17+00:00"
  }
 }
