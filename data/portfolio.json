@@ -6,7 +6,7 @@
  "created": "2026-09-03",
  "base_currency": "EUR",
  "starting_cash": 10000.0,
- "cash": 8279.751317660037,
+ "cash": 9323.952401365226,
  "positions": {
   "PAYX": {
    "symbol": "PAYX",
@@ -63,92 +63,9 @@
     ]
    },
    "last_base_fx_usd": 1.1147277355194092
-  },
-  "PGR": {
-   "symbol": "PGR",
-   "name": "PGR",
-   "quantity": 5.107553104003547,
-   "entry_price": 204.1892842926072,
-   "cost_basis": 1043.4290665993651,
-   "entry_bar_date": "2026-11-09",
-   "last_price": 204.10365421332915,
-   "high_watermark": 204.1892842926072,
-   "last_mark_bar_date": "2026-11-09",
-   "last_action_bar_date": "2026-11-09",
-   "processed_actions": {},
-   "legacy": false,
-   "issuer_key": "name:pgr",
-   "sector": "Financial Services",
-   "country": "us",
-   "instrument_currency": "USD",
-   "base_currency": "EUR",
-   "entry_thesis": {
-    "situation": {
-     "code": "ideal",
-     "label": "Idealfall: günstig UND am Einstiegspunkt"
-    },
-    "deal_quality": {
-     "score": 57.0,
-     "stars": 3,
-     "label": "Deal-Qualität 3 von 5",
-     "historical_percentile": null,
-     "comparison": "Noch keine Vergleichshistorie; Einordnung nach festen Schwellen.",
-     "comparison_basis": "feste Schwellen; Historie baut sich ab jetzt auf",
-     "history_reliable": false,
-     "reference_ready": false,
-     "history_observation_count": 0,
-     "history_calendar_days": 0,
-     "history_requirement": "mindestens 100 Gelegenheiten über mindestens 30 Kalendertage",
-     "components": {
-      "valuation_discount": 51.1,
-      "timing": 74.0,
-      "signals": 75.0,
-      "risk": 20.0
-     }
-    },
-    "discount_pct": 25.6,
-    "potential_score": 91.3,
-    "quality_score": 98.3,
-    "growth_score": 80.8,
-    "potential_driver": "Umsatzwachstum von +16.3%",
-    "residual_risk": null,
-    "sentences": [
-     "Der Kurs liegt rund 26% unter der unteren plausiblen fairen Grenze.",
-     "Dafür spricht Umsatzwachstum von +16.3%.",
-     "Einstieg jetzt möglich."
-    ]
-   },
-   "last_base_fx_usd": 1.1147277355194092
   }
  },
- "pending_orders": [
-  {
-   "order_id": "b6f7b424-5df4-44b6-81f8-0906bf5b8daf",
-   "strategy_version": 3,
-   "action": "SELL",
-   "symbol": "PGR",
-   "name": "PGR",
-   "signal_bar_date": "2026-11-09",
-   "signal_timestamp": "2026-11-09T00:00:00",
-   "signal_constraints": {
-    "radar_score": 73,
-    "avg_dollar_volume_20_usd": 621807030.4679871,
-    "atr_pct": 2.386893686518792,
-    "vol_annual_pct": 26.65830104171904,
-    "daily_signal_direction": "NEGATIVE"
-   },
-   "created_at": "2026-11-10T04:49:05+00:00",
-   "observed_at": "2026-11-10T04:49:05+00:00",
-   "not_before_bar_date": "2026-11-10",
-   "expected_fill_bar_date": "2026-11-10",
-   "status": "pending",
-   "reason": "Kernsignal ist klar gebrochen",
-   "quantity": 5.107553104003547,
-   "exit_trigger": "signal_break",
-   "return_pct": -0.04,
-   "drawdown_from_peak_pct": -0.04
-  }
- ],
+ "pending_orders": [],
  "ledger": [
   {
    "transaction_id": "55c2072f-345a-42e1-90ea-b07d9eef7684",
@@ -4534,6 +4451,74 @@
    "drawdown_from_peak_pct": -0.04,
    "type": "ORDER_CREATED",
    "timestamp": "2026-11-10T04:49:05+00:00"
+  },
+  {
+   "transaction_id": "1f77be8b-1457-46b9-b5e0-6a6001b3bd5d",
+   "type": "FILL",
+   "order_id": "b6f7b424-5df4-44b6-81f8-0906bf5b8daf",
+   "action": "SELL",
+   "symbol": "PGR",
+   "signal_bar_date": "2026-11-09",
+   "signal_timestamp": "2026-11-09T00:00:00",
+   "created_at": "2026-11-10T04:49:05+00:00",
+   "not_before_bar_date": "2026-11-10",
+   "fill_bar_date": "2026-11-10",
+   "fill_timestamp": "2026-11-10T14:30:00+00:00",
+   "fill_session_open_timestamp": "2026-11-10T14:30:00+00:00",
+   "fill_observed_at": "2026-11-10T23:48:40+00:00",
+   "quantity": 5.107553104003547,
+   "raw_fill_price": 204.74955293618424,
+   "raw_fill_price_usd": 228.24000549316406,
+   "execution_price": 204.54480338324805,
+   "gross_value": 1044.723445427904,
+   "commission": 0.522361722713952,
+   "slippage_bps": 10.0,
+   "base_fx_usd": 1.1147277355194092,
+   "fx_bar_date": "2026-11-09",
+   "fx_convention": "preceding daily close, not synchronous execution FX",
+   "strategy_version": 3,
+   "reason": "Kernsignal ist klar gebrochen",
+   "exit_trigger": "signal_break",
+   "thesis": {
+    "situation": {
+     "code": "ideal",
+     "label": "Idealfall: günstig UND am Einstiegspunkt"
+    },
+    "deal_quality": {
+     "score": 57.0,
+     "stars": 3,
+     "label": "Deal-Qualität 3 von 5",
+     "historical_percentile": null,
+     "comparison": "Noch keine Vergleichshistorie; Einordnung nach festen Schwellen.",
+     "comparison_basis": "feste Schwellen; Historie baut sich ab jetzt auf",
+     "history_reliable": false,
+     "reference_ready": false,
+     "history_observation_count": 0,
+     "history_calendar_days": 0,
+     "history_requirement": "mindestens 100 Gelegenheiten über mindestens 30 Kalendertage",
+     "components": {
+      "valuation_discount": 51.1,
+      "timing": 74.0,
+      "signals": 75.0,
+      "risk": 20.0
+     }
+    },
+    "discount_pct": 25.6,
+    "potential_score": 91.3,
+    "quality_score": 98.3,
+    "growth_score": 80.8,
+    "potential_driver": "Umsatzwachstum von +16.3%",
+    "residual_risk": null,
+    "sentences": [
+     "Der Kurs liegt rund 26% unter der unteren plausiblen fairen Grenze.",
+     "Dafür spricht Umsatzwachstum von +16.3%.",
+     "Einstieg jetzt möglich."
+    ]
+   },
+   "signal_return_pct": -0.04,
+   "signal_drawdown_from_peak_pct": -0.04,
+   "realized_pnl": 0.7720171058249434,
+   "timestamp": "2026-11-10T23:48:40+00:00"
   }
  ],
  "equity_curve": [
@@ -7080,42 +7065,35 @@
   },
   {
    "date": "2026-11-10",
-   "as_of_bar_date": "2026-11-09",
-   "valuation_status": "aligned_completed_bar",
+   "as_of_bar_date": null,
+   "valuation_status": "mixed_or_stale",
    "position_valuation_dates": {
-    "PAYX": "2026-11-09",
-    "PGR": "2026-11-09"
+    "PAYX": null
    },
-   "equity": 10397.651093560173,
-   "cash": 8279.751317660037,
-   "invested": 2117.899775900135,
-   "n_positions": 2,
-   "bench_sp500": 6772.900414008577,
-   "bench_sp500_bar_date": "2026-11-09",
-   "bench_ndx": 25035.37856835633,
-   "bench_ndx_bar_date": "2026-11-09",
-   "bench_world": 183.739940074948,
-   "bench_world_bar_date": "2026-11-09",
+   "equity": 10399.381924649606,
+   "cash": 9323.952401365226,
+   "invested": 1075.4295232843788,
+   "n_positions": 1,
    "benchmark_status": {
     "sp500": {
-     "portfolio_bar_date": "2026-11-09",
-     "benchmark_bar_date": "2026-11-09",
-     "aligned": true,
-     "currency": "EUR",
+     "portfolio_bar_date": null,
+     "benchmark_bar_date": "2026-11-10",
+     "aligned": false,
+     "currency": "USD",
      "comparison_status": "descriptive_only_not_comparable_total_return"
     },
     "ndx": {
-     "portfolio_bar_date": "2026-11-09",
-     "benchmark_bar_date": "2026-11-09",
-     "aligned": true,
-     "currency": "EUR",
+     "portfolio_bar_date": null,
+     "benchmark_bar_date": "2026-11-10",
+     "aligned": false,
+     "currency": "USD",
      "comparison_status": "descriptive_only_not_comparable_total_return"
     },
     "world": {
-     "portfolio_bar_date": "2026-11-09",
-     "benchmark_bar_date": "2026-11-09",
-     "aligned": true,
-     "currency": "EUR",
+     "portfolio_bar_date": null,
+     "benchmark_bar_date": "2026-11-10",
+     "aligned": false,
+     "currency": "USD",
      "comparison_status": "descriptive_only_not_comparable_total_return"
     }
    }
@@ -7146,7 +7124,7 @@
  "_meta": {
   "schema": "stock-radar-paper-portfolio",
   "schema_version": 2,
-  "written_at": "2026-11-10T09:59:51+00:00"
+  "written_at": "2026-11-10T23:48:40+00:00"
  },
  "legacy_archive": {
   "schema": "stock-radar-paper-portfolio",
