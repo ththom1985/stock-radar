@@ -95,7 +95,7 @@
  "_meta": {
   "schema": "stock-radar-earnings-tone-cache",
   "schema_version": 2,
-  "written_at": "2026-11-19T10:31:50+00:00",
+  "written_at": "2026-11-20T00:57:51+00:00",
   "refreshed": 3
  },
  "EIX": {
@@ -545,35 +545,35 @@
   "last_success_at": "2026-10-21T01:45:48+00:00"
  },
  "WST": {
-  "score": 50.0,
-  "direction": "neutral",
+  "score": 69.0,
+  "direction": "positive",
   "transcript_status": "prepared-only",
   "analysis_method": "free_financial_lexicon_v1",
-  "current_tone": 70,
-  "previous_tone": 70,
-  "tone_shift": 0,
-  "hedging_shift": 0,
+  "current_tone": 66,
+  "previous_tone": 49,
+  "tone_shift": 17,
+  "hedging_shift": -2,
   "qa_evasiveness_shift": null,
   "qa_status": "not_available",
   "cfo_tone_shift": null,
   "cfo_weight": null,
-  "reason": "Free lexicon: positive/negative 39/14 vs 31/9; Q&A/CFO unavailable.",
+  "reason": "Free lexicon: positive/negative 27/6 vs 73/94; Q&A/CFO unavailable.",
   "current_period": {
-   "period": "2026-07-23",
-   "filing_date": "2026-07-23",
+   "period": "2026-10-29",
+   "filing_date": "2026-10-29",
    "source": "SEC EDGAR 8-K exhibit",
-   "source_url": "https://www.sec.gov/Archives/edgar/data/105770/000010577026000097/exh991q22026earningsrelease.htm"
+   "source_url": "https://www.sec.gov/Archives/edgar/data/105770/000010577026000118/exh991q32026earningsrelease.htm"
   },
   "previous_period": {
-   "period": "2026-04-23",
-   "filing_date": "2026-04-23",
+   "period": "2026-10-26",
+   "filing_date": "2026-10-26",
    "source": "SEC EDGAR 8-K exhibit",
-   "source_url": "https://www.sec.gov/Archives/edgar/data/105770/000010577026000047/exh991q12026earningsrelease.htm"
+   "source_url": "https://www.sec.gov/Archives/edgar/data/105770/000010577026000114/creditagreement-westphar.htm"
   },
   "source": "free earnings text + transparent financial lexicon",
   "expected_delay": "source publication time",
-  "fetched_at": "2026-08-26T10:26:17+00:00",
-  "last_success_at": "2026-08-26T10:26:17+00:00"
+  "fetched_at": "2026-11-20T00:57:40+00:00",
+  "last_success_at": "2026-11-20T00:57:40+00:00"
  },
  "HIMS": {
   "score": 43.0,
@@ -4260,8 +4260,8 @@
   },
   "source": "free earnings text + transparent financial lexicon",
   "expected_delay": "source publication time",
-  "fetched_at": "2026-09-16T01:41:42+00:00",
-  "last_success_at": "2026-09-16T01:41:42+00:00"
+  "fetched_at": "2026-11-20T00:57:47+00:00",
+  "last_success_at": "2026-11-20T00:57:47+00:00"
  },
  "AVT": {
   "score": 36.0,
@@ -11239,5 +11239,36 @@
   "expected_delay": "source publication time",
   "fetched_at": "2026-11-19T10:31:50+00:00",
   "last_success_at": "2026-11-19T10:31:50+00:00"
+ },
+ "EBAY": {
+  "score": 44.0,
+  "direction": "negative",
+  "transcript_status": "prepared-only",
+  "analysis_method": "free_financial_lexicon_v1",
+  "current_tone": 50,
+  "previous_tone": 51,
+  "tone_shift": -1,
+  "hedging_shift": 5,
+  "qa_evasiveness_shift": null,
+  "qa_status": "not_available",
+  "cfo_tone_shift": null,
+  "cfo_weight": null,
+  "reason": "Free lexicon: positive/negative 22/23 vs 12/4; Q&A/CFO unavailable.",
+  "current_period": {
+   "period": "2026-10-28",
+   "filing_date": "2026-10-28",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1065088/000106508826000209/exhibit991erebayq32026.htm"
+  },
+  "previous_period": {
+   "period": "2026-10-20",
+   "filing_date": "2026-10-22",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1065088/000106508826000205/0001065088-26-000205.txt"
+  },
+  "source": "free earnings text + transparent financial lexicon",
+  "expected_delay": "source publication time",
+  "fetched_at": "2026-11-20T00:57:51+00:00",
+  "last_success_at": "2026-11-20T00:57:51+00:00"
  }
 }
