@@ -1,7 +1,7 @@
 {
  "schema": "stock-radar-valuation-anomalies",
  "schema_version": 1,
- "generated_at": "2026-11-21T09:57:14+00:00",
+ "generated_at": "2026-11-21T23:23:53+00:00",
  "anomalies": [
   {
    "symbol": "AAPL",
@@ -6882,6 +6882,65 @@
    }
   },
   {
+   "symbol": "MRNA",
+   "name": "Moderna, Inc.",
+   "price_local": 195.0,
+   "currency": "USD",
+   "gate": {
+    "status": "withheld_narrow_basis",
+    "max_deviation_pct": 50.0,
+    "max_width_factor": 1.5,
+    "observed_deviation_pct": null,
+    "observed_width_factor": null,
+    "checks": {
+     "sector_model_supported": true,
+     "basis_broad": false,
+     "width_within_limit": false,
+     "deviation_within_limit": false
+    },
+    "reason": "Für die direkte Bewertung fehlen mindestens zwei belastbare Fundamental-Referenzen."
+   },
+   "raw_fair_value_range": null,
+   "metrics": {
+    "pe": {
+     "current": null,
+     "own_5y_average": null,
+     "sector_median": 26.75,
+     "sector_peer_count": 113
+    },
+    "forward_pe": {
+     "current": -49.3706,
+     "own_5y_average": null,
+     "sector_median": 18.104,
+     "sector_peer_count": 139
+    },
+    "peg": {
+     "current": null,
+     "own_5y_average": null,
+     "sector_median": 1.574,
+     "sector_peer_count": 93
+    },
+    "ev_ebitda": {
+     "current": -46.426,
+     "own_5y_average": null,
+     "sector_median": 15.544,
+     "sector_peer_count": 131
+    },
+    "price_to_fcf": {
+     "current": null,
+     "own_5y_average": null,
+     "sector_median": 22.3329,
+     "sector_peer_count": 109
+    },
+    "price_to_sales": {
+     "current": 43.043,
+     "own_5y_average": null,
+     "sector_median": 3.6009,
+     "sector_peer_count": 165
+    }
+   }
+  },
+  {
    "symbol": "NVAX",
    "name": "Novavax, Inc.",
    "price_local": 7.46999979019165,
@@ -7075,65 +7134,6 @@
     },
     "price_to_sales": {
      "current": 20.285,
-     "own_5y_average": null,
-     "sector_median": 3.6009,
-     "sector_peer_count": 165
-    }
-   }
-  },
-  {
-   "symbol": "MRNA",
-   "name": "Moderna, Inc.",
-   "price_local": 195.0,
-   "currency": "USD",
-   "gate": {
-    "status": "withheld_narrow_basis",
-    "max_deviation_pct": 50.0,
-    "max_width_factor": 1.5,
-    "observed_deviation_pct": null,
-    "observed_width_factor": null,
-    "checks": {
-     "sector_model_supported": true,
-     "basis_broad": false,
-     "width_within_limit": false,
-     "deviation_within_limit": false
-    },
-    "reason": "Für die direkte Bewertung fehlen mindestens zwei belastbare Fundamental-Referenzen."
-   },
-   "raw_fair_value_range": null,
-   "metrics": {
-    "pe": {
-     "current": null,
-     "own_5y_average": null,
-     "sector_median": 26.75,
-     "sector_peer_count": 113
-    },
-    "forward_pe": {
-     "current": -49.3706,
-     "own_5y_average": null,
-     "sector_median": 18.104,
-     "sector_peer_count": 139
-    },
-    "peg": {
-     "current": null,
-     "own_5y_average": null,
-     "sector_median": 1.574,
-     "sector_peer_count": 93
-    },
-    "ev_ebitda": {
-     "current": -46.426,
-     "own_5y_average": null,
-     "sector_median": 15.544,
-     "sector_peer_count": 131
-    },
-    "price_to_fcf": {
-     "current": null,
-     "own_5y_average": null,
-     "sector_median": 22.3329,
-     "sector_peer_count": 109
-    },
-    "price_to_sales": {
-     "current": 43.043,
      "own_5y_average": null,
      "sector_median": 3.6009,
      "sector_peer_count": 165
@@ -36630,7 +36630,7 @@
      },
      {
       "period_end": "2023-12-31",
-      "price": 8382.5488,
+      "price": 8382.5498,
       "book_value_per_share": 1965.9798,
       "price_to_book": 4.2638,
       "roe_pct": 20.0693,
@@ -36638,7 +36638,7 @@
      },
      {
       "period_end": "2024-12-31",
-      "price": 8870.624,
+      "price": 8870.623,
       "book_value_per_share": 2130.5254,
       "price_to_book": 4.1636,
       "roe_pct": 20.8788,
@@ -55173,7 +55173,7 @@
      },
      {
       "period_end": "2023-12-31",
-      "price": 126.1538,
+      "price": 126.1539,
       "book_value_per_share": 408.3213,
       "price_to_book": 0.309,
       "roe_pct": 14.9893,
@@ -60515,7 +60515,7 @@
     "annual_calculation": [
      {
       "period_end": "2024-12-31",
-      "price": 186.3652,
+      "price": 186.3653,
       "book_value_per_share": 73.3707,
       "price_to_book": 2.5401,
       "roe_pct": 23.4041,
@@ -60584,7 +60584,7 @@
      },
      {
       "period_end": "2023-12-31",
-      "price": 60.6741,
+      "price": 60.674,
       "book_value_per_share": 41.0702,
       "price_to_book": 1.4773,
       "roe_pct": 4.5977,
@@ -60814,7 +60814,7 @@
     "annual_calculation": [
      {
       "period_end": "2022-12-31",
-      "price": 181.7057,
+      "price": 181.7058,
       "book_value_per_share": 43.1505,
       "price_to_book": 4.211,
       "roe_pct": 12.1856,
@@ -60838,7 +60838,7 @@
      },
      {
       "period_end": "2025-12-31",
-      "price": 256.4601,
+      "price": 256.46,
       "book_value_per_share": 90.7432,
       "price_to_book": 2.8262,
       "roe_pct": 6.4062,
@@ -69839,9 +69839,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "issuer_history",
-      "reference_multiple": 15171.9049,
+      "reference_multiple": 15171.9046,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 38.427069
+      "implied_price": 38.427068
      },
      {
       "metric": "price_to_sales",
@@ -69885,7 +69885,7 @@
     },
     "price_to_sales": {
      "current": 13379.9282,
-     "own_5y_average": 15171.9049,
+     "own_5y_average": 15171.9046,
      "sector_median": 7.9804,
      "sector_peer_count": 71
     }
@@ -75430,7 +75430,7 @@
    },
    "raw_fair_value_range": {
     "lower": 5446.8294,
-    "upper": 5722.7727,
+    "upper": 5722.7728,
     "currency": "JPY",
     "method": "Direkte Fundamentalbewertung je Aktie aus Referenz-Multiples; der aktuelle Kurs wird nur anschließend verglichen",
     "input_count": 1,
@@ -86137,7 +86137,7 @@
      },
      {
       "period_end": "2023-12-31",
-      "price": 318.1856,
+      "price": 318.1855,
       "book_value_per_share": 31.8003,
       "price_to_book": 10.0057,
       "roe_pct": 26.8253,
@@ -86227,9 +86227,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "issuer_history",
-      "reference_multiple": 1570.0079,
+      "reference_multiple": 1570.0078,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 228.701364
+      "implied_price": 228.701349
      },
      {
       "metric": "price_to_sales",
@@ -86273,7 +86273,7 @@
     },
     "price_to_sales": {
      "current": 1993.3408,
-     "own_5y_average": 1570.0079,
+     "own_5y_average": 1570.0078,
      "sector_median": 7.9804,
      "sector_peer_count": 71
     }
@@ -89311,7 +89311,7 @@
     "annual_calculation": [
      {
       "period_end": "2022-12-31",
-      "price": 154.8603,
+      "price": 154.8602,
       "book_value_per_share": 21.2617,
       "price_to_book": 7.2835,
       "roe_pct": 28.9924,
@@ -91800,9 +91800,9 @@
      {
       "metric": "price_to_sales",
       "reference_type": "issuer_history",
-      "reference_multiple": 1747.3613,
+      "reference_multiple": 1747.3611,
       "fundamental_input": "Umsatz je Aktie",
-      "implied_price": 59.965539
+      "implied_price": 59.965533
      },
      {
       "metric": "price_to_sales",
@@ -91846,7 +91846,7 @@
     },
     "price_to_sales": {
      "current": 1152.4517,
-     "own_5y_average": 1747.3613,
+     "own_5y_average": 1747.3611,
      "sector_median": 7.9804,
      "sector_peer_count": 71
     }
@@ -92674,7 +92674,7 @@
      },
      {
       "period_end": "2023-12-31",
-      "price": 233.167,
+      "price": 233.1669,
       "book_value_per_share": 92.8436,
       "price_to_book": 2.5114,
       "roe_pct": 11.0819,
@@ -100332,9 +100332,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 14.6719,
+      "reference_multiple": 14.672,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 31.251147
+      "implied_price": 31.25136
      },
      {
       "metric": "pe",
@@ -100383,7 +100383,7 @@
    "metrics": {
     "pe": {
      "current": 5.8283,
-     "own_5y_average": 14.6719,
+     "own_5y_average": 14.672,
      "sector_median": 20.0519,
      "sector_peer_count": 151
     },
@@ -106817,9 +106817,9 @@
      {
       "metric": "price_to_fcf",
       "reference_type": "issuer_history",
-      "reference_multiple": 207.8751,
+      "reference_multiple": 207.875,
       "fundamental_input": "Free Cashflow je Aktie",
-      "implied_price": 2038.929584
+      "implied_price": 2038.928603
      },
      {
       "metric": "price_to_fcf",
@@ -106871,7 +106871,7 @@
     },
     "price_to_fcf": {
      "current": 6.6218,
-     "own_5y_average": 207.8751,
+     "own_5y_average": 207.875,
      "sector_median": 15.2945,
      "sector_peer_count": 128
     },
@@ -110081,7 +110081,7 @@
       "book_value_per_share": 68.8715,
       "price_to_book": 1.6596,
       "roe_pct": 1.4317,
-      "pb_to_roe": 115.9154
+      "pb_to_roe": 115.9155
      },
      {
       "period_end": "2024-12-31",
@@ -110537,9 +110537,9 @@
      {
       "metric": "pe",
       "reference_type": "issuer_history",
-      "reference_multiple": 398.7831,
+      "reference_multiple": 398.7832,
       "fundamental_input": "EPS je Aktie",
-      "implied_price": 370.868283
+      "implied_price": 370.868376
      },
      {
       "metric": "pe",
@@ -110581,7 +110581,7 @@
    "metrics": {
     "pe": {
      "current": 22.7219,
-     "own_5y_average": 398.7831,
+     "own_5y_average": 398.7832,
      "sector_median": 25.7657,
      "sector_peer_count": 242
     },
@@ -118006,7 +118006,7 @@
      },
      {
       "period_end": "2025-12-31",
-      "price": 18.9143,
+      "price": 18.9144,
       "book_value_per_share": 19.5729,
       "price_to_book": 0.9664,
       "roe_pct": 6.2175,
