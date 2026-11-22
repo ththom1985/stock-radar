@@ -95,7 +95,7 @@
  "_meta": {
   "schema": "stock-radar-earnings-tone-cache",
   "schema_version": 2,
-  "written_at": "2026-11-22T09:57:48+00:00",
+  "written_at": "2026-11-22T23:53:12+00:00",
   "refreshed": 3
  },
  "EIX": {
@@ -162,7 +162,7 @@
  },
  "FMX": {
   "_refresh_failure": {
-   "at": "2026-11-22T09:57:47+00:00",
+   "at": "2026-11-22T23:53:12+00:00",
    "error": "fewer than two free quarterly earnings texts"
   }
  },
@@ -5738,35 +5738,35 @@
   "last_success_at": "2026-09-26T13:59:49+00:00"
  },
  "COP": {
-  "score": 79.0,
-  "direction": "positive",
+  "score": 21.0,
+  "direction": "negative",
   "transcript_status": "prepared-only",
   "analysis_method": "free_financial_lexicon_v1",
-  "current_tone": 56,
-  "previous_tone": 20,
-  "tone_shift": 36,
-  "hedging_shift": 7,
+  "current_tone": 20,
+  "previous_tone": 56,
+  "tone_shift": -36,
+  "hedging_shift": -7,
   "qa_evasiveness_shift": null,
   "qa_status": "not_available",
   "cfo_tone_shift": null,
   "cfo_weight": null,
-  "reason": "Free lexicon: positive/negative 10/6 vs 0/18; Q&A/CFO unavailable.",
+  "reason": "Free lexicon: positive/negative 0/18 vs 10/6; Q&A/CFO unavailable.",
   "current_period": {
+   "period": "2026-11-05",
+   "filing_date": "2026-11-05",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1163165/000116316526000043/cop-20261105x8kexx992.htm"
+  },
+  "previous_period": {
    "period": "2026-08-06",
    "filing_date": "2026-08-11",
    "source": "SEC EDGAR 8-K exhibit",
    "source_url": "https://www.sec.gov/Archives/edgar/data/1163165/000110465926094062/tm2622739d1_ex99-1.htm"
   },
-  "previous_period": {
-   "period": "2026-08-06",
-   "filing_date": "2026-08-06",
-   "source": "SEC EDGAR 8-K exhibit",
-   "source_url": "https://www.sec.gov/Archives/edgar/data/1163165/000116316526000030/cop-20260806x8kexx992.htm"
-  },
   "source": "free earnings text + transparent financial lexicon",
   "expected_delay": "source publication time",
-  "fetched_at": "2026-09-26T21:17:22+00:00",
-  "last_success_at": "2026-09-26T21:17:22+00:00"
+  "fetched_at": "2026-11-22T23:53:12+00:00",
+  "last_success_at": "2026-11-22T23:53:12+00:00"
  },
  "ITT": {
   "score": 50.0,
@@ -11459,7 +11459,7 @@
  },
  "ICLR": {
   "_refresh_failure": {
-   "at": "2026-11-22T09:57:47+00:00",
+   "at": "2026-11-22T23:53:12+00:00",
    "error": "fewer than two free quarterly earnings texts"
   }
  },
