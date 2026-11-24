@@ -95,7 +95,7 @@
  "_meta": {
   "schema": "stock-radar-earnings-tone-cache",
   "schema_version": 2,
-  "written_at": "2026-11-24T04:14:44+00:00",
+  "written_at": "2026-11-24T07:05:39+00:00",
   "refreshed": 3
  },
  "EIX": {
@@ -162,7 +162,7 @@
  },
  "FMX": {
   "_refresh_failure": {
-   "at": "2026-11-23T10:57:31+00:00",
+   "at": "2026-11-24T07:05:39+00:00",
    "error": "fewer than two free quarterly earnings texts"
   }
  },
@@ -7345,8 +7345,8 @@
   },
   "source": "free earnings text + transparent financial lexicon",
   "expected_delay": "source publication time",
-  "fetched_at": "2026-10-09T03:04:51+00:00",
-  "last_success_at": "2026-10-09T03:04:51+00:00"
+  "fetched_at": "2026-11-24T07:05:39+00:00",
+  "last_success_at": "2026-11-24T07:05:39+00:00"
  },
  "VLTO": {
   "score": 62.0,
@@ -11557,10 +11557,35 @@
   "last_success_at": "2026-11-22T09:57:48+00:00"
  },
  "BBY": {
-  "_refresh_failure": {
-   "at": "2026-11-24T04:14:37+00:00",
-   "error": "HTTP Error 404: Not Found"
-  }
+  "score": 59.0,
+  "direction": "positive",
+  "transcript_status": "prepared-only",
+  "analysis_method": "free_financial_lexicon_v1",
+  "current_tone": 61,
+  "previous_tone": 54,
+  "tone_shift": 7,
+  "hedging_shift": -2,
+  "qa_evasiveness_shift": null,
+  "qa_status": "not_available",
+  "cfo_tone_shift": null,
+  "cfo_weight": null,
+  "reason": "Free lexicon: positive/negative 29/14 vs 4/2; Q&A/CFO unavailable.",
+  "current_period": {
+   "period": "2026-08-27",
+   "filing_date": "2026-08-27",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/764478/000076447826000037/bby-fy27q2xexx99.htm"
+  },
+  "previous_period": {
+   "period": "2026-06-19",
+   "filing_date": "2026-06-22",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/764478/000076447826000027/exhibit991newsrelease622.htm"
+  },
+  "source": "free earnings text + transparent financial lexicon",
+  "expected_delay": "source publication time",
+  "fetched_at": "2026-11-24T07:05:39+00:00",
+  "last_success_at": "2026-11-24T07:05:39+00:00"
  },
  "BTSG": {
   "score": 51.0,
