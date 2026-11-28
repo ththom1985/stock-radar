@@ -15,9 +15,9 @@
    "entry_price": 212.92667997422856,
    "cost_basis": 1043.3463596047802,
    "entry_bar_date": "2026-11-20",
-   "last_price": 217.7469064467029,
-   "high_watermark": 217.7469064467029,
-   "last_mark_bar_date": "2026-11-25",
+   "last_price": 217.95220516096649,
+   "high_watermark": 217.95220516096649,
+   "last_mark_bar_date": "2026-11-27",
    "last_action_bar_date": "2026-11-20",
    "processed_actions": {},
    "legacy": false,
@@ -62,7 +62,7 @@
      "Einstieg jetzt möglich."
     ]
    },
-   "last_base_fx_usd": 1.0962268114089966
+   "last_base_fx_usd": 1.0972130298614502
   },
   "PAYX": {
    "symbol": "PAYX",
@@ -71,9 +71,9 @@
    "entry_price": 102.4841765015723,
    "cost_basis": 1043.2420771100672,
    "entry_bar_date": "2026-11-23",
-   "last_price": 108.08894348376006,
+   "last_price": 107.66368429687238,
    "high_watermark": 108.08894348376006,
-   "last_mark_bar_date": "2026-11-25",
+   "last_mark_bar_date": "2026-11-27",
    "last_action_bar_date": "2026-11-23",
    "processed_actions": {},
    "legacy": false,
@@ -118,7 +118,7 @@
      "Einstieg jetzt möglich."
     ]
    },
-   "last_base_fx_usd": 1.0962268114089966
+   "last_base_fx_usd": 1.0972130298614502
   },
   "ZBH": {
    "symbol": "ZBH",
@@ -127,9 +127,9 @@
    "entry_price": 93.98869565601046,
    "cost_basis": 1043.2420771100672,
    "entry_bar_date": "2026-11-23",
-   "last_price": 100.39892877381097,
-   "high_watermark": 100.39892877381097,
-   "last_mark_bar_date": "2026-11-25",
+   "last_price": 100.64590676536191,
+   "high_watermark": 100.64590676536191,
+   "last_mark_bar_date": "2026-11-27",
    "last_action_bar_date": "2026-11-23",
    "processed_actions": {},
    "legacy": false,
@@ -174,7 +174,7 @@
      "Einstieg jetzt möglich."
     ]
    },
-   "last_base_fx_usd": 1.0962268114089966
+   "last_base_fx_usd": 1.0972130298614502
   },
   "ASB": {
    "symbol": "ASB",
@@ -183,9 +183,9 @@
    "entry_price": 26.81430390266401,
    "cost_basis": 1045.3493070161592,
    "entry_bar_date": "2026-11-24",
-   "last_price": 26.983466939370366,
-   "high_watermark": 26.998287830107984,
-   "last_mark_bar_date": "2026-11-25",
+   "last_price": 27.077694372827732,
+   "high_watermark": 27.077694372827732,
+   "last_mark_bar_date": "2026-11-27",
    "last_action_bar_date": "2026-11-24",
    "processed_actions": {},
    "legacy": false,
@@ -230,7 +230,7 @@
      "Einstieg jetzt möglich."
     ]
    },
-   "last_base_fx_usd": 1.0962268114089966
+   "last_base_fx_usd": 1.0972130298614502
   }
  },
  "pending_orders": [],
@@ -9284,37 +9284,43 @@
   },
   {
    "date": "2026-11-28",
-   "as_of_bar_date": null,
-   "valuation_status": "mixed_or_stale",
+   "as_of_bar_date": "2026-11-27",
+   "valuation_status": "aligned_completed_bar",
    "position_valuation_dates": {
-    "PGR": null,
-    "PAYX": null,
-    "ZBH": null,
-    "ASB": null
+    "PGR": "2026-11-27",
+    "PAYX": "2026-11-27",
+    "ZBH": "2026-11-27",
+    "ASB": "2026-11-27"
    },
-   "equity": 10595.992549585699,
+   "equity": 10599.082834105719,
    "cash": 6264.5590862430945,
-   "invested": 4331.433463342605,
+   "invested": 4334.523747862624,
    "n_positions": 4,
+   "bench_sp500": 6650.932896136392,
+   "bench_sp500_bar_date": "2026-11-27",
+   "bench_ndx": 24358.433501628082,
+   "bench_ndx_bar_date": "2026-11-27",
+   "bench_world": 180.1473353693847,
+   "bench_world_bar_date": "2026-11-27",
    "benchmark_status": {
     "sp500": {
-     "portfolio_bar_date": null,
+     "portfolio_bar_date": "2026-11-27",
      "benchmark_bar_date": "2026-11-27",
-     "aligned": false,
-     "currency": "USD",
+     "aligned": true,
+     "currency": "EUR",
      "comparison_status": "descriptive_only_not_comparable_total_return"
     },
     "ndx": {
-     "portfolio_bar_date": null,
+     "portfolio_bar_date": "2026-11-27",
      "benchmark_bar_date": "2026-11-27",
-     "aligned": false,
-     "currency": "USD",
+     "aligned": true,
+     "currency": "EUR",
      "comparison_status": "descriptive_only_not_comparable_total_return"
     },
     "world": {
-     "portfolio_bar_date": null,
-     "benchmark_bar_date": "2026-11-25",
-     "aligned": false,
+     "portfolio_bar_date": "2026-11-27",
+     "benchmark_bar_date": "2026-11-27",
+     "aligned": true,
      "currency": "EUR",
      "comparison_status": "descriptive_only_not_comparable_total_return"
     }
@@ -9346,7 +9352,7 @@
  "_meta": {
   "schema": "stock-radar-paper-portfolio",
   "schema_version": 2,
-  "written_at": "2026-11-28T01:41:14+00:00"
+  "written_at": "2026-11-28T06:22:22+00:00"
  },
  "legacy_archive": {
   "schema": "stock-radar-paper-portfolio",
