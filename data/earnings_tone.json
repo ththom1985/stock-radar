@@ -95,7 +95,7 @@
  "_meta": {
   "schema": "stock-radar-earnings-tone-cache",
   "schema_version": 2,
-  "written_at": "2026-11-27T11:02:13+00:00",
+  "written_at": "2026-11-28T01:40:39+00:00",
   "refreshed": 3
  },
  "EIX": {
@@ -2989,47 +2989,39 @@
   },
   "source": "free earnings text + transparent financial lexicon",
   "expected_delay": "source publication time",
-  "fetched_at": "2026-10-23T01:43:45+00:00",
-  "last_success_at": "2026-10-23T01:43:45+00:00",
-  "_refresh_failure": {
-   "at": "2026-11-27T11:01:53+00:00",
-   "error": "HTTP Error 504: Gateway Time-out"
-  }
+  "fetched_at": "2026-11-28T01:40:30+00:00",
+  "last_success_at": "2026-11-28T01:40:30+00:00"
  },
  "CNO": {
-  "score": 87.0,
-  "direction": "positive",
+  "score": 14.0,
+  "direction": "negative",
   "transcript_status": "prepared-only",
   "analysis_method": "free_financial_lexicon_v1",
-  "current_tone": 72,
-  "previous_tone": 31,
-  "tone_shift": 41,
-  "hedging_shift": 4,
+  "current_tone": 32,
+  "previous_tone": 72,
+  "tone_shift": -40,
+  "hedging_shift": -4,
   "qa_evasiveness_shift": null,
   "qa_status": "not_available",
   "cfo_tone_shift": null,
   "cfo_weight": null,
-  "reason": "Free lexicon: positive/negative 23/2 vs 0/27; Q&A/CFO unavailable.",
+  "reason": "Free lexicon: positive/negative 0/27 vs 23/2; Q&A/CFO unavailable.",
   "current_period": {
+   "period": "2026-10-29",
+   "filing_date": "2026-10-29",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/1224608/000162828026068264/exhibit992-09302026investo.htm"
+  },
+  "previous_period": {
    "period": "2026-09-01",
    "filing_date": "2026-09-01",
    "source": "SEC EDGAR 8-K exhibit",
    "source_url": "https://www.sec.gov/Archives/edgar/data/1224608/000122460826000071/september2026investorbri.htm"
   },
-  "previous_period": {
-   "period": "2026-07-30",
-   "filing_date": "2026-07-30",
-   "source": "SEC EDGAR 8-K exhibit",
-   "source_url": "https://www.sec.gov/Archives/edgar/data/1224608/000122460826000061/exhibit992-06302026investo.htm"
-  },
   "source": "free earnings text + transparent financial lexicon",
   "expected_delay": "source publication time",
-  "fetched_at": "2026-10-24T07:29:48+00:00",
-  "last_success_at": "2026-10-24T07:29:48+00:00",
-  "_refresh_failure": {
-   "at": "2026-11-27T11:02:03+00:00",
-   "error": "HTTP Error 504: Gateway Time-out"
-  }
+  "fetched_at": "2026-11-28T01:40:34+00:00",
+  "last_success_at": "2026-11-28T01:40:34+00:00"
  },
  "GEF": {
   "score": 40.0,
@@ -12090,5 +12082,36 @@
   "expected_delay": "source publication time",
   "fetched_at": "2026-11-27T11:02:13+00:00",
   "last_success_at": "2026-11-27T11:02:13+00:00"
+ },
+ "NDSN": {
+  "score": 59.0,
+  "direction": "positive",
+  "transcript_status": "prepared-only",
+  "analysis_method": "free_financial_lexicon_v1",
+  "current_tone": 96,
+  "previous_tone": 87,
+  "tone_shift": 9,
+  "hedging_shift": 0,
+  "qa_evasiveness_shift": null,
+  "qa_status": "not_available",
+  "cfo_tone_shift": null,
+  "cfo_weight": null,
+  "reason": "Free lexicon: positive/negative 52/10 vs 44/10; Q&A/CFO unavailable.",
+  "current_period": {
+   "period": "2026-08-19",
+   "filing_date": "2026-08-19",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/72331/000007233126000052/ndsn-q320268kxex991.htm"
+  },
+  "previous_period": {
+   "period": "2026-05-20",
+   "filing_date": "2026-05-20",
+   "source": "SEC EDGAR 8-K exhibit",
+   "source_url": "https://www.sec.gov/Archives/edgar/data/72331/000007233126000022/ndsn-q220268kxex991.htm"
+  },
+  "source": "free earnings text + transparent financial lexicon",
+  "expected_delay": "source publication time",
+  "fetched_at": "2026-11-28T01:40:39+00:00",
+  "last_success_at": "2026-11-28T01:40:39+00:00"
  }
 }
